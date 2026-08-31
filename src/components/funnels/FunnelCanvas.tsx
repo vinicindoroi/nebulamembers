@@ -27,6 +27,8 @@ import { FunnelNodeConfigSheet } from './FunnelNodeConfigSheet';
 import { FunnelFloatingToolbar, InteractionMode } from './FunnelFloatingToolbar';
 import { FunnelEducationalContext } from './FunnelEducationalContext';
 import { FunnelTrackingDialog } from './FunnelTrackingDialog';
+import { FunnelLiveMenu } from './FunnelLiveMenu';
+
 import { FunnelAnalyticsPanel } from './FunnelAnalyticsPanel';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Eraser, Trash2, Paintbrush, Circle } from 'lucide-react';
@@ -261,6 +263,8 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     getConversionRates,
     getNodeLiveVisitors,
     getSourceStatsForNodeType,
+    refetch: refetchAnalytics,
+
   } = useFunnelAnalytics({
     funnelId: funnel.id,
     enabled: liveMode,
@@ -1491,6 +1495,21 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
           isSaving={isSaving}
           liveMode={liveMode}
           onLiveModeChange={setLiveMode}
+          liveMenu={
+            <FunnelLiveMenu
+              liveMode={liveMode}
+              onLiveModeChange={setLiveMode}
+              nodes={nodes}
+              funnelName={funnel.name}
+              trackingToken={trackingToken}
+              timeRange={analyticsTimeRange}
+              onTimeRangeChange={setAnalyticsTimeRange}
+              getNodeLiveVisitors={getNodeLiveVisitors}
+              onOpenTracking={() => setTrackingDialogOpen(true)}
+              onRefresh={() => { refetchAnalytics(); }}
+            />
+          }
+
           interactionMode={interactionMode}
           onInteractionModeChange={setInteractionMode}
           selectedNodesCount={selectedNodesCount}
