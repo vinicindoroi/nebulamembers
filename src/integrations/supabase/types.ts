@@ -1414,6 +1414,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_profiles: {
+        Args: never
+        Returns: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          instagram: string | null
+          last_seen_at: string | null
+          location: string | null
+          phone: string | null
+          plan: string | null
+          status: string
+          updated_at: string
+          xp: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
       generate_tracking_token: { Args: never; Returns: string }
       has_role: {

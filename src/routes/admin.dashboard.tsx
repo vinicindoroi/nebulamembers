@@ -30,9 +30,9 @@ function Page() {
         { data: lessonProgress },
         { data: courses },
       ] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
         db.from("transactions").select("amount,plan,created_at"),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString()),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString()),
         supabase.from("profiles").select("id,plan,created_at"),
         db.from("activity_logs").select("*").order("created_at", { ascending: false }).limit(8),
         db.from("lesson_progress").select("lesson_id,created_at,lessons(course_id,courses(id,title))"),
