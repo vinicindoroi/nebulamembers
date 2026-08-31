@@ -1411,7 +1411,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          instagram: string | null
+          last_seen_at: string | null
+          plan: string | null
+          status: string | null
+          xp: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          instagram?: string | null
+          last_seen_at?: string | null
+          plan?: string | null
+          status?: string | null
+          xp?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          instagram?: string | null
+          last_seen_at?: string | null
+          plan?: string | null
+          status?: string | null
+          xp?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
