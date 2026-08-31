@@ -261,6 +261,8 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     getConversionRates,
     getNodeLiveVisitors,
     getSourceStatsForNodeType,
+    refetch: refetchAnalytics,
+
   } = useFunnelAnalytics({
     funnelId: funnel.id,
     enabled: liveMode,
