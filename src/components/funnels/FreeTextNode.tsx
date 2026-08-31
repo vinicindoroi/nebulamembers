@@ -206,7 +206,7 @@ export function FreeTextNode({ data, selected, id }: FreeTextNodeProps) {
   const cycleLineHeight = useCallback(() => {
     const order: Array<'tight' | 'normal' | 'relaxed' | 'loose'> = ['tight', 'normal', 'relaxed', 'loose'];
     const idx = order.indexOf(lineHeight as any);
-    const next = order[(idx + 1) % order.length];
+    const next = order[(idx + 1) % order.length]!;
     updateStyle('lineHeight', next);
   }, [lineHeight, updateStyle]);
 

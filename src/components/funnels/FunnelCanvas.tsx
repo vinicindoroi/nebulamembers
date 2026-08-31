@@ -45,8 +45,8 @@ const SNAP_THRESHOLD = 10;
 
 export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: FunnelCanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance<Node, Edge> | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
