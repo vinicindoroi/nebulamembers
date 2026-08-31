@@ -10,33 +10,471 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as FormsRouteImport } from './routes/forms'
+import { Route as LandingRouteImport } from './routes/landing'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RespostasRouteImport } from './routes/respostas'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AppCommunityRouteImport } from './routes/_app.community'
+import { Route as AppCoursesRouteImport } from './routes/_app.courses'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppForumRouteImport } from './routes/_app.forum'
+import { Route as AppFunnelsRouteImport } from './routes/_app.funnels'
+import { Route as AppNotesRouteImport } from './routes/_app.notes'
+import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppSavedRouteImport } from './routes/_app.saved'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppTranscriptRouteImport } from './routes/_app.transcript'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminCommentsRouteImport } from './routes/admin.comments'
+import { Route as AdminCommunityRouteImport } from './routes/admin.community'
+import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
+import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminFormsRouteImport } from './routes/admin.forms'
+import { Route as AdminFunnelsRouteImport } from './routes/admin.funnels'
+import { Route as AdminLogsRouteImport } from './routes/admin.logs'
+import { Route as AdminMembersRouteImport } from './routes/admin.members'
+import { Route as AdminModulesRouteImport } from './routes/admin.modules'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminOffersRouteImport } from './routes/admin.offers'
+import { Route as AdminPlansRouteImport } from './routes/admin.plans'
+import { Route as AdminPlayerRouteImport } from './routes/admin.player'
+import { Route as AdminSalesRouteImport } from './routes/admin.sales'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FormsRoute = FormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandingRoute = LandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RespostasRoute = RespostasRouteImport.update({
+  id: '/respostas',
+  path: '/respostas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppCommunityRoute = AppCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCoursesRoute = AppCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppForumRoute = AppForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFunnelsRoute = AppFunnelsRouteImport.update({
+  id: '/funnels',
+  path: '/funnels',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotesRoute = AppNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOrganizerRoute = AppOrganizerRouteImport.update({
+  id: '/organizer',
+  path: '/organizer',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSavedRoute = AppSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTranscriptRoute = AppTranscriptRouteImport.update({
+  id: '/transcript',
+  path: '/transcript',
+  getParentRoute: () => AppRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommentsRoute = AdminCommentsRouteImport.update({
+  id: '/comments',
+  path: '/comments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommunityRoute = AdminCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCouponsRoute = AdminCouponsRouteImport.update({
+  id: '/coupons',
+  path: '/coupons',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCoursesRoute = AdminCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFormsRoute = AdminFormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFunnelsRoute = AdminFunnelsRouteImport.update({
+  id: '/funnels',
+  path: '/funnels',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMembersRoute = AdminMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminModulesRoute = AdminModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOffersRoute = AdminOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlansRoute = AdminPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlayerRoute = AdminPlayerRouteImport.update({
+  id: '/player',
+  path: '/player',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSalesRoute = AdminSalesRouteImport.update({
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppCoursesCourseIdRoute = AppCoursesCourseIdRouteImport.update({
+  id: '/$courseId',
+  path: '/$courseId',
+  getParentRoute: () => AppCoursesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/forms': typeof FormsRoute
+  '/landing': typeof LandingRoute
+  '/login': typeof LoginRoute
+  '/respostas': typeof RespostasRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/community': typeof AppCommunityRoute
+  '/courses': typeof AppCoursesRouteWithChildren
+  '/dashboard': typeof AppDashboardRoute
+  '/forum': typeof AppForumRoute
+  '/funnels': typeof AppFunnelsRoute
+  '/notes': typeof AppNotesRoute
+  '/organizer': typeof AppOrganizerRoute
+  '/profile': typeof AppProfileRoute
+  '/saved': typeof AppSavedRoute
+  '/settings': typeof AppSettingsRoute
+  '/transcript': typeof AppTranscriptRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/comments': typeof AdminCommentsRoute
+  '/admin/community': typeof AdminCommunityRoute
+  '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/courses': typeof AdminCoursesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/forms': typeof AdminFormsRoute
+  '/admin/funnels': typeof AdminFunnelsRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/modules': typeof AdminModulesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/offers': typeof AdminOffersRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/player': typeof AdminPlayerRoute
+  '/admin/sales': typeof AdminSalesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/forms': typeof FormsRoute
+  '/landing': typeof LandingRoute
+  '/login': typeof LoginRoute
+  '/respostas': typeof RespostasRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/community': typeof AppCommunityRoute
+  '/courses': typeof AppCoursesRouteWithChildren
+  '/dashboard': typeof AppDashboardRoute
+  '/forum': typeof AppForumRoute
+  '/funnels': typeof AppFunnelsRoute
+  '/notes': typeof AppNotesRoute
+  '/organizer': typeof AppOrganizerRoute
+  '/profile': typeof AppProfileRoute
+  '/saved': typeof AppSavedRoute
+  '/settings': typeof AppSettingsRoute
+  '/transcript': typeof AppTranscriptRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/comments': typeof AdminCommentsRoute
+  '/admin/community': typeof AdminCommunityRoute
+  '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/courses': typeof AdminCoursesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/forms': typeof AdminFormsRoute
+  '/admin/funnels': typeof AdminFunnelsRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/modules': typeof AdminModulesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/offers': typeof AdminOffersRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/player': typeof AdminPlayerRoute
+  '/admin/sales': typeof AdminSalesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
+  '/forms': typeof FormsRoute
+  '/landing': typeof LandingRoute
+  '/login': typeof LoginRoute
+  '/respostas': typeof RespostasRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_app/community': typeof AppCommunityRoute
+  '/_app/courses': typeof AppCoursesRouteWithChildren
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/forum': typeof AppForumRoute
+  '/_app/funnels': typeof AppFunnelsRoute
+  '/_app/notes': typeof AppNotesRoute
+  '/_app/organizer': typeof AppOrganizerRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/saved': typeof AppSavedRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/transcript': typeof AppTranscriptRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/comments': typeof AdminCommentsRoute
+  '/admin/community': typeof AdminCommunityRoute
+  '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/courses': typeof AdminCoursesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/forms': typeof AdminFormsRoute
+  '/admin/funnels': typeof AdminFunnelsRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/members': typeof AdminMembersRoute
+  '/admin/modules': typeof AdminModulesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/offers': typeof AdminOffersRoute
+  '/admin/plans': typeof AdminPlansRoute
+  '/admin/player': typeof AdminPlayerRoute
+  '/admin/sales': typeof AdminSalesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/forms'
+    | '/landing'
+    | '/login'
+    | '/respostas'
+    | '/sitemap.xml'
+    | '/community'
+    | '/courses'
+    | '/dashboard'
+    | '/forum'
+    | '/funnels'
+    | '/notes'
+    | '/organizer'
+    | '/profile'
+    | '/saved'
+    | '/settings'
+    | '/transcript'
+    | '/admin/categories'
+    | '/admin/comments'
+    | '/admin/community'
+    | '/admin/coupons'
+    | '/admin/courses'
+    | '/admin/dashboard'
+    | '/admin/forms'
+    | '/admin/funnels'
+    | '/admin/logs'
+    | '/admin/members'
+    | '/admin/modules'
+    | '/admin/notifications'
+    | '/admin/offers'
+    | '/admin/plans'
+    | '/admin/player'
+    | '/admin/sales'
+    | '/admin/settings'
+    | '/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/forms'
+    | '/landing'
+    | '/login'
+    | '/respostas'
+    | '/sitemap.xml'
+    | '/community'
+    | '/courses'
+    | '/dashboard'
+    | '/forum'
+    | '/funnels'
+    | '/notes'
+    | '/organizer'
+    | '/profile'
+    | '/saved'
+    | '/settings'
+    | '/transcript'
+    | '/admin/categories'
+    | '/admin/comments'
+    | '/admin/community'
+    | '/admin/coupons'
+    | '/admin/courses'
+    | '/admin/dashboard'
+    | '/admin/forms'
+    | '/admin/funnels'
+    | '/admin/logs'
+    | '/admin/members'
+    | '/admin/modules'
+    | '/admin/notifications'
+    | '/admin/offers'
+    | '/admin/plans'
+    | '/admin/player'
+    | '/admin/sales'
+    | '/admin/settings'
+    | '/courses/$courseId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/admin'
+    | '/forms'
+    | '/landing'
+    | '/login'
+    | '/respostas'
+    | '/sitemap.xml'
+    | '/_app/community'
+    | '/_app/courses'
+    | '/_app/dashboard'
+    | '/_app/forum'
+    | '/_app/funnels'
+    | '/_app/notes'
+    | '/_app/organizer'
+    | '/_app/profile'
+    | '/_app/saved'
+    | '/_app/settings'
+    | '/_app/transcript'
+    | '/admin/categories'
+    | '/admin/comments'
+    | '/admin/community'
+    | '/admin/coupons'
+    | '/admin/courses'
+    | '/admin/dashboard'
+    | '/admin/forms'
+    | '/admin/funnels'
+    | '/admin/logs'
+    | '/admin/members'
+    | '/admin/modules'
+    | '/admin/notifications'
+    | '/admin/offers'
+    | '/admin/plans'
+    | '/admin/player'
+    | '/admin/sales'
+    | '/admin/settings'
+    | '/_app/courses/$courseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
+  FormsRoute: typeof FormsRoute
+  LandingRoute: typeof LandingRoute
+  LoginRoute: typeof LoginRoute
+  RespostasRoute: typeof RespostasRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +486,354 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forms': {
+      id: '/forms'
+      path: '/forms'
+      fullPath: '/forms'
+      preLoaderRoute: typeof FormsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landing': {
+      id: '/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof LandingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/respostas': {
+      id: '/respostas'
+      path: '/respostas'
+      fullPath: '/respostas'
+      preLoaderRoute: typeof RespostasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/community': {
+      id: '/_app/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof AppCommunityRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/courses': {
+      id: '/_app/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof AppCoursesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/forum': {
+      id: '/_app/forum'
+      path: '/forum'
+      fullPath: '/forum'
+      preLoaderRoute: typeof AppForumRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/funnels': {
+      id: '/_app/funnels'
+      path: '/funnels'
+      fullPath: '/funnels'
+      preLoaderRoute: typeof AppFunnelsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notes': {
+      id: '/_app/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof AppNotesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/organizer': {
+      id: '/_app/organizer'
+      path: '/organizer'
+      fullPath: '/organizer'
+      preLoaderRoute: typeof AppOrganizerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/saved': {
+      id: '/_app/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AppSavedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/transcript': {
+      id: '/_app/transcript'
+      path: '/transcript'
+      fullPath: '/transcript'
+      preLoaderRoute: typeof AppTranscriptRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/comments': {
+      id: '/admin/comments'
+      path: '/comments'
+      fullPath: '/admin/comments'
+      preLoaderRoute: typeof AdminCommentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/community': {
+      id: '/admin/community'
+      path: '/community'
+      fullPath: '/admin/community'
+      preLoaderRoute: typeof AdminCommunityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/coupons': {
+      id: '/admin/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AdminCouponsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/courses': {
+      id: '/admin/courses'
+      path: '/courses'
+      fullPath: '/admin/courses'
+      preLoaderRoute: typeof AdminCoursesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/forms': {
+      id: '/admin/forms'
+      path: '/forms'
+      fullPath: '/admin/forms'
+      preLoaderRoute: typeof AdminFormsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/funnels': {
+      id: '/admin/funnels'
+      path: '/funnels'
+      fullPath: '/admin/funnels'
+      preLoaderRoute: typeof AdminFunnelsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/modules': {
+      id: '/admin/modules'
+      path: '/modules'
+      fullPath: '/admin/modules'
+      preLoaderRoute: typeof AdminModulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/offers': {
+      id: '/admin/offers'
+      path: '/offers'
+      fullPath: '/admin/offers'
+      preLoaderRoute: typeof AdminOffersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/plans': {
+      id: '/admin/plans'
+      path: '/plans'
+      fullPath: '/admin/plans'
+      preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/player': {
+      id: '/admin/player'
+      path: '/player'
+      fullPath: '/admin/player'
+      preLoaderRoute: typeof AdminPlayerRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/sales': {
+      id: '/admin/sales'
+      path: '/sales'
+      fullPath: '/admin/sales'
+      preLoaderRoute: typeof AdminSalesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_app/courses/$courseId': {
+      id: '/_app/courses/$courseId'
+      path: '/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof AppCoursesCourseIdRouteImport
+      parentRoute: typeof AppCoursesRoute
+    }
   }
 }
 
+interface AppCoursesRouteChildren {
+  AppCoursesCourseIdRoute: typeof AppCoursesCourseIdRoute
+}
+
+const AppCoursesRouteChildren: AppCoursesRouteChildren = {
+  AppCoursesCourseIdRoute: AppCoursesCourseIdRoute,
+}
+
+const AppCoursesRouteWithChildren = AppCoursesRoute._addFileChildren(
+  AppCoursesRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppCommunityRoute: typeof AppCommunityRoute
+  AppCoursesRoute: typeof AppCoursesRouteWithChildren
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppForumRoute: typeof AppForumRoute
+  AppFunnelsRoute: typeof AppFunnelsRoute
+  AppNotesRoute: typeof AppNotesRoute
+  AppOrganizerRoute: typeof AppOrganizerRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppSavedRoute: typeof AppSavedRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppTranscriptRoute: typeof AppTranscriptRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCommunityRoute: AppCommunityRoute,
+  AppCoursesRoute: AppCoursesRouteWithChildren,
+  AppDashboardRoute: AppDashboardRoute,
+  AppForumRoute: AppForumRoute,
+  AppFunnelsRoute: AppFunnelsRoute,
+  AppNotesRoute: AppNotesRoute,
+  AppOrganizerRoute: AppOrganizerRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppSavedRoute: AppSavedRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppTranscriptRoute: AppTranscriptRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface AdminRouteChildren {
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminCommentsRoute: typeof AdminCommentsRoute
+  AdminCommunityRoute: typeof AdminCommunityRoute
+  AdminCouponsRoute: typeof AdminCouponsRoute
+  AdminCoursesRoute: typeof AdminCoursesRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminFormsRoute: typeof AdminFormsRoute
+  AdminFunnelsRoute: typeof AdminFunnelsRoute
+  AdminLogsRoute: typeof AdminLogsRoute
+  AdminMembersRoute: typeof AdminMembersRoute
+  AdminModulesRoute: typeof AdminModulesRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminOffersRoute: typeof AdminOffersRoute
+  AdminPlansRoute: typeof AdminPlansRoute
+  AdminPlayerRoute: typeof AdminPlayerRoute
+  AdminSalesRoute: typeof AdminSalesRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminCommentsRoute: AdminCommentsRoute,
+  AdminCommunityRoute: AdminCommunityRoute,
+  AdminCouponsRoute: AdminCouponsRoute,
+  AdminCoursesRoute: AdminCoursesRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminFormsRoute: AdminFormsRoute,
+  AdminFunnelsRoute: AdminFunnelsRoute,
+  AdminLogsRoute: AdminLogsRoute,
+  AdminMembersRoute: AdminMembersRoute,
+  AdminModulesRoute: AdminModulesRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminOffersRoute: AdminOffersRoute,
+  AdminPlansRoute: AdminPlansRoute,
+  AdminPlayerRoute: AdminPlayerRoute,
+  AdminSalesRoute: AdminSalesRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
+  FormsRoute: FormsRoute,
+  LandingRoute: LandingRoute,
+  LoginRoute: LoginRoute,
+  RespostasRoute: RespostasRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
