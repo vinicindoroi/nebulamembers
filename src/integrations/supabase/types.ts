@@ -17,6 +17,7 @@ export type Database = {
       activity_logs: {
         Row: {
           action: string
+          actor_id: string | null
           created_at: string
           id: string
           ip: string | null
@@ -26,6 +27,7 @@ export type Database = {
         }
         Insert: {
           action: string
+          actor_id?: string | null
           created_at?: string
           id?: string
           ip?: string | null
@@ -35,12 +37,31 @@ export type Database = {
         }
         Update: {
           action?: string
+          actor_id?: string | null
           created_at?: string
           id?: string
           ip?: string | null
           metadata?: Json | null
           target?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
@@ -74,6 +95,7 @@ export type Database = {
       comments: {
         Row: {
           content: string
+          course_id: string | null
           created_at: string
           id: string
           image_url: string | null
@@ -84,6 +106,7 @@ export type Database = {
         }
         Insert: {
           content: string
+          course_id?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -94,6 +117,7 @@ export type Database = {
         }
         Update: {
           content?: string
+          course_id?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -103,6 +127,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "comments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "comments_lesson_id_fkey"
             columns: ["lesson_id"]
@@ -606,6 +637,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      generations: {
+        Row: {
+          created_at: string
+          credits_used: number
+          id: string
+          model_id: string | null
+          payload: Json | null
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_used?: number
+          id?: string
+          model_id?: string | null
+          payload?: Json | null
+          status?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_used?: number
+          id?: string
+          model_id?: string | null
+          payload?: Json | null
+          status?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       global_settings: {
         Row: {
@@ -1217,6 +1281,30 @@ export type Database = {
           plan?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_posts: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          post_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          post_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          post_type?: string
+          user_id?: string
         }
         Relationships: []
       }
