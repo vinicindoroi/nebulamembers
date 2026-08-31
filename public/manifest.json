@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/nebula_logo.png",
+      "src": "/nebula_logo.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

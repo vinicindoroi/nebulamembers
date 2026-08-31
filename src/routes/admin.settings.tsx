@@ -19,7 +19,7 @@ type SettingsShape = {
 };
 
 const DEFAULTS: SettingsShape = {
-  general: { name: "Membros", logoUrl: "/nebula_logo.png", primaryColor: "#8b5cf6", restrictToLeads: false },
+  general: { name: "Membros", logoUrl: "/nebula_logo.png?v=2", primaryColor: "#8b5cf6", restrictToLeads: false },
   payments: { gateway: "stripe", publicKey: "" },
   email: { smtpHost: "", sender: "" },
   integrations: { apiKey: "", webhookUrl: "" },

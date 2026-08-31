@@ -104,7 +104,7 @@ function LoginPage() {
       <div className="w-full max-w-md animate-fade-up">
         <div className="glass-strong rounded-2xl p-8 md:p-10">
           <div className="flex flex-col items-center text-center mb-6">
-            <img src="/nebula_logo.png" alt="Nebula Members" className="h-16 w-16 rounded-2xl glow mb-4" />
+            <img src="/nebula_logo.png?v=2" alt="Nebula Members" className="h-16 w-16 rounded-2xl glow mb-4" />
             <h1 className="text-2xl font-semibold">
               {mode === "signin" ? "Bem-vindo de volta" : "Crie sua conta"}
             </h1>
