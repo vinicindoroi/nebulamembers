@@ -209,7 +209,7 @@ export function MindMapNode({ id, data, selected }: NodeProps<Node<MindMapNodeDa
         data.fontStyle === 'italic' ? 'italic' : ''
       )}
       style={{
-        backgroundColor: bgColor,
+        backgroundColor: bgColor as any,
         borderColor: isFloating ? 'transparent' : (selected ? 'oklch(0.65 0.22 290)' : borderStyle === 'none' ? 'transparent' : `${bgColor}88`),
         borderStyle: isFloating ? 'none' : (borderStyle === 'none' ? 'solid' : borderStyle),
         fontSize,

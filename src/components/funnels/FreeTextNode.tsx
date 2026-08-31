@@ -199,7 +199,7 @@ export function FreeTextNode({ data, selected, id }: FreeTextNodeProps) {
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteElements({ nodes: [{ id }] });
+    deleteElements({ nodes: [{ id: id! }] });
   };
 
   // Cycle line height

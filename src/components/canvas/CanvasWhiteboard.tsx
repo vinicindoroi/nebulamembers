@@ -80,7 +80,7 @@ export function CanvasWhiteboard({
   useEffect(() => {
     const selectedSticky = nodes.find(n => n.selected && n.type === 'sticky');
     if (selectedSticky && selectedSticky.data?.backgroundColor && selectedSticky.data.backgroundColor !== stickyColor) {
-      setStickyColor(selectedSticky.data.backgroundColor);
+      setStickyColor(selectedSticky.data.backgroundColor as string);
     }
   }, [nodes, stickyColor]);
 

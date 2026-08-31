@@ -547,7 +547,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
     return `https://wa.me/${formattedPhone}`;
   };
 
-  const waLink = formatWhatsAppLink(member.phone);
+  const waLink = formatWhatsAppLink(member.phone ?? null);
 
   return (
     <Modal

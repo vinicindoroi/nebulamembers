@@ -1420,9 +1420,9 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
         onConnect={onConnect}
         onSelectionChange={onSelectionChange}
         onNodeClick={onNodeClick}
-        onNodeDragStart={onNodeDragStart}
-        onNodeDrag={onNodeDrag}
-        onNodeDragStop={onNodeDragStop}
+        onNodeDragStart={onNodeDragStart as any}
+        onNodeDrag={onNodeDrag as any}
+        onNodeDragStop={onNodeDragStop as any}
         onMoveEnd={onMoveEnd}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={getDefaultEdgeOptions(theme)}

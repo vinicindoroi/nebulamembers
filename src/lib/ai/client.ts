@@ -253,7 +253,7 @@ export const geminiClient = {
         body: JSON.stringify({
           contents: [
             {
-              parts: parts.filter(p => p.text || (p as any).inlineData),
+              parts: parts.filter((p: any) => p.text || p.inlineData),
             },
           ],
           generationConfig: {

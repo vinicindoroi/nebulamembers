@@ -88,7 +88,7 @@ export function AppShell() {
           .eq("key", "plans_config")
           .maybeSingle();
 
-        const plans = settings?.value as any[];
+        const plans = (settings as any)?.value as any[];
         
         let foundFeatures = null;
         if (plans && Array.isArray(plans)) {

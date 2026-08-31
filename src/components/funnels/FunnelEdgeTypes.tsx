@@ -90,8 +90,8 @@ function FunnelEdge({
     try {
       if (isSmartRouting && sourceNode && targetNode && sourceNode.measured && targetNode.measured) {
         // Use internal absolute position if available, otherwise fallback to relative
-        const sPos = sourceNode.internals?.positionAbsolute || sourceNode.position;
-        const tPos = targetNode.internals?.positionAbsolute || targetNode.position;
+        const sPos = (sourceNode as any).internals?.positionAbsolute || sourceNode.position;
+        const tPos = (targetNode as any).internals?.positionAbsolute || targetNode.position;
         
         if (sPos && tPos) {
           const sWidth = sourceNode.measured.width || 100;

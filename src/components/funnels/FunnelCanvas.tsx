@@ -1644,9 +1644,9 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               onReconnectStart={onReconnectStart}
               onReconnect={isRestrictedMode ? undefined : onReconnect}
               onReconnectEnd={onReconnectEnd}
-              onNodeDragStart={onNodeDragStart}
-              onNodeDrag={onNodeDrag}
-              onNodeDragStop={onNodeDragStop}
+              onNodeDragStart={onNodeDragStart as any}
+              onNodeDrag={onNodeDrag as any}
+              onNodeDragStop={onNodeDragStop as any}
               onMove={onViewportMove}
               onMoveEnd={onMoveEnd}
               onInit={(instance) => setReactFlowInstance(instance as ReactFlowInstance<Node, Edge>)}

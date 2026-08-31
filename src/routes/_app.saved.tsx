@@ -69,9 +69,9 @@ function SavedPage() {
           post_id: s.post_id,
           post_type: s.post_type,
           created_at: s.created_at,
-          post: raw ? { ...raw, author: profs.get(raw.user_id) ?? null } : null,
+          post: raw ? { ...(raw as any), author: profs.get((raw as any).user_id) ?? null } : null,
         };
-      }).filter((s) => s.post !== null);
+      }).filter((s) => s.post !== null) as SavedItem[];
     },
   });
 

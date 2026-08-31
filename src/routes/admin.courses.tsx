@@ -219,7 +219,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
             </div>
 
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-              <Field label="Acesso" icon={Crown} hint="Plano mínimo para acessar este curso">
+              <Field label="Acesso" icon={Crown}>
                 <select value={f.access_level} onChange={(e) => { const v = e.target.value; setF({ ...f, access_level: v, is_premium: v !== "free" }); }} className="modal-inp">
                   <option value="free">Free — Todos os membros</option>
                   <option value="pro">Pro</option>

@@ -186,7 +186,7 @@ export function useFunnels() {
 
       const { data: funnel, error } = await supabase
         .from('funnels')
-        .update(updateData)
+        .update(updateData as any)
         .eq('id', data.id)
         .select()
         .maybeSingle();

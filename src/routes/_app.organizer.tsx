@@ -1888,7 +1888,7 @@ function OrganizerPage() {
             {columns.map((col) => {
               const colTasks = tasks.filter((t) => t.column === col.id);
  
-              const colColors = {
+              const colColorMap: Record<string, { border: string; activeBorder: string; bar: string; dot: string }> = {
                 red: { border: "border-red-500/20 bg-red-500/[0.005]", activeBorder: "border-red-500/40 bg-red-500/[0.02] shadow-[0_0_20px_rgba(239,68,68,0.15)]", bar: "bg-red-500", dot: "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" },
                 amber: { border: "border-amber-500/20 bg-amber-500/[0.005]", activeBorder: "border-amber-500/40 bg-amber-500/[0.02] shadow-[0_0_20px_rgba(245,158,11,0.15)]", bar: "bg-amber-500", dot: "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" },
                 emerald: { border: "border-emerald-500/20 bg-emerald-500/[0.005]", activeBorder: "border-emerald-500/40 bg-emerald-500/[0.02] shadow-[0_0_20px_rgba(16,185,129,0.15)]", bar: "bg-emerald-500", dot: "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" },
@@ -1896,7 +1896,8 @@ function OrganizerPage() {
                 purple: { border: "border-primary/20 bg-primary/[0.005]", activeBorder: "border-primary/40 bg-primary/[0.02] shadow-[0_0_20px_rgba(139,92,246,0.15)]", bar: "bg-primary", dot: "bg-primary shadow-[0_0_8px_rgba(139,92,246,0.5)]" },
                 pink: { border: "border-pink-500/20 bg-pink-500/[0.005]", activeBorder: "border-pink-500/40 bg-pink-500/[0.02] shadow-[0_0_20px_rgba(236,72,153,0.15)]", bar: "bg-pink-500", dot: "bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.5)]" },
                 cyan: { border: "border-cyan-500/20 bg-cyan-500/[0.005]", activeBorder: "border-cyan-500/40 bg-cyan-500/[0.02] shadow-[0_0_20px_rgba(6,182,212,0.15)]", bar: "bg-cyan-500", dot: "bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]" }
-              }[col.color] || colColors.purple;
+              };
+              const colColors = colColorMap[col.color] || colColorMap['purple']!;
  
               return (
                 <div 
@@ -2774,7 +2775,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
       onClick={() => onEdit(task)}
       className="group glass rounded-xl p-3.5 border border-white/[0.04] hover:border-white/10 bg-gradient-to-br from-white/[0.015] to-transparent hover:from-white/[0.03] active:scale-[0.985] cursor-pointer hover:shadow-lg hover:shadow-black/20 transition-all duration-300 relative flex flex-col justify-between"
     >
-      <div className="absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full opacity-60" className={`absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full opacity-60 ${colDot}`} />
+      <div className={`absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full opacity-60 ${colDot}`} />
       
       <div className="pl-2 w-full">
         {/* Header Badges */}

@@ -1521,7 +1521,7 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
                     </div>
                     {isMine && (
                       <button
-                        onClick={() => { confirm({ title: "Apagar comentário?", confirmLabel: "Apagar" }).then((ok) => { if (ok) deleteComment.mutate(c.id); }); }}
+                        onClick={() => { if (window.confirm("Apagar comentário?")) deleteComment.mutate(c.id); }}
                         className="opacity-0 group-hover/balloon:opacity-100 text-muted-foreground hover:text-red-400 p-0.5 rounded transition-all duration-200"
                         title="Apagar comentário"
                       >
