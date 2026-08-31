@@ -9,7 +9,7 @@ export const getMentionSuggestions = () => {
       // Fetch users from profiles table matching the query
       let dbQuery = supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, email')
+        .select('id, full_name, avatar_url')
         .limit(10);
       
       if (query) {
