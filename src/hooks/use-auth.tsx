@@ -16,13 +16,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const ensureProfile = async (s: Session | null) => {
+      const u = s?.user;
+      if (!u) return;
+      try {
+        const { data: existing } = await supabase.from("profiles").select("id").eq("id", u.id).maybeSingle();
+        if (!existing) {
+          await supabase.from("profiles").insert({
+            id: u.id,
+            email: u.email ?? null,
+            full_name:
+              (u.user_metadata?.["full_name"] as string) ??
+              (u.user_metadata?.["name"] as string) ??
+              (u.email ? u.email.split("@")[0] : null),
+            avatar_url: (u.user_metadata?.["avatar_url"] as string) ?? null,
+          });
+        }
+        await supabase.from("user_roles").insert({ user_id: u.id, role: "member" });
+      } catch {
+        /* já existe ou sem permissão — ignorar */
+      }
+    };
+
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       setLoading(false);
+      if (s) setTimeout(() => void ensureProfile(s), 0);
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
+      if (data.session) void ensureProfile(data.session);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
