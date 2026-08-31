@@ -78,7 +78,7 @@ function SettingsPage() {
           if (permission === "granted") {
             new Notification("Nebula Member Hub 🚀", {
               body: "Notificações push ativadas com sucesso! Você receberá atualizações importantes aqui.",
-              icon: "/nebula_logo.png"
+              icon: "/nebula_logo.png?v=2"
             });
             toast.success("Notificações Push ativadas com sucesso!");
           } else if (permission === "denied") {

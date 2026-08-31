@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/nebula_logo.png" },
+      { rel: "apple-touch-icon", href: "/nebula_logo.png?v=2" },
     ],
   }),
   shellComponent: RootShell,
@@ -147,7 +147,7 @@ function RootComponent() {
           if (enabled && "Notification" in window && Notification.permission === "granted") {
             new Notification(title, {
               body,
-              icon: "/nebula_logo.png"
+              icon: "/nebula_logo.png?v=2"
             });
           }
         } catch (_) {}
