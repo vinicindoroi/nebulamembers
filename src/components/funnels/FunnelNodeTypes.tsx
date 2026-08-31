@@ -139,6 +139,15 @@ import boltIcon from '@/assets/ai-icons/bolt.png';
 import cursorIcon from '@/assets/ai-icons/cursor.png';
 import perplexityIcon from '@/assets/ai-icons/perplexity.png';
 import deepseekIcon from '@/assets/ai-icons/deepseek.png';
+import flowIcon from '@/assets/ai-icons/flow.png';
+import soraIcon from '@/assets/ai-icons/sora.png';
+import midjourneyIcon from '@/assets/ai-icons/midjourney.png';
+import runwayIcon from '@/assets/ai-icons/runway.png';
+import elevenlabsIcon from '@/assets/ai-icons/elevenlabs.png';
+import sunoIcon from '@/assets/ai-icons/suno.png';
+import copilotIcon from '@/assets/ai-icons/copilot.png';
+import v0Icon from '@/assets/ai-icons/v0.png';
+import notebooklmIcon from '@/assets/ai-icons/notebooklm.png';
 
 // AI tool options for the config panel
 export const aiToolOptions = [
@@ -151,6 +160,15 @@ export const aiToolOptions = [
   { value: 'cursor', label: 'Cursor', image: cursorIcon, color: '#FFFFFF' },
   { value: 'perplexity', label: 'Perplexity', image: perplexityIcon, color: '#FFFFFF' },
   { value: 'deepseek', label: 'DeepSeek', image: deepseekIcon, color: '#FFFFFF' },
+  { value: 'flow', label: 'Google Flow', image: flowIcon, color: '#FFFFFF' },
+  { value: 'sora', label: 'Sora', image: soraIcon, color: '#FFFFFF' },
+  { value: 'midjourney', label: 'Midjourney', image: midjourneyIcon, color: '#FFFFFF' },
+  { value: 'runway', label: 'Runway', image: runwayIcon, color: '#FFFFFF' },
+  { value: 'elevenlabs', label: 'ElevenLabs', image: elevenlabsIcon, color: '#FFFFFF' },
+  { value: 'suno', label: 'Suno', image: sunoIcon, color: '#FFFFFF' },
+  { value: 'copilot', label: 'Copilot', image: copilotIcon, color: '#FFFFFF' },
+  { value: 'v0', label: 'v0', image: v0Icon, color: '#FFFFFF' },
+  { value: 'notebooklm', label: 'NotebookLM', image: notebooklmIcon, color: '#FFFFFF' },
 ];
 
 // AI tool image map for quick lookup
@@ -164,20 +182,22 @@ export const aiToolImageMap: Record<string, string> = {
   cursor: cursorIcon,
   perplexity: perplexityIcon,
   deepseek: deepseekIcon,
+  flow: flowIcon,
+  sora: soraIcon,
+  midjourney: midjourneyIcon,
+  runway: runwayIcon,
+  elevenlabs: elevenlabsIcon,
+  suno: sunoIcon,
+  copilot: copilotIcon,
+  v0: v0Icon,
+  notebooklm: notebooklmIcon,
 };
 
 // AI tool color map
-export const aiToolColorMap: Record<string, string> = {
-  gpt: '#10A37F',
-  gemini: '#FFFFFF',
-  claude: '#FFFFFF',
-  grok: '#FFFFFF',
-  lovable: '#FFFFFF',
-  bolt: '#FFFFFF',
-  cursor: '#FFFFFF',
-  perplexity: '#FFFFFF',
-  deepseek: '#FFFFFF',
-};
+export const aiToolColorMap: Record<string, string> = Object.fromEntries(
+  aiToolOptions.map((t) => [t.value, t.color]),
+);
+
 
 // Node data interface
 export interface FunnelNodeData {
