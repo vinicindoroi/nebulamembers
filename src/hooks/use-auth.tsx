@@ -32,15 +32,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             avatar_url: (u.user_metadata?.["avatar_url"] as string) ?? null,
           });
         }
-        const { data: hasRole } = await supabase
+        await supabase
           .from("user_roles")
-          .select("id")
-          .eq("user_id", u.id)
-          .limit(1)
-          .maybeSingle();
-        if (!hasRole) {
-          await supabase.from("user_roles").insert({ user_id: u.id, role: "member" });
-        }
+          .upsert({ user_id: u.id, role: "member" }, { onConflict: "user_id,role", ignoreDuplicates: true });
       } catch {
         /* já existe ou sem permissão — ignorar */
       }
