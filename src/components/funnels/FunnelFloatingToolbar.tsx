@@ -32,7 +32,9 @@ interface FunnelFloatingToolbarProps {
   onAddStickyNote?: () => void;
   onAddFreeText?: () => void;
   onAddImage?: (base64: string, width: number, height: number) => void;
+  liveMenu?: React.ReactNode;
 }
+
 
 export function FunnelFloatingToolbar({
   onExport,
@@ -54,7 +56,9 @@ export function FunnelFloatingToolbar({
   onAddStickyNote,
   onAddFreeText,
   onAddImage,
+  liveMenu,
 }: FunnelFloatingToolbarProps) {
+
   const imageInputRef = useRef<HTMLInputElement>(null);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
