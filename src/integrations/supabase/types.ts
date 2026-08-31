@@ -190,33 +190,48 @@ export type Database = {
       }
       courses: {
         Row: {
+          access_level: string
           category_id: string | null
           cover_url: string | null
           created_at: string
           description: string | null
+          gradient_from: string | null
+          gradient_to: string | null
           id: string
+          is_premium: boolean
+          offer_id: string | null
           price: number | null
           status: string
           tag: string | null
           title: string
         }
         Insert: {
+          access_level?: string
           category_id?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          gradient_from?: string | null
+          gradient_to?: string | null
           id?: string
+          is_premium?: boolean
+          offer_id?: string | null
           price?: number | null
           status?: string
           tag?: string | null
           title: string
         }
         Update: {
+          access_level?: string
           category_id?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          gradient_from?: string | null
+          gradient_to?: string | null
           id?: string
+          is_premium?: boolean
+          offer_id?: string | null
           price?: number | null
           status?: string
           tag?: string | null
@@ -228,6 +243,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
             referencedColumns: ["id"]
           },
         ]
@@ -767,7 +789,9 @@ export type Database = {
           duration_min: number | null
           id: string
           is_free: boolean
+          is_premium: boolean
           module_id: string | null
+          offer_id: string | null
           position: number
           poster_url: string | null
           title: string
@@ -788,7 +812,9 @@ export type Database = {
           duration_min?: number | null
           id?: string
           is_free?: boolean
+          is_premium?: boolean
           module_id?: string | null
+          offer_id?: string | null
           position?: number
           poster_url?: string | null
           title: string
@@ -809,7 +835,9 @@ export type Database = {
           duration_min?: number | null
           id?: string
           is_free?: boolean
+          is_premium?: boolean
           module_id?: string | null
+          offer_id?: string | null
           position?: number
           poster_url?: string | null
           title?: string
@@ -831,6 +859,13 @@ export type Database = {
             referencedRelation: "modules"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lessons_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       modules: {
@@ -840,6 +875,8 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_premium: boolean
+          offer_id: string | null
           position: number
           title: string
         }
@@ -849,6 +886,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_premium?: boolean
+          offer_id?: string | null
           position?: number
           title: string
         }
@@ -858,6 +897,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_premium?: boolean
+          offer_id?: string | null
           position?: number
           title?: string
         }
@@ -867,6 +908,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "modules_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
             referencedColumns: ["id"]
           },
         ]
@@ -904,6 +952,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          recipient_id: string | null
           scheduled_at: string | null
           sent_at: string | null
           title: string
@@ -914,6 +963,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          recipient_id?: string | null
           scheduled_at?: string | null
           sent_at?: string | null
           title: string
@@ -924,9 +974,43 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          recipient_id?: string | null
           scheduled_at?: string | null
           sent_at?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      offers: {
+        Row: {
+          active: boolean
+          badge_text: string | null
+          checkout_url: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          price: number
+        }
+        Insert: {
+          active?: boolean
+          badge_text?: string | null
+          checkout_url?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          price?: number
+        }
+        Update: {
+          active?: boolean
+          badge_text?: string | null
+          checkout_url?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price?: number
         }
         Relationships: []
       }
