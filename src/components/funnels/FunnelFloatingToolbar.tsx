@@ -338,24 +338,27 @@ export function FunnelFloatingToolbar({
         </>
       )}
 
-      {/* Live Mode Toggle */}
-      <button
-        onClick={() => onLiveModeChange(!liveMode)}
-        className={cn(
-          'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
-          liveMode
-            ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
-            : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent'
-        )}
-      >
-        <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
-        <span className="font-medium">Live</span>
-        <Switch
-          checked={liveMode}
-          onCheckedChange={onLiveModeChange}
-          className="scale-75 -mr-1 pointer-events-none"
-        />
-      </button>
+      {/* Live Mode Menu */}
+      {liveMenu ?? (
+        <button
+          onClick={() => onLiveModeChange(!liveMode)}
+          className={cn(
+            'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
+            liveMode
+              ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+              : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent'
+          )}
+        >
+          <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
+          <span className="font-medium">Live</span>
+          <Switch
+            checked={liveMode}
+            onCheckedChange={onLiveModeChange}
+            className="scale-75 -mr-1 pointer-events-none"
+          />
+        </button>
+      )}
+
     </div>
   );
 }
