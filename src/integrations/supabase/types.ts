@@ -1251,6 +1251,7 @@ export type Database = {
           plan: string | null
           status: string
           updated_at: string
+          xp: number
         }
         Insert: {
           avatar_url?: string | null
@@ -1266,6 +1267,7 @@ export type Database = {
           plan?: string | null
           status?: string
           updated_at?: string
+          xp?: number
         }
         Update: {
           avatar_url?: string | null
@@ -1281,6 +1283,7 @@ export type Database = {
           plan?: string | null
           status?: string
           updated_at?: string
+          xp?: number
         }
         Relationships: []
       }
