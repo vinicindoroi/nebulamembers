@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Orbit, Mail, Lock, ArrowRight, User as UserIcon } from "lucide-react";
+import { Mail, Lock, ArrowRight, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -104,9 +104,7 @@ function LoginPage() {
       <div className="w-full max-w-md animate-fade-up">
         <div className="glass-strong rounded-2xl p-8 md:p-10">
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center glow mb-4">
-              <Orbit className="h-6 w-6 text-primary-foreground" />
-            </div>
+            <img src="/nebula_logo.png" alt="Nebula Members" className="h-16 w-16 rounded-2xl glow mb-4" />
             <h1 className="text-2xl font-semibold">
               {mode === "signin" ? "Bem-vindo de volta" : "Crie sua conta"}
             </h1>
