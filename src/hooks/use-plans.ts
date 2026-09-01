@@ -56,9 +56,9 @@ export async function fetchPlans(): Promise<PlanOption[]> {
     /* ignore */
   }
   return [
-    { id: "plan-free", name: "Free", slug: "free" },
-    { id: "plan-pro", name: "Pro", slug: "pro" },
-    { id: "plan-premium", name: "Premium", slug: "premium" },
+    { id: "plan-free", name: "Free", slug: "free", features: FULL_ACCESS_FEATURES },
+    { id: "plan-pro", name: "Pro", slug: "pro", features: FULL_ACCESS_FEATURES },
+    { id: "plan-premium", name: "Premium", slug: "premium", features: FULL_ACCESS_FEATURES },
   ];
 }
 
