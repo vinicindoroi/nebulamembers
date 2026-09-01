@@ -105,6 +105,26 @@
       radial-gradient(ellipse 45% 35% at 100% 100%, oklch(0.58 0.17 265 / 0.03), transparent 70%);
   }
   h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 35%, transparent);
+    color: var(--foreground);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  /* Consistent keyboard focus across the whole platform */
+  :where(a, button, [role="button"], [role="tab"], summary, [tabindex]):focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--primary) 70%, transparent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
 
   /* Custom scrollbar */
   * {
