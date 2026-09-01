@@ -41,8 +41,8 @@ export function MembersSidebar() {
     <aside className="w-[260px] shrink-0 hidden xl:block animate-fade-up">
       <div className="sticky top-4 space-y-4">
         {/* Painel Online */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.015] backdrop-blur-md overflow-hidden shadow-lg hover:border-white/[0.09] transition-all duration-300">
-          <div className="px-4 py-3.5 border-b border-white/[0.04] flex items-center gap-2 bg-white/[0.01]">
+        <div className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden shadow-lg hover:border-border transition-all duration-300">
+          <div className="px-4 py-3.5 border-b border-border flex items-center gap-2 bg-card">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_6px_oklch(0.7_0.2_160)]"></span>
@@ -61,7 +61,7 @@ export function MembersSidebar() {
                     <div className="h-8 w-8 rounded-xl bg-white/[0.06] shrink-0" />
                     <div className="flex-1 space-y-1.5">
                       <div className="h-2.5 w-24 bg-white/[0.06] rounded-full" />
-                      <div className="h-2 w-16 bg-white/[0.04] rounded-full" />
+                      <div className="h-2 w-16 bg-card rounded-full" />
                     </div>
                   </div>
                 ))}
@@ -77,11 +77,11 @@ export function MembersSidebar() {
         </div>
 
         {/* Painel Offline */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.015] backdrop-blur-md overflow-hidden shadow-lg hover:border-white/[0.09] transition-all duration-300">
-          <div className="px-4 py-3.5 border-b border-white/[0.04] flex items-center gap-2 bg-white/[0.01]">
+        <div className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden shadow-lg hover:border-border transition-all duration-300">
+          <div className="px-4 py-3.5 border-b border-border flex items-center gap-2 bg-card">
             <span className="h-2 w-2 rounded-full bg-white/20" />
             <span className="text-xs font-bold text-muted-foreground tracking-wide uppercase">Offline</span>
-            <span className="text-[10px] font-bold font-mono text-muted-foreground bg-white/5 px-2 py-0.5 rounded-full ml-auto">
+            <span className="text-[10px] font-bold font-mono text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-full ml-auto">
               {offline.length}
             </span>
           </div>
@@ -95,7 +95,7 @@ export function MembersSidebar() {
                 {offline.length > OFFLINE_LIMIT && (
                   <button
                     onClick={() => setShowAllOffline(v => !v)}
-                    className="w-full mt-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground/60 hover:text-muted-foreground transition-colors rounded-lg hover:bg-white/[0.03]"
+                    className="w-full mt-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground/60 hover:text-muted-foreground transition-colors rounded-lg hover:bg-card"
                   >
                     <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${showAllOffline ? 'rotate-180' : ''}`} />
                     {showAllOffline ? 'Ver menos' : `Ver mais ${offline.length - OFFLINE_LIMIT} membros`}
@@ -115,16 +115,16 @@ function MemberRow({ member, online }: { member: Member; online: boolean }) {
   const initials = name.slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.04] transition-all duration-200 group/member cursor-default">
+    <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-card transition-all duration-200 group/member cursor-default">
       <div className="relative shrink-0">
         {member.avatar_url ? (
           <img 
             src={member.avatar_url} 
             alt={name} 
-            className="h-8.5 w-8.5 rounded-xl object-cover border border-white/[0.08] transition-transform duration-200 group-hover/member:scale-105" 
+            className="h-8.5 w-8.5 rounded-xl object-cover border border-border transition-transform duration-200 group-hover/member:scale-105" 
           />
         ) : (
-          <div className="h-8.5 w-8.5 rounded-xl bg-white/5 border border-white/[0.04] flex items-center justify-center text-[10px] font-bold text-muted-foreground/80 uppercase transition-transform duration-200 group-hover/member:scale-105">
+          <div className="h-8.5 w-8.5 rounded-xl bg-muted/40 border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground/80 uppercase transition-transform duration-200 group-hover/member:scale-105">
             {initials}
           </div>
         )}

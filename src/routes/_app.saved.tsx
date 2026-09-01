@@ -89,7 +89,7 @@ function SavedPage() {
         <p className="text-sm text-muted-foreground mt-1">Posts que você salvou do fórum e da comunidade.</p>
       </header>
 
-      <div className="flex gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10 w-fit">
+      <div className="flex gap-1 p-1 rounded-xl bg-card border border-border w-fit">
         {([["all", "Todos"], ["forum", "Fórum"], ["community", "Comunidade"]] as const).map(([id, label]) => (
           <button
             key={id}
@@ -98,7 +98,7 @@ function SavedPage() {
           >
             {label}
             {counts[id] > 0 && (
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${filter === id ? "bg-white/10" : "bg-white/5"}`}>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${filter === id ? "bg-white/10" : "bg-muted/40"}`}>
                 {counts[id]}
               </span>
             )}
@@ -108,10 +108,10 @@ function SavedPage() {
 
       {isLoading ? (
         <div className="space-y-3">
-          {[0, 1, 2].map((i) => <div key={i} className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 h-24 animate-pulse" />)}
+          {[0, 1, 2].map((i) => <div key={i} className="rounded-3xl border border-border bg-card p-5 h-24 animate-pulse" />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-16 text-center">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
           <Bookmark className="h-10 w-10 mx-auto text-muted-foreground/20 mb-3" />
           <div className="text-sm font-medium">Nenhum post salvo</div>
           <p className="text-xs text-muted-foreground mt-1">Salve posts no fórum ou comunidade clicando no ícone de bookmark.</p>
@@ -140,7 +140,7 @@ function SavedCard({ item, onUnsave, onClick }: { item: SavedItem; onUnsave: () 
   const initials = name.slice(0, 2).toUpperCase();
 
   return (
-    <article onClick={onClick} className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 hover:border-white/[0.12] transition group cursor-pointer">
+    <article onClick={onClick} className="rounded-3xl border border-border bg-card p-5 hover:border-primary/30 transition group cursor-pointer">
       <div className="flex items-start gap-3">
         {post.author?.avatar_url ? (
           <img src={post.author.avatar_url} alt={name} className="h-9 w-9 rounded-full object-cover ring-2 ring-white/10 shrink-0" />
@@ -174,7 +174,7 @@ function SavedCard({ item, onUnsave, onClick }: { item: SavedItem; onUnsave: () 
         </button>
       </div>
       {post.image_url && (
-        <div className="mt-3 rounded-xl overflow-hidden border border-white/[0.06]">
+        <div className="mt-3 rounded-xl overflow-hidden border border-border">
           <img src={post.image_url} alt="" className="w-full max-h-48 object-cover" loading="lazy" />
         </div>
       )}
@@ -200,7 +200,7 @@ function SavedPostModal({ item, onClose }: { item: SavedItem; onClose: () => voi
         }}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/[0.06] flex items-center gap-3 shrink-0">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-3 shrink-0">
           {post.author?.avatar_url ? (
             <img src={post.author.avatar_url} alt={name} className="h-10 w-10 rounded-full object-cover ring-2 ring-white/10" />
           ) : (
@@ -222,7 +222,7 @@ function SavedPostModal({ item, onClose }: { item: SavedItem; onClose: () => voi
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition">
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-muted/50 text-muted-foreground hover:text-foreground transition">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -236,7 +236,7 @@ function SavedPostModal({ item, onClose }: { item: SavedItem; onClose: () => voi
             {post.content}
           </div>
           {post.image_url && (
-            <div className="rounded-xl overflow-hidden border border-white/[0.06]">
+            <div className="rounded-xl overflow-hidden border border-border">
               <img src={post.image_url} alt="" className="w-full max-h-[400px] object-cover" loading="lazy" />
             </div>
           )}

@@ -163,14 +163,14 @@ export function ColorPicker({ color, onChange }: ColorPickerProps) {
       {/* Hex input + preview */}
       <div className="flex items-center gap-2">
         <div
-          className="w-8 h-8 rounded-lg border border-white/10 shrink-0"
+          className="w-8 h-8 rounded-lg border border-border shrink-0"
           style={{ backgroundColor: hexInput || color }}
         />
         <input
           type="text"
           value={hexInput}
           onChange={(e) => handleHexChange(e.target.value)}
-          className="flex-1 bg-white/[0.04] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-foreground font-mono outline-none focus:border-primary/50 transition-colors"
+          className="flex-1 bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground font-mono outline-none focus:border-primary/50 transition-colors"
           placeholder="#8b5cf6"
           maxLength={7}
         />

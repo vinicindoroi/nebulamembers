@@ -55,7 +55,7 @@ function Page() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {offers.map((o) => (
-          <div key={o.id} className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 hover:border-white/10 transition group">
+          <div key={o.id} className="rounded-3xl border border-border bg-card p-5 hover:border-border transition group">
             <div className="flex items-start justify-between gap-3">
               <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
                 <Crown className="h-5 w-5 text-amber-400" />
@@ -76,14 +76,14 @@ function Page() {
               <span className="truncate">{o.checkout_url}</span>
             </div>
             <div className="mt-2">
-              <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded ${o.active ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-muted-foreground"}`}>
+              <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded ${o.active ? "bg-emerald-500/10 text-emerald-400" : "bg-muted/40 text-muted-foreground"}`}>
                 {o.active ? "Ativa" : "Inativa"}
               </span>
             </div>
           </div>
         ))}
         {offers.length === 0 && (
-          <div className="col-span-full rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+          <div className="col-span-full rounded-2xl border border-dashed border-border bg-card p-12 text-center">
             <Package className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <div className="text-sm font-medium">Nenhuma oferta</div>
             <div className="text-xs text-muted-foreground mt-1">Crie sua primeira oferta para monetizar conteúdo premium.</div>
@@ -136,7 +136,7 @@ function OfferModal({ initial, onClose, onSaved }: { initial: Partial<Offer>; on
       description="Configure o link de pagamento e detalhes da oferta."
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5 transition">
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50 transition">
             Cancelar
           </button>
           <button
@@ -171,7 +171,7 @@ function OfferModal({ initial, onClose, onSaved }: { initial: Partial<Offer>; on
       </Field>
 
       <Field label="Status">
-        <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+        <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
           <input type="checkbox" checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} className="accent-primary" />
           <span className="text-sm">Oferta ativa</span>
         </label>

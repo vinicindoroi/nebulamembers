@@ -236,7 +236,7 @@ function AdminFormsPage() {
           <button
             onClick={loadSubmissions}
             disabled={loading}
-            className="text-xs px-3 py-2 rounded-xl border border-white/10 hover:bg-white/5 flex items-center gap-2 disabled:opacity-50 transition cursor-pointer"
+            className="text-xs px-3 py-2 rounded-xl border border-border hover:bg-muted/50 flex items-center gap-2 disabled:opacity-50 transition cursor-pointer"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             Atualizar
@@ -256,7 +256,7 @@ function AdminFormsPage() {
       {/* Sleek Dynamic Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Total applications card */}
-        <div className="glass rounded-2xl p-5 border border-white/[0.06] bg-white/[0.01] flex items-center justify-between relative overflow-hidden group">
+        <div className="glass rounded-2xl p-5 border border-border bg-card flex items-center justify-between relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
           <div className="space-y-1">
             <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Total de Aplicações</span>
@@ -269,7 +269,7 @@ function AdminFormsPage() {
         </div>
 
         {/* Most popular mentorship card */}
-        <div className="glass rounded-2xl p-5 border border-white/[0.06] bg-white/[0.01] flex items-center justify-between relative overflow-hidden group">
+        <div className="glass rounded-2xl p-5 border border-border bg-card flex items-center justify-between relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-transparent to-transparent pointer-events-none" />
           <div className="space-y-1">
             <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Mentoria Mais Procurada</span>
@@ -291,16 +291,16 @@ function AdminFormsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
+      <div className="rounded-3xl border border-border bg-card overflow-hidden">
         {/* Search Header */}
-        <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between gap-4 flex-wrap bg-white/[0.01]">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-4 flex-wrap bg-card">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar por nome, e-mail, mentoria..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all"
             />
           </div>
           <div className="text-xs text-muted-foreground">
@@ -321,7 +321,7 @@ function AdminFormsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs text-muted-foreground bg-white/[0.02] border-b border-white/5">
+                <tr className="text-xs text-muted-foreground bg-card border-b border-border">
                   <th className="text-left px-5 py-3 font-medium">Nome Completo</th>
                   <th className="text-left px-5 py-3 font-medium">Contato</th>
                   <th className="text-left px-5 py-3 font-medium">Mentoria</th>
@@ -334,7 +334,7 @@ function AdminFormsPage() {
                   <tr 
                     key={sub.id} 
                     onClick={() => setSelectedSub(sub)}
-                    className="hover:bg-white/[0.02] transition cursor-pointer group"
+                    className="hover:bg-card transition cursor-pointer group"
                   >
                     <td className="px-5 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
@@ -370,7 +370,7 @@ function AdminFormsPage() {
                     <td className="px-5 py-4 text-center whitespace-nowrap">
                       <button
                         onClick={(e) => handleDelete(sub.id, e)}
-                        className="p-1.5 hover:bg-white/5 rounded-lg text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                        className="p-1.5 hover:bg-muted/50 rounded-lg text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                         title="Excluir resposta"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -395,7 +395,7 @@ function AdminFormsPage() {
         {selectedSub && (
           <div className="space-y-6">
             {/* Card Avatar / Title */}
-            <div className="flex flex-col items-center text-center pb-4 border-b border-white/5">
+            <div className="flex flex-col items-center text-center pb-4 border-b border-border">
               <div className="h-16 w-16 rounded-full gradient-primary flex items-center justify-center text-xl font-bold text-primary-foreground shadow-lg mb-3 ring-4 ring-primary/15 animate-fade-in">
                 {selectedSub.name.slice(0, 2).toUpperCase()}
               </div>
@@ -409,7 +409,7 @@ function AdminFormsPage() {
             <div className="space-y-4 text-xs">
               <div className="space-y-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/75">E-mail</span>
-                <div className="text-xs font-medium text-foreground bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+                <div className="text-xs font-medium text-foreground bg-card border border-border rounded-xl px-4 py-3 flex items-center justify-between gap-4">
                   <span className="truncate select-all">{selectedSub.email}</span>
                   <button
                     onClick={() => handleCopy(selectedSub.email, "E-mail")}
@@ -422,7 +422,7 @@ function AdminFormsPage() {
 
               <div className="space-y-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/75">Celular / WhatsApp</span>
-                <div className="text-xs font-medium text-foreground bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+                <div className="text-xs font-medium text-foreground bg-card border border-border rounded-xl px-4 py-3 flex items-center justify-between gap-4">
                   <span className="select-all">{selectedSub.phone}</span>
                   <button
                     onClick={() => handleCopy(selectedSub.phone, "Celular")}
@@ -435,7 +435,7 @@ function AdminFormsPage() {
 
               <div className="space-y-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/75">Enviado em</span>
-                <div className="text-xs font-medium text-foreground bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 flex items-center gap-2">
+                <div className="text-xs font-medium text-foreground bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-2">
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
                   <span>{new Date(selectedSub.date).toLocaleString("pt-BR")}</span>
                 </div>

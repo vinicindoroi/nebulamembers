@@ -69,7 +69,7 @@ function Page() {
       <div className="flex gap-6 flex-col lg:flex-row">
         {/* Tabs */}
         <aside className="lg:w-56 shrink-0">
-          <nav className="rounded-2xl border border-white/5 bg-white/[0.02] p-2 space-y-0.5">
+          <nav className="rounded-3xl border border-border bg-card p-2 space-y-0.5">
             {tabs.map((t) => {
               const Icon = t.icon;
               const active = tab === t.id;
@@ -80,7 +80,7 @@ function Page() {
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition ${
                     active
                       ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
@@ -93,14 +93,14 @@ function Page() {
 
         {/* Content */}
         <div className="flex-1 min-w-0 space-y-6">
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 max-w-2xl space-y-5">
+          <div className="rounded-3xl border border-border bg-card p-6 max-w-2xl space-y-5">
             {tab === "branding" && <BrandingTab s={s} patch={patch} />}
             {tab === "protection" && <ProtectionTab s={s} patch={patch} />}
             {tab === "features" && <FeaturesTab s={s} patch={patch} />}
           </div>
 
           {/* Preview */}
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 max-w-2xl">
+          <div className="rounded-3xl border border-border bg-card p-6 max-w-2xl">
             <div className="flex items-center gap-2 mb-4">
               <Eye className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">Preview do Player</span>
@@ -122,7 +122,7 @@ function BrandingTab({ s, patch }: { s: Partial<PlayerSettings>; patch: (c: Part
             type="color"
             value={s.accent_color || "#8b5cf6"}
             onChange={(e) => patch({ accent_color: e.target.value })}
-            className="h-11 w-16 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer"
+            className="h-11 w-16 rounded-xl bg-card border border-border cursor-pointer"
             style={{ colorScheme: "dark" }}
           />
           <input
@@ -139,7 +139,7 @@ function BrandingTab({ s, patch }: { s: Partial<PlayerSettings>; patch: (c: Part
             type="color"
             value={s.progress_color || "#8b5cf6"}
             onChange={(e) => patch({ progress_color: e.target.value })}
-            className="h-11 w-16 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer"
+            className="h-11 w-16 rounded-xl bg-card border border-border cursor-pointer"
             style={{ colorScheme: "dark" }}
           />
           <input
@@ -170,7 +170,7 @@ function BrandingTab({ s, patch }: { s: Partial<PlayerSettings>; patch: (c: Part
 
       <Field label="Marca d'água" icon={Type}>
         <div className="space-y-3">
-          <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+          <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
             <input
               type="checkbox"
               checked={s.watermark_enabled ?? false}
@@ -297,7 +297,7 @@ function Toggle({ icon: Icon, label, description, checked, onChange }: {
   icon: typeof Lock; label: string; description: string; checked: boolean; onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 cursor-pointer transition">
+    <label className="flex items-start gap-3 p-3 rounded-xl bg-card border border-border hover:border-border cursor-pointer transition">
       <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
         <Icon className="h-4 w-4" />
       </div>
@@ -318,7 +318,7 @@ function Toggle({ icon: Icon, label, description, checked, onChange }: {
 function PlayerPreview({ settings }: { settings: PlayerSettings }) {
   return (
     <div
-      className="relative aspect-video w-full rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-white/10"
+      className="relative aspect-video w-full rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-border"
       style={{ "--player-accent": settings?.accent_color, "--player-progress": settings?.progress_color } as React.CSSProperties}
     >
       {/* Fake video content */}

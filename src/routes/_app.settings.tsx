@@ -132,7 +132,7 @@ function SettingsPage() {
 
       <div className="flex gap-6 flex-col lg:flex-row">
         <aside className="lg:w-56 shrink-0 w-full">
-          <nav className="rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible no-scrollbar">
+          <nav className="rounded-3xl border border-border bg-card p-1.5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible no-scrollbar">
             {TABS.map((t) => {
               const Icon = t.icon;
               const active = tab === t.id;
@@ -143,7 +143,7 @@ function SettingsPage() {
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm transition shrink-0 whitespace-nowrap lg:w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
                     active
                       ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground border border-primary/10 lg:border-transparent"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
@@ -155,7 +155,7 @@ function SettingsPage() {
 
           <button
             onClick={onSignOut}
-            className="mt-3 w-full rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-red-500/5 hover:border-red-500/20 p-3 flex items-center gap-2.5 text-sm text-muted-foreground hover:text-red-400 transition group"
+            className="mt-3 w-full rounded-2xl border border-border bg-card hover:bg-red-500/5 hover:border-red-500/20 p-3 flex items-center gap-2.5 text-sm text-muted-foreground hover:text-red-400 transition group"
           >
             <LogOut className="h-4 w-4" />
             Sair da conta
@@ -166,7 +166,7 @@ function SettingsPage() {
           {tab === "account" && (
             <>
               <Section title="Conta" description="Informações básicas da sua conta.">
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
                   <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-sm font-semibold text-primary-foreground">
                     {initials}
                   </div>
@@ -182,7 +182,7 @@ function SettingsPage() {
 
               <Section title="Aparência" description="Personalize a interface.">
                 <SettingRow icon={Palette} title="Tema" desc="Escolha entre escuro, claro ou automático.">
-                  <div className="flex gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
+                  <div className="flex gap-1 p-1 rounded-xl bg-card border border-border">
                     {([["dark", "Escuro"], ["light", "Claro"], ["system", "Sistema"]] as const).map(([id, label]) => (
                       <button
                         key={id}
@@ -195,7 +195,7 @@ function SettingsPage() {
                   </div>
                 </SettingRow>
                 <SettingRow icon={Globe} title="Idioma" desc="Português · Brasil">
-                  <span className="text-xs px-2 py-1 rounded-lg bg-white/5 text-muted-foreground">PT-BR</span>
+                  <span className="text-xs px-2 py-1 rounded-lg bg-muted/40 text-muted-foreground">PT-BR</span>
                 </SettingRow>
               </Section>
             </>
@@ -268,7 +268,7 @@ function SettingsPage() {
                                 : passStrength.score === 3
                                 ? "bg-cyan-400"
                                 : "bg-emerald-500"
-                              : "bg-white/5"
+                              : "bg-muted/40"
                           }`}
                         />
                       ))}
@@ -321,8 +321,8 @@ function SettingsPage() {
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.02]">
-      <div className="px-5 py-4 border-b border-white/5">
+    <div className="rounded-3xl border border-border bg-card">
+      <div className="px-5 py-4 border-b border-border">
         <h3 className="text-sm font-semibold">{title}</h3>
         {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
       </div>
@@ -336,7 +336,7 @@ function SettingRow({
 }: { icon: any; title: string; desc: string; children?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
-      <div className="h-9 w-9 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center shrink-0">
+      <div className="h-9 w-9 rounded-lg bg-card border border-border flex items-center justify-center shrink-0">
         <Icon className="h-4 w-4 text-muted-foreground" />
       </div>
       <div className="flex-1 min-w-0">

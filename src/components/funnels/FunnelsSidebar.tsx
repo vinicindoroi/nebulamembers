@@ -222,7 +222,7 @@ export function FunnelsSidebar({
           isNested && 'ml-4 w-[calc(100%-1rem)]',
           isSelected
             ? 'bg-primary/[0.08] border border-primary/20 shadow-[0_0_0_1px_oklch(0.65_0.22_290/0.1)]'
-            : 'border border-transparent hover:bg-white/[0.03] hover:border-white/5'
+            : 'border border-transparent hover:bg-card hover:border-border'
         )}
       >
         {isSelected && (
@@ -238,7 +238,7 @@ export function FunnelsSidebar({
                 : isCanvas
                 ? 'bg-emerald-500/15 text-emerald-400'
                 : 'bg-primary/15 text-primary'
-              : 'bg-white/[0.03] text-muted-foreground group-hover:bg-white/[0.06]'
+              : 'bg-card text-muted-foreground group-hover:bg-muted/50'
           )}
         >
           {isMind ? (
@@ -277,7 +277,7 @@ export function FunnelsSidebar({
               <MoreHorizontal className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-popover border-white/10 shadow-2xl w-48">
+          <DropdownMenuContent align="end" className="bg-popover border-border shadow-2xl w-48">
             <DropdownMenuItem
               onSelect={() => openRenameDialog(funnel)}
               className="text-xs cursor-pointer"
@@ -303,7 +303,7 @@ export function FunnelsSidebar({
                   Mover para...
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
-                  <DropdownMenuSubContent className="bg-popover border-white/10 shadow-2xl w-48">
+                  <DropdownMenuSubContent className="bg-popover border-border shadow-2xl w-48">
                     {funnel.folder_id && (
                       <DropdownMenuItem
                         onSelect={() => {
@@ -348,17 +348,17 @@ export function FunnelsSidebar({
 
   if (collapsed) {
     return (
-      <div className="w-14 border-r border-white/5 bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col items-center py-4 gap-2 shrink-0 h-full">
+      <div className="w-14 border-r border-border bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col items-center py-4 gap-2 shrink-0 h-full">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="hover:bg-white/5">
+            <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="hover:bg-muted/50">
               <ChevronRight className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">Expandir</TooltipContent>
         </Tooltip>
 
-        <div className="w-6 h-px bg-white/5 my-1" />
+        <div className="w-6 h-px bg-muted/40 my-1" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -380,7 +380,7 @@ export function FunnelsSidebar({
               variant="ghost"
               size="icon"
               onClick={() => setIsImportDialogOpen(true)}
-              className="hover:bg-white/5"
+              className="hover:bg-muted/50"
             >
               <Upload className="w-4 h-4" />
             </Button>
@@ -393,9 +393,9 @@ export function FunnelsSidebar({
 
   return (
     <>
-      <div className="w-full sm:w-72 shrink-0 border-r border-white/5 bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col h-full z-10">
+      <div className="w-full sm:w-72 shrink-0 border-r border-border bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col h-full z-10">
         {/* Header */}
-        <div className="px-4 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="px-4 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
               <GitFork className="w-4 h-4 text-primary" />
@@ -429,7 +429,7 @@ export function FunnelsSidebar({
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsNewFolderDialogOpen(true)}
-                    className="h-8 w-8 hover:bg-white/5"
+                    className="h-8 w-8 hover:bg-muted/50"
                   >
                     <FolderPlus className="w-4 h-4" />
                   </Button>
@@ -444,7 +444,7 @@ export function FunnelsSidebar({
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsImportDialogOpen(true)}
-                  className="h-8 w-8 hover:bg-white/5"
+                  className="h-8 w-8 hover:bg-muted/50"
                 >
                   <Upload className="w-4 h-4" />
                 </Button>
@@ -458,7 +458,7 @@ export function FunnelsSidebar({
                   variant="ghost"
                   size="icon"
                   onClick={onToggleCollapse}
-                  className="h-8 w-8 hover:bg-white/5"
+                  className="h-8 w-8 hover:bg-muted/50"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
@@ -476,7 +476,7 @@ export function FunnelsSidebar({
               placeholder="Buscar funis ou pastas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 h-9 bg-white/[0.02] border-white/5 focus-visible:border-primary/40 focus-visible:ring-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 text-sm"
+              className="pl-8 h-9 bg-card border-border focus-visible:border-primary/40 focus-visible:ring-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 text-sm"
             />
           </div>
         </div>
@@ -492,7 +492,7 @@ export function FunnelsSidebar({
               </div>
             ) : filteredFunnels.length === 0 && folders.length === 0 ? (
               <div className="text-center py-12 px-4">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-card border border-border flex items-center justify-center">
                   <GitFork className="w-5 h-5 text-muted-foreground/40" />
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -531,7 +531,7 @@ export function FunnelsSidebar({
                             }
                           } catch (err) {}
                         }}
-                        className="group w-full overflow-hidden flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-white/[0.03] text-muted-foreground hover:text-foreground transition-colors"
+                        className="group w-full overflow-hidden flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-card text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
                           {isExpanded ? (
@@ -540,7 +540,7 @@ export function FunnelsSidebar({
                             <Folder className="w-4 h-4 shrink-0" />
                           )}
                           <span className="text-[13px] font-medium truncate min-w-0">{folder.name}</span>
-                          <span className="text-[10px] bg-white/5 px-1.5 py-0.5 rounded-full ml-1 shrink-0">
+                          <span className="text-[10px] bg-muted/40 px-1.5 py-0.5 rounded-full ml-1 shrink-0">
                             {folderFunnels.length}
                           </span>
                         </div>
@@ -557,7 +557,7 @@ export function FunnelsSidebar({
                                 <MoreHorizontal className="h-3.5 w-3.5" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-popover border-white/10 shadow-2xl">
+                            <DropdownMenuContent align="end" className="bg-popover border-border shadow-2xl">
                               <DropdownMenuItem
                                 onSelect={() => setFolderToRename(folder)}
                                 className="text-xs cursor-pointer"
@@ -583,7 +583,7 @@ export function FunnelsSidebar({
 
                       {/* Folder Content */}
                       {isExpanded && (
-                        <div className="mt-1 space-y-0.5 relative before:absolute before:left-[22px] before:top-0 before:bottom-3 before:w-px before:bg-white/5">
+                        <div className="mt-1 space-y-0.5 relative before:absolute before:left-[22px] before:top-0 before:bottom-3 before:w-px before:bg-muted/40">
                           {folderFunnels.length === 0 ? (
                             <div className="pl-9 py-2 text-[11px] text-muted-foreground/50">
                               Pasta vazia

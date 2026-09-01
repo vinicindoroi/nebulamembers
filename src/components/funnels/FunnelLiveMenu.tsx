@@ -111,7 +111,7 @@ export function FunnelLiveMenu({
             'flex items-center gap-2 pl-2.5 pr-2.5 py-1 rounded-full text-xs transition-all',
             liveMode
               ? 'bg-primary/15 border border-primary/30 text-primary'
-              : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent',
+              : 'hover:bg-muted/50 text-muted-foreground border border-transparent',
           )}
         >
           <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
@@ -126,10 +126,10 @@ export function FunnelLiveMenu({
 
       <PopoverContent
         align="end"
-        className="w-[360px] p-0 bg-[#16161c] border-white/10 text-foreground"
+        className="w-[360px] p-0 bg-[#16161c] border-border text-foreground"
       >
         {/* Header */}
-        <div className="p-3 border-b border-white/10 space-y-3">
+        <div className="p-3 border-b border-border space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Radio className={cn('w-4 h-4 text-primary', liveMode && 'animate-pulse')} />
@@ -145,10 +145,10 @@ export function FunnelLiveMenu({
 
           <div className="flex items-center gap-2">
             <Select value={String(timeRange)} onValueChange={(v) => onTimeRangeChange(Number(v))}>
-              <SelectTrigger className="h-8 text-xs bg-[#0a0a0c] border-white/10">
+              <SelectTrigger className="h-8 text-xs bg-[#0a0a0c] border-border">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1f] border-white/10">
+              <SelectContent className="bg-[#1a1a1f] border-border">
                 {TIME_RANGES.map((r) => (
                   <SelectItem key={r.value} value={String(r.value)} className="text-xs">
                     {r.label}
@@ -157,7 +157,7 @@ export function FunnelLiveMenu({
               </SelectContent>
             </Select>
             {onRefresh && (
-              <Button variant="outline" size="sm" className="h-8 px-2 border-white/10" onClick={onRefresh} title="Atualizar dados">
+              <Button variant="outline" size="sm" className="h-8 px-2 border-border" onClick={onRefresh} title="Atualizar dados">
                 <RefreshCw className="w-3.5 h-3.5" />
               </Button>
             )}
@@ -196,7 +196,7 @@ export function FunnelLiveMenu({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar bloco..."
-              className="h-8 pl-7 text-xs bg-[#0a0a0c] border-white/10"
+              className="h-8 pl-7 text-xs bg-[#0a0a0c] border-border"
             />
           </div>
 
@@ -207,7 +207,7 @@ export function FunnelLiveMenu({
               return (
                 <div
                   key={node.id}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-colors"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-card border border-border hover:bg-muted/50 transition-colors"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-xs truncate">{data.label || node.id}</p>

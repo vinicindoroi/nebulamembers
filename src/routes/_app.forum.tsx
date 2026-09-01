@@ -150,25 +150,25 @@ function ForumPage() {
           </button>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
+        <div className="rounded-3xl border border-border bg-card p-4 space-y-3">
           <div className="flex gap-2 flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar no fórum..." className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar no fórum..." className="w-full bg-card border border-border rounded-xl pl-9 pr-8 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
               {search && (
                 <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors">
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
-            <button onClick={() => setShowServices(!showServices)} className={`px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 border transition ${showServices ? "border-pink-500/30 bg-pink-500/10 text-pink-400" : "border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
+            <button onClick={() => setShowServices(!showServices)} className={`px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 border transition ${showServices ? "border-pink-500/30 bg-pink-500/10 text-pink-400" : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
               <Briefcase className="h-3.5 w-3.5" /> Serviços
             </button>
           </div>
           <div className="flex gap-1.5 flex-wrap">
-            <button onClick={() => { setActiveTag(null); setSearch(""); }} className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition ${!activeTag ? "bg-primary/15 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent"}`}>Todos</button>
+            <button onClick={() => { setActiveTag(null); setSearch(""); }} className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition ${!activeTag ? "bg-primary/15 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent"}`}>Todos</button>
             {tags.map((t) => (
-              <button key={t.id} onClick={() => { setActiveTag(activeTag === t.id ? null : t.id); setSearch(""); }} className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition border ${activeTag === t.id ? "border-white/20 bg-white/10 text-foreground" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
+              <button key={t.id} onClick={() => { setActiveTag(activeTag === t.id ? null : t.id); setSearch(""); }} className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition border ${activeTag === t.id ? "border-white/20 bg-white/10 text-foreground" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
                 <span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ background: t.color }} />{t.name}
               </button>
             ))}
@@ -176,9 +176,9 @@ function ForumPage() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-3">{[0,1,2].map((i) => <div key={i} className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 h-28 animate-pulse" />)}</div>
+          <div className="space-y-3">{[0,1,2].map((i) => <div key={i} className="rounded-3xl border border-border bg-card p-5 h-28 animate-pulse" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-16 text-center">
+          <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
             <Hash className="h-10 w-10 mx-auto text-muted-foreground/20 mb-3" />
             <div className="text-sm font-medium">Nenhum post encontrado</div>
             <p className="text-xs text-muted-foreground mt-1">Seja o primeiro a criar um tópico.</p>
@@ -216,7 +216,7 @@ function ForumPage() {
                       ))}
                     </div>
                   ) : pinnedPosts.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-16 text-center">
+                    <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
                       <Hash className="h-10 w-10 mx-auto text-muted-foreground/20 mb-3" />
                       <div className="text-sm font-medium">Nenhum post encontrado</div>
                       <p className="text-xs text-muted-foreground mt-1">Seja o primeiro a criar um tópico.</p>
@@ -319,7 +319,7 @@ function ForumPostCard({ post, userId, onLike, onDelete, onClick }: { post: Foru
           ? "border-pink-500/30 bg-gradient-to-br from-pink-950/[0.05] via-white/[0.01] to-white/[0.02] hover:border-pink-500/50 hover:shadow-[0_0_24px_rgba(244,63,94,0.1)]"
           : post.pinned
           ? "border-primary/20 bg-primary/[0.01] hover:border-primary/35 hover:shadow-[0_0_24px_rgba(139,92,246,0.08)]"
-          : "border-white/[0.08] bg-white/[0.015] hover:bg-white/[0.02] hover:border-white/[0.12] hover:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]"
+          : "border-border bg-white/[0.015] hover:bg-card hover:border-primary/30 hover:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]"
       }`}
     >
       <div className="p-5">
@@ -351,7 +351,7 @@ function ForumPostCard({ post, userId, onLike, onDelete, onClick }: { post: Foru
         {post.tags.length > 0 && (
           <div className="flex gap-1.5 flex-wrap mt-3">
             {post.tags.map((t) => (
-              <span key={t.id} className="text-[10px] px-2 py-0.5 rounded-full border border-white/10 text-muted-foreground flex items-center gap-1">
+              <span key={t.id} className="text-[10px] px-2 py-0.5 rounded-full border border-border text-muted-foreground flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: t.color }} />{t.name}
               </span>
             ))}
@@ -359,16 +359,16 @@ function ForumPostCard({ post, userId, onLike, onDelete, onClick }: { post: Foru
         )}
       </div>
       {post.image_url && (
-        <div className="border-t border-white/[0.06]"><img src={post.image_url} alt="" className="w-full max-h-[360px] object-cover" loading="lazy" /></div>
+        <div className="border-t border-border"><img src={post.image_url} alt="" className="w-full max-h-[360px] object-cover" loading="lazy" /></div>
       )}
-      <div className="px-5 py-3 border-t border-white/[0.06] flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="px-5 py-3 border-t border-border flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         {/* Curtir */}
         <button
           onClick={onLike}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
             post.liked
               ? "text-rose-400 bg-rose-500/10 border border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.15)]"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-white/[0.06] bg-white/[0.01]"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-border bg-card"
           }`}
         >
           <Heart className={`h-3.5 w-3.5 transition-transform duration-200 ${post.liked ? "scale-110" : ""}`} fill={post.liked ? "currentColor" : "none"} />
@@ -376,13 +376,13 @@ function ForumPostCard({ post, userId, onLike, onDelete, onClick }: { post: Foru
         </button>
 
         {/* Respostas */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-muted-foreground border border-white/[0.06] bg-white/[0.01]">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-muted-foreground border border-border bg-card">
           <MessageCircle className="h-3.5 w-3.5" />
           <span className="tabular-nums">{post.replies || 0}</span>
         </div>
 
         {/* Visualizações */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-muted-foreground/50 border border-white/[0.04] bg-white/[0.005] ml-auto">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-muted-foreground/50 border border-border bg-white/[0.005] ml-auto">
           <Eye className="h-3.5 w-3.5" />
           <span className="tabular-nums">{post.views || 0}</span>
         </div>
@@ -494,16 +494,16 @@ function PostDetailModal({ post, userId, onClose, onLike }: { post: ForumPost; u
               </div>
               <div className="text-[11px] text-muted-foreground/50">{formatTime(post.created_at)}</div>
             </div>
-            {mine && !editing && <button onClick={() => setEditing(true)} className="text-[11px] px-3 py-1.5 rounded-xl border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5 transition font-medium">Editar</button>}
+            {mine && !editing && <button onClick={() => setEditing(true)} className="text-[11px] px-3 py-1.5 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition font-medium">Editar</button>}
           </div>
 
           {editing ? (
             <div className="space-y-3">
-              <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-base font-semibold outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+              <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="w-full bg-card border border-border rounded-xl px-4 py-3 text-base font-semibold outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
               <RichTextEditor content={editContent} onChange={(html) => setEditContent(html)} placeholder="Edite o conteúdo..." />
               <div className="flex gap-2">
                 <button onClick={() => saveEdit.mutate()} disabled={saveEdit.isPending} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-medium disabled:opacity-50">{saveEdit.isPending ? "Salvando..." : "Salvar"}</button>
-                <button onClick={() => { setEditing(false); setEditTitle(post.title); setEditContent(post.content); }} className="px-4 py-2 rounded-xl text-xs text-muted-foreground hover:bg-white/5 transition">Cancelar</button>
+                <button onClick={() => { setEditing(false); setEditTitle(post.title); setEditContent(post.content); }} className="px-4 py-2 rounded-xl text-xs text-muted-foreground hover:bg-muted/50 transition">Cancelar</button>
               </div>
             </div>
           ) : (
@@ -518,31 +518,31 @@ function PostDetailModal({ post, userId, onClose, onLike }: { post: ForumPost; u
               <Briefcase className="h-3.5 w-3.5" /> <span>{post.service_price}</span>
             </div>
           )}
-          {post.tags.length > 0 && <div className="flex gap-1.5 flex-wrap">{post.tags.map((t) => <span key={t.id} className="text-[10px] px-2.5 py-1 rounded-full border border-white/10 text-muted-foreground flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: t.color }} /> {t.name}</span>)}</div>}
+          {post.tags.length > 0 && <div className="flex gap-1.5 flex-wrap">{post.tags.map((t) => <span key={t.id} className="text-[10px] px-2.5 py-1 rounded-full border border-border text-muted-foreground flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: t.color }} /> {t.name}</span>)}</div>}
 
-          <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
+          <div className="flex items-center gap-2 pt-3 border-t border-border">
             <button
               onClick={onLike}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 hover:scale-105 active:scale-95 ${
                 post.liked
                   ? "text-rose-400 bg-rose-500/10 border border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.15)]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-white/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-border"
               }`}
             >
               <Heart className={`h-4 w-4 transition-transform duration-200 ${post.liked ? "scale-110" : ""}`} fill={post.liked ? "currentColor" : "none"} />
               <span className="tabular-nums">{post.likes || 0}</span>
             </button>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-muted-foreground border border-white/10 bg-white/[0.02]">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-muted-foreground border border-border bg-card">
               <MessageCircle className="h-4 w-4" />
               <span className="tabular-nums">{replies.length || 0}</span>
             </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-muted-foreground/40 border border-white/[0.06] bg-white/[0.005] ml-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-muted-foreground/40 border border-border bg-white/[0.005] ml-auto">
               <Eye className="h-4 w-4" />
               <span className="tabular-nums">{post.views || 0}</span>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/[0.06]">
+          <div className="pt-4 border-t border-border">
             <h4 className="text-sm font-semibold mb-4">{replies.length} {replies.length === 1 ? "resposta" : "respostas"}</h4>
             {isLoading ? <p className="text-xs text-muted-foreground">Carregando...</p> : replies.length === 0 ? <p className="text-xs text-muted-foreground/50 mb-4">Nenhuma resposta ainda.</p> : (
               <div className="space-y-3 mb-5 max-h-[400px] overflow-y-auto pr-1">
@@ -553,7 +553,7 @@ function PostDetailModal({ post, userId, onClose, onLike }: { post: ForumPost; u
                   return (
                     <div key={r.id} className="flex gap-3 group/r">
                       <Avatar initials={rInit} size="sm" xp={rXp} avatarUrl={r.author?.avatar_url} name={rName} />
-                      <div className="flex-1 min-w-0 rounded-2xl bg-white/[0.03] border border-white/[0.05] px-4 py-3">
+                      <div className="flex-1 min-w-0 rounded-2xl bg-card border border-border px-4 py-3">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <span className="text-xs font-semibold text-foreground/90">{rName}</span>
                           <LevelBadge xp={rXp} />
@@ -561,19 +561,19 @@ function PostDetailModal({ post, userId, onClose, onLike }: { post: ForumPost; u
                           {r.user_id === userId && <button onClick={() => deleteReply.mutate(r.id)} className="opacity-0 group-hover/r:opacity-100 ml-auto text-muted-foreground hover:text-red-400 transition"><Trash2 className="h-3 w-3" /></button>}
                         </div>
                         {r.content && <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{r.content}</p>}
-                        {r.image_url && <div className="mt-2 rounded-xl overflow-hidden border border-white/[0.05] max-h-44"><img src={r.image_url} alt="" className="w-full max-h-44 object-cover" /></div>}
+                        {r.image_url && <div className="mt-2 rounded-xl overflow-hidden border border-border max-h-44"><img src={r.image_url} alt="" className="w-full max-h-44 object-cover" /></div>}
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-3">
-              {replyPreview && <div className="relative mb-2 rounded-xl overflow-hidden border border-white/10 max-h-24 w-fit"><img src={replyPreview} alt="" className="max-h-24 object-cover" /><button onClick={clearReplyImg} className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center"><X className="h-3 w-3" /></button></div>}
+            <div className="rounded-3xl border border-border bg-card p-3">
+              {replyPreview && <div className="relative mb-2 rounded-xl overflow-hidden border border-border max-h-24 w-fit"><img src={replyPreview} alt="" className="max-h-24 object-cover" /><button onClick={clearReplyImg} className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center"><X className="h-3 w-3" /></button></div>}
               <div className="flex items-center gap-2">
                 <input value={replyText} onChange={(e) => setReplyText(e.target.value.slice(0, 5000))} onKeyDown={handleKeyDown} placeholder="Escreva uma resposta..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/40" />
                 <input ref={replyFileRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleReplyImg} />
-                <button onClick={() => replyFileRef.current?.click()} className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-white/5 transition"><ImageIcon className="h-4 w-4" /></button>
+                <button onClick={() => replyFileRef.current?.click()} className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-muted/50 transition"><ImageIcon className="h-4 w-4" /></button>
                 <button onClick={() => addReply.mutate()} disabled={(!replyText.trim() && !replyImg) || addReply.isPending} className="p-2 rounded-xl gradient-primary text-primary-foreground disabled:opacity-30"><Send className="h-4 w-4" /></button>
               </div>
             </div>
@@ -621,12 +621,12 @@ function CreatePostModal({ tags, onClose, onCreated }: { tags: ForumTag[]; onClo
   };
 
   return (
-    <Modal open onClose={onClose} title="Novo post" kicker="Fórum" description="Compartilhe conhecimento, tire dúvidas ou ofereça serviços." size="lg" footer={<><button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-white/5">Cancelar</button><button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">{saving ? "Publicando..." : "Publicar"}</button></>}>
+    <Modal open onClose={onClose} title="Novo post" kicker="Fórum" description="Compartilhe conhecimento, tire dúvidas ou ofereça serviços." size="lg" footer={<><button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-muted/50">Cancelar</button><button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">{saving ? "Publicando..." : "Publicar"}</button></>}>
       <div className="space-y-4">
         <Field label="Título" required><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Ex: Como configurar webhooks no Supabase" className={inputClass} maxLength={200} /></Field>
         <Field label="Conteúdo" required hint="Use a toolbar para formatar o texto."><RichTextEditor content={form.content} onChange={(html) => setForm({ ...form, content: html })} placeholder="Descreva em detalhes..." /></Field>
-        <div><label className="text-xs font-medium text-muted-foreground mb-2 block">Tags</label><div className="flex gap-1.5 flex-wrap">{tags.map((t) => <button key={t.id} type="button" onClick={() => toggleTag(t.id)} className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition border ${selectedTags.includes(t.id) ? "border-white/20 bg-white/10 text-foreground" : "border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5"}`}><span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ background: t.color }} />{t.name}</button>)}</div></div>
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+        <div><label className="text-xs font-medium text-muted-foreground mb-2 block">Tags</label><div className="flex gap-1.5 flex-wrap">{tags.map((t) => <button key={t.id} type="button" onClick={() => toggleTag(t.id)} className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition border ${selectedTags.includes(t.id) ? "border-white/20 bg-white/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}><span className="inline-block h-2 w-2 rounded-full mr-1.5" style={{ background: t.color }} />{t.name}</button>)}</div></div>
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
           <Briefcase className="h-4 w-4 text-pink-400" />
           <div className="flex-1"><div className="text-xs font-medium">Oferecer serviço</div><div className="text-[10px] text-muted-foreground">Marque se está oferecendo um serviço pago.</div></div>
           <button onClick={() => setForm({ ...form, is_service: !form.is_service })} className={`h-6 w-11 rounded-full transition relative shrink-0 ${form.is_service ? "bg-pink-500" : "bg-white/10"}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${form.is_service ? "left-5" : "left-0.5"}`} /></button>
@@ -635,9 +635,9 @@ function CreatePostModal({ tags, onClose, onCreated }: { tags: ForumTag[]; onClo
         <div>
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleImage} />
           {imagePreview ? (
-            <div className="relative rounded-xl overflow-hidden border border-white/10 max-h-48"><img src={imagePreview} alt="" className="w-full max-h-48 object-cover" /><button onClick={removeImage} className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/70 flex items-center justify-center hover:bg-black/90 transition"><X className="h-3.5 w-3.5" /></button></div>
+            <div className="relative rounded-xl overflow-hidden border border-border max-h-48"><img src={imagePreview} alt="" className="w-full max-h-48 object-cover" /><button onClick={removeImage} className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/70 flex items-center justify-center hover:bg-black/90 transition"><X className="h-3.5 w-3.5" /></button></div>
           ) : (
-            <button type="button" onClick={() => fileRef.current?.click()} className="w-full py-4 rounded-xl border border-dashed border-white/10 text-muted-foreground hover:text-foreground hover:border-white/20 hover:bg-white/[0.02] transition flex items-center justify-center gap-2 text-xs"><ImageIcon className="h-4 w-4" /> Adicionar imagem</button>
+            <button type="button" onClick={() => fileRef.current?.click()} className="w-full py-4 rounded-xl border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-white/20 hover:bg-card transition flex items-center justify-center gap-2 text-xs"><ImageIcon className="h-4 w-4" /> Adicionar imagem</button>
           )}
         </div>
       </div>

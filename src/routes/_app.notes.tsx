@@ -54,7 +54,7 @@ function NotesPage() {
 
   const getNoteColorClass = (color: string) => {
     const colors: Record<string, string> = {
-      default: 'border-white/5 bg-white/[0.02]',
+      default: 'border-border bg-card',
       purple: 'border-primary/20 bg-primary/5',
       blue: 'border-primary/20 bg-primary/5',
       green: 'border-green-500/20 bg-green-500/5',
@@ -94,12 +94,12 @@ function NotesPage() {
             placeholder="Buscar notas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-white/[0.03] border-white/10"
+            className="pl-9 bg-card border-border"
           />
         </div>
         <div className="flex items-center gap-2">
           {/* View mode toggle */}
-          <div className="flex items-center bg-white/[0.03] border border-white/10 rounded-lg p-0.5">
+          <div className="flex items-center bg-card border border-border rounded-lg p-0.5">
             <button
               onClick={() => handleSetViewMode('grid')}
               className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
@@ -131,7 +131,7 @@ function NotesPage() {
           <button
             onClick={() => setSelectedTag(null)}
             className={`text-xs px-2.5 py-1 rounded-full transition-colors ${
-              !selectedTag ? 'bg-primary/15 text-primary' : 'bg-white/5 text-muted-foreground hover:text-foreground'
+              !selectedTag ? 'bg-primary/15 text-primary' : 'bg-muted/40 text-muted-foreground hover:text-foreground'
             }`}
           >
             Todas
@@ -141,7 +141,7 @@ function NotesPage() {
               key={tag}
               onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
               className={`text-xs px-2.5 py-1 rounded-full transition-colors flex items-center gap-1 ${
-                selectedTag === tag ? 'bg-primary/15 text-primary' : 'bg-white/5 text-muted-foreground hover:text-foreground'
+                selectedTag === tag ? 'bg-primary/15 text-primary' : 'bg-muted/40 text-muted-foreground hover:text-foreground'
               }`}
             >
               <Tag className="h-3 w-3" />
@@ -157,11 +157,11 @@ function NotesPage() {
           <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
         </div>
       ) : viewMode === 'graph' ? (
-        <div className="h-[calc(100vh-20rem)] min-h-[400px] rounded-xl border border-white/5 overflow-hidden">
+        <div className="h-[calc(100vh-20rem)] min-h-[400px] rounded-xl border border-border overflow-hidden">
           <NotesGraphView notes={notes} onNoteClick={handleEdit} />
         </div>
       ) : notes.length === 0 ? (
-        <div className="text-center py-20 border border-dashed border-white/10 rounded-2xl">
+        <div className="text-center py-20 border border-dashed border-border rounded-2xl">
           <StickyNote className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
           <h3 className="text-lg font-medium mb-1">Nenhuma nota encontrada</h3>
           <p className="text-sm text-muted-foreground mb-4">
@@ -180,7 +180,7 @@ function NotesPage() {
             <div
               key={note.id}
               onClick={() => handleEdit(note)}
-              className={`group relative rounded-xl border p-4 cursor-pointer transition-all hover:border-white/15 hover:shadow-lg ${getNoteColorClass(note.color)}`}
+              className={`group relative rounded-xl border p-4 cursor-pointer transition-all hover:border-border hover:shadow-lg ${getNoteColorClass(note.color)}`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-1.5 min-w-0">
@@ -210,7 +210,7 @@ function NotesPage() {
               <div className="flex items-center justify-between mt-auto">
                 <div className="flex flex-wrap gap-1">
                   {note.tags.slice(0, 3).map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 bg-white/5 text-muted-foreground">
+                    <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 bg-muted/40 text-muted-foreground">
                       {tag}
                     </Badge>
                   ))}
@@ -222,7 +222,7 @@ function NotesPage() {
               </div>
 
               {note.lesson_title && (
-                <div className="flex items-center gap-1 mt-2 pt-2 border-t border-white/5">
+                <div className="flex items-center gap-1 mt-2 pt-2 border-t border-border">
                   <GraduationCap className="h-3 w-3 text-muted-foreground/60" />
                   <span className="text-[10px] text-muted-foreground/60 truncate">{note.lesson_title}</span>
                 </div>
@@ -237,7 +237,7 @@ function NotesPage() {
             <div
               key={note.id}
               onClick={() => handleEdit(note)}
-              className={`group relative rounded-xl border p-3 cursor-pointer transition-all hover:border-white/15 flex items-center gap-4 ${getNoteColorClass(note.color)}`}
+              className={`group relative rounded-xl border p-3 cursor-pointer transition-all hover:border-border flex items-center gap-4 ${getNoteColorClass(note.color)}`}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -255,7 +255,7 @@ function NotesPage() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {note.tags.slice(0, 2).map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 bg-white/5 text-muted-foreground hidden sm:inline-flex">
+                  <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 bg-muted/40 text-muted-foreground hidden sm:inline-flex">
                     {tag}
                   </Badge>
                 ))}

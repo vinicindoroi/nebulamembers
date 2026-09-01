@@ -204,7 +204,7 @@ function ProfilePage() {
         )}
       </header>
 
-      <section className="relative overflow-hidden rounded-2xl border border-white/5 bg-gradient-to-br from-primary/10 via-white/[0.02] to-transparent p-6 md:p-8">
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/10 via-white/[0.02] to-transparent p-6 md:p-8">
         <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-5">
           <div className="relative group">
@@ -244,7 +244,7 @@ function ProfilePage() {
           </div>
         </div>
 
-        <div className="relative mt-6 grid grid-cols-3 gap-3 pt-6 border-t border-white/5">
+        <div className="relative mt-6 grid grid-cols-3 gap-3 pt-6 border-t border-border">
           <MiniStat label="Cursos completos" value={completedCourses} />
           <MiniStat label="Aulas assistidas" value={totalCompletedLessons} />
           <MiniStat label="Conquistas" value={`${earnedBadges}/${achievements.length || 6}`} />
@@ -252,8 +252,8 @@ function ProfilePage() {
       </section>
 
       <section className="grid lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 rounded-2xl border border-white/5 bg-white/[0.02]">
-          <div className="px-5 py-4 border-b border-white/5">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card">
+          <div className="px-5 py-4 border-b border-border">
             <h3 className="text-sm font-semibold">Informações pessoais</h3>
             <p className="text-xs text-muted-foreground mt-0.5">Atualize seus dados de contato e bio.</p>
           </div>
@@ -311,8 +311,8 @@ function ProfilePage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02]">
-          <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="rounded-3xl border border-border bg-card">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold">Conquistas</h3>
               <p className="text-xs text-muted-foreground mt-0.5">{earnedBadges} de {achievements.length || 6} desbloqueadas</p>
@@ -338,13 +338,13 @@ function ProfilePage() {
                   className={`group relative rounded-xl border p-3 flex flex-col items-center text-center transition-all duration-300 select-none ${
                     a.unlocked
                       ? `${cfg.unlockedBorder} ${cfg.unlockedBg} ${cfg.glow}`
-                      : "border-white/5 bg-white/[0.01] opacity-40 grayscale hover:opacity-60 transition"
+                      : "border-border bg-card opacity-40 grayscale hover:opacity-60 transition"
                   }`}
                 >
                   <div className={`relative h-10 w-10 rounded-xl flex items-center justify-center mb-1.5 shadow-lg transition-all duration-300 ${
                     a.unlocked
                       ? `${cfg.bg} ${cfg.glow} group-hover:scale-105 group-hover:rotate-3`
-                      : "bg-white/5 text-muted-foreground/30 ring-dashed"
+                      : "bg-muted/40 text-muted-foreground/30 ring-dashed"
                   }`}>
                     <Icon className={`h-4.5 w-4.5 ${a.unlocked ? cfg.color : "text-muted-foreground/20"} ${cfg.animate || ""}`} />
                     {!a.unlocked && (
@@ -356,7 +356,7 @@ function ProfilePage() {
                   <div className="text-[10px] text-muted-foreground leading-tight truncate w-full">{a.title}</div>
 
                   {/* Premium pure CSS Tooltip */}
-                  <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2.5 w-48 -translate-x-1/2 scale-95 rounded-xl border border-white/[0.08] bg-black/95 p-2.5 text-center opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+                  <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2.5 w-48 -translate-x-1/2 scale-95 rounded-xl border border-border bg-black/95 p-2.5 text-center opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
                     <p className={`font-bold text-[11px] mb-0.5 ${a.unlocked ? cfg.color : "text-muted-foreground"}`}>{a.title}</p>
                     <p className="text-[9px] text-muted-foreground/80 leading-relaxed mb-1">{a.description}</p>
                     {a.unlocked ? (
@@ -364,11 +364,11 @@ function ProfilePage() {
                         Desbloqueado!
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[8px] font-semibold text-muted-foreground/70 bg-white/[0.04] px-1.5 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[8px] font-semibold text-muted-foreground/70 bg-card px-1.5 py-0.5 rounded-full">
                         Bloqueado · {a.progress ?? 0}%
                       </span>
                     )}
-                    <div className="absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1 bg-black/95 border-r border-b border-white/[0.08] rotate-45" />
+                    <div className="absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1 bg-black/95 border-r border-b border-border rotate-45" />
                   </div>
                 </div>
               );

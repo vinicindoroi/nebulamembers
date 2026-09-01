@@ -52,7 +52,7 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-xl hover:bg-white/5 transition"
+        className="relative p-2 rounded-xl hover:bg-muted/50 transition"
         aria-label="Notificações"
       >
         <Bell className={`h-4 w-4 transition-transform ${shaking ? 'animate-[wiggle_0.6s_ease-in-out]' : ''}`} />
@@ -76,7 +76,7 @@ export function NotificationBell() {
           }}
         >
           {/* Header */}
-          <div className="px-4 py-3 flex items-center justify-between border-b border-white/[0.06]">
+          <div className="px-4 py-3 flex items-center justify-between border-b border-border">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold">Notificações</h3>
               {unreadCount > 0 && (
@@ -89,7 +89,7 @@ export function NotificationBell() {
               {unreadCount > 0 && (
                 <button
                   onClick={() => markAllRead.mutate(unreadIds)}
-                  className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground transition"
+                  className="p-1.5 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition"
                   title="Marcar todas como lidas"
                 >
                   <CheckCheck className="h-3.5 w-3.5" />
@@ -97,7 +97,7 @@ export function NotificationBell() {
               )}
               <button
                 onClick={() => setOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-foreground transition"
+                className="p-1.5 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -119,7 +119,7 @@ export function NotificationBell() {
                   <button
                     key={n.id}
                     onClick={() => { if (!n.read) markRead.mutate(n.id); }}
-                    className={`w-full text-left px-4 py-3 transition hover:bg-white/[0.04] ${
+                    className={`w-full text-left px-4 py-3 transition hover:bg-card ${
                       !n.read ? "bg-primary/[0.03]" : ""
                     }`}
                   >
@@ -150,7 +150,7 @@ export function NotificationBell() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-2.5 border-t border-white/[0.06] bg-white/[0.02]">
+            <div className="px-4 py-2.5 border-t border-border bg-card">
               <div className="text-[10px] text-center text-muted-foreground/60">
                 Mostrando as últimas {notifications.length} notificações
               </div>

@@ -35,22 +35,22 @@ function Page() {
         <button
           onClick={load}
           disabled={loading}
-          className="text-xs px-3 py-2 rounded-xl border border-white/10 hover:bg-white/5 flex items-center gap-2 disabled:opacity-50"
+          className="text-xs px-3 py-2 rounded-xl border border-border hover:bg-muted/50 flex items-center gap-2 disabled:opacity-50"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           Atualizar
         </button>
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/5 flex items-center gap-3">
+      <div className="rounded-3xl border border-border bg-card overflow-hidden">
+        <div className="px-4 py-3 border-b border-border flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Filtrar por ação ou alvo..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
             />
           </div>
           <div className="text-xs text-muted-foreground">{filtered.length} de {rows.length}</div>
@@ -68,7 +68,7 @@ function Page() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs text-muted-foreground bg-white/[0.02] border-b border-white/5">
+                <tr className="text-xs text-muted-foreground bg-card border-b border-border">
                   <th className="text-left px-4 py-3 font-medium">Ação</th>
                   <th className="text-left px-4 py-3 font-medium">Alvo</th>
                   <th className="text-left px-4 py-3 font-medium">IP</th>
@@ -77,7 +77,7 @@ function Page() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {filtered.map((l) => (
-                  <tr key={l.id} className="hover:bg-white/[0.02] transition">
+                  <tr key={l.id} className="hover:bg-card transition">
                     <td className="px-4 py-3">
                       <span className="font-medium">{l.action}</span>
                     </td>

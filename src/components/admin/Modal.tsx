@@ -40,11 +40,11 @@ export function Modal({ open, onClose, title, kicker, description, size = "lg", 
     >
       <div className="min-h-full flex items-center justify-center p-4">
         <div
-          className={`relative w-full ${sizeMap[size]} rounded-2xl border border-white/10 bg-[oklch(0.16_0.015_270)] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7)] overflow-hidden`}
+          className={`relative w-full ${sizeMap[size]} rounded-2xl border border-border bg-[oklch(0.16_0.015_270)] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7)] overflow-hidden`}
           style={{ animation: "modal-card-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative px-6 pt-5 pb-4 border-b border-white/5 bg-gradient-to-b from-white/[0.04] to-transparent">
+          <div className="relative px-6 pt-5 pb-4 border-b border-border bg-gradient-to-b from-white/[0.04] to-transparent">
             <div className="flex items-start justify-between gap-4">
               <div>
                 {kicker && (
@@ -59,7 +59,7 @@ export function Modal({ open, onClose, title, kicker, description, size = "lg", 
               </div>
               <button
                 onClick={onClose}
-                className="shrink-0 h-9 w-9 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] flex items-center justify-center transition"
+                className="shrink-0 h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted/50 flex items-center justify-center transition"
                 aria-label="Fechar"
               >
                 <X className="h-4 w-4" />
@@ -72,7 +72,7 @@ export function Modal({ open, onClose, title, kicker, description, size = "lg", 
           </div>
 
           {footer && (
-            <div className="px-6 py-4 border-t border-white/5 bg-white/[0.02] flex items-center justify-end gap-2">
+            <div className="px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
               {footer}
             </div>
           )}
@@ -114,7 +114,7 @@ export function Field({ label, icon: Icon, required, hint, children }: FieldProp
 }
 
 export const inputClass =
-  "w-full bg-white/[0.04] border border-white/10 rounded-xl px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/50 hover:bg-white/[0.06] hover:border-white/15 focus:bg-white/[0.06] focus:border-primary/50 focus:ring-[3px] focus:ring-primary/15";
+  "w-full bg-card border border-border rounded-xl px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/50 hover:bg-muted/50 hover:border-border focus:bg-white/[0.06] focus:border-primary/50 focus:ring-[3px] focus:ring-primary/15";
 
 export const selectClass = `${inputClass} appearance-none pr-9 bg-no-repeat [&>option]:bg-[#1a1a2e] [&>option]:text-white`;
 

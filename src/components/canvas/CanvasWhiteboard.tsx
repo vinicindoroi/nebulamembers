@@ -747,7 +747,7 @@ export function CanvasWhiteboard({
           {/* Infinite dotted background pattern for Miro style */}
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="#ffffff12" />
           
-          <Controls showInteractive={false} className="!bg-[#0f0f13] !border-white/10 !text-white [&>button]:!border-white/5 [&>button]:hover:!bg-white/5" />
+          <Controls showInteractive={false} className="!bg-[#0f0f13] !border-border !text-white [&>button]:!border-border [&>button]:hover:!bg-muted/40" />
           
           {/* Drawing SVG Overlay (Renders ONLY the currently active path) */}
           <svg

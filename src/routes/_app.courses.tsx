@@ -57,7 +57,7 @@ function CoursesList() {
         </div>
       </header>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 space-y-3">
+      <div className="rounded-3xl border border-border bg-card p-4 space-y-3">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -65,7 +65,7 @@ function CoursesList() {
               placeholder="Buscar por título ou descrição..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm outline-none focus:border-primary/40 transition"
+              className="w-full bg-card border border-border rounded-xl pl-9 pr-8 py-2 text-sm outline-none focus:border-primary/40 transition"
             />
             {search && (
               <button
@@ -76,7 +76,7 @@ function CoursesList() {
               </button>
             )}
           </div>
-          <div className="flex gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/10">
+          <div className="flex gap-1 p-1 rounded-xl bg-card border border-border">
             {QUICK_FILTERS.map((f) => {
               const Icon = f.icon;
               const active = filter === f.id;
@@ -102,7 +102,7 @@ function CoursesList() {
             <button
               onClick={() => setTag(null)}
               className={`text-[11px] px-2.5 py-1 rounded-full transition ${
-                !tag ? "bg-primary/15 text-primary border border-primary/20" : "bg-white/5 text-muted-foreground hover:text-foreground border border-transparent"
+                !tag ? "bg-primary/15 text-primary border border-primary/20" : "bg-muted/40 text-muted-foreground hover:text-foreground border border-transparent"
               }`}
             >
               Todas categorias
@@ -114,7 +114,7 @@ function CoursesList() {
                   key={t}
                   onClick={() => setTag(active ? null : t)}
                   className={`text-[11px] px-2.5 py-1 rounded-full transition ${
-                    active ? "bg-primary/15 text-primary border border-primary/20" : "bg-white/5 text-muted-foreground hover:text-foreground border border-transparent"
+                    active ? "bg-primary/15 text-primary border border-primary/20" : "bg-muted/40 text-muted-foreground hover:text-foreground border border-transparent"
                   }`}
                 >
                   {t}
@@ -128,17 +128,17 @@ function CoursesList() {
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl border border-white/5 bg-white/[0.02] animate-pulse">
-              <div className="aspect-[16/10] bg-white/[0.02]" />
+            <div key={i} className="rounded-3xl border border-border bg-card animate-pulse">
+              <div className="aspect-[16/10] bg-card" />
               <div className="p-4 space-y-2">
-                <div className="h-3 w-3/4 bg-white/5 rounded" />
-                <div className="h-2 w-full bg-white/5 rounded" />
+                <div className="h-3 w-3/4 bg-muted/40 rounded" />
+                <div className="h-2 w-full bg-muted/40 rounded" />
               </div>
             </div>
           ))}
         </div>
       ) : visible.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
           <BookOpen className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
           <div className="text-sm font-medium">Nenhum curso encontrado</div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -152,7 +152,7 @@ function CoursesList() {
               key={c.id}
               to="/courses/$courseId"
               params={{ courseId: c.id }}
-              className="group rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden hover:border-white/10 transition"
+              className="group rounded-2xl border border-border bg-card overflow-hidden hover:border-border transition"
             >
               <div className="aspect-[16/10] relative overflow-hidden">
                 {c.cover_url && (
@@ -183,7 +183,7 @@ function CoursesList() {
               </div>
               <div className="p-4">
                 <div className="mt-1 flex items-center gap-2">
-                  <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                  <div className="flex-1 h-1.5 rounded-full bg-muted/40 overflow-hidden">
                     <div className="h-full gradient-primary transition-all" style={{ width: `${c.progress}%` }} />
                   </div>
                   <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">{c.progress}%</span>

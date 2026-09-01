@@ -119,7 +119,7 @@ export function LessonComments({ lessonId }: { lessonId: string }) {
         <MessageSquare className="h-4 w-4 text-primary" />
         <h3 className="text-sm font-semibold">Comentários</h3>
         {totalCount > 0 && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-muted-foreground">
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/40 text-muted-foreground">
             {totalCount}
           </span>
         )}
@@ -128,7 +128,7 @@ export function LessonComments({ lessonId }: { lessonId: string }) {
       {/* Input */}
       <form onSubmit={handleSubmit} className="space-y-2">
         {replyTo && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-white/[0.03] px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-card px-3 py-1.5 rounded-lg">
             <Reply className="h-3 w-3" />
             <span>Respondendo a <strong className="text-foreground">{replyTo.name}</strong></span>
             <button type="button" onClick={() => setReplyTo(null)} className="ml-auto text-[10px] hover:text-foreground">
@@ -142,7 +142,7 @@ export function LessonComments({ lessonId }: { lessonId: string }) {
             onChange={(e) => setText(e.target.value)}
             placeholder={replyTo ? "Escreva sua resposta..." : "Escreva um comentário..."}
             maxLength={1000}
-            className="flex-1 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary/40 placeholder:text-muted-foreground/60 transition"
+            className="flex-1 bg-card border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary/40 placeholder:text-muted-foreground/60 transition"
           />
           <button
             type="submit"

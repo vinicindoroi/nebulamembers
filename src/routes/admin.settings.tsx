@@ -194,7 +194,7 @@ function Page() {
 
       <div className="flex gap-6 flex-col lg:flex-row">
         <aside className="lg:w-56 shrink-0 w-full">
-          <nav className="rounded-2xl border border-white/5 bg-white/[0.02] p-1.5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible no-scrollbar">
+          <nav className="rounded-3xl border border-border bg-card p-1.5 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible no-scrollbar">
             {TABS.map((t) => {
               const Icon = t.icon;
               const active = tab === t.id;
@@ -205,7 +205,7 @@ function Page() {
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm transition shrink-0 whitespace-nowrap lg:w-full ${
                     active
                       ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground border border-primary/10 lg:border-transparent"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
                   <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
@@ -217,7 +217,7 @@ function Page() {
         </aside>
 
         <div className="flex-1 min-w-0">
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 max-w-2xl space-y-5">
+          <div className="rounded-3xl border border-border bg-card p-6 max-w-2xl space-y-5">
             {tab === "general" && (
               <>
                 <Field label="Nome da plataforma" icon={Type}>
@@ -241,7 +241,7 @@ function Page() {
                       type="color"
                       value={s.general.primaryColor}
                       onChange={(e) => update("general", { primaryColor: e.target.value })}
-                      className="h-11 w-16 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer"
+                      className="h-11 w-16 rounded-xl bg-card border border-border cursor-pointer"
                       style={{ colorScheme: "dark" }}
                     />
                     <input
@@ -335,7 +335,7 @@ function Page() {
                   />
                 </Field>
                 <Field label="Autenticação de dois fatores" icon={ShieldCheck}>
-                  <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+                  <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
                     <input
                       type="checkbox"
                       checked={s.security.require2faAdmins}
@@ -346,7 +346,7 @@ function Page() {
                   </label>
                 </Field>
                 <Field label="Restrição de Acesso" icon={ShieldCheck} hint="Habilite para permitir cadastro e login apenas para e-mails presentes nas respostas do formulário (/forms).">
-                  <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+                  <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
                     <input
                       type="checkbox"
                       checked={s.general.restrictToLeads}
@@ -361,7 +361,7 @@ function Page() {
 
             {tab === "vercel" && (
               <div className="space-y-6">
-                <div className="border border-white/5 bg-white/[0.01] rounded-2xl p-5 space-y-4">
+                <div className="border border-border bg-card rounded-2xl p-5 space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary">
                       <CloudLightning className="h-5 w-5" />

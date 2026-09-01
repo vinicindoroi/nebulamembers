@@ -115,16 +115,16 @@ export function RichTextEditor({ content, onChange, placeholder = "Escreva aqui.
       type="button"
       onClick={onClick}
       title={title}
-      className={`p-1.5 rounded-lg transition ${active ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/5"}`}
+      className={`p-1.5 rounded-lg transition ${active ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
     >
       {children}
     </button>
   );
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.04] overflow-hidden">
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 flex-wrap px-3 py-2 border-b border-white/[0.06] bg-white/[0.02]">
+      <div className="flex items-center gap-0.5 flex-wrap px-3 py-2 border-b border-border bg-card">
         <ToolBtn active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} title="Negrito">
           <Bold className="h-4 w-4" />
         </ToolBtn>
@@ -179,9 +179,9 @@ export function RichTextEditor({ content, onChange, placeholder = "Escreva aqui.
             <Palette className="h-4 w-4" />
           </ToolBtn>
           {showColorPicker && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 px-3 py-2.5 rounded-full border border-white/10 bg-[oklch(0.15_0.01_270)] shadow-xl flex items-center gap-2">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 px-3 py-2.5 rounded-full border border-border bg-[oklch(0.15_0.01_270)] shadow-xl flex items-center gap-2">
               {COLORS.map((c) => (
-                <button key={c} type="button" onClick={() => { editor.chain().focus().setColor(c).run(); setShowColorPicker(false); }} className="h-7 w-7 rounded-full border-2 border-white/10 hover:scale-125 hover:border-white/40 transition-transform" style={{ background: c }} />
+                <button key={c} type="button" onClick={() => { editor.chain().focus().setColor(c).run(); setShowColorPicker(false); }} className="h-7 w-7 rounded-full border-2 border-border hover:scale-125 hover:border-white/40 transition-transform" style={{ background: c }} />
               ))}
               <div className="w-px h-5 bg-white/10 mx-0.5" />
               <button type="button" onClick={() => { editor.chain().focus().unsetColor().run(); setShowColorPicker(false); }} className="text-[10px] text-muted-foreground hover:text-foreground whitespace-nowrap px-1.5">Remover</button>
@@ -195,9 +195,9 @@ export function RichTextEditor({ content, onChange, placeholder = "Escreva aqui.
             <Highlighter className="h-4 w-4" />
           </ToolBtn>
           {showHighlightPicker && (
-            <div className="absolute top-full right-0 mt-2 z-50 px-3 py-2.5 rounded-full border border-white/10 bg-[oklch(0.15_0.01_270)] shadow-xl flex items-center gap-2">
+            <div className="absolute top-full right-0 mt-2 z-50 px-3 py-2.5 rounded-full border border-border bg-[oklch(0.15_0.01_270)] shadow-xl flex items-center gap-2">
               {COLORS.slice(2).map((c) => (
-                <button key={c} type="button" onClick={() => { editor.chain().focus().toggleHighlight({ color: c + "33" }).run(); setShowHighlightPicker(false); }} className="h-7 w-7 rounded-full border-2 border-white/10 hover:scale-125 hover:border-white/40 transition-transform" style={{ background: c }} />
+                <button key={c} type="button" onClick={() => { editor.chain().focus().toggleHighlight({ color: c + "33" }).run(); setShowHighlightPicker(false); }} className="h-7 w-7 rounded-full border-2 border-border hover:scale-125 hover:border-white/40 transition-transform" style={{ background: c }} />
               ))}
               <div className="w-px h-5 bg-white/10 mx-0.5" />
               <button type="button" onClick={() => { editor.chain().focus().unsetHighlight().run(); setShowHighlightPicker(false); }} className="text-[10px] text-muted-foreground hover:text-foreground whitespace-nowrap px-1.5">Remover</button>

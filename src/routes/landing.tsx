@@ -117,7 +117,7 @@ function LandingPage() {
 
           {/* Mobile Menu Controls */}
           <div className="flex md:hidden items-center gap-3">
-            <Link to="/login" className="text-xs font-semibold text-white bg-white/5 border border-white/10 rounded-xl px-3.5 py-1.5 hover:bg-white/10 transition-colors">
+            <Link to="/login" className="text-xs font-semibold text-white bg-muted/40 border border-border rounded-xl px-3.5 py-1.5 hover:bg-white/10 transition-colors">
               Entrar
             </Link>
             <button 
@@ -140,7 +140,7 @@ function LandingPage() {
         {/* Mobile Dropdown Panel Menu */}
         {mobileMenuOpen && (
           <div 
-            className="absolute top-full left-5 right-5 mt-2 rounded-2xl border border-white/[0.08] p-4 flex flex-col gap-3.5 z-20 animate-fade-in"
+            className="absolute top-full left-5 right-5 mt-2 rounded-2xl border border-border p-4 flex flex-col gap-3.5 z-20 animate-fade-in"
             style={{ 
               background: "rgba(15, 10, 25, 0.92)", 
               backdropFilter: "blur(50px) saturate(1.5)", 
@@ -179,7 +179,7 @@ function LandingPage() {
       <TestimonialsSection />
       <FAQSection />
       <CTASection />
-      <footer className="relative z-10 px-5 py-8 max-w-7xl mx-auto flex items-center justify-between border-t border-white/[0.04]">
+      <footer className="relative z-10 px-5 py-8 max-w-7xl mx-auto flex items-center justify-between border-t border-border">
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-md gradient-primary flex items-center justify-center"><Orbit className="h-3 w-3 text-white" /></div>
           <span className="text-xs text-white/40">Nebula</span>
@@ -341,17 +341,17 @@ function DashboardPreview() {
         </div>
 
         {/* Dashboard Mockup Container */}
-        <div className="glass-strong rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] relative group">
+        <div className="glass-strong rounded-2xl overflow-hidden border border-border shadow-[0_24px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] relative group">
           <div className="absolute top-0 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           
           {/* Top Window Bar */}
-          <div className="h-10 border-b border-white/[0.06] bg-white/[0.02] flex items-center px-4 justify-between">
+          <div className="h-10 border-b border-border bg-card flex items-center px-4 justify-between">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-white/10" />
               <span className="w-2 h-2 rounded-full bg-white/10" />
               <span className="w-2 h-2 rounded-full bg-white/10" />
             </div>
-            <div className="text-[10px] text-white/30 font-medium tracking-tight bg-white/[0.03] px-4 py-1 rounded-md border border-white/[0.04]">
+            <div className="text-[10px] text-white/30 font-medium tracking-tight bg-card px-4 py-1 rounded-md border border-border">
               nebula.app/dashboard
             </div>
             <div className="w-8" />
@@ -359,7 +359,7 @@ function DashboardPreview() {
 
           <div className="flex min-h-[420px] flex-col md:flex-row">
             {/* Sidebar Mock */}
-            <div className="w-full md:w-48 border-b md:border-b-0 md:border-r border-white/[0.06] bg-white/[0.01] p-4 flex md:flex-col gap-1 overflow-x-auto whitespace-nowrap shrink-0 md:overflow-x-visible md:whitespace-normal">
+            <div className="w-full md:w-48 border-b md:border-b-0 md:border-r border-border bg-card p-4 flex md:flex-col gap-1 overflow-x-auto whitespace-nowrap shrink-0 md:overflow-x-visible md:whitespace-normal">
               {[
                 { label: "Dashboard", icon: Target },
                 { label: "Cursos", icon: Play },
@@ -375,7 +375,7 @@ function DashboardPreview() {
                     className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs transition-all shrink-0 text-left w-full cursor-pointer ${
                       isActive
                         ? "bg-primary/10 text-white font-medium border border-primary/20 shadow-[0_0_15px_rgba(180,120,255,0.06)]"
-                        : "text-white/40 hover:text-white/70 hover:bg-white/[0.02] border border-transparent"
+                        : "text-white/40 hover:text-white/70 hover:bg-card border border-transparent"
                     }`}
                   >
                     <item.icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary animate-pulse" : "text-white/30"}`} />
@@ -392,14 +392,14 @@ function DashboardPreview() {
               {activeTab === "Dashboard" && (
                 <div className="space-y-5 animate-fade-in">
                   {/* Top Banner Widget */}
-                  <div className="rounded-xl border border-white/[0.06] bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="rounded-xl border border-border bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                       <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
                         <Orbit className="h-3.5 w-3.5 text-primary" /> Bem-vindo à Nebula, Lucas!
                       </h3>
                       <p className="text-[10px] text-white/50 mt-1">Seu plano de ação de 90 dias está ativo. Aplique a tarefa da aula de hoje.</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 bg-white/[0.04] border border-white/[0.08] rounded-lg px-2.5 py-1">
+                    <div className="flex items-center gap-2 shrink-0 bg-card border border-border rounded-lg px-2.5 py-1">
                       <div className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
                       <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Suporte Ativo</span>
                     </div>
@@ -410,7 +410,7 @@ function DashboardPreview() {
                     {/* Active Course Play Widget */}
                     <button 
                       onClick={() => { setActiveVideoCourse({ title: "Criando seu primeiro Funil de WhatsApp", category: "Módulo 02 • Aula Prática" }); setIsPlaying(true); setCurrentTime(102); }}
-                      className="glass rounded-xl p-4 border border-white/[0.06] flex flex-col justify-between min-h-[160px] relative overflow-hidden group/card hover:border-primary/20 transition-all text-left w-full cursor-pointer"
+                      className="glass rounded-xl p-4 border border-border flex flex-col justify-between min-h-[160px] relative overflow-hidden group/card hover:border-primary/20 transition-all text-left w-full cursor-pointer"
                     >
                       <div className="absolute top-0 right-0 p-3 opacity-20 group-hover/card:opacity-40 transition-opacity">
                         <Play className="h-10 w-10 text-primary" />
@@ -420,7 +420,7 @@ function DashboardPreview() {
                         <h4 className="text-xs font-bold text-white mt-1 leading-snug">Criando seu primeiro Funil de WhatsApp</h4>
                         <p className="text-[10px] text-white/40 mt-1">Tempo de aplicação: 25 minutos</p>
                       </div>
-                      <div className="mt-4 pt-3 border-t border-white/[0.04] w-full">
+                      <div className="mt-4 pt-3 border-t border-border w-full">
                         <div className="flex justify-between text-[9px] text-white/40 mb-1.5">
                           <span>Seu progresso da aula</span>
                           <span className="text-white/70 font-semibold">75%</span>
@@ -432,7 +432,7 @@ function DashboardPreview() {
                     </button>
 
                     {/* Live Gamification Widget */}
-                    <div className="glass rounded-xl p-4 border border-white/[0.06] flex flex-col justify-between min-h-[160px] hover:border-primary/20 transition-all">
+                    <div className="glass rounded-xl p-4 border border-border flex flex-col justify-between min-h-[160px] hover:border-primary/20 transition-all">
                       <div className="flex justify-between items-start">
                         <div>
                           <span className="text-[9px] uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1">
@@ -454,7 +454,7 @@ function DashboardPreview() {
                           <div className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full" style={{ width: "65%" }} />
                         </div>
                         <div className="flex items-center gap-1.5 mt-3">
-                          <span className="text-[8px] bg-white/[0.04] border border-white/[0.06] text-white/60 px-1.5 py-0.5 rounded uppercase font-semibold">Insignia: Lucro Rápido</span>
+                          <span className="text-[8px] bg-card border border-border text-white/60 px-1.5 py-0.5 rounded uppercase font-semibold">Insignia: Lucro Rápido</span>
                           <span className="text-[8px] bg-primary/10 border border-primary/20 text-primary px-1.5 py-0.5 rounded uppercase font-semibold">Ativa</span>
                         </div>
                       </div>
@@ -464,9 +464,9 @@ function DashboardPreview() {
                   {/* Live Community Feed Widget Summary */}
                   <button 
                     onClick={() => setActiveTab("Comunidade")}
-                    className="glass rounded-xl p-4 border border-white/[0.06] hover:border-primary/20 transition-all space-y-3 text-left w-full cursor-pointer"
+                    className="glass rounded-xl p-4 border border-border hover:border-primary/20 transition-all space-y-3 text-left w-full cursor-pointer"
                   >
-                    <div className="flex items-center justify-between border-b border-white/[0.04] pb-2">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
                       <span className="text-[9px] uppercase tracking-wider text-white/40 font-bold flex items-center gap-1.5">
                         <MessageSquare className="h-3 w-3 text-primary" /> Atividade da Comunidade
                       </span>
@@ -474,7 +474,7 @@ function DashboardPreview() {
                     </div>
                     <div className="space-y-2.5">
                       {posts.slice(0, 2).map((post, pIdx) => (
-                        <div key={pIdx} className="flex items-center justify-between gap-3 text-[10px] hover:bg-white/[0.01] p-1 rounded-lg transition-all">
+                        <div key={pIdx} className="flex items-center justify-between gap-3 text-[10px] hover:bg-card p-1 rounded-lg transition-all">
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div className={`h-6 w-6 rounded-full bg-gradient-to-tr ${post.avatarGrad} flex items-center justify-center text-[8px] font-bold text-white shrink-0 shadow-sm`}>
                               {post.init}
@@ -494,7 +494,7 @@ function DashboardPreview() {
               {/* Tab 2: Cursos */}
               {activeTab === "Cursos" && (
                 <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
+                  <div className="flex items-center justify-between border-b border-border pb-3">
                     <span className="text-xs font-bold text-white flex items-center gap-1.5">
                       <Play className="h-3.5 w-3.5 text-primary" /> Seus Cursos & Trilhas
                     </span>
@@ -509,8 +509,8 @@ function DashboardPreview() {
                     ].map((course, idx) => (
                       <div
                         key={idx}
-                        className={`glass rounded-xl p-4 border border-white/[0.06] flex items-center justify-between gap-4 transition-all ${
-                          course.locked ? "opacity-60 bg-white/[0.01]" : "hover:border-primary/25"
+                        className={`glass rounded-xl p-4 border border-border flex items-center justify-between gap-4 transition-all ${
+                          course.locked ? "opacity-60 bg-card" : "hover:border-primary/25"
                         }`}
                       >
                         <div className="space-y-1">
@@ -538,7 +538,7 @@ function DashboardPreview() {
                             <Play className="h-3 w-3 fill-white" /> Assistir
                           </button>
                         ) : (
-                          <div className="h-7 w-7 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center shrink-0">
+                          <div className="h-7 w-7 rounded-lg bg-card border border-border flex items-center justify-center shrink-0">
                             <Unlock className="h-3.5 w-3.5 text-white/20" />
                           </div>
                         )}
@@ -551,7 +551,7 @@ function DashboardPreview() {
               {/* Tab 3: Comunidade (Fully Interactive Simulator) */}
               {activeTab === "Comunidade" && (
                 <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
+                  <div className="flex items-center justify-between border-b border-border pb-3">
                     <span className="text-xs font-bold text-white flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5 text-primary" /> Feed da Comunidade (Simulador)
                     </span>
@@ -565,7 +565,7 @@ function DashboardPreview() {
                       placeholder="Compartilhe um resultado ou dúvida..."
                       value={newPostText}
                       onChange={(e) => setNewPostText(e.target.value)}
-                      className="flex-1 text-xs bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all"
+                      className="flex-1 text-xs bg-card border border-border rounded-xl px-3 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all"
                     />
                     <button
                       type="submit"
@@ -578,7 +578,7 @@ function DashboardPreview() {
                   {/* Posts List */}
                   <div className="space-y-3.5 mt-2">
                     {posts.map((post) => (
-                      <div key={post.id} className="glass rounded-xl p-3 border border-white/[0.06] space-y-2 hover:border-white/10 transition-all">
+                      <div key={post.id} className="glass rounded-xl p-3 border border-border space-y-2 hover:border-border transition-all">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div className={`h-6 w-6 rounded-full bg-gradient-to-tr ${post.avatarGrad} flex items-center justify-center text-[8px] font-bold text-white shadow-sm`}>
@@ -594,7 +594,7 @@ function DashboardPreview() {
                             className={`flex items-center gap-1 text-[9px] px-2 py-1 rounded-lg border transition-all cursor-pointer ${
                               post.liked
                                 ? "bg-primary/20 border-primary text-primary font-bold shadow-[0_0_8px_rgba(180,120,255,0.08)]"
-                                : "bg-white/[0.02] border-white/[0.04] text-white/40 hover:text-white/60"
+                                : "bg-card border-border text-white/40 hover:text-white/60"
                             }`}
                           >
                             <Trophy className={`h-3 w-3 ${post.liked ? "fill-primary text-primary animate-bounce" : "text-white/30"}`} />
@@ -611,7 +611,7 @@ function DashboardPreview() {
               {/* Tab 4: Fórum de Dúvidas (Fully Functional Support Simulation with AI Auto-Answer) */}
               {activeTab === "Fórum de Dúvidas" && (
                 <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
+                  <div className="flex items-center justify-between border-b border-border pb-3">
                     <span className="text-xs font-bold text-white flex items-center gap-1.5">
                       <MessageSquare className="h-3.5 w-3.5 text-primary" /> Fórum de Dúvidas Práticas
                     </span>
@@ -626,7 +626,7 @@ function DashboardPreview() {
                       value={ticketInput}
                       onChange={(e) => setTicketInput(e.target.value)}
                       disabled={ticketLoading}
-                      className="flex-1 text-xs bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/40 disabled:opacity-50 transition-all"
+                      className="flex-1 text-xs bg-card border border-border rounded-xl px-3 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/40 disabled:opacity-50 transition-all"
                     />
                     <button
                       type="submit"
@@ -640,10 +640,10 @@ function DashboardPreview() {
                   {/* Tickets List */}
                   <div className="space-y-3 mt-2">
                     {tickets.map((t) => (
-                      <div key={t.id} className="glass rounded-xl p-4 border border-white/[0.06] space-y-3">
+                      <div key={t.id} className="glass rounded-xl p-4 border border-border space-y-3">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <span className="text-[8px] bg-white/[0.03] border border-white/[0.06] text-white/50 px-1.5 py-0.5 rounded font-semibold uppercase tracking-wider">{t.category}</span>
+                            <span className="text-[8px] bg-card border border-border text-white/50 px-1.5 py-0.5 rounded font-semibold uppercase tracking-wider">{t.category}</span>
                             <h4 className="text-xs font-bold text-white mt-1 leading-snug">{t.title}</h4>
                             <span className="text-[8px] text-white/30 block mt-0.5">{t.time}</span>
                           </div>
@@ -677,7 +677,7 @@ function DashboardPreview() {
               {/* Tab 5: Funis de Vendas (Interactive Schematic Flowchart Simulator) */}
               {activeTab === "Funis de Vendas" && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="flex items-center justify-between border-b border-white/[0.04] pb-3">
+                  <div className="flex items-center justify-between border-b border-border pb-3">
                     <span className="text-xs font-bold text-white flex items-center gap-1.5">
                       <Zap className="h-3.5 w-3.5 text-primary" /> Visualizador de Funis Ativos
                     </span>
@@ -697,7 +697,7 @@ function DashboardPreview() {
                         className={`py-2 px-1 text-center rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                           activeFunnel === funnel.id
                             ? "border-primary bg-primary/10 text-white shadow-[0_0_10px_rgba(180,120,255,0.06)]"
-                            : "border-white/[0.04] bg-white/[0.01] text-white/40 hover:text-white/60"
+                            : "border-border bg-card text-white/40 hover:text-white/60"
                         }`}
                       >
                         {funnel.label}
@@ -706,18 +706,18 @@ function DashboardPreview() {
                   </div>
 
                   {/* Flowchart Schematic representation */}
-                  <div className="glass rounded-xl p-5 border border-white/[0.06] bg-black/10 flex flex-col items-center justify-center min-h-[160px] text-center space-y-4 relative overflow-hidden">
+                  <div className="glass rounded-xl p-5 border border-border bg-black/10 flex flex-col items-center justify-center min-h-[160px] text-center space-y-4 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/[0.02] to-transparent pointer-events-none" />
                     
                     {activeFunnel === "whatsapp" && (
                       <div className="space-y-4 w-full animate-fade-in">
                         <span className="text-[8px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded uppercase font-bold tracking-widest">Estrutura WhatsApp</span>
                         <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-semibold text-white/80">
-                          <div className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/[0.02]">Anúncio (Meta Ads)</div>
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card">Anúncio (Meta Ads)</div>
                           <div className="text-primary">➔</div>
                           <div className="px-2.5 py-1.5 rounded-lg border border-primary/20 bg-primary/5 shadow-[0_0_10px_rgba(180,120,255,0.05)]">WhatsApp Automático</div>
                           <div className="text-primary">➔</div>
-                          <div className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/[0.02]">Script Oferta</div>
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card">Script Oferta</div>
                           <div className="text-primary">➔</div>
                           <div className="px-2.5 py-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 font-bold">Venda Confirmada!</div>
                         </div>
@@ -731,9 +731,9 @@ function DashboardPreview() {
                       <div className="space-y-4 w-full animate-fade-in">
                         <span className="text-[8px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded uppercase font-bold tracking-widest">Estrutura Vídeo de Vendas</span>
                         <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-semibold text-white/80">
-                          <div className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/[0.02]">Tráfego Pago</div>
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card">Tráfego Pago</div>
                           <div className="text-primary">➔</div>
-                          <div className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/[0.02]">Página VSL</div>
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card">Página VSL</div>
                           <div className="text-primary">➔</div>
                           <div className="px-2.5 py-1.5 rounded-lg border border-primary/20 bg-primary/5">Oferta Pitch</div>
                           <div className="text-primary">➔</div>
@@ -749,11 +749,11 @@ function DashboardPreview() {
                       <div className="space-y-4 w-full animate-fade-in">
                         <span className="text-[8px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded uppercase font-bold tracking-widest">Estrutura Conteúdo Orgânico</span>
                         <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-semibold text-white/80">
-                          <div className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/[0.02]">Reels / TikTok</div>
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card">Reels / TikTok</div>
                           <div className="text-primary">➔</div>
                           <div className="px-2.5 py-1.5 rounded-lg border border-primary/20 bg-primary/5">Direct Chat (ManyChat)</div>
                           <div className="text-primary">➔</div>
-                          <div className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-white/[0.02]">Isca Digital</div>
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card">Isca Digital</div>
                           <div className="text-primary">➔</div>
                           <div className="px-2.5 py-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 font-bold">Venda no Pix</div>
                         </div>
@@ -775,11 +775,11 @@ function DashboardPreview() {
       {activeVideoCourse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
           <div 
-            className="glass-strong w-full max-w-2xl rounded-2xl border border-white/[0.08] overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.06)] relative"
+            className="glass-strong w-full max-w-2xl rounded-2xl border border-border overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.06)] relative"
             style={{ background: "rgba(15, 10, 25, 0.8)", backdropFilter: "blur(50px)" }}
           >
             {/* Modal Header */}
-            <div className="h-12 border-b border-white/[0.06] bg-white/[0.02] flex items-center px-5 justify-between">
+            <div className="h-12 border-b border-border bg-card flex items-center px-5 justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
                 <span className="text-[10px] text-primary font-bold uppercase tracking-wider">Demonstração Interativa</span>
@@ -887,7 +887,7 @@ function DashboardPreview() {
               </div>
 
               {/* Premium Call to Action */}
-              <div className="rounded-xl border border-white/[0.08] p-4 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ background: "linear-gradient(135deg, rgba(140, 80, 220, 0.1), rgba(40, 20, 80, 0.05))" }}>
+              <div className="rounded-xl border border-border p-4 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ background: "linear-gradient(135deg, rgba(140, 80, 220, 0.1), rgba(40, 20, 80, 0.05))" }}>
                 <div className="text-center sm:text-left space-y-1">
                   <h5 className="text-xs font-bold text-white flex items-center justify-center sm:justify-start gap-1.5">
                     <Orbit className="h-3.5 w-3.5 text-primary" /> Desbloqueie todo o ambiente Nebula!
@@ -1010,7 +1010,7 @@ function RevenueCalculator() {
                       className={`py-2.5 px-3 rounded-xl text-xs font-medium border transition-all duration-200 ${
                         niche === item.id
                           ? "border-primary bg-primary/10 text-white shadow-[0_0_15px_rgba(180,120,255,0.08)]"
-                          : "border-white/[0.06] bg-white/[0.02] text-white/50 hover:border-white/10 hover:text-white"
+                          : "border-border bg-card text-white/50 hover:border-border hover:text-white"
                       }`}
                     >
                       {item.name}
@@ -1020,7 +1020,7 @@ function RevenueCalculator() {
               </div>
             </div>
 
-            <div className="text-center md:border-l border-white/[0.06] md:pl-8 py-4 flex flex-col items-center justify-center">
+            <div className="text-center md:border-l border-border md:pl-8 py-4 flex flex-col items-center justify-center">
               <span className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Projeção Estimada (90 dias)</span>
               <div className="text-3xl sm:text-4xl font-extrabold text-gradient tracking-tight">
                 R$ {estimatedIncome.toLocaleString("pt-BR")}
@@ -1114,7 +1114,7 @@ function PlansSection() {
             <Link 
               to={targetLink} 
               search={user ? undefined : { mode: "signup" }} 
-              className="w-full py-3 px-4 rounded-xl text-center text-xs font-bold border border-white/10 bg-white/[0.01] hover:bg-white/[0.06] hover:border-white/20 text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-auto"
+              className="w-full py-3 px-4 rounded-xl text-center text-xs font-bold border border-border bg-card hover:bg-muted/50 hover:border-white/20 text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-auto"
             >
               Começar Agora <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -1326,7 +1326,7 @@ function TestimonialsSection() {
                 ))}
               </div>
               <p className="text-xs text-white/50 leading-relaxed italic">&ldquo;{item.quote}&rdquo;</p>
-              <div className="mt-auto pt-3 border-t border-white/[0.05] flex items-center gap-3">
+              <div className="mt-auto pt-3 border-t border-border flex items-center gap-3">
                 <div className={`h-8 w-8 rounded-full bg-gradient-to-tr ${item.grad} flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0`}>
                   {item.initials}
                 </div>
@@ -1380,8 +1380,8 @@ function FAQSection() {
           return (
             <div
               key={idx}
-              className={`rounded-2xl border border-white/[0.06] transition-all duration-300 overflow-hidden ${
-                isOpen ? "bg-white/[0.03] border-white/10" : "bg-white/[0.01] hover:border-white/[0.08]"
+              className={`rounded-2xl border border-border transition-all duration-300 overflow-hidden ${
+                isOpen ? "bg-card border-border" : "bg-card hover:border-border"
               }`}
             >
               <button
@@ -1397,7 +1397,7 @@ function FAQSection() {
               </button>
               <div
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  isOpen ? "max-h-[200px] border-t border-white/[0.04]" : "max-h-0 opacity-0"
+                  isOpen ? "max-h-[200px] border-t border-border" : "max-h-0 opacity-0"
                 }`}
               >
                 <p className="p-5 text-xs text-white/50 leading-relaxed bg-black/10">

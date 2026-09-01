@@ -80,7 +80,7 @@ function Page() {
         <button
           onClick={load}
           disabled={loading}
-          className="text-xs px-3 py-2 rounded-xl border border-white/10 hover:bg-white/5 flex items-center gap-2 disabled:opacity-50"
+          className="text-xs px-3 py-2 rounded-xl border border-border hover:bg-muted/50 flex items-center gap-2 disabled:opacity-50"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           Atualizar
@@ -99,7 +99,7 @@ function Page() {
               className={`rounded-xl border p-3 text-left transition ${
                 active
                   ? "border-primary/40 bg-primary/5"
-                  : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]"
+                  : "border-border bg-card hover:border-border hover:bg-card"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -112,15 +112,15 @@ function Page() {
         })}
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02]">
-        <div className="px-4 py-3 border-b border-white/5">
+      <div className="rounded-3xl border border-border bg-card">
+        <div className="px-4 py-3 border-b border-border">
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar no conteúdo..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
             />
           </div>
         </div>
@@ -138,7 +138,7 @@ function Page() {
             {filtered.map((c) => {
               const status = c.status ?? "approved";
               return (
-                <div key={c.id} className="p-4 hover:bg-white/[0.02] transition flex items-start gap-3">
+                <div key={c.id} className="p-4 hover:bg-card transition flex items-start gap-3">
                   <div className="h-9 w-9 rounded-full gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground shrink-0">
                     {(c.user_id ?? "U").slice(0, 1).toUpperCase()}
                   </div>
@@ -202,7 +202,7 @@ function StatusBadge({ status }: { status: string }) {
     pending: { label: "Pendente", cls: "bg-amber-500/10 text-amber-400" },
     reported: { label: "Reportado", cls: "bg-red-500/10 text-red-400" },
   };
-  const m = map[status] ?? { label: status, cls: "bg-white/5 text-muted-foreground" };
+  const m = map[status] ?? { label: status, cls: "bg-muted/40 text-muted-foreground" };
   return (
     <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-medium ${m.cls}`}>
       {m.label}

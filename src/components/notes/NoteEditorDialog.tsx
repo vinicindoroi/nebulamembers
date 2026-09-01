@@ -107,7 +107,7 @@ export function NoteEditorDialog({ open, onOpenChange, note, lessonId, lessonTit
             placeholder="Título da nota..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-white/[0.04] border-white/10 focus:border-primary/60 rounded-xl h-11 transition-colors"
+            className="bg-card border-border focus:border-primary/60 rounded-xl h-11 transition-colors"
             style={{ borderColor: color ? `${color}40` : undefined }}
           />
 
@@ -116,7 +116,7 @@ export function NoteEditorDialog({ open, onOpenChange, note, lessonId, lessonTit
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={6}
-            className="bg-white/[0.04] border-white/10 focus:border-primary/60 rounded-xl resize-none transition-colors"
+            className="bg-card border-border focus:border-primary/60 rounded-xl resize-none transition-colors"
           />
 
           {/* Tags */}
@@ -125,7 +125,7 @@ export function NoteEditorDialog({ open, onOpenChange, note, lessonId, lessonTit
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="bg-white/[0.06] text-foreground/80 border-white/10 gap-1 rounded-lg">
+                  <Badge key={tag} variant="secondary" className="bg-white/[0.06] text-foreground/80 border-border gap-1 rounded-lg">
                     {tag}
                     <button onClick={() => handleRemoveTag(tag)} className="hover:text-destructive ml-0.5">
                       <X className="h-3 w-3" />
@@ -140,9 +140,9 @@ export function NoteEditorDialog({ open, onOpenChange, note, lessonId, lessonTit
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagKeyDown}
-                className="bg-white/[0.04] border-white/10 text-sm h-9 rounded-xl"
+                className="bg-card border-border text-sm h-9 rounded-xl"
               />
-              <Button size="sm" variant="ghost" onClick={handleAddTag} className="h-9 w-9 p-0 hover:bg-white/5 rounded-xl">
+              <Button size="sm" variant="ghost" onClick={handleAddTag} className="h-9 w-9 p-0 hover:bg-muted/50 rounded-xl">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -185,13 +185,13 @@ export function NoteEditorDialog({ open, onOpenChange, note, lessonId, lessonTit
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-3 border-t border-white/5">
+          <div className="flex items-center justify-between pt-3 border-t border-border">
             <button
               onClick={() => setPinned(!pinned)}
               className={`flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl transition-all duration-200 ${
                 pinned
                   ? 'bg-primary/15 text-primary border border-primary/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent'
               }`}
             >
               <Pin className={`h-3.5 w-3.5 ${pinned ? 'fill-primary' : ''}`} />
@@ -202,7 +202,7 @@ export function NoteEditorDialog({ open, onOpenChange, note, lessonId, lessonTit
                 variant="ghost"
                 onClick={() => onOpenChange(false)}
                 size="sm"
-                className="rounded-xl hover:bg-white/5"
+                className="rounded-xl hover:bg-muted/50"
               >
                 Cancelar
               </Button>

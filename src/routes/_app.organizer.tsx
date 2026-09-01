@@ -970,11 +970,11 @@ function OrganizerPage() {
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 bg-white/[0.02] border border-white/5 rounded-xl p-1 shadow-sm">
+          <div className="flex items-center gap-1.5 bg-card border border-border rounded-xl p-1 shadow-sm">
              <div className="relative z-[100]">
                <button
                  onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
-                 className="flex items-center justify-between bg-transparent hover:bg-white/5 rounded-lg text-[11px] font-bold text-foreground border-none outline-none py-1.5 px-3 cursor-pointer w-[160px] transition"
+                 className="flex items-center justify-between bg-transparent hover:bg-muted/50 rounded-lg text-[11px] font-bold text-foreground border-none outline-none py-1.5 px-3 cursor-pointer w-[160px] transition"
                >
                  <span className="truncate">{projects.find(p => p.id === activeProjectId)?.name || "Selecione o Projeto"}</span>
                  <ChevronDown className="h-3 w-3 text-muted-foreground ml-2 shrink-0" />
@@ -983,7 +983,7 @@ function OrganizerPage() {
                {isProjectDropdownOpen && (
                  <>
                    <div className="fixed inset-0 z-40" onClick={() => setIsProjectDropdownOpen(false)} />
-                   <div className="absolute top-full left-0 mt-1 w-full bg-[#0a0a0a] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                   <div className="absolute top-full left-0 mt-1 w-full bg-[#0a0a0a] border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                      <div className="max-h-[200px] overflow-y-auto py-1">
                        {projects.map(p => (
                          <button
@@ -995,7 +995,7 @@ function OrganizerPage() {
                              setActiveProjectId(p.id);
                              setIsProjectDropdownOpen(false);
                            }}
-                           className={`w-full text-left px-3 py-2 text-[11px] font-medium transition hover:bg-white/5 ${activeProjectId === p.id ? 'text-primary bg-primary/5' : 'text-foreground/80'}`}
+                           className={`w-full text-left px-3 py-2 text-[11px] font-medium transition hover:bg-muted/50 ${activeProjectId === p.id ? 'text-primary bg-primary/5' : 'text-foreground/80'}`}
                          >
                            {p.name}
                          </button>
@@ -1025,7 +1025,7 @@ function OrganizerPage() {
                     <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsTeamModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.04] text-muted-foreground hover:text-foreground text-[11px] font-semibold flex items-center gap-2 transition cursor-pointer"
+                className="px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-card text-muted-foreground hover:text-foreground text-[11px] font-semibold flex items-center gap-2 transition cursor-pointer"
               >
                 <div className="flex -space-x-2 mr-1">
                   {teamMembers.slice(0, 3).map((m, i) => (
@@ -1036,7 +1036,7 @@ function OrganizerPage() {
               </button>
               <button
                 onClick={() => setIsColModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.04] text-muted-foreground hover:text-foreground text-[11px] font-semibold flex items-center gap-2 transition cursor-pointer"
+              className="px-3.5 py-2 rounded-xl border border-border bg-card hover:bg-card text-muted-foreground hover:text-foreground text-[11px] font-semibold flex items-center gap-2 transition cursor-pointer"
             >
               <Trello className="h-3.5 w-3.5" /> Colunas
             </button>
@@ -1053,7 +1053,7 @@ function OrganizerPage() {
       {/* Dynamic Statistics Panel */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Stat 1: General Progress */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/[0.04] rounded-full blur-[20px] pointer-events-none" />
           <div className="space-y-1.5 flex-1 min-w-0">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Progresso Geral</span>
@@ -1061,7 +1061,7 @@ function OrganizerPage() {
               <span className="text-2xl font-black text-foreground tracking-tight">{studyCompletionRate}%</span>
               <span className="text-[10px] text-muted-foreground/60">{studyCompletedLessons} de {studyTotalLessons} aulas concluídas</span>
             </div>
-            <div className="h-1.5 w-full bg-white/[0.04] rounded-full overflow-hidden relative">
+            <div className="h-1.5 w-full bg-card rounded-full overflow-hidden relative">
               <div 
                 className="h-full gradient-primary rounded-full transition-all duration-500" 
                 style={{ width: `${studyCompletionRate}%` }}
@@ -1074,7 +1074,7 @@ function OrganizerPage() {
         </div>
 
         {/* Stat 2: High Priority Tasks */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/[0.02] rounded-full blur-[20px] pointer-events-none" />
           <div className="space-y-1.5 flex-1 min-w-0">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Foco Crítico</span>
@@ -1097,7 +1097,7 @@ function OrganizerPage() {
         </div>
 
         {/* Stat 3: Ofensiva Streak */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/[0.02] rounded-full blur-[20px] pointer-events-none" />
           <div className="space-y-1.5 flex-1 min-w-0">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Ofensiva Operacional</span>
@@ -1117,7 +1117,7 @@ function OrganizerPage() {
         </div>
 
         {/* Stat 4: Mini Weekly Chart */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/[0.02] rounded-full blur-[20px] pointer-events-none" />
           <div className="space-y-1.5 flex-1 min-w-0">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Frequência Semanal</span>
@@ -1128,7 +1128,7 @@ function OrganizerPage() {
                 const heightVal = day.active ? 85 : 12;
                 return (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <div className="w-1.5 h-6 bg-white/[0.04] rounded-t relative overflow-hidden flex items-end">
+                    <div className="w-1.5 h-6 bg-card rounded-t relative overflow-hidden flex items-end">
                       <div 
                         className="w-full gradient-primary rounded-t transition-all duration-500" 
                         style={{ height: `${heightVal}%` }}
@@ -1148,7 +1148,7 @@ function OrganizerPage() {
 
       {/* Main Grid: Kanban (Full Width) */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between border-b border-white/[0.04] pb-2">
+        <div className="flex items-center justify-between border-b border-border pb-2">
           <h2 className="text-sm font-semibold flex items-center gap-2">
             {viewMode === "kanban" && (
               <>
@@ -1168,7 +1168,7 @@ function OrganizerPage() {
           </h2>
           
           {/* View Mode Toggle Segmented Control */}
-          <div className="flex items-center bg-white/[0.03] border border-white/[0.06] rounded-full p-1 shadow-inner">
+          <div className="flex items-center bg-card border border-border rounded-full p-1 shadow-inner">
             <button 
               onClick={() => setViewMode("kanban")}
               className={`px-3 py-1.5 rounded-full text-[10px] font-bold flex items-center gap-1.5 transition select-none cursor-pointer ${viewMode === "kanban" ? "bg-white/10 text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
@@ -1195,7 +1195,7 @@ function OrganizerPage() {
             {/* KPI Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Card 1: Faturamento */}
-              <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+              <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/[0.03] rounded-full blur-[20px] pointer-events-none" />
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Faturamento (Receita)</span>
@@ -1210,7 +1210,7 @@ function OrganizerPage() {
               </div>
 
               {/* Card 2: Despesas */}
-              <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+              <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/[0.03] rounded-full blur-[20px] pointer-events-none" />
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Custos Operacionais</span>
@@ -1225,7 +1225,7 @@ function OrganizerPage() {
               </div>
 
               {/* Card 3: Lucro Líquido */}
-              <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+              <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/[0.03] rounded-full blur-[20px] pointer-events-none" />
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Lucro Líquido Real</span>
@@ -1240,7 +1240,7 @@ function OrganizerPage() {
               </div>
 
               {/* Card 4: ROI Médio */}
-              <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.01] p-4 flex items-center justify-between gap-4">
+              <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-4 flex items-center justify-between gap-4">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/[0.03] rounded-full blur-[20px] pointer-events-none" />
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Média de Retorno (ROI)</span>
@@ -1259,7 +1259,7 @@ function OrganizerPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
               {/* Box 1: Registrar Transação */}
-              <div className="glass rounded-2xl border border-white/[0.05] p-5 space-y-4">
+              <div className="glass rounded-2xl border border-border p-5 space-y-4">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
                   <Plus className="h-3.5 w-3.5 text-primary" /> Registrar Movimentação
                 </h3>
@@ -1341,7 +1341,7 @@ function OrganizerPage() {
               </div>
 
               {/* Box 2: Calculadora de ROI de Campanhas */}
-              <div className="glass rounded-2xl border border-white/[0.05] p-5 space-y-4 flex flex-col justify-between">
+              <div className="glass rounded-2xl border border-border p-5 space-y-4 flex flex-col justify-between">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
@@ -1349,7 +1349,7 @@ function OrganizerPage() {
                     </h3>
                     
                     {/* Tab Selector */}
-                    <div className="flex bg-white/[0.03] border border-white/[0.06] rounded-lg p-0.5 scale-90 origin-right">
+                    <div className="flex bg-card border border-border rounded-lg p-0.5 scale-90 origin-right">
                       <button
                         type="button"
                         onClick={() => setRoiTab("real")}
@@ -1385,7 +1385,7 @@ function OrganizerPage() {
                       </div>
 
                       {realAdSpend > 0 ? (
-                        <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl mt-2 space-y-2.5">
+                        <div className="bg-card border border-border p-3 rounded-xl mt-2 space-y-2.5">
                           <div className="flex justify-between items-center">
                             <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">ROI das Campanhas:</span>
                             <span className={`text-xs font-black px-2 py-0.5 rounded-full ${realROI >= 0 ? "bg-emerald-500/10 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)]" : "bg-red-500/10 text-red-400 animate-pulse"}`}>
@@ -1400,7 +1400,7 @@ function OrganizerPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="bg-white/[0.01] border border-dashed border-white/[0.05] p-3.5 rounded-xl text-center text-[10px] text-muted-foreground/45">
+                        <div className="bg-card border border-dashed border-border p-3.5 rounded-xl text-center text-[10px] text-muted-foreground/45">
                           Nenhum investimento registrado em "Tráfego Pago" para calcular o ROI automático. Adicione despesas com essa categoria!
                         </div>
                       )}
@@ -1512,29 +1512,29 @@ function OrganizerPage() {
                   }
 
                   return (
-                    <div className="space-y-3.5 mt-4 pt-3.5 border-t border-white/[0.04] animate-in fade-in duration-200">
+                    <div className="space-y-3.5 mt-4 pt-3.5 border-t border-border animate-in fade-in duration-200">
                       {/* Breakdown grid */}
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
-                        <div className="bg-white/[0.01] border border-white/[0.03] p-2.5 rounded-xl">
+                        <div className="bg-card border border-border p-2.5 rounded-xl">
                           <span className="text-muted-foreground/60 block">Cliques Previstos</span>
                           <span className="font-extrabold text-foreground text-xs">{estimatedClicks.toLocaleString()}</span>
                         </div>
-                        <div className="bg-white/[0.01] border border-white/[0.03] p-2.5 rounded-xl">
+                        <div className="bg-card border border-border p-2.5 rounded-xl">
                           <span className="text-muted-foreground/60 block">Vendas Previstas</span>
                           <span className="font-extrabold text-foreground text-xs">{estimatedSales.toLocaleString()}</span>
                         </div>
-                        <div className="bg-white/[0.01] border border-white/[0.03] p-2.5 rounded-xl">
+                        <div className="bg-card border border-border p-2.5 rounded-xl">
                           <span className="text-muted-foreground/60 block">CPA Estimado</span>
                           <span className="font-extrabold text-cyan-400 text-xs">R$ {parseFloat(cpa).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="bg-white/[0.01] border border-white/[0.03] p-2.5 rounded-xl">
+                        <div className="bg-card border border-border p-2.5 rounded-xl">
                           <span className="text-muted-foreground/60 block">Faturamento Previsto</span>
                           <span className="font-extrabold text-emerald-400 text-xs">R$ {expectedRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
                         </div>
                       </div>
 
                       {/* ROI Summary bar */}
-                      <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl flex justify-between items-center text-xs">
+                      <div className="bg-card border border-border p-3 rounded-xl flex justify-between items-center text-xs">
                         <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">ROI da Operação:</span>
                         <span className={`font-black px-2 py-0.5 rounded-full ${roiPercent >= 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
                           {roiPercent}% ({roiMultiplier}x)
@@ -1564,7 +1564,7 @@ function OrganizerPage() {
               </div>
 
               {/* Box 3: Balanço CSS Proporcional */}
-              <div className="glass rounded-2xl border border-white/[0.05] p-5 space-y-4 flex flex-col justify-between">
+              <div className="glass rounded-2xl border border-border p-5 space-y-4 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
                     <TrendingUp className="h-3.5 w-3.5 text-primary" /> Balanço de Caixa
@@ -1579,7 +1579,7 @@ function OrganizerPage() {
                       <span className="text-emerald-400">Faturamento Operacional</span>
                       <span>{totalIncome > 0 ? "100%" : "0%"}</span>
                     </div>
-                    <div className="h-3.5 w-full bg-white/[0.03] rounded-lg overflow-hidden border border-white/5 relative">
+                    <div className="h-3.5 w-full bg-card rounded-lg overflow-hidden border border-border relative">
                       <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-lg shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all duration-500" style={{ width: totalIncome > 0 ? "100%" : "0%" }} />
                     </div>
                   </div>
@@ -1590,7 +1590,7 @@ function OrganizerPage() {
                       <span className="text-red-400">Despesas Totais</span>
                       <span>{totalIncome > 0 ? Math.round((totalExpense / totalIncome) * 100) : 0}%</span>
                     </div>
-                    <div className="h-3.5 w-full bg-white/[0.03] rounded-lg overflow-hidden border border-white/5 relative">
+                    <div className="h-3.5 w-full bg-card rounded-lg overflow-hidden border border-border relative">
                       <div 
                         className="h-full bg-gradient-to-r from-red-500 to-rose-500 rounded-lg shadow-[0_0_12px_rgba(239,68,68,0.3)] transition-all duration-500" 
                         style={{ width: `${totalIncome > 0 ? Math.min(100, Math.round((totalExpense / totalIncome) * 100)) : 0}%` }} 
@@ -1599,7 +1599,7 @@ function OrganizerPage() {
                   </div>
                 </div>
 
-                <div className="bg-white/[0.01] border border-white/[0.04] p-3 rounded-xl text-center text-[10px] text-muted-foreground/60">
+                <div className="bg-card border border-border p-3 rounded-xl text-center text-[10px] text-muted-foreground/60">
                   {netProfit >= 0 ? (
                     <span className="text-cyan-400 font-extrabold">Operação Saudável! Lucro líquido positivo de R$ {netProfit.toLocaleString("pt-BR")}.</span>
                   ) : (
@@ -1610,7 +1610,7 @@ function OrganizerPage() {
             </div>
 
             {/* Histórico Completo de Transações */}
-            <div className="glass rounded-2xl border border-white/[0.05] p-5 space-y-4">
+            <div className="glass rounded-2xl border border-border p-5 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
                   <Coins className="h-3.5 w-3.5 text-primary" /> Histórico de Lançamentos ({filteredTransactions.length} de {transactions.length})
@@ -1619,14 +1619,14 @@ function OrganizerPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={exportTransactionsToCSV}
-                    className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-foreground text-[10px] font-bold flex items-center gap-1.5 transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted/50 text-foreground text-[10px] font-bold flex items-center gap-1.5 transition cursor-pointer"
                     title="Exportar dados para Excel/CSV"
                   >
                     <ArrowUpRight className="h-3.5 w-3.5 text-emerald-400" /> Exportar CSV
                   </button>
                   <button
                     onClick={handleResetTransactions}
-                    className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] text-muted-foreground hover:text-foreground text-[10px] font-bold flex items-center gap-1.5 transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted/50 text-muted-foreground hover:text-foreground text-[10px] font-bold flex items-center gap-1.5 transition cursor-pointer"
                     title="Remover todas as transações"
                   >
                     <Trash2 className="h-3.5 w-3.5 text-rose-400" /> Limpar Histórico
@@ -1635,7 +1635,7 @@ function OrganizerPage() {
               </div>
 
               {/* Search & Filters Controls */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/[0.01] border border-white/[0.03] p-3 rounded-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-card border border-border p-3 rounded-xl">
                 <div>
                   <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest block mb-1">Buscar Lançamento</span>
                   <input
@@ -1679,7 +1679,7 @@ function OrganizerPage() {
               <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-white/[0.05] text-[9px] text-muted-foreground uppercase tracking-widest font-black">
+                    <tr className="border-b border-border text-[9px] text-muted-foreground uppercase tracking-widest font-black">
                       <th className="py-2.5 px-3">Data</th>
                       <th className="py-2.5 px-3">Descrição</th>
                       <th className="py-2.5 px-3">Categoria</th>
@@ -1697,11 +1697,11 @@ function OrganizerPage() {
                         "Infoproduto": "bg-cyan-500/10 border-cyan-500/20 text-cyan-400",
                         "Dropshipping": "bg-pink-500/10 border-pink-500/20 text-pink-400",
                         "Ferramentas": "bg-amber-500/10 border-amber-500/20 text-amber-400",
-                        "Outros": "bg-white/[0.04] border-white/5 text-muted-foreground"
-                      }[tx.category] || "bg-white/[0.02] border-white/5 text-muted-foreground";
+                        "Outros": "bg-card border-border text-muted-foreground"
+                      }[tx.category] || "bg-card border-border text-muted-foreground";
 
                       return (
-                        <tr key={tx.id} className="text-xs hover:bg-white/[0.01] transition duration-150">
+                        <tr key={tx.id} className="text-xs hover:bg-card transition duration-150">
                           <td className="py-3 px-3 text-muted-foreground font-medium">{tx.date.split("-").reverse().join("/")}</td>
                           <td className="py-3 px-3 font-semibold text-foreground truncate max-w-[200px]">{tx.description}</td>
                           <td className="py-3 px-3">
@@ -1854,7 +1854,7 @@ function OrganizerPage() {
                   ? "border-emerald-500/40 bg-emerald-500/[0.04] shadow-[0_0_20px_rgba(16,185,129,0.15)] scale-[1.005]" 
                   : isDragging 
                     ? "border-dashed border-emerald-500/20 bg-emerald-500/[0.01] opacity-85" 
-                    : "border-white/[0.03] bg-white/[0.01]"
+                    : "border-border bg-card"
               }`}
             >
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-emerald-500/30" />
@@ -1910,7 +1910,7 @@ function OrganizerPage() {
                       ? colColors.activeBorder + " scale-[1.01]" 
                       : isDragging 
                         ? colColors.border + " opacity-80" 
-                        : "bg-white/[0.015] border border-white/[0.03] backdrop-blur-md shadow-sm"
+                        : "bg-white/[0.015] border border-border backdrop-blur-md shadow-sm"
                   }`}
                 >
                   <div className="flex items-center justify-between px-2 pt-1 pb-1">
@@ -1947,7 +1947,7 @@ function OrganizerPage() {
       </div>
 
       {/* SECTION: STICKY NOTES MURAL */}
-      <section className="space-y-4 pt-6 border-t border-white/[0.04] stagger-enter">
+      <section className="space-y-4 pt-6 border-t border-border stagger-enter">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold flex items-center gap-2">
@@ -2027,7 +2027,7 @@ function OrganizerPage() {
                   />
                 </div>
 
-                <div className="text-[8px] text-muted-foreground/40 font-semibold text-right pt-2 border-t border-white/[0.02] mt-2">
+                <div className="text-[8px] text-muted-foreground/40 font-semibold text-right pt-2 border-t border-border mt-2">
                   Criada em {note.date.split("-").reverse().join("/")}
                 </div>
               </div>
@@ -2035,7 +2035,7 @@ function OrganizerPage() {
           })}
 
           {notes.length === 0 && (
-            <div className="col-span-full py-10 text-center rounded-xl border border-dashed border-white/[0.04] bg-white/[0.003] text-xs text-muted-foreground/40 space-y-2">
+            <div className="col-span-full py-10 text-center rounded-xl border border-dashed border-border bg-white/[0.003] text-xs text-muted-foreground/40 space-y-2">
               <Notebook className="h-8 w-8 mx-auto text-muted-foreground/10 animate-pulse" />
               <p>Nenhum rascunho ou insight anotado no mural.</p>
               <p className="text-[10px] text-muted-foreground/20">Digite uma ideia no formulário acima para registrar!</p>
@@ -2047,7 +2047,7 @@ function OrganizerPage() {
           <div className="pt-2 flex justify-center animate-fade-up">
             <button
               onClick={() => setShowAllNotes(!showAllNotes)}
-              className="px-5 py-2 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-primary/30 text-xs font-bold text-foreground transition-all duration-300 hover:scale-102 cursor-pointer shadow-md"
+              className="px-5 py-2 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/30 text-xs font-bold text-foreground transition-all duration-300 hover:scale-102 cursor-pointer shadow-md"
             >
               {showAllNotes ? "Recolher mural de insights ▴" : `Ver todos os insights (${notes.length}) ▾`}
             </button>
@@ -2063,7 +2063,7 @@ function OrganizerPage() {
       >
         <div className="space-y-6">
           {/* Form: Adicionar Nova Coluna */}
-          <form onSubmit={handleAddColumn} className="space-y-4 pb-5 border-b border-white/[0.05]">
+          <form onSubmit={handleAddColumn} className="space-y-4 pb-5 border-b border-border">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
               <Plus className="h-3.5 w-3.5 text-primary" /> Adicionar Nova Coluna
             </h3>
@@ -2148,7 +2148,7 @@ function OrganizerPage() {
                           type="text"
                           value={editColTitle}
                           onChange={(e) => setEditColTitle(e.target.value)}
-                          className="flex-1 glass rounded-lg px-2.5 py-1.5 text-xs text-foreground bg-background border border-white/10 outline-none focus:border-primary/40"
+                          className="flex-1 glass rounded-lg px-2.5 py-1.5 text-xs text-foreground bg-background border border-border outline-none focus:border-primary/40"
                           placeholder="Título da coluna"
                           autoFocus
                           onKeyDown={(e) => {
@@ -2168,7 +2168,7 @@ function OrganizerPage() {
                         <button
                           type="button"
                           onClick={() => setEditingColId(null)}
-                          className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-foreground text-xs font-bold transition cursor-pointer"
+                          className="px-2.5 py-1.5 rounded-lg bg-muted/40 hover:bg-white/10 text-foreground text-xs font-bold transition cursor-pointer"
                         >
                           Cancelar
                         </button>
@@ -2206,7 +2206,7 @@ function OrganizerPage() {
                 return (
                   <div 
                     key={col.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg border border-white/[0.04] bg-white/[0.01]"
+                    className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-card"
                   >
                     <div className="flex items-center gap-2">
                       <span className={`h-2.5 w-2.5 rounded-full ${colColors}`} />
@@ -2218,7 +2218,7 @@ function OrganizerPage() {
                         type="button"
                         onClick={() => handleMoveColumn(col.id, "up")}
                         disabled={isFirst}
-                        className="p-1.5 hover:bg-white/5 rounded-lg text-muted-foreground hover:text-foreground transition cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                        className="p-1.5 hover:bg-muted/50 rounded-lg text-muted-foreground hover:text-foreground transition cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
                         title="Mover para cima"
                       >
                         <ArrowUp className="h-3.5 w-3.5" />
@@ -2227,7 +2227,7 @@ function OrganizerPage() {
                         type="button"
                         onClick={() => handleMoveColumn(col.id, "down")}
                         disabled={isLast}
-                        className="p-1.5 hover:bg-white/5 rounded-lg text-muted-foreground hover:text-foreground transition cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
+                        className="p-1.5 hover:bg-muted/50 rounded-lg text-muted-foreground hover:text-foreground transition cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
                         title="Mover para baixo"
                       >
                         <ArrowDown className="h-3.5 w-3.5" />
@@ -2239,7 +2239,7 @@ function OrganizerPage() {
                           setEditColTitle(col.title);
                           setEditColColor(col.color);
                         }}
-                        className="p-1.5 hover:bg-white/5 rounded-lg text-muted-foreground hover:text-foreground transition cursor-pointer"
+                        className="p-1.5 hover:bg-muted/50 rounded-lg text-muted-foreground hover:text-foreground transition cursor-pointer"
                         title="Editar Coluna"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -2260,11 +2260,11 @@ function OrganizerPage() {
 
           </div>
 
-          <div className="flex justify-end pt-3 border-t border-white/[0.04]">
+          <div className="flex justify-end pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setIsColModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/[0.04] hover:bg-white/[0.08] transition text-foreground"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-card hover:bg-muted/50 transition text-foreground"
             >
               Fechar Painel
             </button>
@@ -2331,7 +2331,7 @@ function OrganizerPage() {
             </div>
           </div>
 
-          <div className="bg-white/[0.01] border border-white/[0.04] p-3 rounded-xl space-y-2">
+          <div className="bg-card border border-border p-3 rounded-xl space-y-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Classificação de Eisenhower</span>
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-xs text-foreground/80 cursor-pointer select-none">
@@ -2339,7 +2339,7 @@ function OrganizerPage() {
                   type="checkbox"
                   checked={taskImportante}
                   onChange={(e) => setTaskImportante(e.target.checked)}
-                  className="rounded border-white/10 bg-white/[0.02] text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
+                  className="rounded border-border bg-card text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
                 />
                 <span>Importante</span>
               </label>
@@ -2348,7 +2348,7 @@ function OrganizerPage() {
                   type="checkbox"
                   checked={taskUrgente}
                   onChange={(e) => setTaskUrgente(e.target.checked)}
-                  className="rounded border-white/10 bg-white/[0.02] text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
+                  className="rounded border-border bg-card text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
                 />
                 <span>Urgente</span>
               </label>
@@ -2376,7 +2376,7 @@ function OrganizerPage() {
                       className={`text-[8px] font-bold px-2 py-0.5 rounded border transition-all ${
                         taskCategory === cat
                           ? "bg-primary/20 border-primary/45 text-primary-foreground shadow-[0_0_8px_rgba(139,92,246,0.2)]"
-                          : "bg-white/[0.02] border-white/5 text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+                          : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-card"
                       }`}
                     >
                       {cat}
@@ -2417,13 +2417,13 @@ function OrganizerPage() {
               <button
                 type="button"
                 onClick={addSubtaskToAddModal}
-                className="px-3.5 py-2 rounded-lg bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] text-xs font-bold transition text-foreground"
+                className="px-3.5 py-2 rounded-lg bg-card border border-border hover:bg-muted/50 text-xs font-bold transition text-foreground"
               >
                 +
               </button>
             </div>
             {taskSubtasks.length > 0 && (
-              <div className="space-y-1.5 max-h-[120px] overflow-y-auto bg-black/20 p-2.5 rounded-lg border border-white/5 stagger-enter">
+              <div className="space-y-1.5 max-h-[120px] overflow-y-auto bg-black/20 p-2.5 rounded-lg border border-border stagger-enter">
                 {taskSubtasks.map((st) => (
                   <div key={st.id} className="flex items-center justify-between gap-2 text-xs text-foreground/80">
                     <span className="truncate">{st.text}</span>
@@ -2440,11 +2440,11 @@ function OrganizerPage() {
             )}
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-white/[0.04]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setIsTaskModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold hover:bg-white/5 border border-transparent transition text-foreground"
+              className="px-4 py-2 rounded-xl text-xs font-semibold hover:bg-muted/50 border border-transparent transition text-foreground"
             >
               Cancelar
             </button>
@@ -2517,7 +2517,7 @@ function OrganizerPage() {
             </div>
           </div>
 
-          <div className="bg-white/[0.01] border border-white/[0.04] p-3 rounded-xl space-y-2">
+          <div className="bg-card border border-border p-3 rounded-xl space-y-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Classificação de Eisenhower</span>
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-xs text-foreground/80 cursor-pointer select-none">
@@ -2525,7 +2525,7 @@ function OrganizerPage() {
                   type="checkbox"
                   checked={editImportante}
                   onChange={(e) => setEditImportante(e.target.checked)}
-                  className="rounded border-white/10 bg-white/[0.02] text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
+                  className="rounded border-border bg-card text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
                 />
                 <span>Importante</span>
               </label>
@@ -2534,7 +2534,7 @@ function OrganizerPage() {
                   type="checkbox"
                   checked={editUrgente}
                   onChange={(e) => setEditUrgente(e.target.checked)}
-                  className="rounded border-white/10 bg-white/[0.02] text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
+                  className="rounded border-border bg-card text-primary focus:ring-primary/20 accent-primary h-3.5 w-3.5 cursor-pointer"
                 />
                 <span>Urgente</span>
               </label>
@@ -2562,7 +2562,7 @@ function OrganizerPage() {
                       className={`text-[8px] font-bold px-2 py-0.5 rounded border transition-all ${
                         editCategory === cat
                           ? "bg-primary/20 border-primary/45 text-primary-foreground shadow-[0_0_8px_rgba(139,92,246,0.2)]"
-                          : "bg-white/[0.02] border-white/5 text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
+                          : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-card"
                       }`}
                     >
                       {cat}
@@ -2603,13 +2603,13 @@ function OrganizerPage() {
               <button
                 type="button"
                 onClick={addSubtaskToEditModal}
-                className="px-3.5 py-2 rounded-lg bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] text-xs font-bold transition text-foreground"
+                className="px-3.5 py-2 rounded-lg bg-card border border-border hover:bg-muted/50 text-xs font-bold transition text-foreground"
               >
                 +
               </button>
             </div>
             {editSubtasks.length > 0 && (
-              <div className="space-y-1.5 max-h-[120px] overflow-y-auto bg-black/20 p-2.5 rounded-lg border border-white/5 stagger-enter">
+              <div className="space-y-1.5 max-h-[120px] overflow-y-auto bg-black/20 p-2.5 rounded-lg border border-border stagger-enter">
                 {editSubtasks.map((st) => (
                   <div key={st.id} className="flex items-center justify-between gap-2 text-xs text-foreground/80">
                     <span className="truncate">{st.text}</span>
@@ -2626,11 +2626,11 @@ function OrganizerPage() {
             )}
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-white/[0.04]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => setEditingTask(null)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold hover:bg-white/5 border border-transparent transition text-foreground"
+              className="px-4 py-2 rounded-xl text-xs font-semibold hover:bg-muted/50 border border-transparent transition text-foreground"
             >
               Cancelar
             </button>
@@ -2670,9 +2670,9 @@ function OrganizerPage() {
           <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
             <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Membros Atuais ({teamMembers.length})</h4>
             {teamMembers.map(member => (
-              <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
+              <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
                 <div className="flex items-center gap-3">
-                  <img src={member.avatar} alt="avatar" className="w-8 h-8 rounded-full border border-white/10" />
+                  <img src={member.avatar} alt="avatar" className="w-8 h-8 rounded-full border border-border" />
                   <div>
                     <p className="text-xs font-bold text-foreground">{member.email}</p>
                     <p className="text-[10px] text-muted-foreground capitalize">{member.role === "owner" ? "Proprietário" : "Membro"}</p>
@@ -2711,7 +2711,7 @@ function OrganizerPage() {
             <button
               type="button"
               onClick={() => setIsProjectModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold hover:bg-white/5 border border-transparent transition text-foreground"
+              className="px-4 py-2 rounded-xl text-xs font-semibold hover:bg-muted/50 border border-transparent transition text-foreground"
             >
               Cancelar
             </button>
@@ -2773,7 +2773,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
       onDragStart={(e) => onDragStart(e, task.id)}
       onDragEnd={onDragEnd}
       onClick={() => onEdit(task)}
-      className="group glass rounded-xl p-3.5 border border-white/[0.04] hover:border-white/10 bg-gradient-to-br from-white/[0.015] to-transparent hover:from-white/[0.03] active:scale-[0.985] cursor-pointer hover:shadow-lg hover:shadow-black/20 transition-all duration-300 relative flex flex-col justify-between"
+      className="group glass rounded-xl p-3.5 border border-border hover:border-border bg-gradient-to-br from-white/[0.015] to-transparent hover:from-white/[0.03] active:scale-[0.985] cursor-pointer hover:shadow-lg hover:shadow-black/20 transition-all duration-300 relative flex flex-col justify-between"
     >
       <div className={`absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full opacity-60 ${colDot}`} />
       
@@ -2804,7 +2804,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
         {totalSubtasks > 0 && (
           <div className="mt-3" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-1 bg-white/[0.04] rounded-full overflow-hidden">
+              <div className="flex-1 h-1 bg-card rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-300 ${subtasksProgress === 100 ? 'bg-emerald-500' : 'bg-primary/60'}`}
                   style={{ width: `${subtasksProgress}%` }}
@@ -2818,7 +2818,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
         )}
 
         {/* Actions Menu */}
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-md border border-white/10 rounded-lg p-0.5 flex items-center gap-0.5 translate-x-2 group-hover:translate-x-0">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-md border border-border rounded-lg p-0.5 flex items-center gap-0.5 translate-x-2 group-hover:translate-x-0">
           <button
             onClick={(e) => { e.stopPropagation(); onMove(task.id, "left"); }}
             className="p-1.5 hover:bg-white/10 rounded-md text-muted-foreground hover:text-white transition"
@@ -2848,7 +2848,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
 
 function EmptyColumnState() {
   return (
-    <div className="py-8 text-center text-[10px] text-muted-foreground/30 border border-dashed border-white/[0.04] rounded-xl bg-white/[0.005]">
+    <div className="py-8 text-center text-[10px] text-muted-foreground/30 border border-dashed border-border rounded-xl bg-white/[0.005]">
       <CheckSquare className="h-6 w-6 mx-auto mb-2 text-muted-foreground/10" />
       Sem tarefas nesta coluna
     </div>

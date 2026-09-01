@@ -126,7 +126,7 @@ function Page() {
         <button
           onClick={load}
           disabled={loading}
-          className="text-xs px-3 py-2 rounded-xl border border-white/10 hover:bg-white/5 flex items-center gap-2 disabled:opacity-50"
+          className="text-xs px-3 py-2 rounded-xl border border-border hover:bg-muted/50 flex items-center gap-2 disabled:opacity-50"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           Atualizar
@@ -139,15 +139,15 @@ function Page() {
         <StatCard icon={Heart} label="Curtidas" value={posts.reduce((s, p) => s + p.likes, 0)} accent="pink" />
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02]">
-        <div className="px-4 py-3 border-b border-white/5">
+      <div className="rounded-3xl border border-border bg-card">
+        <div className="px-4 py-3 border-b border-border">
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar por conteúdo ou autor..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
             />
           </div>
         </div>
@@ -165,7 +165,7 @@ function Page() {
             {filtered.map((p) => {
               const isExpanded = expanded.has(p.id);
               return (
-                <div key={p.id} className="p-4 hover:bg-white/[0.02] transition">
+                <div key={p.id} className="p-4 hover:bg-card transition">
                   <div className="flex items-start gap-3">
                     <div className="h-9 w-9 rounded-full gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground shrink-0">
                       {(p.author_name ?? "M")[0].toUpperCase()}
@@ -209,10 +209,10 @@ function Page() {
                   </div>
 
                   {isExpanded && p.comments.length > 0 && (
-                    <div className="ml-12 mt-3 space-y-2 border-l-2 border-white/5 pl-4">
+                    <div className="ml-12 mt-3 space-y-2 border-l-2 border-border pl-4">
                       {p.comments.map((c) => (
                         <div key={c.id} className="flex items-start gap-2 group">
-                          <div className="h-6 w-6 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
+                          <div className="h-6 w-6 rounded-full bg-muted/40 flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
                             {(c.author_name ?? "M")[0].toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -253,7 +253,7 @@ function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: stri
     : accent === "pink" ? "bg-pink-500/10 text-pink-400"
     : "bg-primary/10 text-primary";
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 hover:border-white/10 transition">
+    <div className="rounded-xl border border-border bg-card p-4 hover:border-border transition">
       <div className="flex items-center justify-between">
         <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${cls}`}>
           <Icon className="h-4 w-4" />

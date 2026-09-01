@@ -50,7 +50,7 @@ function NoteNode({ data }: { data: any }) {
         {data.tags && data.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1.5 ml-4.5">
             {data.tags.slice(0, 2).map((tag: string) => (
-              <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground/80">
+              <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted/40 text-muted-foreground/80">
                 {tag}
               </span>
             ))}
