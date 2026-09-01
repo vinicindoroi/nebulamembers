@@ -96,17 +96,14 @@
   *:where(:not(.react-flow *)) { border-color: var(--color-border); }
   html, body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); }
   body {
-    background-image:
-      radial-gradient(ellipse 60% 45% at 12% -5%, rgba(139, 92, 246, 0.10), transparent 65%),
-      radial-gradient(ellipse 50% 40% at 100% 105%, rgba(139, 92, 246, 0.06), transparent 70%);
-    background-repeat: no-repeat;
+    background-image: none;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
   .light body, .light {
-    background-image:
-      radial-gradient(ellipse 50% 40% at 0% 0%, oklch(0.63 0.19 292 / 0.05), transparent 70%),
-      radial-gradient(ellipse 45% 35% at 100% 100%, oklch(0.58 0.17 265 / 0.03), transparent 70%);
+    background-image: none;
   }
+
   h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
   h1 { text-wrap: balance; }
   p, li { text-wrap: pretty; }
