@@ -184,9 +184,11 @@ function Dashboard() {
           const Icon = s.icon;
           return (
             <Link key={s.label} to="/courses" className="bg-card p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Icon className="h-3.5 w-3.5" />
-                <span className="text-xs">{s.label}</span>
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex h-7 w-7 items-center justify-center rounded-lg ${s.chip}`}>
+                  <Icon className={`h-3.5 w-3.5 ${s.color}`} />
+                </span>
+                <span className="text-xs text-muted-foreground">{s.label}</span>
               </div>
               <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight">{s.value}</div>
               <div className="text-[11px] text-muted-foreground mt-0.5">{s.hint}</div>
