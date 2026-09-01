@@ -1527,9 +1527,9 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
         {/* Draw Mode sub-toolbar with Miro-style colors and tools */}
         {interactionMode === 'draw' && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 px-4 py-2 rounded-full bg-[#16161c]/95 border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 px-4 py-2 rounded-full bg-[#16161c]/95 border border-border shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-in fade-in slide-in-from-top-3 duration-200">
             {/* Tool Selector: Brush vs Eraser */}
-            <div className="flex items-center bg-white/[0.04] rounded-full p-0.5 border border-white/5 shrink-0">
+            <div className="flex items-center bg-card rounded-full p-0.5 border border-border shrink-0">
               <Button
                 variant="ghost"
                 size="sm"
@@ -1538,7 +1538,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
                   "h-7 px-3 text-xs rounded-full transition-all flex items-center gap-1.5",
                   !isEraserMode
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "hover:bg-white/[0.06] text-muted-foreground"
+                    : "hover:bg-muted/50 text-muted-foreground"
                 )}
                 title="Pincel"
               >
@@ -1553,7 +1553,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
                   "h-7 px-3 text-xs rounded-full transition-all flex items-center gap-1.5",
                   isEraserMode
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "hover:bg-white/[0.06] text-muted-foreground"
+                    : "hover:bg-muted/50 text-muted-foreground"
                 )}
                 title="Borracha"
               >
@@ -1606,7 +1606,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
             {/* Brush Thickness selector (Only show when not in eraser mode) */}
             {!isEraserMode && (
-              <div className="flex items-center bg-white/[0.04] rounded-full p-0.5 border border-white/5 shrink-0">
+              <div className="flex items-center bg-card rounded-full p-0.5 border border-border shrink-0">
                 {[
                   { width: 2, label: 'Fino' },
                   { width: 4, label: 'Médio' },

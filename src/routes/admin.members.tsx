@@ -128,12 +128,12 @@ function Page() {
       <div className="glass rounded-2xl p-4 flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome..." className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome..." className="w-full bg-muted/40 border border-border rounded-xl pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
           <option value="all">Todos status</option><option value="active">Ativo</option><option value="suspended">Suspenso</option><option value="pending">Pendente</option>
         </select>
-        <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
+        <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
           <option value="all">Todos planos</option><option>Free</option><option>Pro</option><option>Premium</option>
         </select>
       </div>
@@ -154,7 +154,7 @@ function Page() {
                   await bulkUpdatePlan(plan);
                   e.target.value = "";
                 }}
-                className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white"
+                className="bg-muted/40 border border-border rounded-xl px-2.5 py-1.5 text-xs cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white"
                 style={{ colorScheme: "dark" }}
               >
                 <option value="">Alterar...</option>
@@ -173,7 +173,7 @@ function Page() {
                   await bulkUpdateStatus(status);
                   e.target.value = "";
                 }}
-                className="bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white"
+                className="bg-muted/40 border border-border rounded-xl px-2.5 py-1.5 text-xs cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white"
                 style={{ colorScheme: "dark" }}
               >
                 <option value="">Alterar...</option>
@@ -196,7 +196,7 @@ function Page() {
       <div className="glass rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground bg-white/[0.02] sticky top-0">
+            <thead className="text-xs text-muted-foreground bg-card sticky top-0">
               <tr>
                 <th className="px-4 py-3 w-10 text-center">
                   <input
@@ -224,7 +224,7 @@ function Page() {
               {loading && <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-xs">Carregando...</td></tr>}
               {!loading && filtered.length === 0 && <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-xs">Nenhum membro encontrado</td></tr>}
               {filtered.map((r) => (
-                <tr key={r.id} className={`hover:bg-white/[0.02] transition cursor-pointer select-none group ${selectedIds.includes(r.id) ? "bg-primary/[0.02]" : ""}`}>
+                <tr key={r.id} className={`hover:bg-card transition cursor-pointer select-none group ${selectedIds.includes(r.id) ? "bg-primary/[0.02]" : ""}`}>
                   <td className="px-4 py-3 w-10 text-center" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
@@ -247,7 +247,7 @@ function Page() {
                       <div className="font-medium group-hover:text-primary transition duration-200">{r.full_name ?? "Sem nome"}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3" onClick={() => setViewing(r)}><span className="text-xs px-2 py-1 rounded-md bg-white/5">{r.plan ?? "Free"}</span></td>
+                  <td className="px-4 py-3" onClick={() => setViewing(r)}><span className="text-xs px-2 py-1 rounded-md bg-muted/40">{r.plan ?? "Free"}</span></td>
                   <td className="px-4 py-3" onClick={() => setViewing(r)}>
                     <span className={`text-xs px-2 py-1 rounded-md ${r.status === "active" ? "bg-emerald-500/10 text-emerald-400" : r.status === "suspended" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>{r.status}</span>
                   </td>
@@ -313,7 +313,7 @@ function EditModal({ member, onClose, onSaved }: { member: Member; onClose: () =
       size="md"
       footer={
         <>
-          <button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-white/5">Cancelar</button>
+          <button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-muted/50">Cancelar</button>
           <button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm disabled:opacity-50">{saving ? "Salvando..." : "Salvar"}</button>
         </>
       }
@@ -427,7 +427,7 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
       size="md"
       footer={
         <>
-          <button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-white/5">Cancelar</button>
+          <button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-muted/50">Cancelar</button>
           <button onClick={handleSave} disabled={saving} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm disabled:opacity-50">
             {saving ? "Salvando..." : mode === "invite" ? "Enviar convite" : "Adicionar"}
           </button>
@@ -435,7 +435,7 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
       }
     >
       <div className="space-y-4">
-        <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10">
+        <div className="flex gap-1 p-1 rounded-xl bg-card border border-border">
           <button
             onClick={() => setMode("manual")}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition ${mode === "manual" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white"}`}
@@ -558,7 +558,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
       size="md"
       footer={
         <>
-          <button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-white/5 text-muted-foreground hover:text-foreground">Fechar</button>
+          <button onClick={onClose} className="px-3.5 py-2 rounded-xl text-sm hover:bg-muted/50 text-muted-foreground hover:text-foreground">Fechar</button>
           <button 
             onClick={() => {
               onClose();
@@ -573,7 +573,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
     >
       <div className="space-y-6">
         {/* Header Profile Info */}
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] relative overflow-hidden">
+        <div className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
           <div className="h-16 w-16 rounded-full gradient-primary flex items-center justify-center text-xl font-bold text-primary-foreground shadow-[0_0_15px_rgba(139,92,246,0.25)] shrink-0">
             {(member.full_name ?? "U").slice(0, 2).toUpperCase()}
@@ -581,7 +581,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-bold text-foreground truncate leading-snug">{member.full_name ?? "Sem nome"}</h3>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-foreground">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-muted/40 border border-border text-foreground">
                 {member.plan ?? "Free"}
               </span>
               <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${
@@ -602,7 +602,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
             <FileText className="h-3.5 w-3.5 text-primary" /> Biografia
           </h4>
-          <p className="text-xs text-foreground/80 leading-relaxed p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] min-h-[50px] whitespace-pre-wrap">
+          <p className="text-xs text-foreground/80 leading-relaxed p-3.5 rounded-xl border border-border bg-card min-h-[50px] whitespace-pre-wrap">
             {member.bio || "Nenhuma biografia descrita para este membro."}
           </p>
         </div>
@@ -610,7 +610,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
         {/* Details Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           {/* Email */}
-          <div className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] space-y-1">
+          <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <Mail className="h-3.5 w-3.5 text-primary" /> E-mail
             </div>
@@ -626,7 +626,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           </div>
 
           {/* Telefone / WhatsApp */}
-          <div className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] space-y-1">
+          <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <Phone className="h-3.5 w-3.5 text-primary" /> Telefone / WhatsApp
             </div>
@@ -650,7 +650,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           </div>
 
           {/* Localização */}
-          <div className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] space-y-1">
+          <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5 text-primary" /> Localização
             </div>
@@ -660,7 +660,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           </div>
 
           {/* Instagram */}
-          <div className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] space-y-1">
+          <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <Instagram className="h-3.5 w-3.5 text-primary" /> Instagram
             </div>
@@ -682,7 +682,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           </div>
 
           {/* Data de Cadastro */}
-          <div className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] space-y-1">
+          <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5 text-primary" /> Membro Desde
             </div>
@@ -692,7 +692,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
           </div>
 
           {/* Último Acesso */}
-          <div className="p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] space-y-1">
+          <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-primary" /> Último Acesso
             </div>

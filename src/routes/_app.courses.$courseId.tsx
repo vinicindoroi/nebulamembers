@@ -243,7 +243,7 @@ function CourseDetail() {
                     className={`relative w-64 aspect-[14/9] shrink-0 rounded-2xl border text-left overflow-hidden transition-all duration-300 group cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 ${
                       isSelected
                         ? "border-primary shadow-[0_0_25px_rgba(99,102,241,0.25)] ring-1 ring-primary/50"
-                        : "border-white/5 hover:border-white/15 bg-white/[0.01]"
+                        : "border-border hover:border-border bg-card"
                     }`}
                   >
                     {/* Cover image if available */}
@@ -268,7 +268,7 @@ function CourseDetail() {
                     {/* Content */}
                     <div className="absolute inset-0 p-4 flex flex-col justify-between z-10">
                       <div className="flex items-start justify-between">
-                        <span className="text-[9px] uppercase tracking-wider text-white/80 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
+                        <span className="text-[9px] uppercase tracking-wider text-white/80 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-border">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
                         {mod?.is_premium && (
@@ -306,7 +306,7 @@ function CourseDetail() {
 
           {/* Timeline do Módulo Ativo */}
           {activeGroup && (
-            <div className="glass rounded-2xl p-6 border border-white/5 space-y-6 animate-fade-in">
+            <div className="glass rounded-2xl p-6 border border-border space-y-6 animate-fade-in">
               {(() => {
                 const mod = activeGroup.mod;
                 const modLessons = activeGroup.items;
@@ -320,7 +320,7 @@ function CourseDetail() {
 
                 return (
                   <>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
                       <div className="space-y-1">
                         <span className="text-[10px] uppercase tracking-wider text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-full">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
@@ -336,7 +336,7 @@ function CourseDetail() {
                         <span className="text-xs text-muted-foreground">
                           {modCompleted}/{modTotal} concluídas
                         </span>
-                        <div className="relative h-12 w-12 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.15)] rounded-full bg-white/[0.02] border border-white/5">
+                        <div className="relative h-12 w-12 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.15)] rounded-full bg-card border border-border">
                           <svg className="w-12 h-12 transform -rotate-90">
                             <circle cx="24" cy="24" r={radius} className="stroke-white/5" strokeWidth="2.5" fill="transparent" />
                             <circle
@@ -357,7 +357,7 @@ function CourseDetail() {
                     </div>
 
                     {/* Vertical Timeline pathway for Active Module's Lessons */}
-                    <div className="relative pl-6 sm:pl-8 border-l border-white/10 space-y-4 ml-3 sm:ml-5 mt-4">
+                    <div className="relative pl-6 sm:pl-8 border-l border-border space-y-4 ml-3 sm:ml-5 mt-4">
                       {modLessons.map((l, idx) => {
                         const isDone = done.has(l.id);
                         const lMod = modules.find((m) => m.id === l.module_id);
@@ -370,7 +370,7 @@ function CourseDetail() {
                                 ? "border-amber-500/30 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
                                 : isDone
                                   ? "gradient-primary border-transparent text-primary-foreground shadow-[0_0_12px_rgba(99,102,241,0.3)]"
-                                  : "border-white/10 text-muted-foreground group-hover:border-primary/50 group-hover:text-primary group-hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]"
+                                  : "border-border text-muted-foreground group-hover:border-primary/50 group-hover:text-primary group-hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]"
                             }`}>
                               {lLocked ? (
                                 <Lock className="h-3 w-3" />
@@ -383,7 +383,7 @@ function CourseDetail() {
 
                             <button
                               onClick={() => setActiveLessonId(l.id)}
-                              className="w-full text-left p-4 rounded-xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-primary/20 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group-hover:translate-x-1"
+                              className="w-full text-left p-4 rounded-xl bg-card hover:bg-card border border-border hover:border-primary/20 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group-hover:translate-x-1"
                             >
                               <div className="space-y-1">
                                 <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
@@ -395,7 +395,7 @@ function CourseDetail() {
                               </div>
 
                               <div className="flex items-center gap-3 shrink-0">
-                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-white/[0.02] px-2.5 py-1 rounded-md border border-white/5">
+                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-card px-2.5 py-1 rounded-md border border-border">
                                   <Clock className="h-3.5 w-3.5" />
                                   <span>{l.duration ?? l.duration_min ?? 0} min</span>
                                 </div>
@@ -549,7 +549,7 @@ function CourseDetail() {
                           key={l.id}
                           onClick={() => setActiveLessonId(l.id)}
                           className={`w-full text-left px-2 py-2 rounded-lg flex items-center gap-3 transition ${
-                            isActive ? "bg-white/[0.08]" : "hover:bg-white/[0.04]"
+                            isActive ? "bg-white/[0.08]" : "hover:bg-card"
                           }`}
                         >
                           <div
@@ -560,7 +560,7 @@ function CourseDetail() {
                                   ? "gradient-primary text-primary-foreground"
                                   : isActive
                                     ? "bg-primary/20 text-primary"
-                                    : "bg-white/5 text-muted-foreground"
+                                    : "bg-muted/40 text-muted-foreground"
                             }`}
                           >
                             {lLocked ? <Lock className="h-3 w-3" /> : isDone ? <Check className="h-3.5 w-3.5" /> : <Play className="h-3 w-3" fill="currentColor" />}
@@ -684,7 +684,7 @@ function LessonPlayer({ lesson, lessons, onNextLesson }: { lesson: Lesson; lesso
   const embed = toEmbedUrl(url);
   if (embed) {
     return (
-      <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10">
+      <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border">
         <iframe
           key={embed}
           src={embed}
@@ -700,7 +700,7 @@ function LessonPlayer({ lesson, lessons, onNextLesson }: { lesson: Lesson; lesso
   // Custom player for direct video files
   if (!resolvedUrl) {
     return (
-      <div className="aspect-video w-full rounded-2xl bg-black border border-white/10 flex items-center justify-center">
+      <div className="aspect-video w-full rounded-2xl bg-black border border-border flex items-center justify-center">
         <div className="text-sm text-muted-foreground">Carregando player...</div>
       </div>
     );
@@ -826,7 +826,7 @@ function LessonAttachments({ lessonId }: { lessonId: string }) {
             key={att.id}
             onClick={() => handleDownload(att)}
             disabled={downloading === att.id}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-primary/30 hover:bg-white/[0.05] transition text-left group disabled:opacity-50"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border hover:border-primary/30 hover:bg-muted/50 transition text-left group disabled:opacity-50"
           >
             <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition">
               <Download className="h-4 w-4" />

@@ -214,7 +214,7 @@ const getTheme = (slug: string) => {
       glow: "bg-gradient-to-b from-cyan-500/10 via-cyan-500/5 to-transparent",
       text: "text-cyan-400",
       brand: "text-cyan-400/40",
-      buttonBorder: "border-white/10 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.06] text-white",
+      buttonBorder: "border-border hover:border-white/20 bg-card hover:bg-muted/50 text-white",
       pill: "bg-cyan-950/30 border-cyan-800/20 text-cyan-400/80",
     };
   }
@@ -288,7 +288,7 @@ function Page() {
           return (
             <div
               key={p.id}
-              className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] backdrop-blur p-6 flex flex-col h-full min-h-[520px] transition-all duration-300 hover:scale-[1.02] hover:border-white/15"
+              className="group relative rounded-2xl overflow-hidden border border-border bg-card backdrop-blur p-6 flex flex-col h-full min-h-[520px] transition-all duration-300 hover:scale-[1.02] hover:border-border"
               style={{
                 boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
               }}
@@ -297,14 +297,14 @@ function Page() {
               <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-4/5 h-28 ${theme.glow} blur-[32px] rounded-full pointer-events-none`} />
 
               {/* Status Badge */}
-              <div className={`absolute top-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/60 border text-[9px] font-bold uppercase tracking-widest shadow-lg ${p.is_active ? "border-emerald-500/30 text-emerald-400" : "border-white/10 text-white/50"}`}>
+              <div className={`absolute top-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/60 border text-[9px] font-bold uppercase tracking-widest shadow-lg ${p.is_active ? "border-emerald-500/30 text-emerald-400" : "border-border text-white/50"}`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${p.is_active ? "bg-emerald-400 animate-pulse" : "bg-white/20"}`} />
                 {p.is_active ? "Ativo" : "Inativo"}
               </div>
 
               {/* Edit/Delete Actions */}
               <div className="absolute top-4 right-4 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onClick={() => setEditing(p)} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white cursor-pointer transition">
+                <button onClick={() => setEditing(p)} className="p-1.5 rounded-lg bg-muted/40 hover:bg-white/10 text-white cursor-pointer transition">
                   <Edit3 className="h-3.5 w-3.5" />
                 </button>
                 <button onClick={() => remove(p.id)} className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 cursor-pointer transition">
@@ -380,7 +380,7 @@ function Page() {
           );
         })}
         {plans.length === 0 && (
-          <div className="col-span-full rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+          <div className="col-span-full rounded-2xl border border-dashed border-border bg-card p-12 text-center">
             <Package className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <div className="text-sm font-medium">Nenhum plano configurado</div>
             <div className="text-xs text-muted-foreground mt-1">
@@ -465,7 +465,7 @@ function PlanModal({ initial, onClose, onSaved }: {
       size="xl"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5 transition">
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50 transition">
             Cancelar
           </button>
           <button
@@ -496,7 +496,7 @@ function PlanModal({ initial, onClose, onSaved }: {
           <input value={f.billing_period} onChange={(e) => setF({ ...f, billing_period: e.target.value })} placeholder="mensal" className={inputClass} />
         </Field>
         <Field label="Status">
-          <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+          <label className="flex items-center gap-3 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
             <input type="checkbox" checked={f.is_active} onChange={(e) => setF({ ...f, is_active: e.target.checked })} className="accent-primary" />
             <span className="text-sm">Ativo</span>
           </label>
@@ -527,7 +527,7 @@ function PlanModal({ initial, onClose, onSaved }: {
         <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Features</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {Object.entries(FEATURE_LABELS).map(([key, { label, icon: Icon }]) => (
-            <label key={key} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/5 hover:border-white/10 cursor-pointer transition">
+            <label key={key} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-card border border-border hover:border-border cursor-pointer transition">
               <input
                 type="checkbox"
                 checked={!!f.features[key as keyof PlanFeatures]}
@@ -553,7 +553,7 @@ function PlanModal({ initial, onClose, onSaved }: {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
                 f.features.course_categories.includes(cat)
                   ? "bg-primary/15 border-primary/30 text-primary"
-                  : "bg-white/[0.03] border-white/10 text-muted-foreground hover:border-white/20"
+                  : "bg-card border-border text-muted-foreground hover:border-white/20"
               }`}
             >
               {f.features.course_categories.includes(cat) && <Check className="h-3 w-3 inline mr-1" />}
@@ -575,7 +575,7 @@ function PlanModal({ initial, onClose, onSaved }: {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
                 f.features.funnel_types.includes(type)
                   ? "bg-primary/15 border-primary/30 text-primary"
-                  : "bg-white/[0.03] border-white/10 text-muted-foreground hover:border-white/20"
+                  : "bg-card border-border text-muted-foreground hover:border-white/20"
               }`}
             >
               {f.features.funnel_types.includes(type) && <Check className="h-3 w-3 inline mr-1" />}

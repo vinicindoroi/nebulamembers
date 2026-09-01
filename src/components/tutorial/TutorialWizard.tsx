@@ -30,7 +30,7 @@ interface TutorialStep {
 
 function FeatureRow({ icon: Icon, label, desc, color }: { icon: React.ElementType; label: string; desc: string; color: string }) {
   return (
-    <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-colors">
+    <div className="flex items-start gap-3 p-3 rounded-xl bg-card border border-border hover:bg-muted/50 transition-colors">
       <div className={`shrink-0 h-8 w-8 rounded-lg flex items-center justify-center ${color}`}>
         <Icon className="h-4 w-4" />
       </div>
@@ -189,7 +189,7 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-2xl border border-white/[0.08] bg-[oklch(0.14_0.01_270)] shadow-2xl overflow-hidden animate-wizard-in">
+      <div className="relative w-full max-w-md rounded-2xl border border-border bg-[oklch(0.14_0.01_270)] shadow-2xl overflow-hidden animate-wizard-in">
         {/* Ambient glow */}
         <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-primary/20 blur-[50px] pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full bg-primary/10 blur-[50px] pointer-events-none" />
@@ -197,13 +197,13 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.1] transition-colors"
+          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg bg-white/[0.05] border border-border hover:bg-white/[0.1] transition-colors"
         >
           <X className="h-4 w-4 text-muted-foreground" />
         </button>
 
         {/* Progress bar */}
-        <div className="h-1 bg-white/[0.04]">
+        <div className="h-1 bg-card">
           <div
             className="h-full gradient-primary rounded-full transition-all duration-300 ease-out"
             style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
@@ -259,7 +259,7 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
         </div>
 
         {/* Footer */}
-        <div className="relative border-t border-white/[0.06] px-6 py-4 flex items-center justify-between">
+        <div className="relative border-t border-border px-6 py-4 flex items-center justify-between">
           <button
             onClick={onClose}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -270,7 +270,7 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
             {step > 0 && (
               <button
                 onClick={goPrev}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-all"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 Anterior

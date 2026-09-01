@@ -479,7 +479,7 @@ function Page() {
 
             {/* Tab Content */}
             {activeTab === "texto" && (
-              <div className="rounded-2xl border border-border/30 bg-card/40 backdrop-blur-sm p-6 relative overflow-hidden animate-fade-up">
+              <div className="rounded-3xl border border-border/30 bg-card/40 backdrop-blur-sm p-6 relative overflow-hidden animate-fade-up">
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary via-primary/50 to-transparent rounded-l-2xl" />
                 <p className="text-sm text-white/90 whitespace-pre-wrap leading-[1.8] pl-4 selection:bg-primary/20">{currentResult.text}</p>
                 <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border/20 pl-4">
@@ -493,7 +493,7 @@ function Page() {
             {activeTab === "analise" && (
               <div className="space-y-4 animate-fade-up">
                 {(!currentResult.confidence && !(currentResult.strengths?.length) && !(currentResult.structure?.length)) ? (
-                  <div className="rounded-2xl border border-border/30 bg-card/40 p-10 flex flex-col items-center justify-center gap-4 text-center">
+                  <div className="rounded-3xl border border-border/30 bg-card/40 p-10 flex flex-col items-center justify-center gap-4 text-center">
                     <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
                       <Wand2 className="h-8 w-8 text-primary" />
                     </div>
@@ -514,7 +514,7 @@ function Page() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-[200px,1fr] gap-6">
                       {/* Confidence Gauge */}
-                      <div className="rounded-2xl border border-border/30 bg-card/40 p-6 flex flex-col items-center justify-center">
+                      <div className="rounded-3xl border border-border/30 bg-card/40 p-6 flex flex-col items-center justify-center">
                         <ConfidenceGauge value={currentResult.confidence ?? 0} />
                         <p className="text-xs text-muted-foreground mt-2 text-center">Qualidade da Copy</p>
                       </div>
@@ -545,7 +545,7 @@ function Page() {
 
                         {/* Weaknesses */}
                         {(currentResult.weaknesses?.length ?? 0) > 0 && (
-                          <div className="rounded-2xl border border-border/30 bg-card/30 p-5 space-y-3">
+                          <div className="rounded-3xl border border-border/30 bg-card/30 p-5 space-y-3">
                             <div className="flex items-center gap-2">
                               <div className="h-7 w-7 rounded-lg bg-muted flex items-center justify-center">
                                 <TrendingDown className="h-4 w-4 text-muted-foreground" />

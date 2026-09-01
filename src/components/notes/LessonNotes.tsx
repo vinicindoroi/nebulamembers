@@ -36,7 +36,7 @@ export function LessonNotes({ lessonId, lessonTitle }: LessonNotesProps) {
 
   const getNoteColorClass = (color: string) => {
     const colors: Record<string, string> = {
-      default: 'border-white/5 bg-white/[0.02]',
+      default: 'border-border bg-card',
       purple: 'border-primary/20 bg-primary/5',
       blue: 'border-primary/20 bg-primary/5',
       green: 'border-green-500/20 bg-green-500/5',
@@ -64,7 +64,7 @@ export function LessonNotes({ lessonId, lessonTitle }: LessonNotesProps) {
       </div>
 
       {notes.length === 0 ? (
-        <div className="text-center py-6 border border-dashed border-white/10 rounded-xl">
+        <div className="text-center py-6 border border-dashed border-border rounded-xl">
           <StickyNote className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
           <p className="text-xs text-muted-foreground">Nenhuma nota nesta aula</p>
           <Button size="sm" variant="ghost" onClick={handleNew} className="mt-2 text-xs text-primary hover:bg-primary/10">
@@ -76,7 +76,7 @@ export function LessonNotes({ lessonId, lessonTitle }: LessonNotesProps) {
           {notes.map((note) => (
             <div
               key={note.id}
-              className={`group relative rounded-xl border p-3 transition-all hover:border-white/10 ${getNoteColorClass(note.color)}`}
+              className={`group relative rounded-xl border p-3 transition-all hover:border-border ${getNoteColorClass(note.color)}`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -90,7 +90,7 @@ export function LessonNotes({ lessonId, lessonTitle }: LessonNotesProps) {
                   {note.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {note.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 bg-white/5 text-muted-foreground">
+                        <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 bg-muted/40 text-muted-foreground">
                           {tag}
                         </Badge>
                       ))}
@@ -100,14 +100,14 @@ export function LessonNotes({ lessonId, lessonTitle }: LessonNotesProps) {
                 <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => togglePin.mutate({ id: note.id, pinned: !note.pinned })}
-                    className={`p-1 rounded hover:bg-white/5 ${note.pinned ? 'text-primary' : 'text-muted-foreground'}`}
+                    className={`p-1 rounded hover:bg-muted/50 ${note.pinned ? 'text-primary' : 'text-muted-foreground'}`}
                   >
                     <Pin className="h-3 w-3" />
                   </button>
-                  <button onClick={() => handleEdit(note)} className="p-1 rounded text-muted-foreground hover:bg-white/5 hover:text-foreground">
+                  <button onClick={() => handleEdit(note)} className="p-1 rounded text-muted-foreground hover:bg-muted/50 hover:text-foreground">
                     <Pencil className="h-3 w-3" />
                   </button>
-                  <button onClick={() => deleteNote.mutate(note.id)} className="p-1 rounded text-muted-foreground hover:bg-white/5 hover:text-destructive">
+                  <button onClick={() => deleteNote.mutate(note.id)} className="p-1 rounded text-muted-foreground hover:bg-muted/50 hover:text-destructive">
                     <Trash2 className="h-3 w-3" />
                   </button>
                 </div>

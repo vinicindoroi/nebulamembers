@@ -227,7 +227,7 @@ export function NebulaPlayer({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 group select-none focus:outline-none"
+      className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border group select-none focus:outline-none"
       onMouseMove={wake}
       onMouseLeave={() => { if (playing) setShowControls(false); }}
       tabIndex={0}
@@ -400,7 +400,7 @@ export function NebulaPlayer({
                 <Settings className="h-4 w-4" />
               </button>
               {showSettings && (
-                <div className="absolute right-0 bottom-full mb-2 min-w-[160px] rounded-xl bg-black/95 border border-white/10 p-1 shadow-2xl z-50">
+                <div className="absolute right-0 bottom-full mb-2 min-w-[160px] rounded-xl bg-black/95 border border-border p-1 shadow-2xl z-50">
                   <div className="text-[10px] uppercase tracking-widest text-white/40 px-2 py-1">Velocidade</div>
                   {RATES.map((r) => (
                     <button
@@ -511,7 +511,7 @@ function ProgressBar({
       {/* Hover tooltip */}
       {hoverPct !== null && duration > 0 && (
         <div
-          className="absolute -top-7 -translate-x-1/2 px-1.5 py-0.5 rounded bg-black/90 border border-white/10 text-[10px] text-white tabular-nums pointer-events-none"
+          className="absolute -top-7 -translate-x-1/2 px-1.5 py-0.5 rounded bg-black/90 border border-border text-[10px] text-white tabular-nums pointer-events-none"
           style={{ left: `${hoverPct}%` }}
         >
           {fmt((hoverPct / 100) * duration)}

@@ -46,15 +46,15 @@ function Page() {
         </button>
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02]">
-        <div className="px-4 py-3 border-b border-white/5 flex items-center gap-3">
+      <div className="rounded-3xl border border-border bg-card">
+        <div className="px-4 py-3 border-b border-border flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar categorias..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
             />
           </div>
           <div className="text-xs text-muted-foreground">{filtered.length} de {rows.length}</div>
@@ -71,7 +71,7 @@ function Page() {
             {filtered.map((c) => {
               const count = c.courses?.[0]?.count ?? 0;
               return (
-                <div key={c.id} className="group relative rounded-xl border border-white/5 bg-white/[0.02] p-4 hover:border-white/10 transition">
+                <div key={c.id} className="group relative rounded-xl border border-border bg-card p-4 hover:border-border transition">
                   <div className="flex items-start gap-3">
                     <div
                       className="h-11 w-11 rounded-xl flex items-center justify-center text-sm font-bold text-white shadow-lg shrink-0"
@@ -146,7 +146,7 @@ function CategoryModal({ initial, onClose, onSaved }: { initial: Partial<Categor
       size="md"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50">Cancelar</button>
           <button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">
             {saving ? "Salvando..." : initial.id ? "Salvar" : "Criar"}
           </button>
@@ -205,7 +205,7 @@ function CategoryModal({ initial, onClose, onSaved }: { initial: Partial<Categor
               key={c}
               type="button"
               onClick={() => setF({ ...f, color: c })}
-              className={`h-9 w-9 rounded-lg border-2 transition ${f.color === c ? "border-white scale-110" : "border-white/10 hover:border-white/30"}`}
+              className={`h-9 w-9 rounded-lg border-2 transition ${f.color === c ? "border-white scale-110" : "border-border hover:border-white/30"}`}
               style={{ background: c }}
               aria-label={c}
             />

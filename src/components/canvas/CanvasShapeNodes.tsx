@@ -581,7 +581,7 @@ export const ImageNode = memo(({ id, data, selected }: NodeProps) => {
 
       <div
         className={cn(
-          "w-full h-full rounded-lg overflow-hidden border border-white/10 shadow-xl bg-[#121216] flex flex-col items-center justify-center relative",
+          "w-full h-full rounded-lg overflow-hidden border border-border shadow-xl bg-[#121216] flex flex-col items-center justify-center relative",
           selected ? "ring-2 ring-primary" : "hover:border-white/20"
         )}
       >

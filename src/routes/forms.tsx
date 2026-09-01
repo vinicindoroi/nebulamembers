@@ -234,10 +234,10 @@ function FormsPage() {
 
       <div className="w-full max-w-lg relative z-10">
         {/* Typeform style container */}
-        <div className="glass rounded-2xl p-8 md:p-10 border border-white/[0.06] shadow-2xl relative overflow-hidden">
+        <div className="glass rounded-2xl p-8 md:p-10 border border-border shadow-2xl relative overflow-hidden">
           
           {/* Header brand accent line */}
-          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-white/[0.04]" />
+          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-card" />
           
           {!success ? (
             <>
@@ -247,7 +247,7 @@ function FormsPage() {
                   <span>Passo {step} de 4</span>
                   <span>{Math.round(progressPercent)}% Concluído</span>
                 </div>
-                <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden w-full">
+                <div className="h-1 bg-card rounded-full overflow-hidden w-full">
                   <div 
                     className="h-full gradient-primary rounded-full transition-all duration-500 ease-out shadow-[0_0_12px_oklch(0.65_0.22_290/0.4)]" 
                     style={{ width: `${progressPercent}%` }}
@@ -369,7 +369,7 @@ function FormsPage() {
                             className={`py-3 px-3 rounded-xl text-xs font-semibold text-center border transition-all duration-300 cursor-pointer relative group flex items-center justify-center gap-1.5 shrink-0 ${
                               isSelected
                                 ? "gradient-primary text-white border-transparent shadow-[0_0_15px_oklch(0.65_0.22_290/0.3)] scale-[1.02]"
-                                : "border-white/[0.06] bg-white/[0.01] text-muted-foreground hover:text-foreground hover:bg-white/[0.04] hover:border-white/15"
+                                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-card hover:border-border"
                             }`}
                           >
                             <span>{opt.label}</span>
@@ -399,13 +399,13 @@ function FormsPage() {
               </div>
 
               {/* Bottom Navigation Buttons */}
-              <div className="mt-8 pt-5 border-t border-white/[0.04] flex items-center justify-between">
+              <div className="mt-8 pt-5 border-t border-border flex items-center justify-between">
                 <div>
                   {step > 1 && (
                     <button
                       type="button"
                       onClick={goPrev}
-                      className="px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl border border-border hover:bg-muted/50 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       <ArrowLeft className="h-3.5 w-3.5" /> Voltar
                     </button>
@@ -460,17 +460,17 @@ function FormsPage() {
               </p>
 
               {/* Simple Details Table */}
-              <div className="glass rounded-xl p-5 my-6 text-xs border border-white/[0.04] bg-white/[0.01] space-y-3">
+              <div className="glass rounded-xl p-5 my-6 text-xs border border-border bg-card space-y-3">
                 
                 {/* Nome Row */}
-                <div className="flex justify-between items-center group/row border-b border-white/[0.03] pb-2 last:border-0 last:pb-0">
+                <div className="flex justify-between items-center group/row border-b border-border pb-2 last:border-0 last:pb-0">
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider font-mono">Nome</span>
                     <span className="text-foreground font-medium text-xs mt-0.5">{name}</span>
                   </div>
                   <button
                     onClick={() => handleEditField(1)}
-                    className="p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold"
+                    className="p-1.5 rounded-lg bg-card border border-border opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold"
                     title="Editar nome"
                   >
                     <Pencil className="h-3 w-3" />
@@ -479,14 +479,14 @@ function FormsPage() {
                 </div>
 
                 {/* Celular Row */}
-                <div className="flex justify-between items-center group/row border-b border-white/[0.03] pb-2 last:border-0 last:pb-0">
+                <div className="flex justify-between items-center group/row border-b border-border pb-2 last:border-0 last:pb-0">
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider font-mono">Celular</span>
                     <span className="text-foreground font-medium text-xs mt-0.5">{phone}</span>
                   </div>
                   <button
                     onClick={() => handleEditField(2)}
-                    className="p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold"
+                    className="p-1.5 rounded-lg bg-card border border-border opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold"
                     title="Editar celular"
                   >
                     <Pencil className="h-3 w-3" />
@@ -495,14 +495,14 @@ function FormsPage() {
                 </div>
 
                 {/* E-mail Row */}
-                <div className="flex justify-between items-center group/row border-b border-white/[0.03] pb-2 last:border-0 last:pb-0">
+                <div className="flex justify-between items-center group/row border-b border-border pb-2 last:border-0 last:pb-0">
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider font-mono">E-mail</span>
                     <span className="text-foreground font-medium text-xs mt-0.5 break-all pr-2">{email}</span>
                   </div>
                   <button
                     onClick={() => handleEditField(3)}
-                    className="p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold shrink-0"
+                    className="p-1.5 rounded-lg bg-card border border-border opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold shrink-0"
                     title="Editar e-mail"
                   >
                     <Pencil className="h-3 w-3" />
@@ -511,14 +511,14 @@ function FormsPage() {
                 </div>
 
                 {/* Mentoria Row */}
-                <div className="flex justify-between items-center group/row border-b border-white/[0.03] pb-2 last:border-0 last:pb-0">
+                <div className="flex justify-between items-center group/row border-b border-border pb-2 last:border-0 last:pb-0">
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider font-mono">Mentoria</span>
                     <span className="text-primary font-bold text-xs mt-0.5 capitalize">{mentorship === "outra" ? customMentorship : mentorship}</span>
                   </div>
                   <button
                     onClick={() => handleEditField(4)}
-                    className="p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold"
+                    className="p-1.5 rounded-lg bg-card border border-border opacity-45 hover:opacity-100 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all flex items-center gap-1 cursor-pointer text-[10px] font-semibold"
                     title="Editar mentoria"
                   >
                     <Pencil className="h-3 w-3" />
@@ -531,13 +531,13 @@ function FormsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleReset}
-                  className="w-full inline-flex items-center justify-center bg-white/5 border border-white/8 hover:bg-white/10 text-foreground rounded-lg py-2.5 text-xs font-semibold transition-colors cursor-pointer"
+                  className="w-full inline-flex items-center justify-center bg-muted/40 border border-border hover:bg-white/10 text-foreground rounded-lg py-2.5 text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Enviar outro
                 </button>
                 <a
                   href="/"
-                  className="w-full inline-flex items-center justify-center bg-white/5 border border-white/8 hover:bg-white/10 text-foreground rounded-lg py-2.5 text-xs font-semibold transition-colors cursor-pointer"
+                  className="w-full inline-flex items-center justify-center bg-muted/40 border border-border hover:bg-white/10 text-foreground rounded-lg py-2.5 text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Voltar ao Início
                 </a>
@@ -547,7 +547,7 @@ function FormsPage() {
 
           {/* Minimalist Footer Back Link */}
           {!success && (
-            <div className="text-center text-[10px] text-muted-foreground/60 mt-6 border-t border-white/[0.04] pt-4">
+            <div className="text-center text-[10px] text-muted-foreground/60 mt-6 border-t border-border pt-4">
               <a href="/" className="hover:text-foreground transition-colors">
                 ← Voltar para a Home
               </a>

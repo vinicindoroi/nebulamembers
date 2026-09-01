@@ -1445,20 +1445,20 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
 
         {/* Bottom controls */}
         <Panel position="bottom-center" className="flex gap-1.5 mb-2">
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => zoomIn({ duration: 200 })} title="Zoom In">
+          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => zoomIn({ duration: 200 })} title="Zoom In">
             <ZoomIn className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => zoomOut({ duration: 200 })} title="Zoom Out">
+          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => zoomOut({ duration: 200 })} title="Zoom Out">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => fitView({ padding: 0.2, duration: 300 })} title="Ajustar">
+          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => fitView({ padding: 0.2, duration: 300 })} title="Ajustar">
             <Maximize className="h-4 w-4" />
           </Button>
-          <Button size="sm" variant="ghost" className="h-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30] gap-1.5" onClick={() => autoLayout()}>
+          <Button size="sm" variant="ghost" className="h-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30] gap-1.5" onClick={() => autoLayout()}>
             <LayoutGrid className="h-3.5 w-3.5" />
             Auto-layout
           </Button>
-          <div className="flex items-center bg-[#1a1a1f]/90 border border-white/10 rounded-lg shadow-lg backdrop-blur-sm overflow-hidden h-8">
+          <div className="flex items-center bg-[#1a1a1f]/90 border border-border rounded-lg shadow-lg backdrop-blur-sm overflow-hidden h-8">
             <Button
               size="sm"
               variant={interactionMode === 'move' ? 'default' : 'ghost'}
@@ -1482,7 +1482,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
           <Button
             size="sm"
             variant={isFloating ? 'default' : 'ghost'}
-            className={cn("h-8 rounded-lg shadow-lg gap-1.5 text-xs backdrop-blur-sm", !isFloating && "bg-[#1a1a1f]/90 border border-white/10 hover:bg-[#2a2a30]")}
+            className={cn("h-8 rounded-lg shadow-lg gap-1.5 text-xs backdrop-blur-sm", !isFloating && "bg-[#1a1a1f]/90 border border-border hover:bg-[#2a2a30]")}
             onClick={() => {
               const next = !isFloating;
               setIsFloating(next);
@@ -1496,7 +1496,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]"
+            className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]"
             onClick={() => {
               // Collapse all nodes that have children — only keep root expanded
               const parentsWithChildren = new Set(edges.map((e) => e.source));
@@ -1516,7 +1516,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]"
+            className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]"
             onClick={() => {
               const newCollapsed = new Set<string>();
               setCollapsedNodes(newCollapsed);
@@ -1531,7 +1531,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
             <ChevronsUpDown className="h-4 w-4" />
           </Button>
           <MindMapThemeSelector currentTheme={themeId} onChangeTheme={changeTheme} />
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-white/10 shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => setPresentationMode(true)} title="Modo Apresentação">
+          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => setPresentationMode(true)} title="Modo Apresentação">
             <Presentation className="h-4 w-4" />
           </Button>
           <MindMapExportMenu onExportMarkdown={exportMarkdown} onExportJSON={exportJSON} onImportJSON={importJSON} canvasRef={canvasRef} />
@@ -1539,7 +1539,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
 
         {/* Auto-save status indicator */}
         <Panel position="top-right" className="mr-2 mt-2">
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-[#1a1a1f]/90 backdrop-blur border border-white/10 rounded-lg shadow-lg">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-[#1a1a1f]/90 backdrop-blur border border-border rounded-lg shadow-lg">
             {isSaving ? (
               <>
                 <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
@@ -1556,7 +1556,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
 
         {/* Hint */}
         <Panel position="top-left" className="ml-2 mt-2">
-          <div className="text-[11px] text-muted-foreground bg-[#1a1a1f]/90 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 shadow-lg space-x-2">
+          <div className="text-[11px] text-muted-foreground bg-[#1a1a1f]/90 backdrop-blur px-3 py-1.5 rounded-lg border border-border shadow-lg space-x-2">
             <span><kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px]">Tab</kbd> filho</span>
             <span><kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px]">Enter</kbd> irmão</span>
             <span><kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px]">↑↓←→</kbd> navegar</span>

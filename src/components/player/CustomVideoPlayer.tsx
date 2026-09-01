@@ -183,7 +183,7 @@ export function CustomVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 group select-none"
+      className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border group select-none"
       onMouseMove={resetHideTimer}
       onMouseLeave={() => playing && setShowControls(false)}
       style={{ "--player-accent": settings.accent_color, "--player-progress": settings.progress_color } as React.CSSProperties}
@@ -341,13 +341,13 @@ export function CustomVideoPlayer({
                 {speed}x
               </button>
               {showSpeedMenu && (
-                <div className="absolute bottom-full right-0 mb-2 bg-black/95 border border-white/10 rounded-xl p-1 min-w-[80px]">
+                <div className="absolute bottom-full right-0 mb-2 bg-black/95 border border-border rounded-xl p-1 min-w-[80px]">
                   {SPEEDS.map((s) => (
                     <button
                       key={s}
                       onClick={() => changeSpeed(s)}
                       className={`w-full text-left px-3 py-1.5 rounded-lg text-xs transition ${
-                        speed === s ? "text-white bg-white/10" : "text-white/70 hover:text-white hover:bg-white/5"
+                        speed === s ? "text-white bg-white/10" : "text-white/70 hover:text-white hover:bg-muted/50"
                       }`}
                     >
                       {s}x

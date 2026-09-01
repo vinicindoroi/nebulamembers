@@ -51,7 +51,7 @@ function Page() {
           const gTo = c.gradient_to || "#8b5cf6";
           const catName = cats.find((cat) => cat.id === c.category_id)?.name;
           return (
-            <div key={c.id} className="glass rounded-2xl overflow-hidden hover:bg-white/[0.07] transition group">
+            <div key={c.id} className="glass rounded-2xl overflow-hidden hover:bg-muted/50 transition group">
               <div className="relative aspect-video">
                 {c.cover_url && (
                   <img src={c.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -73,7 +73,7 @@ function Page() {
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded ${c.status === "published" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}`}>{c.status}</span>
-                  {c.tag && <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-muted-foreground">{c.tag}</span>}
+                  {c.tag && <span className="text-[10px] px-2 py-0.5 rounded bg-muted/40 text-muted-foreground">{c.tag}</span>}
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs text-muted-foreground">R$ {Number(c.price ?? 0).toFixed(2)}</span>
@@ -138,11 +138,11 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
     >
       <div className="min-h-full flex items-center justify-center p-4">
         <div
-          className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-[oklch(0.16_0.015_270)] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7)] overflow-hidden"
+          className="relative w-full max-w-2xl rounded-2xl border border-border bg-[oklch(0.16_0.015_270)] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7)] overflow-hidden"
           style={{ animation: "modal-card-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative px-6 pt-5 pb-4 border-b border-white/5 bg-gradient-to-b from-white/[0.04] to-transparent">
+          <div className="relative px-6 pt-5 pb-4 border-b border-border bg-gradient-to-b from-white/[0.04] to-transparent">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/80 mb-1">
@@ -153,7 +153,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
               </div>
               <button
                 onClick={onClose}
-                className="shrink-0 h-9 w-9 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] flex items-center justify-center transition"
+                className="shrink-0 h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted/50 flex items-center justify-center transition"
                 aria-label="Fechar"
               >
                 <X className="h-4 w-4" />
@@ -251,7 +251,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                       type="color"
                       value={toHex(f.gradient_from)}
                       onChange={(e) => setF({ ...f, gradient_from: e.target.value })}
-                      className="h-9 w-9 rounded-lg border border-white/10 cursor-pointer bg-transparent shrink-0"
+                      className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent shrink-0"
                     />
                     <input
                       type="text"
@@ -269,7 +269,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                       type="color"
                       value={toHex(f.gradient_to)}
                       onChange={(e) => setF({ ...f, gradient_to: e.target.value })}
-                      className="h-9 w-9 rounded-lg border border-white/10 cursor-pointer bg-transparent shrink-0"
+                      className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent shrink-0"
                     />
                     <input
                       type="text"
@@ -294,7 +294,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                     key={from + to}
                     type="button"
                     onClick={() => setF({ ...f, gradient_from: from, gradient_to: to })}
-                    className="w-8 h-8 rounded-lg border border-white/10 hover:border-white/30 hover:scale-110 transition-all shadow-sm"
+                    className="w-8 h-8 rounded-lg border border-border hover:border-white/30 hover:scale-110 transition-all shadow-sm"
                     style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
                     title={`${from} → ${to}`}
                   />
@@ -307,7 +307,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                 <Eye className="h-3.5 w-3.5" />
                 Preview da capa
               </label>
-              <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/10">
+              <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-border">
                 {f.cover_url && (
                   <img src={f.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
                 )}
@@ -330,14 +330,14 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-white/5 bg-white/[0.02] flex items-center justify-between gap-3">
+          <div className="px-6 py-4 border-t border-border bg-card flex items-center justify-between gap-3">
             <div className="text-[11px] text-muted-foreground">
               {f.status === "published" ? "Será publicado ao salvar" : "Salvo como rascunho"}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5 transition"
+                className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50 transition"
               >
                 Cancelar
               </button>

@@ -5,11 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-2xl: 32px;
+  --radius-3xl: 40px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -31,35 +32,35 @@
   --color-ring: var(--ring);
   --color-glass: var(--glass);
   --color-glass-border: var(--glass-border);
-  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --background: oklch(0.13 0.003 285);
-  --foreground: oklch(0.96 0.003 285);
-  --card: oklch(0.175 0.004 285);
-  --card-foreground: oklch(0.96 0.003 285);
-  --popover: oklch(0.175 0.004 285);
-  --popover-foreground: oklch(0.96 0.003 285);
-  --primary: oklch(0.63 0.19 292);
-  --primary-foreground: oklch(0.99 0.005 285);
-  --secondary: oklch(0.215 0.005 285);
-  --secondary-foreground: oklch(0.96 0.003 285);
-  --muted: oklch(0.215 0.005 285);
-  --muted-foreground: oklch(0.68 0.008 285);
-  --accent: oklch(0.63 0.19 292);
-  --accent-foreground: oklch(0.99 0.005 285);
+  --background: #0a0a0e;
+  --foreground: #e1e1e6;
+  --card: #16161c;
+  --card-foreground: #e1e1e6;
+  --popover: #16161c;
+  --popover-foreground: #e1e1e6;
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2a35;
+  --secondary-foreground: #e1e1e6;
+  --muted: #2a2a35;
+  --muted-foreground: #a1a1aa;
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(0.98 0.003 285);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 7%);
-  --ring: oklch(0.63 0.19 292);
-  --glass: oklch(0.175 0.004 285 / 0.88);
-  --glass-border: oklch(1 0 0 / 0.07);
-  --gradient-primary: linear-gradient(135deg, oklch(0.63 0.19 292), oklch(0.58 0.17 265));
-  --shadow-glass: 0 8px 32px 0 oklch(0 0 0 / 0.4);
-  --shadow-glow: 0 0 40px oklch(0.63 0.19 292 / 0.22);
+  --border: #2a2a35;
+  --input: #2a2a35;
+  --ring: #8b5cf6;
+  --glass: oklch(0.175 0.004 285 / 0.9);
+  --glass-border: #2a2a35;
+  --gradient-primary: linear-gradient(135deg, #8b5cf6, #6d3ff0);
+  --shadow-glass: 0 8px 32px 0 oklch(0 0 0 / 0.45);
+  --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.35);
 }
 
 .light {
@@ -94,8 +95,8 @@
   html, body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); }
   body {
     background-image:
-      radial-gradient(ellipse 50% 40% at 0% 0%, oklch(0.63 0.19 292 / 0.07), transparent 70%),
-      radial-gradient(ellipse 45% 35% at 100% 100%, oklch(0.58 0.17 265 / 0.05), transparent 70%);
+      radial-gradient(ellipse 60% 45% at 12% -5%, rgba(139, 92, 246, 0.10), transparent 65%),
+      radial-gradient(ellipse 50% 40% at 100% 105%, rgba(139, 92, 246, 0.06), transparent 70%);
     background-repeat: no-repeat;
     min-height: 100vh;
   }
@@ -384,7 +385,22 @@
   }
   .animate-wizard-in { animation: wizard-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .animate-wizard-fade { animation: wizard-fade 0.25s ease-out both; }
-  .animate-ambient-pulse { animation: ambient-pulse 12s ease-in-out infinite; }
+    .animate-ambient-pulse { animation: ambient-pulse 12s ease-in-out infinite; }
+  .font-display { font-family: var(--font-display); }
+  .nav-pill {
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .glow-primary { box-shadow: 0 0 24px rgba(139, 92, 246, 0.35); }
+  .bento-card {
+    border-radius: var(--radius-2xl);
+    background: var(--card);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .bento-card:hover { border-color: color-mix(in oklab, var(--primary) 35%, transparent); }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up,

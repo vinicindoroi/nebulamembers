@@ -86,9 +86,9 @@ export function FunnelFloatingToolbar({
   };
 
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-2 py-1.5 rounded-full bg-[#0f0f12]/95 border border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-2 py-1.5 rounded-full bg-[#0f0f12]/95 border border-border shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl">
       {/* Interaction Mode Toggle */}
-      <div className="flex items-center bg-white/[0.04] rounded-full p-0.5 border border-white/5">
+      <div className="flex items-center bg-card rounded-full p-0.5 border border-border">
         <Button
           variant="ghost"
           size="sm"
@@ -97,7 +97,7 @@ export function FunnelFloatingToolbar({
             "h-7 w-7 p-0 rounded-full transition-all",
             interactionMode === 'select'
               ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-              : "hover:bg-white/[0.06] text-muted-foreground"
+              : "hover:bg-muted/50 text-muted-foreground"
           )}
           title="Selecionar (V)"
         >
@@ -111,7 +111,7 @@ export function FunnelFloatingToolbar({
             "h-7 w-7 p-0 rounded-full transition-all",
             interactionMode === 'pan'
               ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-              : "hover:bg-white/[0.06] text-muted-foreground"
+              : "hover:bg-muted/50 text-muted-foreground"
           )}
           title="Mover (H)"
         >
@@ -125,7 +125,7 @@ export function FunnelFloatingToolbar({
             "h-7 w-7 p-0 rounded-full transition-all",
             interactionMode === 'draw'
               ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-              : "hover:bg-white/[0.06] text-muted-foreground"
+              : "hover:bg-muted/50 text-muted-foreground"
           )}
           title="Desenho Livre (D)"
         >
@@ -137,7 +137,7 @@ export function FunnelFloatingToolbar({
       {(onAddStickyNote || onAddFreeText || onAddImage) && (
         <>
           <div className="w-px h-5 bg-white/10" />
-          <div className="flex items-center bg-white/[0.04] rounded-full p-0.5 border border-white/5">
+          <div className="flex items-center bg-card rounded-full p-0.5 border border-border">
             {onAddImage && (
               <>
                 <input 
@@ -151,7 +151,7 @@ export function FunnelFloatingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => imageInputRef.current?.click()}
-                  className="h-7 w-7 p-0 rounded-full transition-all hover:bg-white/[0.06] text-muted-foreground"
+                  className="h-7 w-7 p-0 rounded-full transition-all hover:bg-muted/50 text-muted-foreground"
                   title="Adicionar Imagem"
                 >
                   <ImageIcon className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ export function FunnelFloatingToolbar({
                   "h-7 w-7 p-0 rounded-full transition-all",
                   interactionMode === 'sticky-note'
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-                    : "hover:bg-white/[0.06] text-muted-foreground"
+                    : "hover:bg-muted/50 text-muted-foreground"
                 )}
                 title="Nota Livre (N)"
               >
@@ -183,7 +183,7 @@ export function FunnelFloatingToolbar({
                   "h-7 w-7 p-0 rounded-full transition-all",
                   interactionMode === 'free-text'
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-                    : "hover:bg-white/[0.06] text-muted-foreground"
+                    : "hover:bg-muted/50 text-muted-foreground"
                 )}
                 title="Texto Livre (T)"
               >
@@ -202,7 +202,7 @@ export function FunnelFloatingToolbar({
             variant="ghost"
             size="sm"
             onClick={onGroupNodes}
-            className="h-8 px-3 text-xs hover:bg-white/[0.06] text-primary rounded-full"
+            className="h-8 px-3 text-xs hover:bg-muted/50 text-primary rounded-full"
             title="Agrupar selecionados"
           >
             <Group className="w-3.5 h-3.5 mr-1.5" />
@@ -219,7 +219,7 @@ export function FunnelFloatingToolbar({
             variant="ghost"
             size="sm"
             onClick={onUngroupNodes}
-            className="h-8 px-3 text-xs hover:bg-white/[0.06] text-orange-400 rounded-full"
+            className="h-8 px-3 text-xs hover:bg-muted/50 text-orange-400 rounded-full"
             title="Desagrupar selecionados"
           >
             <Ungroup className="w-3.5 h-3.5 mr-1.5" />
@@ -233,7 +233,7 @@ export function FunnelFloatingToolbar({
       {/* Auto-save status indicator */}
       <div className={cn(
         "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors",
-        isSaving ? "bg-white/[0.03]" : "bg-emerald-500/10 border border-emerald-500/20"
+        isSaving ? "bg-card" : "bg-emerald-500/10 border border-emerald-500/20"
       )}>
         {isSaving ? (
           <>
@@ -253,12 +253,12 @@ export function FunnelFloatingToolbar({
       {/* Export/Import Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-white/[0.06] rounded-full text-foreground/80 hover:text-foreground">
+          <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50 rounded-full text-foreground/80 hover:text-foreground">
             <Download className="w-3.5 h-3.5 mr-1.5" />
             Exportar
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" className="bg-popover border-white/10 shadow-2xl">
+        <DropdownMenuContent align="center" className="bg-popover border-border shadow-2xl">
           <DropdownMenuItem onClick={() => onExport('png')} className="text-xs cursor-pointer">
             Exportar como PNG
           </DropdownMenuItem>
@@ -282,7 +282,7 @@ export function FunnelFloatingToolbar({
             onChange={handleFileChange}
             className="hidden"
           />
-          <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-white/[0.06] rounded-full text-foreground/80 hover:text-foreground" asChild>
+          <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50 rounded-full text-foreground/80 hover:text-foreground" asChild>
             <span>
               <Upload className="w-3.5 h-3.5 mr-1.5" />
               Importar
@@ -304,7 +304,7 @@ export function FunnelFloatingToolbar({
               "h-8 px-3 text-xs rounded-full transition-all",
               hasTrackingToken
                 ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/15"
-                : "hover:bg-white/[0.06] text-foreground/80 hover:text-foreground"
+                : "hover:bg-muted/50 text-foreground/80 hover:text-foreground"
             )}
             title="Gerar script de tracking"
           >
@@ -327,7 +327,7 @@ export function FunnelFloatingToolbar({
               'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
               educationalMode
                 ? 'bg-primary/15 border border-primary/30 text-primary'
-                : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent'
+                : 'hover:bg-muted/50 text-muted-foreground border border-transparent'
             )}
           >
             <GraduationCap className={cn('w-3.5 h-3.5', educationalMode && 'animate-pulse')} />
@@ -350,7 +350,7 @@ export function FunnelFloatingToolbar({
             'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
             liveMode
               ? 'bg-primary/15 border border-primary/30 text-primary'
-              : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent'
+              : 'hover:bg-muted/50 text-muted-foreground border border-transparent'
           )}
         >
           <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />

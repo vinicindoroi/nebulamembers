@@ -580,12 +580,12 @@ function CommunityPage() {
                 placeholder="Pesquisar publicações ou membros..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 focus:bg-white/[0.04] focus:shadow-glow transition-all duration-300"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-border bg-card text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 focus:bg-card focus:shadow-glow transition-all duration-300"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-white/5 text-muted-foreground/50 hover:text-foreground transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-muted/50 text-muted-foreground/50 hover:text-foreground transition"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -593,13 +593,13 @@ function CommunityPage() {
             </div>
 
             {/* Abas do Feed */}
-            <div className="flex bg-white/[0.02] border border-white/[0.06] p-1 rounded-xl items-center gap-1 shrink-0">
+            <div className="flex bg-card border border-border p-1 rounded-xl items-center gap-1 shrink-0">
               <button
                 onClick={() => setActiveTab("all")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
                   activeTab === "all"
                     ? "bg-primary text-primary-foreground shadow-lg"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 <Sparkles className="h-3 w-3" />
@@ -610,7 +610,7 @@ function CommunityPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
                   activeTab === "my"
                     ? "bg-primary text-primary-foreground shadow-lg"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 <User className="h-3 w-3" />
@@ -621,7 +621,7 @@ function CommunityPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
                   activeTab === "saved"
                     ? "bg-primary text-primary-foreground shadow-lg"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 <Bookmark className="h-3 w-3" />
@@ -632,7 +632,7 @@ function CommunityPage() {
         </div>
 
         {/* Composer (Novo Post) */}
-        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.015] backdrop-blur-md overflow-hidden transition-all duration-300 focus-within:border-primary/40 focus-within:shadow-glow focus-within:bg-white/[0.03] animate-fade-up">
+        <div className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden transition-all duration-300 focus-within:border-primary/40 focus-within:shadow-glow focus-within:bg-card animate-fade-up">
           <div className="px-5 pt-4 pb-3">
             <div className="flex items-center gap-3 mb-3">
               <Avatar initials={initials} xp={myXp} avatarUrl={myProfile?.avatar_url} />
@@ -647,7 +647,7 @@ function CommunityPage() {
           </div>
 
           {imagePreview && (
-            <div className="relative mx-5 mb-3 rounded-xl overflow-hidden border border-white/10 max-h-56 animate-fade-up">
+            <div className="relative mx-5 mb-3 rounded-xl overflow-hidden border border-border max-h-56 animate-fade-up">
               <img src={imagePreview} alt="Preview" className="w-full h-full object-cover max-h-56" />
               <button
                 onClick={removeImage}
@@ -658,10 +658,10 @@ function CommunityPage() {
             </div>
           )}
 
-          <div className="px-5 py-3 border-t border-white/[0.06] bg-white/[0.01] flex items-center justify-between">
+          <div className="px-5 py-3 border-t border-border bg-card flex items-center justify-between">
             <div className="flex gap-1 text-muted-foreground">
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleImageSelect} />
-              <button type="button" onClick={() => fileRef.current?.click()} className="p-2 rounded-xl hover:bg-white/5 hover:text-foreground transition-all duration-200 hover:scale-105 active:scale-95" title="Adicionar Imagem">
+              <button type="button" onClick={() => fileRef.current?.click()} className="p-2 rounded-xl hover:bg-muted/50 hover:text-foreground transition-all duration-200 hover:scale-105 active:scale-95" title="Adicionar Imagem">
                 <ImageIcon className="h-4 w-4" />
               </button>
             </div>
@@ -680,7 +680,7 @@ function CommunityPage() {
         </div>
 
         {/* Stories Operacionais Rápidos (Feature 5) */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.015] p-4 flex flex-col gap-3">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-white/[0.015] p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
               <Sparkles className="h-3 w-3 text-primary animate-pulse" /> Stories Operacionais (24h)
@@ -694,7 +694,7 @@ function CommunityPage() {
               <button
                 type="button"
                 onClick={() => setIsCreatingStory(true)}
-                className="h-14 w-14 rounded-full border border-dashed border-white/20 hover:border-primary/50 bg-white/[0.02] flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative group"
+                className="h-14 w-14 rounded-full border border-dashed border-white/20 hover:border-primary/50 bg-card flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative group"
               >
                 <div className="absolute inset-0.5 rounded-full bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Plus className="h-5 w-5" />
@@ -726,7 +726,7 @@ function CommunityPage() {
                   }}
                   className={`h-14 w-14 rounded-full p-[2.5px] bg-gradient-to-tr transition-all duration-300 hover:scale-105 cursor-pointer active:scale-95 ${
                     st.viewed 
-                      ? "from-white/10 to-white/5 border border-white/5 shadow-inner" 
+                      ? "from-white/10 to-white/5 border border-border shadow-inner" 
                       : "from-primary via-pink-500 to-amber-400 p-[3px] shadow-[0_0_12px_rgba(167,139,250,0.25)] animate-pulse"
                   }`}
                 >
@@ -750,7 +750,7 @@ function CommunityPage() {
                 onClick={() => setActiveStoryIndex(null)}
               >
                 <div 
-                  className={`relative w-full h-full md:h-[92vh] md:max-w-lg md:aspect-[9/16] md:border md:border-white/10 md:rounded-[32px] overflow-hidden shadow-[0_0_80px_-10px_rgba(139,92,246,0.25)] flex flex-col justify-between p-6 transition-all duration-300 ${
+                  className={`relative w-full h-full md:h-[92vh] md:max-w-lg md:aspect-[9/16] md:border md:border-border md:rounded-[32px] overflow-hidden shadow-[0_0_80px_-10px_rgba(139,92,246,0.25)] flex flex-col justify-between p-6 transition-all duration-300 ${
                     activeStory.image_url ? "" : `bg-gradient-to-br ${activeStory.gradient}`
                   }`}
                   style={
@@ -787,7 +787,7 @@ function CommunityPage() {
                   {/* Story Header */}
                   <div className="flex items-center justify-between mt-3 z-10">
                     <div className="flex items-center gap-2.5">
-                      <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${activeStory.gradient} flex items-center justify-center font-bold text-xs border border-white/15 shadow-md text-white select-none`}>
+                      <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${activeStory.gradient} flex items-center justify-center font-bold text-xs border border-border shadow-md text-white select-none`}>
                         {activeStory.userAvatar}
                       </div>
                       <div>
@@ -872,7 +872,7 @@ function CommunityPage() {
                   {/* Story Text Content with Glowing Premium Design */}
                   <div className="flex-1 flex items-center justify-center p-4 z-10 select-none">
                     {activeStory.image_url ? (
-                      <div className="bg-black/35 backdrop-blur-lg px-5 py-4 rounded-3xl border border-white/10 shadow-2xl text-left w-full max-w-[92%] mx-auto mt-auto mb-12 select-none animate-fade-up">
+                      <div className="bg-black/35 backdrop-blur-lg px-5 py-4 rounded-3xl border border-border shadow-2xl text-left w-full max-w-[92%] mx-auto mt-auto mb-12 select-none animate-fade-up">
                         <p className="text-[13px] font-medium leading-relaxed tracking-wide text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
                           {activeStory.content}
                         </p>
@@ -899,7 +899,7 @@ function CommunityPage() {
         {/* Story Creator Overlay */}
         {isCreatingStory && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm animate-fade-in" onClick={() => setIsCreatingStory(false)}>
-            <form onSubmit={handleCreateStory} className="w-full max-w-md bg-[#0c0c0e] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4 mx-4" onClick={(e) => e.stopPropagation()}>
+            <form onSubmit={handleCreateStory} className="w-full max-w-md bg-[#0c0c0e] border border-border rounded-2xl p-6 shadow-2xl space-y-4 mx-4" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
                   <Plus className="h-4 w-4 text-primary" /> Publicar Story Operacional
@@ -907,7 +907,7 @@ function CommunityPage() {
                 <button
                   type="button"
                   onClick={() => setIsCreatingStory(false)}
-                  className="p-1 rounded-full hover:bg-white/5 text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="p-1 rounded-full hover:bg-muted/50 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -921,7 +921,7 @@ function CommunityPage() {
                     placeholder="Ex: Novo recorde! R$ 4.2k faturados hoje de manhã no tráfego direto! 📈🔥"
                     value={newStoryText}
                     onChange={(e) => setNewStoryText(e.target.value)}
-                    className="w-full h-24 bg-white/[0.02] border border-white/10 rounded-xl p-3 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/50 transition-all resize-none bg-background"
+                    className="w-full h-24 bg-card border border-border rounded-xl p-3 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/50 transition-all resize-none bg-background"
                   />
                   <span className="text-[9px] text-muted-foreground/40 block text-right mt-0.5">{160 - newStoryText.length} caracteres restantes</span>
                 </div>
@@ -942,7 +942,7 @@ function CommunityPage() {
                     <button
                       type="button"
                       onClick={() => storyFileRef.current?.click()}
-                      className="px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-semibold text-foreground hover:bg-white/10 transition flex items-center gap-1.5 cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-card border border-border text-xs font-semibold text-foreground hover:bg-white/10 transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <ImageIcon className="h-3.5 w-3.5 text-primary" />
                       <span>{storyImageFile ? "Alterar Imagem" : "Escolher Imagem"}</span>
@@ -980,7 +980,7 @@ function CommunityPage() {
                         type="button"
                         onClick={() => setNewStoryGrad(g.id)}
                         className={`flex-1 h-8 rounded-lg bg-gradient-to-br ${g.id} border hover:scale-105 active:scale-95 transition-all text-[8px] font-black text-white flex items-center justify-center select-none cursor-pointer ${
-                          newStoryGrad === g.id ? "border-white scale-102 ring-2 ring-primary/20 shadow-md" : "border-white/10 hover:border-white/30"
+                          newStoryGrad === g.id ? "border-white scale-102 ring-2 ring-primary/20 shadow-md" : "border-border hover:border-white/30"
                         }`}
                         title={g.label}
                       >
@@ -995,7 +995,7 @@ function CommunityPage() {
               <div className="pt-2">
                 <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block mb-1">Prévia do Layout</span>
                 <div 
-                  className={`w-full aspect-[16/9] rounded-xl p-4 flex items-center justify-center text-center border border-white/10 shadow relative overflow-hidden ${
+                  className={`w-full aspect-[16/9] rounded-xl p-4 flex items-center justify-center text-center border border-border shadow relative overflow-hidden ${
                     storyImagePreview ? "" : `bg-gradient-to-br ${newStoryGrad}`
                   }`}
                   style={
@@ -1027,11 +1027,11 @@ function CommunityPage() {
         {isLoading ? (
           <div className="space-y-4">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 h-36 animate-pulse" />
+              <div key={i} className="rounded-3xl border border-border bg-card p-5 h-36 animate-pulse" />
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.015] p-16 text-center animate-fade-up">
+          <div className="rounded-2xl border border-dashed border-border bg-white/[0.015] p-16 text-center animate-fade-up">
             <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground/20 mb-3" strokeWidth={1.2} />
             <div className="text-sm font-semibold">Nenhuma publicação encontrada</div>
             <p className="text-xs text-muted-foreground/70 mt-1">Experimente mudar o filtro ou fazer outra busca.</p>
@@ -1054,7 +1054,7 @@ function CommunityPage() {
               <div className="pt-4 flex justify-center pb-8 animate-fade-up">
                 <button
                   onClick={() => setLimit((l) => l + 10)}
-                  className="px-6 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-primary/30 text-xs font-bold text-foreground transition-all duration-300 hover:scale-102 cursor-pointer shadow-md"
+                  className="px-6 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/30 text-xs font-bold text-foreground transition-all duration-300 hover:scale-102 cursor-pointer shadow-md"
                 >
                   Carregar mais publicações ➔
                 </button>
@@ -1107,7 +1107,7 @@ function ProfileSidebarWidget() {
   const rankColor = getRankColor(levelInfo.level);
 
   return (
-    <div className="sticky top-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-md overflow-hidden shadow-xl transition-all duration-300 hover:shadow-glow hover:border-white/[0.12] group/profile">
+    <div className="sticky top-4 rounded-2xl border border-border bg-card backdrop-blur-md overflow-hidden shadow-xl transition-all duration-300 hover:shadow-glow hover:border-primary/30 group/profile">
       {/* Banner Capa Premium com Efeito Nebulosa Animado */}
       <div className="h-24 w-full bg-gradient-to-tr from-primary via-primary to-pink-500 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent opacity-80 animate-ambient-pulse" />
@@ -1115,7 +1115,7 @@ function ProfileSidebarWidget() {
       </div>
 
       {/* Avatar flutuante e Informações básicas */}
-      <div className="relative px-4 pb-4 pt-12 text-center flex flex-col items-center border-b border-white/[0.06] bg-white/[0.01]">
+      <div className="relative px-4 pb-4 pt-12 text-center flex flex-col items-center border-b border-border bg-card">
         <div className="absolute -top-10 left-1/2 -translate-x-1/2">
           <div className="relative">
             <Avatar initials={initials} size="lg" xp={xp} avatarUrl={myProfile?.avatar_url} />
@@ -1146,20 +1146,20 @@ function ProfileSidebarWidget() {
       </div>
 
       {/* XP e Gamificação */}
-      <div className="p-4 space-y-3.5 bg-white/[0.01]">
+      <div className="p-4 space-y-3.5 bg-card">
         <div className="flex items-center justify-between">
           <div className="flex flex-col items-start gap-0.5">
             <span className="text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">Patente</span>
             <span className="text-xs font-semibold text-foreground/90">{levelInfo.title}</span>
           </div>
-          <span className="text-[10px] text-muted-foreground/60 font-mono bg-white/5 px-2 py-1 rounded border border-white/[0.04]">
+          <span className="text-[10px] text-muted-foreground/60 font-mono bg-muted/40 px-2 py-1 rounded border border-border">
             {levelInfo.currentXp} / {levelInfo.nextLevelXp} XP
           </span>
         </div>
 
         {/* Barra de Progresso Premium */}
         <div className="relative">
-          <div className="h-2.5 w-full rounded-full bg-white/5 overflow-hidden border border-white/[0.04] p-[1px]">
+          <div className="h-2.5 w-full rounded-full bg-muted/40 overflow-hidden border border-border p-[1px]">
             <div
               className={`h-full rounded-full bg-gradient-to-r ${rankColor} transition-all duration-500 relative`}
               style={{ width: `${Math.min(100, (levelInfo.currentXp / levelInfo.nextLevelXp) * 100)}%` }}
@@ -1264,7 +1264,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
   };
 
   return (
-    <article className="rounded-2xl border border-white/[0.06] bg-white/[0.015] backdrop-blur-md overflow-hidden hover:bg-white/[0.02] hover:border-white/[0.1] hover:shadow-glass transition-all duration-300 group relative">
+    <article className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden hover:bg-card hover:border-primary/30 hover:shadow-glass transition-all duration-300 group relative">
       {/* Linha vertical conectora de threads para comentários aberta */}
       {showComments && (
         <div className="absolute top-[60px] bottom-0 left-[29px] w-[1px] bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
@@ -1331,7 +1331,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
                 setIsEditing(false);
                 setEditContent(post.content || "");
               }}
-              className="px-3.5 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-[11px] font-semibold text-foreground transition-all active:scale-95 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl border border-border hover:bg-muted/50 text-[11px] font-semibold text-foreground transition-all active:scale-95 cursor-pointer"
             >
               Cancelar
             </button>
@@ -1360,7 +1360,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
 
       {/* Image */}
       {post.image_url && (
-        <div className="mt-3 mx-5 rounded-xl overflow-hidden border border-white/[0.06] ml-[62px] relative z-10 group/img shadow-md">
+        <div className="mt-3 mx-5 rounded-xl overflow-hidden border border-border ml-[62px] relative z-10 group/img shadow-md">
           <img
             src={post.image_url}
             alt="Post"
@@ -1371,14 +1371,14 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
       )}
 
       {/* Actions (Curtir, Comentar, Salvar, Compartilhar) */}
-      <div className="px-5 py-3.5 mt-2 flex items-center gap-2 pl-[62px] border-t border-white/[0.02] relative z-10">
+      <div className="px-5 py-3.5 mt-2 flex items-center gap-2 pl-[62px] border-t border-border relative z-10">
         {/* Curtir */}
         <button
           onClick={onLike}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 hover:scale-105 active:scale-95 ${
             post.liked
               ? "text-rose-400 bg-rose-500/10 border border-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.15)]"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent"
           }`}
         >
           <Heart className={`h-4 w-4 transition-transform duration-300 ${post.liked ? "scale-120 animate-ambient-pulse" : ""}`} fill={post.liked ? "currentColor" : "none"} />
@@ -1390,8 +1390,8 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
           onClick={() => setShowComments(!showComments)}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border duration-200 hover:scale-105 active:scale-95 ${
             showComments
-              ? "text-foreground bg-white/5 border-white/10"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/5 border-transparent"
+              ? "text-foreground bg-muted/40 border-border"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
           }`}
         >
           <MessageCircle className="h-4 w-4" />
@@ -1402,7 +1402,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
         {/* Compartilhar */}
         <button
           onClick={handleShare}
-          className="inline-flex items-center justify-center p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent transition-all duration-200 hover:scale-105 active:scale-95"
+          className="inline-flex items-center justify-center p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 border border-transparent transition-all duration-200 hover:scale-105 active:scale-95"
           title="Compartilhar publicação"
         >
           <Share2 className="h-4 w-4" />
@@ -1414,7 +1414,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border duration-200 hover:scale-105 active:scale-95 ml-auto ${
             saved
               ? "text-amber-400 bg-amber-500/10 border-amber-500/25 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/5 border-transparent"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent"
           }`}
         >
           <Bookmark className="h-4 w-4" fill={saved ? "currentColor" : "none"} />
@@ -1499,7 +1499,7 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
   };
 
   return (
-    <div className="border-t border-white/[0.05] bg-black/15 pb-2 animate-fade-up">
+    <div className="border-t border-border bg-black/15 pb-2 animate-fade-up">
       {comments.length > 0 && (
         <div className="px-5 py-4 space-y-4 max-h-[380px] overflow-y-auto pl-[62px]">
           {comments.map((c, index) => {
@@ -1511,7 +1511,7 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
               <div key={c.id} className="flex gap-3 group/comment relative items-start">
                 <Avatar initials={cInit} size="sm" xp={cXp} avatarUrl={c.author?.avatar_url} />
                 
-                <div className="flex-1 min-w-0 rounded-2xl bg-white/[0.025] border border-white/[0.05] px-3.5 py-2.5 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-200 relative group/balloon shadow-sm">
+                <div className="flex-1 min-w-0 rounded-2xl bg-white/[0.025] border border-border px-3.5 py-2.5 hover:bg-card hover:border-border transition-all duration-200 relative group/balloon shadow-sm">
                   {/* Detalhes de Cabeçalho do Balão */}
                   <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -1534,7 +1534,7 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
                   {c.content && <p className="text-[11.5px] text-foreground/80 mt-1 leading-relaxed break-words">{c.content}</p>}
                   
                   {c.image_url && (
-                    <div className="mt-2 rounded-lg overflow-hidden border border-white/[0.06] max-h-48 shadow-sm">
+                    <div className="mt-2 rounded-lg overflow-hidden border border-border max-h-48 shadow-sm">
                       <img src={c.image_url} alt="" className="w-full max-h-48 object-cover" loading="lazy" />
                     </div>
                   )}
@@ -1546,9 +1546,9 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
       )}
 
       {/* Comment composer */}
-      <div className="px-5 py-3 border-t border-white/[0.04] pl-[62px]">
+      <div className="px-5 py-3 border-t border-border pl-[62px]">
         {imgPreview && (
-          <div className="relative mb-2 ml-9 rounded-lg overflow-hidden border border-white/10 max-h-32 w-fit animate-fade-up">
+          <div className="relative mb-2 ml-9 rounded-lg overflow-hidden border border-border max-h-32 w-fit animate-fade-up">
             <img src={imgPreview} alt="Preview" className="max-h-32 object-cover" />
             <button onClick={clearImg} className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center shadow-md">
               <X className="h-3 w-3" />
@@ -1564,14 +1564,14 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
             onChange={(e) => setText(e.target.value.slice(0, 1000))}
             onKeyDown={handleKeyDown}
             placeholder="Escreva um comentário (Pressione Enter para enviar)..."
-            className="flex-1 bg-white/[0.02] border border-white/[0.06] rounded-xl px-3.5 py-2.5 text-xs outline-none placeholder:text-muted-foreground/35 focus:border-primary/40 focus:bg-white/[0.04] focus:ring-1 focus:ring-primary/40 transition-all duration-200"
+            className="flex-1 bg-card border border-border rounded-xl px-3.5 py-2.5 text-xs outline-none placeholder:text-muted-foreground/35 focus:border-primary/40 focus:bg-card focus:ring-1 focus:ring-primary/40 transition-all duration-200"
           />
           
           <input ref={imgRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleImg} />
           
           <button 
             onClick={() => imgRef.current?.click()} 
-            className="p-2 rounded-xl text-muted-foreground/50 hover:text-foreground hover:bg-white/5 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0"
+            className="p-2 rounded-xl text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 transition-all duration-200 hover:scale-105 active:scale-95 shrink-0"
             title="Adicionar imagem ao comentário"
           >
             <ImageIcon className="h-4 w-4" />

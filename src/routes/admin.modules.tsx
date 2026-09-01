@@ -129,15 +129,15 @@ function Page() {
         <Stat icon={Clock} label="Curso" value={courses.find((c) => c.id === selected)?.title ?? "—"} text />
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02]">
-        <div className="px-4 py-3 border-b border-white/5 flex items-center gap-3">
+      <div className="rounded-3xl border border-border bg-card">
+        <div className="px-4 py-3 border-b border-border flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar módulo..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
             />
           </div>
           <button
@@ -164,7 +164,7 @@ function Page() {
             const open = openMod === m.id;
             const ls = lessons[m.id] ?? [];
             return (
-              <div key={m.id} className="rounded-xl border border-white/5 bg-white/[0.02] overflow-hidden">
+              <div key={m.id} className="rounded-xl border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 px-3 py-2.5 group">
                   <div className="flex flex-col -gap-1">
                     <button
@@ -192,7 +192,7 @@ function Page() {
                     <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
                     <span className="text-[10px] font-mono text-muted-foreground/60 w-6">{String(idx + 1).padStart(2, "0")}</span>
                     <span className="text-sm font-medium truncate">{m.title}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-muted-foreground shrink-0">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/40 text-muted-foreground shrink-0">
                       {ls.length} {ls.length === 1 ? "aula" : "aulas"}
                     </span>
                   </button>
@@ -211,14 +211,14 @@ function Page() {
                 </div>
 
                 {open && (
-                  <div className="border-t border-white/5 bg-black/20 px-3 py-2 space-y-1">
+                  <div className="border-t border-border bg-black/20 px-3 py-2 space-y-1">
                     {ls.length === 0 && (
                       <div className="text-xs text-muted-foreground py-4 text-center">
                         Nenhuma aula. Clique em "+ Aula" para criar.
                       </div>
                     )}
                     {ls.map((l, li) => (
-                      <div key={l.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-white/[0.03] transition group">
+                      <div key={l.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-card transition group">
                         <div className="flex flex-col">
                           <button
                             onClick={() => moveLesson(m.id, l.id, -1)}
@@ -235,7 +235,7 @@ function Page() {
                             <ArrowDown className="h-2.5 w-2.5" />
                           </button>
                         </div>
-                        <div className="h-7 w-7 rounded-md bg-white/5 flex items-center justify-center shrink-0">
+                        <div className="h-7 w-7 rounded-md bg-muted/40 flex items-center justify-center shrink-0">
                           <Video className="h-3.5 w-3.5 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -310,7 +310,7 @@ function Page() {
 
 function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; value: number | string; text?: boolean }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex items-center gap-3">
+    <div className="rounded-xl border border-border bg-card p-3 flex items-center gap-3">
       <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
         <Icon className="h-4 w-4" />
       </div>
@@ -346,7 +346,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       size="md"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50">Cancelar</button>
           <button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">
             {saving ? "Salvando..." : initial.id ? "Salvar" : "Criar módulo"}
           </button>
@@ -373,7 +373,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
             <Eye className="h-3.5 w-3.5" />
             Preview da capa
           </label>
-          <div className="relative aspect-[16/10] w-full max-w-[280px] rounded-xl overflow-hidden border border-white/10 mx-auto mb-2">
+          <div className="relative aspect-[16/10] w-full max-w-[280px] rounded-xl overflow-hidden border border-border mx-auto mb-2">
             <img src={f.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute inset-x-3 bottom-3 text-left">
@@ -506,7 +506,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       size="lg"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50">Cancelar</button>
           <button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">
             {saving ? "Salvando..." : initial.id ? "Salvar" : "Criar aula"}
           </button>
@@ -544,7 +544,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
           <input type="number" min="0" value={f.duration} onChange={(e) => setF({ ...f, duration: Number(e.target.value) })} className={inputClass} />
         </Field>
         <Field label="Acesso">
-          <label className="flex items-center gap-2 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+          <label className="flex items-center gap-2 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
             <input type="checkbox" checked={f.is_free} onChange={(e) => setF({ ...f, is_free: e.target.checked })} className="accent-primary" />
             <span className="text-sm">Aula gratuita</span>
           </label>
@@ -568,7 +568,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
           <Field label="Arquivos para download" icon={Paperclip} hint="PDF, TXT, DOC, ZIP... (máx 50MB cada)">
             <div className="space-y-2">
               {attachments.map((att) => (
-                <div key={att.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5">
+                <div key={att.id} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border">
                   <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                   <span className="text-sm truncate flex-1">{att.file_name}</span>
                   <span className="text-[10px] text-muted-foreground shrink-0">{formatFileSize(att.file_size)}</span>
@@ -581,7 +581,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
                   </button>
                 </div>
               ))}
-              <label className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl border border-dashed border-white/10 hover:border-primary/40 cursor-pointer transition ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+              <label className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl border border-dashed border-border hover:border-primary/40 cursor-pointer transition ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
                 <Upload className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">{uploading ? "Enviando..." : "Clique para enviar arquivos"}</span>
                 <input type="file" multiple onChange={handleFileUpload} className="hidden" />

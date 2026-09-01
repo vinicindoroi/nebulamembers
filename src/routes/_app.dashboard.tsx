@@ -275,7 +275,7 @@ function Dashboard() {
   return (
     <div className="space-y-6 stagger-enter">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.08] via-white/[0.02] to-transparent p-6 md:p-8">
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/[0.08] via-white/[0.02] to-transparent p-6 md:p-8">
         <div className="absolute top-0 right-0 w-80 h-80 bg-primary/[0.12] rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 animate-[ambient-pulse_12s_ease-in-out_infinite]" />
         <div className="absolute bottom-0 left-0 w-60 h-60 bg-primary/[0.06] rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4 animate-[ambient-pulse_15s_ease-in-out_infinite_2s]" />
 
@@ -315,7 +315,7 @@ function Dashboard() {
           </div>
 
           {/* Gamification Level Status Card */}
-          <div className="shrink-0 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4 min-w-[240px] backdrop-blur-md relative overflow-hidden flex flex-col justify-between self-start md:self-auto">
+          <div className="shrink-0 rounded-2xl border border-border bg-card p-4 min-w-[240px] backdrop-blur-md relative overflow-hidden flex flex-col justify-between self-start md:self-auto">
             <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full blur-xl" />
             <div>
               <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground/60">Licença de Voo</span>
@@ -326,12 +326,12 @@ function Dashboard() {
               <div className="text-[10px] text-primary/80 font-medium mt-0.5">{getPatentName(level)}</div>
             </div>
             
-            <div className="mt-4 pt-3 border-t border-white/[0.06]">
+            <div className="mt-4 pt-3 border-t border-border">
               <div className="flex justify-between text-[9px] text-muted-foreground font-medium mb-1.5">
                 <span>XP de Aprendizado</span>
                 <span className="font-semibold">{xpInCurrentLevel} / {xpNeededPerLevel} XP</span>
               </div>
-              <div className="h-2 w-full rounded-full bg-white/[0.04] overflow-hidden p-[1px] border border-white/[0.06]">
+              <div className="h-2 w-full rounded-full bg-card overflow-hidden p-[1px] border border-border">
                 <div
                   className="h-full rounded-full gradient-primary shadow-[0_0_12px_rgba(139,92,246,0.6)] transition-all duration-1000"
                   style={{ width: mounted ? `${xpProgressPct}%` : '0%' }}
@@ -356,7 +356,7 @@ function Dashboard() {
             <Link
               key={s.label}
               to={s.to}
-              className={`group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300 active:scale-[0.98] ${accentStyles.glow}`}
+              className={`group relative overflow-hidden rounded-3xl border border-border bg-card p-4 hover:border-primary/30 hover:bg-card transition-all duration-300 active:scale-[0.98] ${accentStyles.glow}`}
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <div className={`absolute -top-8 -right-8 w-20 h-20 rounded-full ${accentStyles.bg} blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500`} />
@@ -384,7 +384,7 @@ function Dashboard() {
           
           {/* Cosmic Mentor Recommendation Banner */}
           {recommendedCourse && (
-            <section className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/20 via-black/30 to-cyan-950/20 p-5 hover:border-primary/30 transition-all duration-300 shadow-[0_8px_32px_-16px_rgba(139,92,246,0.15)]">
+            <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/20 via-black/30 to-cyan-950/20 p-5 hover:border-primary/30 transition-all duration-300 shadow-[0_8px_32px_-16px_rgba(139,92,246,0.15)]">
               <div className="absolute -top-12 -left-12 w-24 h-24 bg-primary/20 rounded-full blur-2xl pointer-events-none" />
               <div className="absolute -bottom-12 -right-12 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
               
@@ -400,7 +400,7 @@ function Dashboard() {
                   <div className="mt-2.5 flex items-center gap-2 text-xs">
                     <span className="font-semibold text-foreground truncate max-w-[200px]">{recommendedCourse.title}</span>
                     <span className="text-muted-foreground/40">•</span>
-                    <span className="text-[10px] text-muted-foreground bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] text-muted-foreground bg-card border border-border px-2 py-0.5 rounded-md">
                       {recommendedCourse.completedLessons} / {recommendedCourse.totalLessons} concluídas
                     </span>
                   </div>
@@ -418,7 +418,7 @@ function Dashboard() {
           )}
 
           {/* Mini-Kanban Quick Focus Widget */}
-          <section className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-white/[0.08] transition-all duration-300">
+          <section className="rounded-3xl border border-border bg-card p-5 hover:border-border transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="h-7 w-7 rounded-lg bg-rose-500/10 flex items-center justify-center">
@@ -437,7 +437,7 @@ function Dashboard() {
             </div>
             
             {dashboardPendingTasks.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-white/[0.06] bg-white/[0.01] p-5 text-center flex flex-col items-center">
+              <div className="rounded-xl border border-dashed border-border bg-card p-5 text-center flex flex-col items-center">
                 <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-2.5">
                   <Check className="h-5 w-5" />
                 </div>
@@ -463,11 +463,11 @@ function Dashboard() {
                   return (
                     <div 
                       key={task.id}
-                      className="flex items-center gap-3.5 p-3 rounded-xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/[0.08] transition-all duration-300 group"
+                      className="flex items-center gap-3.5 p-3 rounded-xl border border-border bg-card hover:bg-card hover:border-border transition-all duration-300 group"
                     >
                       <button
                         onClick={() => handleToggleLocalTask(task.id)}
-                        className="h-5 w-5 shrink-0 rounded-md border border-white/[0.15] bg-white/[0.02] hover:border-primary flex items-center justify-center text-primary-foreground group-hover:scale-105 active:scale-95 transition-all duration-200"
+                        className="h-5 w-5 shrink-0 rounded-md border border-white/[0.15] bg-card hover:border-primary flex items-center justify-center text-primary-foreground group-hover:scale-105 active:scale-95 transition-all duration-200"
                       >
                         <div className="h-2.5 w-2.5 rounded-sm bg-primary/0 group-hover:bg-primary/20 transition-all flex items-center justify-center">
                           <Check className="h-3 w-3 opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
@@ -533,7 +533,7 @@ function Dashboard() {
             {isLoading ? (
               <SkeletonGrid />
             ) : inProgress.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.02] p-10 text-center">
+              <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
                 <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
                   <BookOpen className="h-6 w-6 text-primary/60" />
                 </div>
@@ -581,20 +581,20 @@ function Dashboard() {
 
           {isProgressLoading && (
             <>
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 animate-pulse space-y-3">
+              <div className="rounded-3xl border border-border bg-card p-5 animate-pulse space-y-3">
                 <div className="h-4 w-32 bg-white/[0.06] rounded" />
-                <div className="h-3 w-48 bg-white/[0.04] rounded" />
+                <div className="h-3 w-48 bg-card rounded" />
                 <div className="flex gap-2 mt-4">
                   {Array.from({ length: 7 }).map((_, i) => (
-                    <div key={i} className="flex-1 h-9 bg-white/[0.04] rounded-xl" />
+                    <div key={i} className="flex-1 h-9 bg-card rounded-xl" />
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 animate-pulse space-y-3">
+              <div className="rounded-3xl border border-border bg-card p-5 animate-pulse space-y-3">
                 <div className="h-4 w-36 bg-white/[0.06] rounded" />
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-28 bg-white/[0.04] rounded-xl" />
+                    <div key={i} className="h-28 bg-card rounded-xl" />
                   ))}
                 </div>
               </div>
@@ -603,7 +603,7 @@ function Dashboard() {
 
           {/* Upgraded Ofensiva Cósmica Grid */}
           {streak && (
-            <section className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-white/[0.08] transition-all duration-300">
+            <section className="rounded-3xl border border-border bg-card p-5 hover:border-border transition-all duration-300">
               <div className="flex items-center justify-between mb-3.5">
                 <div className="flex items-center gap-2">
                   <div className="h-7 w-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -623,7 +623,7 @@ function Dashboard() {
                 Mantenha a consistência. Seu recorde registrado é de <strong className="text-foreground">{streak.longestStreak} dias seguidos</strong>.
               </p>
               
-              <div className="flex items-center gap-2 justify-between py-2.5 px-2 bg-white/[0.01] rounded-xl border border-white/[0.04]">
+              <div className="flex items-center gap-2 justify-between py-2.5 px-2 bg-card rounded-xl border border-border">
                 {streak.weekDays.map((day, dayIdx) => {
                   const dateObj = new Date(day.date + "T12:00:00");
                   const label = DAY_LABELS[dateObj.getDay()];
@@ -634,7 +634,7 @@ function Dashboard() {
                         className={`h-9 w-9 rounded-xl flex flex-col items-center justify-center text-xs font-semibold tracking-tight transition-all duration-500 ${
                           day.active
                             ? "bg-gradient-to-br from-amber-500/30 to-amber-600/10 text-amber-400 ring-2 ring-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.25)] scale-105"
-                            : "bg-white/[0.03] text-muted-foreground/35 border border-white/[0.04]"
+                            : "bg-card text-muted-foreground/35 border border-border"
                         }`}
                       >
                         <span className="text-[10px] leading-none mb-0.5 font-bold">{label}</span>
@@ -646,10 +646,10 @@ function Dashboard() {
                       </div>
                       
                       {/* Daily Tooltip */}
-                      <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-28 -translate-x-1/2 scale-95 rounded-lg border border-white/[0.08] bg-black/90 p-1.5 text-center text-[9px] opacity-0 shadow-xl backdrop-blur-md transition-all duration-200 group-hover/day:scale-100 group-hover/day:opacity-100 z-20">
+                      <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-28 -translate-x-1/2 scale-95 rounded-lg border border-border bg-black/90 p-1.5 text-center text-[9px] opacity-0 shadow-xl backdrop-blur-md transition-all duration-200 group-hover/day:scale-100 group-hover/day:opacity-100 z-20">
                         <p className="font-semibold text-foreground">{day.date.split("-").reverse().slice(0, 2).join("/")}</p>
                         <p className="text-muted-foreground/80 mt-0.5">{day.active ? "Ativo! Aula concluída" : "Sem atividade"}</p>
-                        <div className="absolute top-full left-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1 bg-black/90 border-r border-b border-white/[0.08] rotate-45" />
+                        <div className="absolute top-full left-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1 bg-black/90 border-r border-b border-border rotate-45" />
                       </div>
                     </div>
                   );
@@ -671,7 +671,7 @@ function Dashboard() {
           )}
 
           {/* Upgraded CSS-Only Study Performance charts */}
-          <section className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-white/[0.08] transition-all duration-300">
+          <section className="rounded-3xl border border-border bg-card p-5 hover:border-border transition-all duration-300">
             <div className="flex items-center gap-2 mb-4">
               <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Activity className="h-3.5 w-3.5 text-primary animate-pulse" />
@@ -682,7 +682,7 @@ function Dashboard() {
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-xl bg-white/[0.01] border border-white/[0.04]">
+            <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-xl bg-card border border-border">
               {/* SVG Radial Progress Ring */}
               <div className="relative shrink-0 flex items-center justify-center">
                 <svg className="h-20 w-20 transform -rotate-90">
@@ -720,7 +720,7 @@ function Dashboard() {
                     <span>Cursos</span>
                     <span>{courses.length} no total</span>
                   </div>
-                  <div className="h-3 w-full rounded-full bg-white/[0.04] flex overflow-hidden p-[1px] border border-white/[0.04]">
+                  <div className="h-3 w-full rounded-full bg-card flex overflow-hidden p-[1px] border border-border">
                     {completed > 0 && (
                       <div 
                         style={{ width: `${Math.max(8, (completed / (courses.length || 1)) * 100)}%` }} 
@@ -775,7 +775,7 @@ function Dashboard() {
 
           {/* Visual Achievements Card */}
           {achievements.length > 0 && (
-            <section className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-white/[0.08] transition-all duration-300">
+            <section className="rounded-3xl border border-border bg-card p-5 hover:border-border transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="h-7 w-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -813,7 +813,7 @@ function Dashboard() {
                       className={`group relative rounded-xl border p-3.5 text-center transition-all duration-300 flex flex-col items-center justify-between min-h-[135px] select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                         a.unlocked
                           ? `${cfg.unlockedBorder} ${cfg.unlockedBg} ${cfg.glow}`
-                          : "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/[0.08]"
+                          : "border-border bg-card hover:bg-card hover:border-border"
                       }`}
                     >
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -822,7 +822,7 @@ function Dashboard() {
                         <div className={`relative h-11 w-11 rounded-xl flex items-center justify-center mb-2.5 ring-1 ring-white/[0.06] transition-all duration-300 ${
                           a.unlocked
                             ? `${cfg.bg} ${cfg.glow} group-hover:scale-105 group-hover:rotate-3`
-                            : "bg-white/[0.02] text-muted-foreground/30 ring-dashed"
+                            : "bg-card text-muted-foreground/30 ring-dashed"
                         }`}>
                           <Icon className={`h-5 w-5 ${a.unlocked ? cfg.color : "text-muted-foreground/20"} ${cfg.animate || ""}`} />
 
@@ -842,7 +842,7 @@ function Dashboard() {
                           <Check className="h-2 w-2 text-emerald-400" strokeWidth={3.5} />
                         </div>
                       ) : (
-                        <div className="absolute top-2 right-2 h-3.5 w-3.5 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center">
+                        <div className="absolute top-2 right-2 h-3.5 w-3.5 rounded-full bg-card border border-border flex items-center justify-center">
                           <Lock className="h-2.5 w-2.5 text-muted-foreground/20" />
                         </div>
                       )}
@@ -850,7 +850,7 @@ function Dashboard() {
                       <div className="w-full mt-2.5 relative z-10">
                         {!a.unlocked && a.progress !== undefined ? (
                           <div>
-                            <div className="h-0.5 w-full rounded-full bg-white/[0.04] overflow-hidden">
+                            <div className="h-0.5 w-full rounded-full bg-card overflow-hidden">
                               <div className="h-full gradient-primary rounded-full transition-all duration-500" style={{ width: `${a.progress}%` }} />
                             </div>
                             <div className="flex justify-between items-center text-[7px] text-muted-foreground/40 mt-1 tabular-nums">
@@ -866,7 +866,7 @@ function Dashboard() {
                       </div>
 
                       {/* Premium Hover Tooltip */}
-                      <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-48 -translate-x-1/2 scale-95 rounded-xl border border-white/[0.08] bg-black/95 p-2.5 text-center opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+                      <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-48 -translate-x-1/2 scale-95 rounded-xl border border-border bg-black/95 p-2.5 text-center opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
                         <p className={`font-bold text-[10px] mb-0.5 ${a.unlocked ? cfg.color : "text-muted-foreground"}`}>{a.title}</p>
                         <p className="text-[9px] text-muted-foreground/80 leading-snug mb-1">{a.description}</p>
                         {a.unlocked ? (
@@ -874,11 +874,11 @@ function Dashboard() {
                             Desbloqueado!
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-0.5 text-[8px] font-bold text-muted-foreground/70 bg-white/[0.04] px-1.5 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-0.5 text-[8px] font-bold text-muted-foreground/70 bg-card px-1.5 py-0.5 rounded-full">
                             Bloqueado · {a.progress}%
                           </span>
                         )}
-                        <div className="absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-0.5 bg-black/95 border-r border-b border-white/[0.08] rotate-45" />
+                        <div className="absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-0.5 bg-black/95 border-r border-b border-border rotate-45" />
                       </div>
                     </div>
                   );
@@ -901,7 +901,7 @@ function CourseProgressCard({ course, index }: { course: ReturnType<typeof useCo
     <Link
       to="/courses/$courseId"
       params={{ courseId: c.id }}
-      className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 flex items-center gap-4 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300 hover:shadow-[0_8px_32px_-12px_oklch(0.65_0.22_290/0.2)]"
+      className="group rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 hover:bg-card transition-all duration-300 hover:shadow-[0_8px_32px_-12px_oklch(0.65_0.22_290/0.2)]"
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="h-14 w-14 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-[0_8px_24px_-8px_oklch(0.65_0.22_290/0.5)] group-hover:scale-105 group-hover:shadow-[0_12px_32px_-8px_oklch(0.65_0.22_290/0.6)] transition-all duration-300">
@@ -929,7 +929,7 @@ function NewCourseCard({ course, index }: { course: ReturnType<typeof useCourses
     <Link
       to="/courses/$courseId"
       params={{ courseId: c.id }}
-      className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden hover:border-white/[0.12] hover:shadow-[0_8px_32px_-12px_oklch(0.65_0.22_290/0.15)] transition-all duration-300"
+      className="group rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-[0_8px_32px_-12px_oklch(0.65_0.22_290/0.15)] transition-all duration-300"
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="aspect-[16/9] relative overflow-hidden">
@@ -939,7 +939,7 @@ function NewCourseCard({ course, index }: { course: ReturnType<typeof useCourses
         <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${c.gradient_from || "#6366f1"}, ${(c.gradient_to || "#8b5cf6")}00)` }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         {c.tag && (
-          <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-lg font-medium border border-white/[0.08]">
+          <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-lg font-medium border border-border">
             {c.tag}
           </span>
         )}
@@ -970,13 +970,13 @@ function SkeletonGrid() {
   return (
     <div className="grid md:grid-cols-2 gap-3">
       {[0, 1].map((i) => (
-        <div key={i} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 h-24 animate-pulse">
+        <div key={i} className="rounded-3xl border border-border bg-card p-4 h-24 animate-pulse">
           <div className="flex items-center gap-4">
             <div className="h-14 w-14 rounded-xl bg-white/[0.06]" />
             <div className="flex-1 space-y-2">
               <div className="h-3 w-2/3 rounded bg-white/[0.06]" />
-              <div className="h-2 w-1/3 rounded bg-white/[0.04]" />
-              <div className="h-1.5 w-full rounded-full bg-white/[0.04]" />
+              <div className="h-2 w-1/3 rounded bg-card" />
+              <div className="h-1.5 w-full rounded-full bg-card" />
             </div>
           </div>
         </div>

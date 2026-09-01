@@ -270,7 +270,7 @@ export function AppShell() {
     <div className="min-h-screen flex">
       {/* Sidebar - single element with smooth width transition */}
       <aside
-        className={`hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-white/5 bg-background/40 backdrop-blur-2xl flex-col transition-all duration-300 ease-in-out overflow-visible ${
+        className={`hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-border bg-background flex-col transition-all duration-300 ease-in-out overflow-visible ${
           collapsed ? "w-14" : "w-72"
         }`}
       >
@@ -279,7 +279,7 @@ export function AppShell() {
           <TooltipTrigger asChild>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute top-1/2 -translate-y-1/2 -right-3 z-50 h-6 w-6 rounded-full border border-white/10 bg-background/80 backdrop-blur-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all shadow-md"
+          className="absolute top-1/2 -translate-y-1/2 -right-3 z-50 h-6 w-6 rounded-full border border-border bg-background/80 backdrop-blur-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all shadow-md"
           aria-label={collapsed ? "Expandir sidebar" : "Recolher sidebar"}
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform duration-300 ${collapsed ? "rotate-0" : "rotate-180"}`}>
@@ -300,7 +300,7 @@ export function AppShell() {
               </div>
             )}
           </Link>
-          <div className="w-6 h-px bg-white/5 mb-2" />
+          <div className="w-6 h-px bg-muted/40 mb-2" />
           {allNav.map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
@@ -310,7 +310,7 @@ export function AppShell() {
                   <Link
                     to={item.to}
                     className={`relative p-2.5 rounded-xl transition-colors ${
-                      active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -322,7 +322,7 @@ export function AppShell() {
           })}
           {isAdmin && (
             <>
-              <div className="w-6 h-px bg-white/5 my-2" />
+              <div className="w-6 h-px bg-muted/40 my-2" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <a href="/admin/dashboard" className="p-2.5 rounded-xl text-primary hover:bg-primary/10 transition-colors">
@@ -333,13 +333,13 @@ export function AppShell() {
               </Tooltip>
             </>
           )}
-          <div className="w-6 h-px bg-white/5 my-2" />
+          <div className="w-6 h-px bg-muted/40 my-2" />
           <div className="mt-auto flex flex-col items-center gap-1">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={onSignOut}
-                  className="p-2.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-white/5 transition-colors"
+                  className="p-2.5 rounded-xl text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
@@ -382,10 +382,10 @@ export function AppShell() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setOpen(false)}
-                        className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm ${
+                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
                           active
-                            ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                            ? "bg-primary/10 text-primary border border-primary/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
                         }`}
                       >
                         {active && (
@@ -408,7 +408,7 @@ export function AppShell() {
                 <a
                   href="/admin/dashboard"
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
                 >
                   <Shield className="h-4 w-4" />
                   <span className="font-medium">Painel Admin</span>
@@ -417,7 +417,7 @@ export function AppShell() {
             )}
           </nav>
 
-          <div className="mt-4 rounded-2xl p-3 flex items-center gap-3 bg-white/[0.03] border border-white/5">
+          <div className="mt-4 rounded-2xl p-4 flex items-center gap-3 bg-card border border-border">
             <div
               role="img"
               aria-label={`Avatar de ${name}`}
@@ -431,7 +431,7 @@ export function AppShell() {
             </div>
             <button
               onClick={onSignOut}
-              className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+              className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
               aria-label="Sair"
             >
               <LogOut className="h-4 w-4" />
@@ -445,7 +445,7 @@ export function AppShell() {
         role="dialog"
         aria-modal="true"
         aria-label="Menu de navegação"
-        className={`fixed md:hidden top-0 left-0 z-40 h-screen w-72 border-r border-white/5 bg-background/40 backdrop-blur-2xl transition-transform duration-300 ${
+        className={`fixed md:hidden top-0 left-0 z-40 h-screen w-72 border-r border-border bg-background transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -466,7 +466,7 @@ export function AppShell() {
             </Link>
             <button
               onClick={() => setOpen(false)}
-              className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors"
+              className="p-2 rounded-xl hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Fechar menu"
             >
               <X className="h-5 w-5" />
@@ -481,7 +481,7 @@ export function AppShell() {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
                     return (
-                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm ${active ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
+                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
                         {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />}
                         <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         <span className="font-medium">{item.label}</span>
@@ -501,8 +501,8 @@ export function AppShell() {
 
       <div className="flex-1 min-w-0 flex flex-col">
         {!isFunnelsPage && (
-        <header className="sticky top-0 z-20 h-16 border-b border-white/5 bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
-            <button className="md:hidden p-2 rounded-lg hover:bg-white/5" onClick={() => setOpen(true)} aria-label="Abrir menu">
+        <header className="sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
+            <button className="md:hidden p-2 rounded-lg hover:bg-muted/50" onClick={() => setOpen(true)} aria-label="Abrir menu">
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2 text-xs">
@@ -519,7 +519,7 @@ export function AppShell() {
                   placeholder="Buscar cursos, comunidade... ⌘K"
                   autoComplete="off"
                   data-lpignore="true"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-full pl-9 pr-4 py-2 text-sm placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white/[0.05] transition"
+                  className="w-full bg-card border border-border rounded-full pl-9 pr-4 py-2 text-sm placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white/[0.05] transition"
                 />
               </div>
             </div>
@@ -528,7 +528,7 @@ export function AppShell() {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setShowTutorial(true)}
-                  className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-primary transition-colors"
+                  className="p-2 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-primary transition-colors"
                   aria-label="Tutorial"
                 >
                   <HelpCircle className="h-4 w-4" />
@@ -584,7 +584,7 @@ function PlanLockScreen() {
         </Link>
         <Link
           to="/profile"
-          className="w-full inline-flex items-center justify-center bg-white/5 border border-white/10 hover:bg-white/10 text-foreground py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer"
+          className="w-full inline-flex items-center justify-center bg-muted/40 border border-border hover:bg-white/10 text-foreground py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer"
         >
           Voltar ao Meu Perfil
         </Link>

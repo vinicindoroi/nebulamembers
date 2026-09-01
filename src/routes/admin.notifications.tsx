@@ -85,8 +85,8 @@ function Page() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-5">
-        <div className="lg:col-span-3 rounded-2xl border border-white/5 bg-white/[0.02]">
-          <div className="px-5 py-4 border-b border-white/5">
+        <div className="lg:col-span-3 rounded-2xl border border-border bg-card">
+          <div className="px-5 py-4 border-b border-border">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-primary/80 mb-1">Compor</div>
             <h3 className="text-base font-semibold">Nova notificação</h3>
           </div>
@@ -135,7 +135,7 @@ function Page() {
             </div>
           </div>
 
-          <div className="px-5 py-4 border-t border-white/5 bg-white/[0.02] flex items-center justify-between gap-3">
+          <div className="px-5 py-4 border-t border-border bg-card flex items-center justify-between gap-3">
             <div className="text-[11px] text-muted-foreground">
               {f.scheduled_at ? `Será enviada para ${audienceLabel.toLowerCase()} em ${new Date(f.scheduled_at).toLocaleString("pt-BR")}` : `Enviar agora para ${audienceLabel.toLowerCase()}`}
             </div>
@@ -150,11 +150,11 @@ function Page() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 rounded-2xl border border-white/5 bg-white/[0.02]">
-          <div className="px-5 py-4 border-b border-white/5 flex items-center gap-2">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card">
+          <div className="px-5 py-4 border-b border-border flex items-center gap-2">
             <History className="h-4 w-4 text-muted-foreground" />
             <h3 className="text-sm font-semibold">Histórico</h3>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-muted-foreground ml-auto">{rows.length}</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted/40 text-muted-foreground ml-auto">{rows.length}</span>
           </div>
 
           <div className="max-h-[520px] overflow-y-auto">
@@ -168,7 +168,7 @@ function Page() {
                 {rows.map((n) => {
                   const scheduled = !n.sent_at && n.scheduled_at;
                   return (
-                    <div key={n.id} className="p-4 hover:bg-white/[0.02] transition group">
+                    <div key={n.id} className="p-4 hover:bg-card transition group">
                       <div className="flex items-start justify-between gap-2">
                         <div className="text-sm font-medium leading-tight min-w-0 flex-1 truncate">{n.title}</div>
                         <button
@@ -185,7 +185,7 @@ function Page() {
                         }`}>
                           {scheduled ? "Agendada" : "Enviada"}
                         </span>
-                        <span className="px-1.5 py-0.5 rounded bg-white/5">{n.audience}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-muted/40">{n.audience}</span>
                         <span>{new Date(n.sent_at ?? n.scheduled_at ?? n.created_at).toLocaleString("pt-BR")}</span>
                       </div>
                     </div>
@@ -207,7 +207,7 @@ function Stat({ icon: Icon, label, value, accent }: { icon: any; label: string; 
     ? "bg-amber-500/10 text-amber-400"
     : "bg-primary/10 text-primary";
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex items-center gap-3">
+    <div className="rounded-xl border border-border bg-card p-3 flex items-center gap-3">
       <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${cls}`}>
         <Icon className="h-4 w-4" />
       </div>

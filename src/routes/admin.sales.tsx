@@ -46,13 +46,13 @@ function Page() {
       </div>
       <div className="glass rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="text-xs text-muted-foreground bg-white/[0.02]"><tr>
+          <thead className="text-xs text-muted-foreground bg-card"><tr>
             <th className="text-left px-4 py-3 font-medium">ID</th><th className="text-left px-4 py-3 font-medium">Plano</th>
             <th className="text-left px-4 py-3 font-medium">Valor</th><th className="text-left px-4 py-3 font-medium">Status</th>
             <th className="text-left px-4 py-3 font-medium">Data</th><th></th></tr></thead>
           <tbody className="divide-y divide-white/5">
             {rows.map((r) => (
-              <tr key={r.id} className="hover:bg-white/[0.02]">
+              <tr key={r.id} className="hover:bg-card">
                 <td className="px-4 py-3 font-mono text-xs">{r.id.slice(0,8)}</td>
                 <td className="px-4 py-3">{r.plan}</td>
                 <td className="px-4 py-3">R$ {Number(r.amount).toFixed(2)}</td>

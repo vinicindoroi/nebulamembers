@@ -76,15 +76,15 @@ function Page() {
         <Stat icon={Hash} label="Resgates" value={totalUses} />
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/5">
+      <div className="rounded-3xl border border-border bg-card overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar pelo código..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
+              className="w-full bg-card border border-border rounded-lg pl-9 pr-3 py-1.5 text-sm outline-none focus:border-primary/40"
             />
           </div>
         </div>
@@ -99,7 +99,7 @@ function Page() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs text-muted-foreground bg-white/[0.02] border-b border-white/5">
+                <tr className="text-xs text-muted-foreground bg-card border-b border-border">
                   <th className="text-left px-4 py-3 font-medium">Código</th>
                   <th className="text-left px-4 py-3 font-medium">Desconto</th>
                   <th className="text-left px-4 py-3 font-medium">Usos</th>
@@ -113,7 +113,7 @@ function Page() {
                   const expired = c.expires_at && new Date(c.expires_at) < new Date();
                   const exhausted = c.max_uses && c.uses >= c.max_uses;
                   return (
-                    <tr key={c.id} className="hover:bg-white/[0.02] transition">
+                    <tr key={c.id} className="hover:bg-card transition">
                       <td className="px-4 py-3">
                         <button
                           onClick={() => copyCode(c.code)}
@@ -148,7 +148,7 @@ function Page() {
                             className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded transition ${
                               c.active
                                 ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                                : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                                : "bg-muted/40 text-muted-foreground hover:bg-white/10"
                             }`}
                           >
                             {c.active ? "Ativo" : "Inativo"}
@@ -187,7 +187,7 @@ function Page() {
 
 function Stat({ icon: Icon, label, value, accent }: { icon: any; label: string; value: number | string; accent?: "emerald" }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex items-center gap-3">
+    <div className="rounded-xl border border-border bg-card p-3 flex items-center gap-3">
       <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${accent === "emerald" ? "bg-emerald-500/10 text-emerald-400" : "bg-primary/10 text-primary"}`}>
         <Icon className="h-4 w-4" />
       </div>
@@ -246,7 +246,7 @@ function CouponModal({ initial, onClose, onSaved }: { initial: Partial<Coupon>; 
       size="md"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-white/10 hover:bg-white/5">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm border border-border hover:bg-muted/50">Cancelar</button>
           <button onClick={save} disabled={saving} className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50">
             {saving ? "Salvando..." : initial.id ? "Salvar" : "Criar cupom"}
           </button>
@@ -265,7 +265,7 @@ function CouponModal({ initial, onClose, onSaved }: { initial: Partial<Coupon>; 
           <button
             type="button"
             onClick={generate}
-            className="shrink-0 px-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] text-xs flex items-center gap-1.5 transition"
+            className="shrink-0 px-3 rounded-xl border border-border bg-card hover:bg-muted/50 text-xs flex items-center gap-1.5 transition"
             title="Gerar código"
           >
             <Hash className="h-3.5 w-3.5" />Gerar
@@ -316,7 +316,7 @@ function CouponModal({ initial, onClose, onSaved }: { initial: Partial<Coupon>; 
       </div>
 
       <Field label="Estado">
-        <label className="flex items-center gap-2 h-[42px] px-3.5 rounded-xl bg-white/[0.04] border border-white/10 cursor-pointer">
+        <label className="flex items-center gap-2 h-[42px] px-3.5 rounded-xl bg-card border border-border cursor-pointer">
           <input type="checkbox" checked={f.active} onChange={(e) => setF({ ...f, active: e.target.checked })} className="accent-primary" />
           <span className="text-sm">Cupom ativo</span>
         </label>
