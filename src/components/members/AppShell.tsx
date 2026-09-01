@@ -56,6 +56,7 @@ export function AppShell() {
     return saved === "true";
   });
   const [showTutorial, setShowTutorial] = useState(false);
+  const [mobileSearch, setMobileSearch] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
