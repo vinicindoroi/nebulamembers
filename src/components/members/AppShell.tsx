@@ -505,6 +505,13 @@ export function AppShell() {
             <button className="md:hidden p-2 rounded-lg hover:bg-muted/50" onClick={() => setOpen(true)} aria-label="Abrir menu">
               <Menu className="h-5 w-5" />
             </button>
+            <button
+              className="sm:hidden p-2 rounded-lg hover:bg-muted/50 text-muted-foreground"
+              onClick={() => setMobileSearch((v) => !v)}
+              aria-label="Buscar"
+            >
+              <Search className="h-5 w-5" />
+            </button>
             <div className="flex items-center gap-2 text-xs">
               <span className="hidden md:inline text-muted-foreground">{siteSettings.name}</span>
               <span className="hidden md:inline text-muted-foreground/40">/</span>
