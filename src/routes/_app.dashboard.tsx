@@ -145,10 +145,10 @@ function Dashboard() {
   const continueCourse = lastLesson ? { id: lastLesson.courseId, label: lastLesson.lessonTitle } : inProgress[0] ? { id: inProgress[0].id, label: inProgress[0].title } : notStarted[0] ? { id: notStarted[0].id, label: notStarted[0].title } : null;
 
   const stats = [
-    { label: "Progresso geral", value: `${overall}%`, icon: TrendingUp, hint: `${completedLessons} de ${totalLessons} aulas`, color: "text-tint-cyan", chip: "bg-tint-cyan/15" },
-    { label: "Aulas concluídas", value: completedLessons, icon: Clock, hint: "no total", color: "text-tint-violet", chip: "bg-tint-violet/15" },
-    { label: "Cursos completos", value: completed, icon: Award, hint: completed === 1 ? "concluído" : "concluídos", color: "text-tint-amber", chip: "bg-tint-amber/15" },
-    { label: "Em andamento", value: inProgress.length, icon: Flame, hint: "continue", color: "text-tint-rose", chip: "bg-tint-rose/15" },
+    { label: "Progresso geral", value: `${overall}%`, icon: TrendingUp, hint: `${completedLessons} de ${totalLessons} aulas` },
+    { label: "Aulas concluídas", value: completedLessons, icon: Clock, hint: "no total" },
+    { label: "Cursos completos", value: completed, icon: Award, hint: completed === 1 ? "concluído" : "concluídos" },
+    { label: "Em andamento", value: inProgress.length, icon: Flame, hint: "continue" },
   ];
 
   return (
@@ -184,11 +184,9 @@ function Dashboard() {
           const Icon = s.icon;
           return (
             <Link key={s.label} to="/courses" className="bg-card p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex items-center gap-2">
-                <span className={`inline-flex h-7 w-7 items-center justify-center rounded-lg ${s.chip}`}>
-                  <Icon className={`h-3.5 w-3.5 ${s.color}`} />
-                </span>
-                <span className="text-xs text-muted-foreground">{s.label}</span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Icon className="h-3.5 w-3.5" />
+                <span className="text-xs">{s.label}</span>
               </div>
               <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight">{s.value}</div>
               <div className="text-[11px] text-muted-foreground mt-0.5">{s.hint}</div>
