@@ -14,34 +14,34 @@ import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; color?: string };
 type NavGroup = { label: string; items: NavItem[] };
 
 const navGroups: NavGroup[] = [
   {
     label: "Visão geral",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/organizer", label: "Organização", icon: Trello },
+      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, color: "text-tint-cyan" },
+      { to: "/organizer", label: "Organização", icon: Trello, color: "text-tint-blue" },
     ],
   },
   {
     label: "Aprendizado",
     items: [
-      { to: "/courses", label: "Cursos", icon: GraduationCap },
-      { to: "/community", label: "Comunidade", icon: Users },
-      { to: "/forum", label: "Fórum", icon: MessageSquare },
-      { to: "/saved", label: "Salvos", icon: Bookmark },
-      { to: "/notes", label: "Notas", icon: StickyNote },
-      { to: "/funnels", label: "Funis", icon: GitBranch },
-      { to: "/transcript", label: "Transcrição", icon: Mic },
+      { to: "/courses", label: "Cursos", icon: GraduationCap, color: "text-tint-violet" },
+      { to: "/community", label: "Comunidade", icon: Users, color: "text-tint-pink" },
+      { to: "/forum", label: "Fórum", icon: MessageSquare, color: "text-tint-emerald" },
+      { to: "/saved", label: "Salvos", icon: Bookmark, color: "text-tint-amber" },
+      { to: "/notes", label: "Notas", icon: StickyNote, color: "text-tint-orange" },
+      { to: "/funnels", label: "Funis", icon: GitBranch, color: "text-tint-rose" },
+      { to: "/transcript", label: "Transcrição", icon: Mic, color: "text-tint-blue" },
     ],
   },
   {
     label: "Conta",
     items: [
-      { to: "/profile", label: "Perfil", icon: User },
-      { to: "/settings", label: "Configurações", icon: Settings },
+      { to: "/profile", label: "Perfil", icon: User, color: "text-tint-emerald" },
+      { to: "/settings", label: "Configurações", icon: Settings, color: "text-tint-blue" },
     ],
   },
 ];
@@ -320,10 +320,10 @@ export function AppShell() {
                   <Link
                     to={item.to}
                     className={`relative p-2.5 rounded-xl transition-colors ${
-                      active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
+                      active ? "bg-primary/15 text-primary" : "hover:bg-card border border-transparent"
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className={`h-4 w-4 ${active ? "" : (item.color ?? "text-muted-foreground")}`} />
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right">{item.label}</TooltipContent>
@@ -402,7 +402,7 @@ export function AppShell() {
                         {active && (
                           <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />
                         )}
-                        <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
+                        <Icon className={`h-4 w-4 ${active ? "text-primary" : (item.color ?? "")}`} />
                         <span className="font-medium">{item.label}</span>
                       </Link>
                     );
@@ -495,7 +495,7 @@ export function AppShell() {
                       <Link key={item.to} to={item.to} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined}
                         className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
                         {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />}
-                        <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
+                        <Icon className={`h-4 w-4 ${active ? "text-primary" : (item.color ?? "")}`} />
                         <span className="font-medium">{item.label}</span>
                       </Link>
                     );
