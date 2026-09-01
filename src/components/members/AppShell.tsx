@@ -61,15 +61,9 @@ export function AppShell() {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [userPlanFeatures, setUserPlanFeatures] = useState<any>(null);
+  const [planPending, setPlanPending] = useState(false);
 
-  const fallbackFeatures = {
-    courses_access: true,
-    community_access: true,
-    forum_access: true,
-    organizer_access: true,
-    notes_access: true,
-    funnels_access: true,
-  };
+  const fallbackFeatures = NO_ACCESS_FEATURES;
 
   useEffect(() => {
     if (!user) return;
@@ -81,38 +75,36 @@ export function AppShell() {
           .eq("id", user.id)
           .maybeSingle();
 
-        const userPlanSlug = (profile?.plan || "Free").toLowerCase();
-
-        const { data: settings } = await supabase
-          .from("app_settings" as any)
-          .select("value")
-          .eq("key", "plans_config")
-          .maybeSingle();
-
-        const plans = (settings as any)?.value as any[];
-        
-        let foundFeatures = null;
-        if (plans && Array.isArray(plans)) {
-          const userPlan = plans.find(p => p.slug.toLowerCase() === userPlanSlug) || plans.find(p => p.slug.toLowerCase() === "free");
-          if (userPlan) foundFeatures = userPlan.features;
+        if (isPendingPlan(profile?.plan)) {
+          setPlanPending(true);
+          setUserPlanFeatures(NO_ACCESS_FEATURES);
+          return;
         }
 
-        if (!foundFeatures) {
-          if (userPlanSlug === "free") {
-            foundFeatures = { courses_access: true, community_access: true, forum_access: true, organizer_access: true, notes_access: true, funnels_access: false };
-          } else {
-            foundFeatures = { courses_access: true, community_access: true, forum_access: true, organizer_access: true, notes_access: true, funnels_access: true };
-          }
+        const userPlanSlug = (profile?.plan || "").toLowerCase();
+        const plans = await fetchPlans();
+        const userPlan = plans.find(
+          (p) => p.slug?.toLowerCase() === userPlanSlug || p.name?.toLowerCase() === userPlanSlug,
+        );
+
+        if (!userPlan) {
+          // Plano não reconhecido — trata como pendente (sem acesso)
+          setPlanPending(true);
+          setUserPlanFeatures(NO_ACCESS_FEATURES);
+          return;
         }
 
-        setUserPlanFeatures(foundFeatures);
+        setPlanPending(false);
+        setUserPlanFeatures(userPlan.features ?? NO_ACCESS_FEATURES);
       } catch (err) {
         console.error("Error loading user plan features:", err);
-        setUserPlanFeatures(fallbackFeatures);
+        setPlanPending(true);
+        setUserPlanFeatures(NO_ACCESS_FEATURES);
       }
     };
     loadUserPlan();
   }, [user]);
+
 
   const ALWAYS_ALLOWED = ["/profile", "/settings"];
 
