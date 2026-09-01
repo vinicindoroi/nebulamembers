@@ -13,7 +13,7 @@ import { NotificationBell } from "@/components/members/NotificationBell";
 import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES } from "@/hooks/use-plans";
+import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } from "@/hooks/use-plans";
 
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
