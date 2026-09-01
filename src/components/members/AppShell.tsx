@@ -90,14 +90,14 @@ export function AppShell() {
         );
 
         if (!userPlan) {
-          // Plano não reconhecido — trata como pendente (sem acesso)
-          setPlanPending(true);
-          setUserPlanFeatures(NO_ACCESS_FEATURES);
+          // Plano definido pelo admin mas não listado na config — libera acesso total
+          setPlanPending(false);
+          setUserPlanFeatures(FULL_ACCESS_FEATURES);
           return;
         }
 
         setPlanPending(false);
-        setUserPlanFeatures(userPlan.features ?? NO_ACCESS_FEATURES);
+        setUserPlanFeatures(userPlan.features ?? FULL_ACCESS_FEATURES);
       } catch (err) {
         console.error("Error loading user plan features:", err);
         setPlanPending(true);
