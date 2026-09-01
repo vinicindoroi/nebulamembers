@@ -2,7 +2,7 @@ import { Link, useRouterState, Outlet, useNavigate } from "@tanstack/react-route
 import {
   LayoutDashboard, GraduationCap, Users, User, Settings, Search, Bell,
   Menu, X, Orbit, LogOut, Shield, MessageSquare, Bookmark, GitBranch,
-  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic,
+  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock,
 } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,7 +13,7 @@ import { NotificationBell } from "@/components/members/NotificationBell";
 import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, type PlanOption } from "@/hooks/use-plans";
+import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES } from "@/hooks/use-plans";
 
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
@@ -315,6 +315,12 @@ export function AppShell() {
             return (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
+                  {item.locked ? (
+                    <div className="relative p-2.5 rounded-xl text-muted-foreground/40 cursor-not-allowed">
+                      <Icon className="h-4 w-4" />
+                      <Lock className="h-2.5 w-2.5 absolute right-1 bottom-1" />
+                    </div>
+                  ) : (
                   <Link
                     to={item.to}
                     className={`relative p-2.5 rounded-xl transition-colors ${
@@ -323,8 +329,9 @@ export function AppShell() {
                   >
                     <Icon className="h-4 w-4" />
                   </Link>
+                  )}
                 </TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
+                <TooltipContent side="right">{item.locked ? `${item.label} — Indisponível` : item.label}</TooltipContent>
               </Tooltip>
             );
           })}
@@ -385,6 +392,22 @@ export function AppShell() {
                   {group.items.map((item) => {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
+                    if (item.locked) {
+                      return (
+                        <div
+                          key={item.to}
+                          aria-disabled="true"
+                          title="Indisponível no seu nível de acesso"
+                          className="relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground/40 cursor-not-allowed border border-transparent"
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="font-medium">{item.label}</span>
+                          <span className="ml-auto flex items-center gap-1 text-[10px] uppercase tracking-wide">
+                            <Lock className="h-3 w-3" />Indisponível
+                          </span>
+                        </div>
+                      );
+                    }
                     return (
                       <Link
                         key={item.to}
@@ -489,6 +512,15 @@ export function AppShell() {
                   {group.items.map((item) => {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
+                    if (item.locked) {
+                      return (
+                        <div key={item.to} aria-disabled="true" className="relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground/40 cursor-not-allowed">
+                          <Icon className="h-4 w-4" />
+                          <span className="font-medium">{item.label}</span>
+                          <Lock className="h-3 w-3 ml-auto" />
+                        </div>
+                      );
+                    }
                     return (
                       <Link key={item.to} to={item.to} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined}
                         className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
@@ -598,6 +630,14 @@ export function AppShell() {
           ].map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
+            if (isLocked(item.to)) {
+              return (
+                <div key={item.to} aria-disabled="true" className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium text-muted-foreground/40">
+                  <Lock className="h-5 w-5" />
+                  {item.label}
+                </div>
+              );
+            }
             return (
               <Link
                 key={item.to}
