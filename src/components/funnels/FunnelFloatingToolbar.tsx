@@ -349,7 +349,7 @@ export function FunnelFloatingToolbar({
           className={cn(
             'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
             liveMode
-              ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+              ? 'bg-primary/15 border border-primary/30 text-primary'
               : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent'
           )}
         >
