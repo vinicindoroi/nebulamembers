@@ -56,6 +56,7 @@ export function AppShell() {
     return saved === "true";
   });
   const [showTutorial, setShowTutorial] = useState(false);
+  const [mobileSearch, setMobileSearch] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
@@ -261,6 +262,15 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // ESC fecha o menu mobile e trava o scroll quando aberto
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+  }, [open]);
+
   const onSignOut = async () => {
     await signOut();
     navigate({ to: "/login" });
@@ -362,7 +372,7 @@ export function AppShell() {
               )}
               <div>
                 <div className="font-semibold text-sm leading-none">{siteSettings.name}</div>
-                <div className="text-[10px] text-muted-foreground mt-1.5">área exclusiva</div>
+                <div className="text-[10px] text-muted-foreground mt-1.5">Members</div>
               </div>
             </Link>
           </div>
@@ -382,7 +392,8 @@ export function AppShell() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setOpen(false)}
-                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
+                        aria-current={active ? "page" : undefined}
+                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${
                           active
                             ? "bg-primary/10 text-primary border border-primary/20"
                             : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
@@ -461,7 +472,7 @@ export function AppShell() {
               )}
               <div>
                 <div className="font-semibold text-sm leading-none">{siteSettings.name}</div>
-                <div className="text-[10px] text-muted-foreground mt-1.5">área exclusiva</div>
+                <div className="text-[10px] text-muted-foreground mt-1.5">Members</div>
               </div>
             </Link>
             <button
@@ -481,7 +492,8 @@ export function AppShell() {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
                     return (
-                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
+                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined}
+                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
                         {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />}
                         <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         <span className="font-medium">{item.label}</span>
@@ -504,6 +516,13 @@ export function AppShell() {
         <header className="sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
             <button className="md:hidden p-2 rounded-lg hover:bg-muted/50" onClick={() => setOpen(true)} aria-label="Abrir menu">
               <Menu className="h-5 w-5" />
+            </button>
+            <button
+              className="sm:hidden p-2 rounded-lg hover:bg-muted/50 text-muted-foreground"
+              onClick={() => setMobileSearch((v) => !v)}
+              aria-label="Buscar"
+            >
+              <Search className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2 text-xs">
               <span className="hidden md:inline text-muted-foreground">{siteSettings.name}</span>
@@ -545,8 +564,21 @@ export function AppShell() {
             </div>
           </header>
         )}
-        <main ref={mainRef} className={`flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8'}`}>
-          <div className={isFunnelsPage ? 'h-full' : 'admin-route-slot'}>
+        {!isFunnelsPage && mobileSearch && (
+          <div className="sm:hidden sticky top-16 z-20 px-4 py-2 border-b border-border bg-background/90 backdrop-blur-xl">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                autoFocus
+                type="search"
+                placeholder="Buscar cursos, comunidade..."
+                className="w-full bg-card border border-border rounded-full pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+          </div>
+        )}
+        <main ref={mainRef} className={`flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
+          <div className={isFunnelsPage ? 'h-full' : 'admin-route-slot w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
               <Outlet />
             ) : (
@@ -555,6 +587,35 @@ export function AppShell() {
           </div>
         </main>
       </div>
+
+      {/* Bottom nav (mobile) */}
+      {!isFunnelsPage && (
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
+          {[
+            { to: "/dashboard", label: "Início", icon: LayoutDashboard },
+            { to: "/courses", label: "Cursos", icon: GraduationCap },
+            { to: "/community", label: "Comunidade", icon: Users },
+            { to: "/notes", label: "Notas", icon: StickyNote },
+            { to: "/profile", label: "Perfil", icon: User },
+          ].map((item) => {
+            const active = path === item.to || path.startsWith(item.to + "/");
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                aria-current={active ? "page" : undefined}
+                className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
 
       {/* Tutorial Wizard */}
       <TutorialWizard open={showTutorial} onClose={handleCloseTutorial} />
