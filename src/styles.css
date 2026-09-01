@@ -95,8 +95,8 @@
   html, body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); }
   body {
     background-image:
-      radial-gradient(ellipse 50% 40% at 0% 0%, oklch(0.63 0.19 292 / 0.07), transparent 70%),
-      radial-gradient(ellipse 45% 35% at 100% 100%, oklch(0.58 0.17 265 / 0.05), transparent 70%);
+      radial-gradient(ellipse 60% 45% at 12% -5%, rgba(139, 92, 246, 0.10), transparent 65%),
+      radial-gradient(ellipse 50% 40% at 100% 105%, rgba(139, 92, 246, 0.06), transparent 70%);
     background-repeat: no-repeat;
     min-height: 100vh;
   }
@@ -385,7 +385,22 @@
   }
   .animate-wizard-in { animation: wizard-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .animate-wizard-fade { animation: wizard-fade 0.25s ease-out both; }
-  .animate-ambient-pulse { animation: ambient-pulse 12s ease-in-out infinite; }
+    .animate-ambient-pulse { animation: ambient-pulse 12s ease-in-out infinite; }
+  .font-display { font-family: var(--font-display); }
+  .nav-pill {
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .glow-primary { box-shadow: 0 0 24px rgba(139, 92, 246, 0.35); }
+  .bento-card {
+    border-radius: var(--radius-2xl);
+    background: var(--card);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+  .bento-card:hover { border-color: color-mix(in oklab, var(--primary) 35%, transparent); }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up,
