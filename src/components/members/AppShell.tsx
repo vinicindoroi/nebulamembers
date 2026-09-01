@@ -262,6 +262,15 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // ESC fecha o menu mobile e trava o scroll quando aberto
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+  }, [open]);
+
   const onSignOut = async () => {
     await signOut();
     navigate({ to: "/login" });
