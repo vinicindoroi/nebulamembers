@@ -114,37 +114,41 @@ export function AppShell() {
     loadUserPlan();
   }, [user]);
 
-  const filteredNavGroups = useMemo(() => {
-    const features = userPlanFeatures || fallbackFeatures;
+  const ALWAYS_ALLOWED = ["/profile", "/settings"];
 
-    return navGroups.map(group => {
-      const items = group.items.filter(item => {
-        if (item.to === "/organizer" && features.organizer_access === false) return false;
-        if (item.to === "/courses" && features.courses_access === false) return false;
-        if (item.to === "/community" && features.community_access === false) return false;
-        if (item.to === "/forum" && features.forum_access === false) return false;
-        if (item.to === "/notes" && features.notes_access === false) return false;
-        if (item.to === "/funnels" && features.funnels_access === false) return false;
-        return true;
-      });
-      return { ...group, items };
-    }).filter(group => group.items.length > 0);
-  }, [userPlanFeatures]);
+  const isLocked = useMemo(() => {
+    const features = userPlanFeatures || fallbackFeatures;
+    return (to: string) => {
+      if (isAdmin) return false;
+      if (ALWAYS_ALLOWED.includes(to)) return false;
+      if (planPending) return true;
+      if (to === "/organizer") return features.organizer_access === false;
+      if (to === "/courses") return features.courses_access === false;
+      if (to === "/community") return features.community_access === false;
+      if (to === "/forum") return features.forum_access === false;
+      if (to === "/notes") return features.notes_access === false;
+      if (to === "/funnels") return features.funnels_access === false;
+      return false;
+    };
+  }, [userPlanFeatures, planPending, isAdmin]);
+
+  const filteredNavGroups = useMemo(
+    () => navGroups.map((group) => ({
+      ...group,
+      items: group.items.map((item) => ({ ...item, locked: isLocked(item.to) })),
+    })),
+    [isLocked],
+  );
 
   const allNav = useMemo(() => {
     return filteredNavGroups.flatMap((g) => g.items);
   }, [filteredNavGroups]);
 
   const hasAccess = useMemo(() => {
-    const features = userPlanFeatures || fallbackFeatures;
-    if (path === "/organizer" && features.organizer_access === false) return false;
-    if (path === "/courses" && features.courses_access === false) return false;
-    if (path === "/community" && features.community_access === false) return false;
-    if (path === "/forum" && features.forum_access === false) return false;
-    if (path === "/notes" && features.notes_access === false) return false;
-    if (path === "/funnels" && features.funnels_access === false) return false;
-    return true;
-  }, [path, userPlanFeatures]);
+    const base = "/" + (path.split("/")[1] ?? "");
+    return !isLocked(base);
+  }, [path, isLocked]);
+
 
   usePresence();
 
