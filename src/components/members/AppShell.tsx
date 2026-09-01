@@ -2,7 +2,7 @@ import { Link, useRouterState, Outlet, useNavigate } from "@tanstack/react-route
 import {
   LayoutDashboard, GraduationCap, Users, User, Settings, Search, Bell,
   Menu, X, Orbit, LogOut, Shield, MessageSquare, Bookmark, GitBranch,
-  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic,
+  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock,
 } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,6 +13,8 @@ import { NotificationBell } from "@/components/members/NotificationBell";
 import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES } from "@/hooks/use-plans";
+
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 type NavGroup = { label: string; items: NavItem[] };
@@ -61,15 +63,9 @@ export function AppShell() {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [userPlanFeatures, setUserPlanFeatures] = useState<any>(null);
+  const [planPending, setPlanPending] = useState(false);
 
-  const fallbackFeatures = {
-    courses_access: true,
-    community_access: true,
-    forum_access: true,
-    organizer_access: true,
-    notes_access: true,
-    funnels_access: true,
-  };
+  const fallbackFeatures = NO_ACCESS_FEATURES;
 
   useEffect(() => {
     if (!user) return;
@@ -81,70 +77,72 @@ export function AppShell() {
           .eq("id", user.id)
           .maybeSingle();
 
-        const userPlanSlug = (profile?.plan || "Free").toLowerCase();
-
-        const { data: settings } = await supabase
-          .from("app_settings" as any)
-          .select("value")
-          .eq("key", "plans_config")
-          .maybeSingle();
-
-        const plans = (settings as any)?.value as any[];
-        
-        let foundFeatures = null;
-        if (plans && Array.isArray(plans)) {
-          const userPlan = plans.find(p => p.slug.toLowerCase() === userPlanSlug) || plans.find(p => p.slug.toLowerCase() === "free");
-          if (userPlan) foundFeatures = userPlan.features;
+        if (isPendingPlan(profile?.plan)) {
+          setPlanPending(true);
+          setUserPlanFeatures(NO_ACCESS_FEATURES);
+          return;
         }
 
-        if (!foundFeatures) {
-          if (userPlanSlug === "free") {
-            foundFeatures = { courses_access: true, community_access: true, forum_access: true, organizer_access: true, notes_access: true, funnels_access: false };
-          } else {
-            foundFeatures = { courses_access: true, community_access: true, forum_access: true, organizer_access: true, notes_access: true, funnels_access: true };
-          }
+        const userPlanSlug = (profile?.plan || "").toLowerCase();
+        const plans = await fetchPlans();
+        const userPlan = plans.find(
+          (p) => p.slug?.toLowerCase() === userPlanSlug || p.name?.toLowerCase() === userPlanSlug,
+        );
+
+        if (!userPlan) {
+          // Plano não reconhecido — trata como pendente (sem acesso)
+          setPlanPending(true);
+          setUserPlanFeatures(NO_ACCESS_FEATURES);
+          return;
         }
 
-        setUserPlanFeatures(foundFeatures);
+        setPlanPending(false);
+        setUserPlanFeatures(userPlan.features ?? NO_ACCESS_FEATURES);
       } catch (err) {
         console.error("Error loading user plan features:", err);
-        setUserPlanFeatures(fallbackFeatures);
+        setPlanPending(true);
+        setUserPlanFeatures(NO_ACCESS_FEATURES);
       }
     };
     loadUserPlan();
   }, [user]);
 
-  const filteredNavGroups = useMemo(() => {
-    const features = userPlanFeatures || fallbackFeatures;
 
-    return navGroups.map(group => {
-      const items = group.items.filter(item => {
-        if (item.to === "/organizer" && features.organizer_access === false) return false;
-        if (item.to === "/courses" && features.courses_access === false) return false;
-        if (item.to === "/community" && features.community_access === false) return false;
-        if (item.to === "/forum" && features.forum_access === false) return false;
-        if (item.to === "/notes" && features.notes_access === false) return false;
-        if (item.to === "/funnels" && features.funnels_access === false) return false;
-        return true;
-      });
-      return { ...group, items };
-    }).filter(group => group.items.length > 0);
-  }, [userPlanFeatures]);
+  const ALWAYS_ALLOWED = ["/profile", "/settings"];
+
+  const isLocked = useMemo(() => {
+    const features = userPlanFeatures || fallbackFeatures;
+    return (to: string) => {
+      if (isAdmin) return false;
+      if (ALWAYS_ALLOWED.includes(to)) return false;
+      if (planPending) return true;
+      if (to === "/organizer") return features.organizer_access === false;
+      if (to === "/courses") return features.courses_access === false;
+      if (to === "/community") return features.community_access === false;
+      if (to === "/forum") return features.forum_access === false;
+      if (to === "/notes") return features.notes_access === false;
+      if (to === "/funnels") return features.funnels_access === false;
+      return false;
+    };
+  }, [userPlanFeatures, planPending, isAdmin]);
+
+  const filteredNavGroups = useMemo(
+    () => navGroups.map((group) => ({
+      ...group,
+      items: group.items.map((item) => ({ ...item, locked: isLocked(item.to) })),
+    })),
+    [isLocked],
+  );
 
   const allNav = useMemo(() => {
     return filteredNavGroups.flatMap((g) => g.items);
   }, [filteredNavGroups]);
 
   const hasAccess = useMemo(() => {
-    const features = userPlanFeatures || fallbackFeatures;
-    if (path === "/organizer" && features.organizer_access === false) return false;
-    if (path === "/courses" && features.courses_access === false) return false;
-    if (path === "/community" && features.community_access === false) return false;
-    if (path === "/forum" && features.forum_access === false) return false;
-    if (path === "/notes" && features.notes_access === false) return false;
-    if (path === "/funnels" && features.funnels_access === false) return false;
-    return true;
-  }, [path, userPlanFeatures]);
+    const base = "/" + (path.split("/")[1] ?? "");
+    return !isLocked(base);
+  }, [path, isLocked]);
+
 
   usePresence();
 
@@ -317,6 +315,12 @@ export function AppShell() {
             return (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>
+                  {item.locked ? (
+                    <div className="relative p-2.5 rounded-xl text-muted-foreground/40 cursor-not-allowed">
+                      <Icon className="h-4 w-4" />
+                      <Lock className="h-2.5 w-2.5 absolute right-1 bottom-1" />
+                    </div>
+                  ) : (
                   <Link
                     to={item.to}
                     className={`relative p-2.5 rounded-xl transition-colors ${
@@ -325,8 +329,9 @@ export function AppShell() {
                   >
                     <Icon className="h-4 w-4" />
                   </Link>
+                  )}
                 </TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
+                <TooltipContent side="right">{item.locked ? `${item.label} — Indisponível` : item.label}</TooltipContent>
               </Tooltip>
             );
           })}
@@ -387,6 +392,22 @@ export function AppShell() {
                   {group.items.map((item) => {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
+                    if (item.locked) {
+                      return (
+                        <div
+                          key={item.to}
+                          aria-disabled="true"
+                          title="Indisponível no seu nível de acesso"
+                          className="relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground/40 cursor-not-allowed border border-transparent"
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="font-medium">{item.label}</span>
+                          <span className="ml-auto flex items-center gap-1 text-[10px] uppercase tracking-wide">
+                            <Lock className="h-3 w-3" />Indisponível
+                          </span>
+                        </div>
+                      );
+                    }
                     return (
                       <Link
                         key={item.to}
@@ -491,6 +512,15 @@ export function AppShell() {
                   {group.items.map((item) => {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
+                    if (item.locked) {
+                      return (
+                        <div key={item.to} aria-disabled="true" className="relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground/40 cursor-not-allowed">
+                          <Icon className="h-4 w-4" />
+                          <span className="font-medium">{item.label}</span>
+                          <Lock className="h-3 w-3 ml-auto" />
+                        </div>
+                      );
+                    }
                     return (
                       <Link key={item.to} to={item.to} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined}
                         className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
@@ -582,7 +612,7 @@ export function AppShell() {
             {hasAccess ? (
               <Outlet />
             ) : (
-              <PlanLockScreen />
+              <PlanLockScreen pending={planPending} />
             )}
           </div>
         </main>
@@ -600,6 +630,14 @@ export function AppShell() {
           ].map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
+            if (isLocked(item.to)) {
+              return (
+                <div key={item.to} aria-disabled="true" className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium text-muted-foreground/40">
+                  <Lock className="h-5 w-5" />
+                  {item.label}
+                </div>
+              );
+            }
             return (
               <Link
                 key={item.to}
@@ -623,7 +661,7 @@ export function AppShell() {
   );
 }
 
-function PlanLockScreen() {
+function PlanLockScreen({ pending }: { pending?: boolean }) {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 max-w-md mx-auto space-y-5 animate-fade-in relative z-10">
       <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
@@ -631,9 +669,13 @@ function PlanLockScreen() {
         <Shield className="h-8 w-8 stroke-[1.5]" />
       </div>
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Recurso Premium</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          {pending ? "Acesso pendente" : "Recurso indisponível"}
+        </h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Esta funcionalidade não está disponível no seu plano atual. Faça upgrade para continuar evoluindo na sua jornada.
+          {pending
+            ? "Sua conta ainda não tem um nível de acesso definido. Assim que um administrador liberar seu acesso, todas as áreas serão desbloqueadas."
+            : "Esta funcionalidade não está disponível no seu nível de acesso atual."}
         </p>
       </div>
       <div className="pt-2 flex flex-col gap-2 w-full">
