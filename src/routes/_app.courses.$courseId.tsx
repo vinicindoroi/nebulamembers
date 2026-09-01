@@ -52,12 +52,12 @@ type Module = {
 };
 
 const premiumGradients = [
-  "from-indigo-600/30 via-violet-600/10 to-[#0c0c0e]/90 border-indigo-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(99,102,241,0.15)]",
+  "from-primary/30 via-primary/10 to-[#0c0c0e]/90 border-primary/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(99,102,241,0.15)]",
   "from-rose-600/30 via-pink-600/10 to-[#0c0c0e]/90 border-rose-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(244,63,94,0.15)]",
   "from-emerald-600/30 via-teal-600/10 to-[#0c0c0e]/90 border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(16,185,129,0.15)]",
-  "from-cyan-600/30 via-blue-600/10 to-[#0c0c0e]/90 border-cyan-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(6,182,212,0.15)]",
+  "from-cyan-600/30 via-primary/10 to-[#0c0c0e]/90 border-cyan-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(6,182,212,0.15)]",
   "from-amber-600/30 via-orange-600/10 to-[#0c0c0e]/90 border-amber-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(245,158,11,0.15)]",
-  "from-fuchsia-600/30 via-purple-600/10 to-[#0c0c0e]/90 border-fuchsia-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(217,70,239,0.15)]",
+  "from-primary/30 via-primary/10 to-[#0c0c0e]/90 border-primary/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(217,70,239,0.15)]",
 ];
 
 function CourseDetail() {
@@ -201,7 +201,7 @@ function CourseDetail() {
       ) : activeLessonId === null ? (
         <div className="space-y-6">
           {/* CTA Card */}
-          <div className="relative overflow-hidden rounded-2xl p-6 border border-primary/20 bg-gradient-to-r from-primary/10 via-purple-500/5 to-transparent backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_12px_40px_-12px_rgba(99,102,241,0.25)]">
+          <div className="relative overflow-hidden rounded-2xl p-6 border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_12px_40px_-12px_rgba(99,102,241,0.25)]">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
             <div className="relative z-10 space-y-1">
               <span className="text-[10px] uppercase tracking-wider text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-full">Status do Progresso</span>

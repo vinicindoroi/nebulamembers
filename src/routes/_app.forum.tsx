@@ -192,9 +192,9 @@ function ForumPage() {
               return (
                 <>
                   {pinnedPosts.length > 0 && (
-                    <div className="space-y-3 p-4 rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/[0.04] to-transparent shadow-[0_8px_32px_-12px_rgba(139,92,246,0.15)] relative overflow-hidden group/pinned">
-                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-500/10 via-transparent to-transparent pointer-events-none" />
-                      <div className="flex items-center gap-2 text-xs font-semibold text-violet-400 tracking-wide uppercase px-1 pb-1">
+                    <div className="space-y-3 p-4 rounded-3xl border border-primary/20 bg-gradient-to-b from-primary/[0.04] to-transparent shadow-[0_8px_32px_-12px_rgba(139,92,246,0.15)] relative overflow-hidden group/pinned">
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none" />
+                      <div className="flex items-center gap-2 text-xs font-semibold text-primary tracking-wide uppercase px-1 pb-1">
                         <Pin className="h-3.5 w-3.5" />
                         <span>Tópicos em Destaque</span>
                       </div>
@@ -252,9 +252,9 @@ function LevelBadge({ xp }: { xp: number }) {
   const levelInfo = getLevel(xp);
   const getRankColor = (lvl: number) => {
     if (lvl >= 8) return "from-yellow-400/20 to-amber-500/20 text-amber-300 border-amber-500/30";
-    if (lvl >= 7) return "from-fuchsia-500/20 to-purple-600/20 text-purple-300 border-purple-500/30";
-    if (lvl >= 6) return "from-violet-500/20 to-indigo-600/20 text-indigo-300 border-indigo-500/30";
-    if (lvl >= 5) return "from-blue-500/20 to-cyan-500/20 text-blue-300 border-blue-500/30";
+    if (lvl >= 7) return "from-primary/20 to-primary/20 text-primary border-primary/30";
+    if (lvl >= 6) return "from-primary/20 to-primary/20 text-primary border-primary/30";
+    if (lvl >= 5) return "from-primary/20 to-cyan-500/20 text-primary border-primary/30";
     if (lvl >= 4) return "from-teal-500/20 to-emerald-500/20 text-emerald-300 border-teal-500/30";
     if (lvl >= 3) return "from-emerald-500/20 to-green-500/20 text-green-300 border-emerald-500/30";
     if (lvl >= 2) return "from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30";
@@ -274,9 +274,9 @@ function Avatar({ initials, size = "md", xp = 0, avatarUrl, name }: { initials: 
 
   const getRingColor = (lvl: number) => {
     if (lvl >= 8) return "ring-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.3)]";
-    if (lvl >= 7) return "ring-purple-500/40 shadow-[0_0_8px_rgba(168,85,247,0.3)]";
-    if (lvl >= 6) return "ring-indigo-500/40 shadow-[0_0_8px_rgba(99,102,241,0.3)]";
-    if (lvl >= 5) return "ring-blue-500/30 shadow-[0_0_6px_rgba(59,130,246,0.25)]";
+    if (lvl >= 7) return "ring-primary/40 shadow-[0_0_8px_rgba(168,85,247,0.3)]";
+    if (lvl >= 6) return "ring-primary/40 shadow-[0_0_8px_rgba(99,102,241,0.3)]";
+    if (lvl >= 5) return "ring-primary/30 shadow-[0_0_6px_rgba(59,130,246,0.25)]";
     if (lvl >= 4) return "ring-teal-500/30";
     if (lvl >= 3) return "ring-emerald-500/30";
     if (lvl >= 2) return "ring-orange-500/30";
@@ -318,7 +318,7 @@ function ForumPostCard({ post, userId, onLike, onDelete, onClick }: { post: Foru
         post.is_service
           ? "border-pink-500/30 bg-gradient-to-br from-pink-950/[0.05] via-white/[0.01] to-white/[0.02] hover:border-pink-500/50 hover:shadow-[0_0_24px_rgba(244,63,94,0.1)]"
           : post.pinned
-          ? "border-violet-500/20 bg-violet-500/[0.01] hover:border-violet-500/35 hover:shadow-[0_0_24px_rgba(139,92,246,0.08)]"
+          ? "border-primary/20 bg-primary/[0.01] hover:border-primary/35 hover:shadow-[0_0_24px_rgba(139,92,246,0.08)]"
           : "border-white/[0.08] bg-white/[0.015] hover:bg-white/[0.02] hover:border-white/[0.12] hover:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]"
       }`}
     >
@@ -329,7 +329,7 @@ function ForumPostCard({ post, userId, onLike, onDelete, onClick }: { post: Foru
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold truncate text-foreground/90">{name}</span>
               <LevelBadge xp={postXp} />
-              {post.pinned && <Pin className="h-3 w-3 text-violet-400" />}
+              {post.pinned && <Pin className="h-3 w-3 text-primary" />}
               {post.is_service && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 font-semibold shadow-[0_2px_8px_rgba(244,63,94,0.15)]">Serviço</span>}
             </div>
             <div className="text-[11px] text-muted-foreground/60">{formatTime(post.created_at)}</div>

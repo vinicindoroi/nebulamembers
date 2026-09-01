@@ -37,8 +37,8 @@ export function LessonNotes({ lessonId, lessonTitle }: LessonNotesProps) {
   const getNoteColorClass = (color: string) => {
     const colors: Record<string, string> = {
       default: 'border-white/5 bg-white/[0.02]',
-      purple: 'border-purple-500/20 bg-purple-500/5',
-      blue: 'border-blue-500/20 bg-blue-500/5',
+      purple: 'border-primary/20 bg-primary/5',
+      blue: 'border-primary/20 bg-primary/5',
       green: 'border-green-500/20 bg-green-500/5',
       yellow: 'border-yellow-500/20 bg-yellow-500/5',
       pink: 'border-pink-500/20 bg-pink-500/5',

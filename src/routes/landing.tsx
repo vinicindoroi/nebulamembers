@@ -222,7 +222,7 @@ function DashboardPreview() {
   
   // Community Feed State
   const [posts, setPosts] = useState([
-    { id: 1, name: "Pedro H.", action: "fechou 2 novos clientes de tráfego usando a nossa estrutura!", time: "há 3 min", avatarGrad: "from-blue-500 to-indigo-600", init: "PH", likes: 14, liked: false },
+    { id: 1, name: "Pedro H.", action: "fechou 2 novos clientes de tráfego usando a nossa estrutura!", time: "há 3 min", avatarGrad: "from-primary to-primary", init: "PH", likes: 14, liked: false },
     { id: 2, name: "Camila R.", action: "compartilhou um novo post no fórum: 'Como fiz R$ 5.000 em 15 dias'", time: "há 12 min", avatarGrad: "from-pink-500 to-rose-500", init: "CR", likes: 29, liked: false }
   ]);
   const [newPostText, setNewPostText] = useState("");
@@ -235,7 +235,7 @@ function DashboardPreview() {
       name: "Você (Simulador)",
       action: `postou: "${newPostText}"`,
       time: "agora mesmo",
-      avatarGrad: "from-purple-500 to-indigo-500",
+      avatarGrad: "from-primary to-primary",
       init: "VC",
       likes: 0,
       liked: false
@@ -796,7 +796,7 @@ function DashboardPreview() {
             <div className="relative aspect-video w-full bg-black/50 overflow-hidden flex flex-col items-center justify-center group/player">
               {/* Simulated presenter content/Cosmic visualizer */}
               {isPlaying ? (
-                <div className="absolute inset-0 bg-gradient-to-tr from-purple-950/40 via-black to-indigo-950/40 flex flex-col items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 via-black to-primary/40 flex flex-col items-center justify-center">
                   {/* Spinning cosmic light */}
                   <div className="absolute w-[200px] h-[200px] rounded-full bg-primary/5 blur-[50px] animate-pulse" />
                   
@@ -1125,7 +1125,7 @@ function PlansSection() {
         <GlowCard delay={150} isVisible={isVisible} featured>
           <div className="flex flex-col h-full relative py-2 min-h-[500px]">
             {/* Top Purple Glow Accent */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4/5 h-28 bg-gradient-to-b from-violet-600/15 via-violet-600/5 to-transparent blur-[32px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4/5 h-28 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent blur-[32px] rounded-full pointer-events-none" />
             
             {currentPlan === "pro" && (
               <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/60 border border-emerald-500/30 text-[9px] font-bold text-emerald-400 uppercase tracking-widest shadow-lg">
@@ -1135,7 +1135,7 @@ function PlansSection() {
             )}
             
             <div className="text-center mt-4">
-              <span className="text-[9px] font-extrabold uppercase tracking-[0.25em] text-violet-400/40">NEBULA.HUB</span>
+              <span className="text-[9px] font-extrabold uppercase tracking-[0.25em] text-primary/40">NEBULA.HUB</span>
               <h3 className="text-2xl font-black text-white tracking-tight mt-1">Pro</h3>
             </div>
 
@@ -1145,7 +1145,7 @@ function PlansSection() {
                 <span className="text-xs text-white/40 font-medium">/ mês</span>
               </div>
               <span className="text-xs text-white/40 font-semibold mt-1">cobrado mensalmente</span>
-              <span className="text-[10px] font-bold text-violet-400/90 mt-3 bg-violet-950/40 border border-violet-800/30 px-3 py-1 rounded-full inline-block">
+              <span className="text-[10px] font-bold text-primary/90 mt-3 bg-primary/40 border border-primary/30 px-3 py-1 rounded-full inline-block">
                 10 cursos & Kanban
               </span>
             </div>
@@ -1153,10 +1153,10 @@ function PlansSection() {
             <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent my-4" />
 
             <ul className="space-y-3.5 px-2 mb-4">
-              <PlanCheckItem color="text-violet-400">Todos os recursos do Free</PlanCheckItem>
-              <PlanCheckItem color="text-violet-400">10 cursos e 50 módulos inclusos</PlanCheckItem>
-              <PlanCheckItem color="text-violet-400">Acesso total ao Organizador (Kanban)</PlanCheckItem>
-              <PlanCheckItem color="text-violet-400">Acesso ao Notas Tiptap com IA Híbrida</PlanCheckItem>
+              <PlanCheckItem color="text-primary">Todos os recursos do Free</PlanCheckItem>
+              <PlanCheckItem color="text-primary">10 cursos e 50 módulos inclusos</PlanCheckItem>
+              <PlanCheckItem color="text-primary">Acesso total ao Organizador (Kanban)</PlanCheckItem>
+              <PlanCheckItem color="text-primary">Acesso ao Notas Tiptap com IA Híbrida</PlanCheckItem>
               <span className="text-[10px] text-white/30 italic block mt-2 ml-7">+ 3 recursos adicionais</span>
             </ul>
 
@@ -1167,7 +1167,7 @@ function PlansSection() {
             <Link 
               to={targetLink} 
               search={user ? undefined : { mode: "signup" }} 
-              className="w-full py-3.5 px-4 rounded-xl text-center text-xs font-bold bg-gradient-to-r from-violet-600 via-indigo-600 to-indigo-700 hover:from-violet-500 hover:to-indigo-600 text-white shadow-[0_8px_24px_-8px_rgba(139,92,246,0.8)] hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-auto btn-glow"
+              className="w-full py-3.5 px-4 rounded-xl text-center text-xs font-bold bg-gradient-to-r from-primary via-primary to-primary hover:from-primary hover:to-primary text-white shadow-[0_8px_24px_-8px_rgba(139,92,246,0.8)] hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-auto btn-glow"
             >
               Começar Agora <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -1309,8 +1309,8 @@ function JourneySection() {
 function TestimonialsSection() {
   const { ref, isVisible } = useScrollReveal();
   const testimonials = [
-    { name: "Lucas M.", role: "Afiliado", quote: "Em 60 dias saí do zero pra R$4.200/mês. O método é simples, mas funciona de verdade.", stars: 5, initials: "LM", grad: "from-blue-500 to-indigo-600" },
-    { name: "Camila R.", role: "Infoprodutora", quote: "Já tinha tentado 3 cursos antes. Aqui foi a primeira vez que tive acompanhamento real.", stars: 5, initials: "CR", grad: "from-purple-500 to-pink-500" },
+    { name: "Lucas M.", role: "Afiliado", quote: "Em 60 dias saí do zero pra R$4.200/mês. O método é simples, mas funciona de verdade.", stars: 5, initials: "LM", grad: "from-primary to-primary" },
+    { name: "Camila R.", role: "Infoprodutora", quote: "Já tinha tentado 3 cursos antes. Aqui foi a primeira vez que tive acompanhamento real.", stars: 5, initials: "CR", grad: "from-primary to-pink-500" },
     { name: "Pedro H.", role: "Gestor de tráfego", quote: "A comunidade sozinha já vale. Fechei 2 clientes só com networking dentro da plataforma.", stars: 5, initials: "PH", grad: "from-amber-400 to-orange-500" },
   ];
   return (
@@ -1467,7 +1467,7 @@ function GlowCard({ children, delay = 0, isVisible = true, featured = false }: {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`group relative rounded-2xl overflow-hidden transition-all duration-700 hover:scale-[1.02] will-change-transform ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${featured ? "ring-1 ring-purple-400/20" : ""}`}
+      className={`group relative rounded-2xl overflow-hidden transition-all duration-700 hover:scale-[1.02] will-change-transform ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${featured ? "ring-1 ring-primary/20" : ""}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div ref={glowRef} className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 will-change-[opacity] z-10" />

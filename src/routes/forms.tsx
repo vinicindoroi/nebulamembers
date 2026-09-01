@@ -212,7 +212,7 @@ function FormsPage() {
     <main className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden bg-background">
       {/* Animated glowing cosmic background */}
       <div className="absolute top-[10%] left-[10%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[140px] pointer-events-none animate-ambient-pulse" />
-      <div className="absolute bottom-[10%] right-[10%] w-[60%] h-[60%] rounded-full bg-indigo-500/5 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[10%] right-[10%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[140px] pointer-events-none" />
 
       {/* Floating particles background */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
