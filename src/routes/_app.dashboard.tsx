@@ -216,7 +216,7 @@ function Dashboard() {
                     <button
                       onClick={() => handleToggleLocalTask(task.id)}
                       aria-label={`Concluir ${task.title}`}
-                      className="h-4.5 w-4.5 h-[18px] w-[18px] shrink-0 rounded border border-border hover:border-primary flex items-center justify-center transition-colors"
+                      className="h-[18px] w-[18px] shrink-0 rounded border border-border hover:border-primary flex items-center justify-center transition-colors"
                     >
                       <Check className="h-3 w-3 opacity-0 group-hover:opacity-60 text-primary transition-opacity" />
                     </button>
