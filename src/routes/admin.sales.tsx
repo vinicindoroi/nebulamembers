@@ -41,7 +41,7 @@ function Page() {
           <XAxis dataKey="d" stroke="#71717a" fontSize={10} tickLine={false} axisLine={false}/>
           <YAxis stroke="#71717a" fontSize={10} tickLine={false} axisLine={false}/>
           <Tooltip contentStyle={{background:"rgba(15,15,20,0.9)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12}}/>
-          <Line type="monotone" dataKey="v" stroke="#8b5cf6" strokeWidth={2} dot={false}/>
+          <Line type="monotone" dataKey="v" stroke="#7ad3d8" strokeWidth={2} dot={false}/>
         </LineChart></ResponsiveContainer></div>
       </div>
       <div className="glass rounded-2xl overflow-hidden">

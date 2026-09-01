@@ -7,7 +7,7 @@ import { StatCard } from "@/components/admin/StatCard";
 
 export const Route = createFileRoute("/admin/dashboard")({ component: Page });
 
-const COLORS = ["#8b5cf6", "#06b6d4", "#f59e0b", "#10b981"];
+const COLORS = ["#7ad3d8", "#9aa0a6", "#f59e0b", "#10b981"];
 
 function Page() {
   const [stats, setStats] = useState({ members: 0, revenue: 0, newUsers: 0, retention: 0 });
@@ -140,7 +140,7 @@ function Page() {
                 <XAxis dataKey="d" stroke="#71717a" fontSize={10} tickLine={false} axisLine={false} />
                 <YAxis stroke="#71717a" fontSize={10} tickLine={false} axisLine={false} />
                 <Tooltip contentStyle={{ background: "rgba(15,15,20,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, backdropFilter: "blur(20px)" }} />
-                <Line type="monotone" dataKey="v" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="v" stroke="#7ad3d8" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -170,7 +170,7 @@ function Page() {
                 <XAxis dataKey="m" stroke="#71717a" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke="#71717a" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip contentStyle={{ background: "rgba(15,15,20,0.9)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12 }} />
-                <Bar dataKey="v" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="v" fill="#7ad3d8" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -193,7 +193,7 @@ export function AppShell() {
   const searchRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   useScrollRestore(mainRef);
-  const [siteSettings, setSiteSettings] = useState({ name: "Membros", logoUrl: "/nebula_logo.png?v=2", primaryColor: "#8b5cf6" });
+  const [siteSettings, setSiteSettings] = useState({ name: "Membros", logoUrl: "/nebula_logo.png?v=2", primaryColor: "#7ad3d8" });
 
   useEffect(() => {
     // Try to load from localStorage first for instant initial render
@@ -205,7 +205,7 @@ export function AppShell() {
           setSiteSettings({
             name: parsed.general.name || "Membros",
             logoUrl: parsed.general.logoUrl || "/nebula_logo.png?v=2",
-            primaryColor: parsed.general.primaryColor || "#8b5cf6"
+            primaryColor: parsed.general.primaryColor || "#7ad3d8"
           });
         }
       }
