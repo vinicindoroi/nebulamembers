@@ -458,7 +458,7 @@ function Dashboard() {
                   const priorityColors = {
                     alta: "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_8px_rgba(244,63,94,0.15)]",
                     media: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                    baixa: "bg-slate-500/10 text-slate-400 border-slate-500/20"
+                    baixa: "bg-muted/10 text-muted-foreground border-border/20"
                   };
                   return (
                     <div 

@@ -258,7 +258,7 @@ function LevelBadge({ xp }: { xp: number }) {
     if (lvl >= 4) return "from-teal-500/20 to-emerald-500/20 text-emerald-300 border-teal-500/30";
     if (lvl >= 3) return "from-emerald-500/20 to-green-500/20 text-green-300 border-emerald-500/30";
     if (lvl >= 2) return "from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30";
-    return "from-slate-500/10 to-slate-600/10 text-slate-400 border-slate-500/20";
+    return "from-slate-500/10 to-slate-600/10 text-muted-foreground border-border/20";
   };
 
   return (

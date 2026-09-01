@@ -1542,8 +1542,8 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-[#1a1a1f]/90 backdrop-blur border border-white/10 rounded-lg shadow-lg">
             {isSaving ? (
               <>
-                <Loader2 className="w-3 h-3 animate-spin text-zinc-400" />
-                <span className="text-zinc-400">Salvando...</span>
+                <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+                <span className="text-muted-foreground">Salvando...</span>
               </>
             ) : (
               <>
@@ -1556,7 +1556,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
 
         {/* Hint */}
         <Panel position="top-left" className="ml-2 mt-2">
-          <div className="text-[11px] text-zinc-400 bg-[#1a1a1f]/90 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 shadow-lg space-x-2">
+          <div className="text-[11px] text-muted-foreground bg-[#1a1a1f]/90 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 shadow-lg space-x-2">
             <span><kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px]">Tab</kbd> filho</span>
             <span><kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px]">Enter</kbd> irmão</span>
             <span><kbd className="bg-white/10 px-1 py-0.5 rounded text-[10px]">↑↓←→</kbd> navegar</span>
