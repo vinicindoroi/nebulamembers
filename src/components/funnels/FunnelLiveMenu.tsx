@@ -110,14 +110,14 @@ export function FunnelLiveMenu({
           className={cn(
             'flex items-center gap-2 pl-2.5 pr-2.5 py-1 rounded-full text-xs transition-all',
             liveMode
-              ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+              ? 'bg-primary/15 border border-primary/30 text-primary'
               : 'hover:bg-white/[0.06] text-muted-foreground border border-transparent',
           )}
         >
           <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
           <span className="font-medium">Live</span>
           {liveMode && (
-            <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-[10px] font-semibold text-emerald-300">
+            <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-primary/20 text-[10px] font-semibold text-primary">
               {totalLive}
             </span>
           )}
@@ -132,7 +132,7 @@ export function FunnelLiveMenu({
         <div className="p-3 border-b border-white/10 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Radio className={cn('w-4 h-4 text-emerald-400', liveMode && 'animate-pulse')} />
+              <Radio className={cn('w-4 h-4 text-primary', liveMode && 'animate-pulse')} />
               <div>
                 <p className="text-xs font-semibold">Modo Live</p>
                 <p className="text-[11px] text-muted-foreground">
@@ -167,7 +167,7 @@ export function FunnelLiveMenu({
             className={cn(
               'flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg text-[11px] border',
               trackingToken
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+                ? 'bg-primary/10 border-primary/20 text-primary'
                 : 'bg-amber-500/10 border-amber-500/20 text-amber-300',
             )}
           >
@@ -214,7 +214,7 @@ export function FunnelLiveMenu({
                     <p className="text-[10px] text-muted-foreground truncate">{data.type}</p>
                   </div>
                   {liveMode && live > 0 && (
-                    <span className="shrink-0 px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-[10px] text-emerald-300">
+                    <span className="shrink-0 px-1.5 py-0.5 rounded-full bg-primary/15 text-[10px] text-primary">
                       {live} ao vivo
                     </span>
                   )}
@@ -226,7 +226,7 @@ export function FunnelLiveMenu({
                     title="Copiar código desta etapa"
                   >
                     {copiedId === node.id ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="w-3.5 h-3.5 text-primary" />
                     ) : (
                       <Copy className="w-3.5 h-3.5" />
                     )}
