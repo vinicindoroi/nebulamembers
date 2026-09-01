@@ -29,6 +29,16 @@ export const NO_ACCESS_FEATURES: PlanFeatureFlags = {
   funnels_access: false,
 };
 
+export const FULL_ACCESS_FEATURES: PlanFeatureFlags = {
+  courses_access: true,
+  community_access: true,
+  forum_access: true,
+  organizer_access: true,
+  notes_access: true,
+  funnels_access: true,
+};
+
+
 export function isPendingPlan(plan: string | null | undefined) {
   const p = (plan ?? "").trim().toLowerCase();
   return p === "" || p === "pending" || p === "pendente";
