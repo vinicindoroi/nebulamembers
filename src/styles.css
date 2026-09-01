@@ -63,11 +63,11 @@
   --accent-foreground: oklch(0.96 0 0);
   --destructive: oklch(0.6 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.26 0 0);
-  --input: oklch(0.3 0 0);
-  --ring: oklch(0.82 0.07 195);
-  --glass: oklch(0.19 0 0 / 0.9);
-  --glass-border: oklch(0.3 0 0);
+  --border: oklch(0.31 0.01 260);
+  --input: oklch(0.35 0.012 260);
+  --ring: oklch(0.84 0.09 200);
+  --glass: oklch(0.24 0.01 260 / 0.9);
+  --glass-border: oklch(0.34 0.012 260);
   --gradient-primary: linear-gradient(135deg, oklch(0.82 0.07 195), oklch(0.72 0.06 210));
   --shadow-glass: 0 8px 32px 0 oklch(0 0 0 / 0.45);
   --shadow-glow: 0 0 24px color-mix(in oklab, var(--primary) 18%, transparent);
