@@ -1818,19 +1818,19 @@ function OrganizerPage() {
               onDrop={(e) => handleDropEisenhower(e, true, false)}
               className={`rounded-2xl border transition-all duration-300 p-4 min-h-[240px] flex flex-col gap-3 relative overflow-hidden ${
                 activeDragEisenhower === "q3" 
-                  ? "border-blue-500/40 bg-blue-500/[0.04] shadow-[0_0_20px_rgba(59,130,246,0.15)] scale-[1.005]" 
+                  ? "border-primary/40 bg-primary/[0.04] shadow-[0_0_20px_rgba(59,130,246,0.15)] scale-[1.005]" 
                   : isDragging 
-                    ? "border-dashed border-blue-500/20 bg-blue-500/[0.01] opacity-85" 
-                    : "border-blue-500/10 bg-blue-500/[0.02]"
+                    ? "border-dashed border-primary/20 bg-primary/[0.01] opacity-85" 
+                    : "border-primary/10 bg-primary/[0.02]"
               }`}
             >
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-blue-500/30" />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-primary/30" />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-foreground flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                  <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                   Q3: Delegar (Urgente, Não Importante)
                 </span>
-                <span className="text-[10px] bg-blue-500/10 px-2 py-0.5 rounded-full text-blue-400 font-extrabold">
+                <span className="text-[10px] bg-primary/10 px-2 py-0.5 rounded-full text-primary font-extrabold">
                   {tasks.filter((t) => (t.urgente) && !(t.importante) && t.column !== doneColId).length}
                 </span>
               </div>
@@ -1892,7 +1892,7 @@ function OrganizerPage() {
                 red: { border: "border-red-500/20 bg-red-500/[0.005]", activeBorder: "border-red-500/40 bg-red-500/[0.02] shadow-[0_0_20px_rgba(239,68,68,0.15)]", bar: "bg-red-500", dot: "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" },
                 amber: { border: "border-amber-500/20 bg-amber-500/[0.005]", activeBorder: "border-amber-500/40 bg-amber-500/[0.02] shadow-[0_0_20px_rgba(245,158,11,0.15)]", bar: "bg-amber-500", dot: "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" },
                 emerald: { border: "border-emerald-500/20 bg-emerald-500/[0.005]", activeBorder: "border-emerald-500/40 bg-emerald-500/[0.02] shadow-[0_0_20px_rgba(16,185,129,0.15)]", bar: "bg-emerald-500", dot: "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" },
-                blue: { border: "border-blue-500/20 bg-blue-500/[0.005]", activeBorder: "border-blue-500/40 bg-blue-500/[0.02] shadow-[0_0_20px_rgba(59,130,246,0.15)]", bar: "bg-blue-500", dot: "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" },
+                blue: { border: "border-primary/20 bg-primary/[0.005]", activeBorder: "border-primary/40 bg-primary/[0.02] shadow-[0_0_20px_rgba(59,130,246,0.15)]", bar: "bg-primary", dot: "bg-primary shadow-[0_0_8px_rgba(59,130,246,0.5)]" },
                 purple: { border: "border-primary/20 bg-primary/[0.005]", activeBorder: "border-primary/40 bg-primary/[0.02] shadow-[0_0_20px_rgba(139,92,246,0.15)]", bar: "bg-primary", dot: "bg-primary shadow-[0_0_8px_rgba(139,92,246,0.5)]" },
                 pink: { border: "border-pink-500/20 bg-pink-500/[0.005]", activeBorder: "border-pink-500/40 bg-pink-500/[0.02] shadow-[0_0_20px_rgba(236,72,153,0.15)]", bar: "bg-pink-500", dot: "bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.5)]" },
                 cyan: { border: "border-cyan-500/20 bg-cyan-500/[0.005]", activeBorder: "border-cyan-500/40 bg-cyan-500/[0.02] shadow-[0_0_20px_rgba(6,182,212,0.15)]", bar: "bg-cyan-500", dot: "bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]" }
@@ -1987,14 +1987,14 @@ function OrganizerPage() {
           {displayedNotes.map((note) => {
             const colorClasses = {
               purple: "from-primary/[0.08] to-primary/[0.01] border-primary/20 hover:border-primary/40 focus-within:border-primary/50 shadow-[0_4px_20px_rgba(147,51,234,0.02)]",
-              blue: "from-blue-500/[0.08] to-blue-500/[0.01] border-blue-500/20 hover:border-blue-500/40 focus-within:border-blue-500/50 shadow-[0_4px_20px_rgba(59,130,246,0.02)]",
+              blue: "from-primary/[0.08] to-primary/[0.01] border-primary/20 hover:border-primary/40 focus-within:border-primary/50 shadow-[0_4px_20px_rgba(59,130,246,0.02)]",
               pink: "from-pink-500/[0.08] to-pink-500/[0.01] border-pink-500/20 hover:border-pink-500/40 focus-within:border-pink-500/50 shadow-[0_4px_20px_rgba(236,72,153,0.02)]",
               amber: "from-amber-500/[0.08] to-amber-500/[0.01] border-amber-500/20 hover:border-amber-500/40 focus-within:border-amber-500/50 shadow-[0_4px_20px_rgba(245,158,11,0.02)]"
             }[note.color];
 
             const bulletColor = {
               purple: "bg-primary shadow-[0_0_6px_rgba(147,51,234,0.5)]",
-              blue: "bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.5)]",
+              blue: "bg-primary shadow-[0_0_6px_rgba(59,130,246,0.5)]",
               pink: "bg-pink-500 shadow-[0_0_6px_rgba(236,72,153,0.5)]",
               amber: "bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.5)]"
             }[note.color];
@@ -2086,7 +2086,7 @@ function OrganizerPage() {
                   { name: "red", colorClass: "bg-red-500" },
                   { name: "amber", colorClass: "bg-amber-500" },
                   { name: "emerald", colorClass: "bg-emerald-500" },
-                  { name: "blue", colorClass: "bg-blue-500" },
+                  { name: "blue", colorClass: "bg-primary" },
                   { name: "purple", colorClass: "bg-primary" },
                   { name: "pink", colorClass: "bg-pink-500" },
                   { name: "cyan", colorClass: "bg-cyan-500" }
@@ -2131,7 +2131,7 @@ function OrganizerPage() {
                   red: "bg-red-500",
                   amber: "bg-amber-500",
                   emerald: "bg-emerald-500",
-                  blue: "bg-blue-500",
+                  blue: "bg-primary",
                   purple: "bg-primary",
                   pink: "bg-pink-500",
                   cyan: "bg-cyan-500"
@@ -2179,7 +2179,7 @@ function OrganizerPage() {
                           { name: "red", colorClass: "bg-red-500" },
                           { name: "amber", colorClass: "bg-amber-500" },
                           { name: "emerald", colorClass: "bg-emerald-500" },
-                          { name: "blue", colorClass: "bg-blue-500" },
+                          { name: "blue", colorClass: "bg-primary" },
                           { name: "purple", colorClass: "bg-primary" },
                           { name: "pink", colorClass: "bg-pink-500" },
                           { name: "cyan", colorClass: "bg-cyan-500" }
@@ -2754,7 +2754,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
     red: "bg-red-500",
     amber: "bg-amber-500",
     emerald: "bg-emerald-500",
-    blue: "bg-blue-500",
+    blue: "bg-primary",
     purple: "bg-primary",
     pink: "bg-pink-500",
     cyan: "bg-cyan-500"
@@ -2763,7 +2763,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
   const priorityColors = {
     alta: "bg-red-500/20 text-red-400 border-red-500/30",
     media: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    baixa: "bg-blue-500/20 text-blue-400 border-blue-500/30"
+    baixa: "bg-primary/20 text-primary border-primary/30"
   };
   const prioData = priorityColors[task.priority as keyof typeof priorityColors] || priorityColors.media;
 

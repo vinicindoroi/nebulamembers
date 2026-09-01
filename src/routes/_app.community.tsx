@@ -121,7 +121,7 @@ function CommunityPage() {
             userId: "default",
             userName: "Thiago Mentor",
             userAvatar: "TM",
-            gradient: "from-purple-600 via-pink-600 to-amber-500",
+            gradient: "from-primary via-pink-600 to-amber-500",
             content: "Bati R$ 15k de faturamento hoje no dropshipping com o novo funil de conversão rápida! O ROAS disparou para 5.4x! 📈🚀",
             date: "há 2 horas",
             viewed: viewedIds.includes("st-1")
@@ -131,7 +131,7 @@ function CommunityPage() {
             userId: "default",
             userName: "Carol Estrategista",
             userAvatar: "CE",
-            gradient: "from-blue-600 to-violet-600",
+            gradient: "from-primary to-primary",
             content: "Dica de ouro para anúncios de tráfego: comecem com criativos focados na dor principal do cliente nos primeiros 3 segundos! A CTR média subiu para 3.8% nos testes. 🎯",
             date: "há 5 horas",
             viewed: viewedIds.includes("st-2")
@@ -271,7 +271,7 @@ function CommunityPage() {
   const [storyProgress, setStoryProgress] = useState(0);
   const [isCreatingStory, setIsCreatingStory] = useState(false);
   const [newStoryText, setNewStoryText] = useState("");
-  const [newStoryGrad, setNewStoryGrad] = useState("from-purple-600 via-pink-600 to-amber-500");
+  const [newStoryGrad, setNewStoryGrad] = useState("from-primary via-pink-600 to-amber-500");
   const [isStoryPaused, setIsStoryPaused] = useState(false);
 
   // Reset story progress on active story change
@@ -969,8 +969,8 @@ function CommunityPage() {
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-1.5">Escolha a cor do seu Story</span>
                   <div className="flex gap-2">
                     {[
-                      { id: "from-purple-600 via-pink-600 to-amber-500", label: "Magma" },
-                      { id: "from-blue-600 to-indigo-600", label: "Estelar" },
+                      { id: "from-primary via-pink-600 to-amber-500", label: "Magma" },
+                      { id: "from-primary to-primary", label: "Estelar" },
                       { id: "from-cyan-500 to-emerald-500", label: "Esmeralda" },
                       { id: "from-orange-500 to-rose-500", label: "Crepúsculo" },
                       { id: "from-[#0f0c29] via-[#302b63] to-[#24243e]", label: "Nebulosa" }
@@ -1095,9 +1095,9 @@ function ProfileSidebarWidget() {
 
   const getRankColor = (lvl: number) => {
     if (lvl >= 8) return "from-amber-400 to-yellow-300 text-yellow-950 ring-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.4)]";
-    if (lvl >= 7) return "from-fuchsia-500 to-purple-600 text-white ring-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.4)]";
-    if (lvl >= 6) return "from-indigo-500 to-violet-600 text-white ring-indigo-500/40 shadow-[0_0_15px_rgba(99,102,241,0.4)]";
-    if (lvl >= 5) return "from-blue-500 to-cyan-400 text-white ring-blue-500/30 shadow-[0_0_12px_rgba(59,130,246,0.3)]";
+    if (lvl >= 7) return "from-primary to-primary text-white ring-primary/40 shadow-[0_0_15px_rgba(168,85,247,0.4)]";
+    if (lvl >= 6) return "from-primary to-primary text-white ring-primary/40 shadow-[0_0_15px_rgba(99,102,241,0.4)]";
+    if (lvl >= 5) return "from-primary to-cyan-400 text-white ring-primary/30 shadow-[0_0_12px_rgba(59,130,246,0.3)]";
     if (lvl >= 4) return "from-teal-500 to-emerald-400 text-white ring-teal-500/30";
     if (lvl >= 3) return "from-emerald-500 to-green-400 text-white ring-emerald-500/30";
     if (lvl >= 2) return "from-orange-500 to-red-500 text-white ring-orange-500/30";
@@ -1109,7 +1109,7 @@ function ProfileSidebarWidget() {
   return (
     <div className="sticky top-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-md overflow-hidden shadow-xl transition-all duration-300 hover:shadow-glow hover:border-white/[0.12] group/profile">
       {/* Banner Capa Premium com Efeito Nebulosa Animado */}
-      <div className="h-24 w-full bg-gradient-to-tr from-violet-600 via-primary to-pink-500 relative overflow-hidden">
+      <div className="h-24 w-full bg-gradient-to-tr from-primary via-primary to-pink-500 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent opacity-80 animate-ambient-pulse" />
         <div className="absolute inset-0 bg-black/20" />
       </div>
@@ -1186,13 +1186,13 @@ function LevelBadge({ xp }: { xp: number }) {
   const levelInfo = getLevel(xp);
   const getRankColor = (lvl: number) => {
     if (lvl >= 8) return "from-yellow-400/20 to-amber-500/20 text-amber-300 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.15)]";
-    if (lvl >= 7) return "from-fuchsia-500/20 to-purple-600/20 text-purple-300 border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.15)]";
-    if (lvl >= 6) return "from-violet-500/20 to-indigo-600/20 text-indigo-300 border-indigo-500/30 shadow-[0_0_8px_rgba(99,102,241,0.15)]";
-    if (lvl >= 5) return "from-blue-500/20 to-cyan-500/20 text-blue-300 border-blue-500/30 shadow-[0_0_8px_rgba(59,130,246,0.1)]";
+    if (lvl >= 7) return "from-primary/20 to-primary/20 text-primary border-primary/30 shadow-[0_0_8px_rgba(168,85,247,0.15)]";
+    if (lvl >= 6) return "from-primary/20 to-primary/20 text-primary border-primary/30 shadow-[0_0_8px_rgba(99,102,241,0.15)]";
+    if (lvl >= 5) return "from-primary/20 to-cyan-500/20 text-primary border-primary/30 shadow-[0_0_8px_rgba(59,130,246,0.1)]";
     if (lvl >= 4) return "from-teal-500/20 to-emerald-500/20 text-emerald-300 border-teal-500/30";
     if (lvl >= 3) return "from-emerald-500/20 to-green-500/20 text-green-300 border-emerald-500/30";
     if (lvl >= 2) return "from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30";
-    return "from-slate-500/10 to-slate-600/10 text-slate-400 border-slate-500/20";
+    return "from-slate-500/10 to-slate-600/10 text-muted-foreground border-border/20";
   };
 
   return (
@@ -1208,9 +1208,9 @@ function Avatar({ initials, size = "md", xp = 0, avatarUrl = null }: { initials:
 
   const getRingColor = (lvl: number) => {
     if (lvl >= 8) return "ring-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.35)]";
-    if (lvl >= 7) return "ring-purple-500/40 shadow-[0_0_10px_rgba(168,85,247,0.35)]";
-    if (lvl >= 6) return "ring-indigo-500/40 shadow-[0_0_10px_rgba(99,102,241,0.35)]";
-    if (lvl >= 5) return "ring-blue-500/30 shadow-[0_0_8px_rgba(59,130,246,0.25)]";
+    if (lvl >= 7) return "ring-primary/40 shadow-[0_0_10px_rgba(168,85,247,0.35)]";
+    if (lvl >= 6) return "ring-primary/40 shadow-[0_0_10px_rgba(99,102,241,0.35)]";
+    if (lvl >= 5) return "ring-primary/30 shadow-[0_0_8px_rgba(59,130,246,0.25)]";
     if (lvl >= 4) return "ring-teal-500/30";
     if (lvl >= 3) return "ring-emerald-500/30";
     if (lvl >= 2) return "ring-orange-500/30";
@@ -1331,7 +1331,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
                 setIsEditing(false);
                 setEditContent(post.content || "");
               }}
-              className="px-3.5 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-[11px] font-semibold text-slate-300 transition-all active:scale-95 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-[11px] font-semibold text-foreground transition-all active:scale-95 cursor-pointer"
             >
               Cancelar
             </button>
@@ -1344,7 +1344,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
                 await onEdit(post.id, editContent);
                 setIsEditing(false);
               }}
-              className="px-3.5 py-1.5 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-[11px] font-semibold text-white transition-all active:scale-95 cursor-pointer shadow-md shadow-purple-500/15"
+              className="px-3.5 py-1.5 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-[11px] font-semibold text-white transition-all active:scale-95 cursor-pointer shadow-md shadow-primary/15"
             >
               Salvar
             </button>

@@ -54,12 +54,12 @@ const ACHIEVEMENT_ICONS: Record<
   },
   twenty_lessons: {
     icon: Rocket,
-    color: "text-indigo-400",
-    bg: "bg-indigo-500/10",
+    color: "text-primary",
+    bg: "bg-primary/10",
     glow: "shadow-[0_0_20px_rgba(99,102,241,0.2)]",
-    border: "border-indigo-500/20",
-    unlockedBorder: "hover:border-indigo-500/40 border-indigo-500/15",
-    unlockedBg: "bg-indigo-500/[0.02] hover:bg-indigo-500/[0.04]",
+    border: "border-primary/20",
+    unlockedBorder: "hover:border-primary/40 border-primary/15",
+    unlockedBg: "bg-primary/[0.02] hover:bg-primary/[0.04]",
     animate: "group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300",
   },
   streak_3: {
@@ -384,7 +384,7 @@ function Dashboard() {
           
           {/* Cosmic Mentor Recommendation Banner */}
           {recommendedCourse && (
-            <section className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-violet-950/20 via-black/30 to-cyan-950/20 p-5 hover:border-primary/30 transition-all duration-300 shadow-[0_8px_32px_-16px_rgba(139,92,246,0.15)]">
+            <section className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/20 via-black/30 to-cyan-950/20 p-5 hover:border-primary/30 transition-all duration-300 shadow-[0_8px_32px_-16px_rgba(139,92,246,0.15)]">
               <div className="absolute -top-12 -left-12 w-24 h-24 bg-primary/20 rounded-full blur-2xl pointer-events-none" />
               <div className="absolute -bottom-12 -right-12 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
               
@@ -458,7 +458,7 @@ function Dashboard() {
                   const priorityColors = {
                     alta: "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_8px_rgba(244,63,94,0.15)]",
                     media: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                    baixa: "bg-slate-500/10 text-slate-400 border-slate-500/20"
+                    baixa: "bg-muted/10 text-muted-foreground border-border/20"
                   };
                   return (
                     <div 
@@ -521,8 +521,8 @@ function Dashboard() {
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                  <BookOpen className="h-3.5 w-3.5 text-violet-400" />
+                <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <BookOpen className="h-3.5 w-3.5 text-primary" />
                 </div>
                 <h2 className="text-sm font-semibold">Cursos em andamento</h2>
               </div>
@@ -731,7 +731,7 @@ function Dashboard() {
                     {inProgress.length > 0 && (
                       <div 
                         style={{ width: `${Math.max(8, (inProgress.length / (courses.length || 1)) * 100)}%` }} 
-                        className={`h-full bg-gradient-to-r from-violet-500/80 to-fuchsia-500/80 shadow-[0_0_8px_rgba(139,92,246,0.3)] transition-all duration-700 ${completed === 0 ? "rounded-l-full" : ""} ${notStarted.length === 0 ? "rounded-r-full" : ""}`}
+                        className={`h-full bg-gradient-to-r from-primary/80 to-primary/80 shadow-[0_0_8px_rgba(139,92,246,0.3)] transition-all duration-700 ${completed === 0 ? "rounded-l-full" : ""} ${notStarted.length === 0 ? "rounded-r-full" : ""}`}
                         title={`Em Andamento: ${inProgress.length}`}
                       />
                     )}
@@ -756,7 +756,7 @@ function Dashboard() {
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary/15" />
                       <span className="text-[10px] font-semibold text-foreground/80">{inProgress.length}</span>
                     </div>
                     <span className="text-[8px] text-muted-foreground/60">Andamento</span>

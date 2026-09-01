@@ -59,8 +59,8 @@ export function FunnelAnalyticsPanel({
       {/* Stats */}
       <div className="grid grid-cols-2 gap-2">
         <div className="flex items-center gap-2 bg-[#2a2a30] rounded-lg p-2">
-          <div className="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center">
-            <Users className="w-3.5 h-3.5 text-blue-400" />
+          <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
+            <Users className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
             <p className="text-[10px] text-muted-foreground">Visitantes</p>

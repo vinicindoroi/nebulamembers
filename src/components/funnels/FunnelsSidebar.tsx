@@ -234,7 +234,7 @@ export function FunnelsSidebar({
             'shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
             isSelected
               ? isMind
-                ? 'bg-purple-500/15 text-purple-400'
+                ? 'bg-primary/15 text-primary'
                 : isCanvas
                 ? 'bg-emerald-500/15 text-emerald-400'
                 : 'bg-primary/15 text-primary'

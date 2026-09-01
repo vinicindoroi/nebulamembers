@@ -220,11 +220,11 @@ const getTheme = (slug: string) => {
   }
   if (s.includes("pro")) {
     return {
-      glow: "bg-gradient-to-b from-violet-600/15 via-violet-600/5 to-transparent",
-      text: "text-violet-400",
-      brand: "text-violet-400/40",
-      buttonBorder: "bg-gradient-to-r from-violet-600 via-indigo-600 to-indigo-700 text-white hover:from-violet-500 hover:to-indigo-600 shadow-[0_8px_24px_-8px_rgba(139,92,246,0.8)]",
-      pill: "bg-violet-950/30 border-violet-800/20 text-violet-400/80",
+      glow: "bg-gradient-to-b from-primary/15 via-primary/5 to-transparent",
+      text: "text-primary",
+      brand: "text-primary/40",
+      buttonBorder: "bg-gradient-to-r from-primary via-primary to-primary text-white hover:from-primary hover:to-primary shadow-[0_8px_24px_-8px_rgba(139,92,246,0.8)]",
+      pill: "bg-primary/30 border-primary/20 text-primary/80",
     };
   }
   return {

@@ -855,7 +855,7 @@ export function FunnelNodeConfigSheet({ node, onClose, funnelId, liveMode, analy
                       </SelectContent>
                     </Select>
                     {campaignType === 'advantage_plus' && (
-                      <p className="text-[10px] text-purple-400">
+                      <p className="text-[10px] text-primary">
                         O bloco exibirá um badge indicando Advantage+
                       </p>
                     )}
@@ -917,7 +917,7 @@ export function FunnelNodeConfigSheet({ node, onClose, funnelId, liveMode, analy
                         </SelectItem>
                         <SelectItem value="advantage">
                           <div className="flex items-center gap-2">
-                            <Sparkles className="w-3 h-3 text-purple-500" />
+                            <Sparkles className="w-3 h-3 text-primary" />
                             <span>Advantage+</span>
                           </div>
                         </SelectItem>

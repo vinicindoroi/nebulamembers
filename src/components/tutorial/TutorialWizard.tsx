@@ -76,13 +76,13 @@ const STEPS: TutorialStep[] = [
     title: "Barra lateral",
     description: "Navegue entre as seções usando o menu à esquerda.",
     icon: LayoutDashboard,
-    accentColor: "bg-blue-500/10 text-blue-400",
+    accentColor: "bg-primary/10 text-primary",
     content: (
       <div className="space-y-2">
         <FeatureRow icon={LayoutDashboard} label="Dashboard" desc="Visão geral do seu progresso e cursos" color="bg-primary/10 text-primary" />
         <FeatureRow icon={GraduationCap} label="Cursos" desc="Acesse todos os cursos disponíveis" color="bg-emerald-500/10 text-emerald-400" />
         <FeatureRow icon={Users} label="Comunidade" desc="Conecte-se com outros membros" color="bg-cyan-500/10 text-cyan-400" />
-        <FeatureRow icon={MessageSquare} label="Fórum" desc="Tire dúvidas e participe de discussões" color="bg-violet-500/10 text-violet-400" />
+        <FeatureRow icon={MessageSquare} label="Fórum" desc="Tire dúvidas e participe de discussões" color="bg-primary/10 text-primary" />
         <FeatureRow icon={Bookmark} label="Salvos" desc="Aulas e conteúdos que você salvou" color="bg-pink-500/10 text-pink-400" />
       </div>
     ),
@@ -96,7 +96,7 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-2">
         <FeatureRow icon={StickyNote} label="Notas" desc="Anote insights durante as aulas" color="bg-amber-500/10 text-amber-400" />
-        <FeatureRow icon={GitBranch} label="Funis" desc="Visualize e crie funis de venda" color="bg-blue-500/10 text-blue-400" />
+        <FeatureRow icon={GitBranch} label="Funis" desc="Visualize e crie funis de venda" color="bg-primary/10 text-primary" />
         <FeatureRow icon={Search} label="Busca rápida" desc="Use a barra de busca no topo para encontrar qualquer conteúdo" color="bg-muted text-muted-foreground" />
         <div className="mt-3 p-3 rounded-xl bg-primary/[0.06] border border-primary/20">
           <p className="text-xs text-muted-foreground">
