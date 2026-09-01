@@ -4,6 +4,19 @@ import { Search, Trash2, Edit3, Download, Plus, MoreVertical, Shield, Pause, Pla
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
+import { usePlans, isPendingPlan, PENDING_PLAN } from "@/hooks/use-plans";
+
+function PlanOptions({ includePending = true }: { includePending?: boolean }) {
+  const { plans } = usePlans();
+  return (
+    <>
+      {includePending && <option value={PENDING_PLAN}>Pendente (sem acesso)</option>}
+      {plans.map((p) => (
+        <option key={p.id} value={p.name}>{p.name}</option>
+      ))}
+    </>
+  );
+}
 
 export const Route = createFileRoute("/admin/members")({ component: Page });
 
@@ -44,7 +57,8 @@ function Page() {
 
   const filtered = rows.filter((r) => {
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
-    if (planFilter !== "all" && (r.plan ?? "Free") !== planFilter) return false;
+    if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
+    else if (planFilter !== "all" && (r.plan ?? "") !== planFilter) return false;
     if (q && !(r.full_name ?? "").toLowerCase().includes(q.toLowerCase())) return false;
     return true;
   });
@@ -106,7 +120,7 @@ function Page() {
 
   const exportCsv = () => {
     const head = "Nome,Plano,Status,Cadastro\n";
-    const body = filtered.map((r) => `"${r.full_name ?? ""}","${r.plan ?? "Free"}","${r.status}","${r.created_at}"`).join("\n");
+    const body = filtered.map((r) => `"${r.full_name ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${r.status}","${r.created_at}"`).join("\n");
     const blob = new Blob([head + body], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "membros.csv"; a.click();
@@ -134,7 +148,7 @@ function Page() {
           <option value="all">Todos status</option><option value="active">Ativo</option><option value="suspended">Suspenso</option><option value="pending">Pendente</option>
         </select>
         <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
-          <option value="all">Todos planos</option><option>Free</option><option>Pro</option><option>Premium</option>
+          <option value="all">Todos planos</option><option value="pending">Pendente (sem acesso)</option><PlanOptions includePending={false} />
         </select>
       </div>
 
@@ -158,9 +172,7 @@ function Page() {
                 style={{ colorScheme: "dark" }}
               >
                 <option value="">Alterar...</option>
-                <option value="Free">Free</option>
-                <option value="Pro">Pro</option>
-                <option value="Premium">Premium</option>
+                <PlanOptions />
               </select>
             </div>
 
@@ -247,7 +259,7 @@ function Page() {
                       <div className="font-medium group-hover:text-primary transition duration-200">{r.full_name ?? "Sem nome"}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3" onClick={() => setViewing(r)}><span className="text-xs px-2 py-1 rounded-md bg-muted/40">{r.plan ?? "Free"}</span></td>
+                  <td className="px-4 py-3" onClick={() => setViewing(r)}><span className={`text-xs px-2 py-1 rounded-md ${isPendingPlan(r.plan) ? "bg-amber-500/10 text-amber-400" : "bg-muted/40"}`}>{isPendingPlan(r.plan) ? "Pendente" : r.plan}</span></td>
                   <td className="px-4 py-3" onClick={() => setViewing(r)}>
                     <span className={`text-xs px-2 py-1 rounded-md ${r.status === "active" ? "bg-emerald-500/10 text-emerald-400" : r.status === "suspended" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>{r.status}</span>
                   </td>
@@ -280,7 +292,7 @@ function Page() {
 function EditModal({ member, onClose, onSaved }: { member: Member; onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState({ 
     full_name: member.full_name ?? "", 
-    plan: member.plan ?? "Free", 
+    plan: member.plan ?? PENDING_PLAN, 
     bio: member.bio ?? "",
     phone: member.phone ?? "",
     location: member.location ?? "",
@@ -336,7 +348,7 @@ function EditModal({ member, onClose, onSaved }: { member: Member; onClose: () =
         </Field>
         <Field label="Plano" icon={Shield}>
           <select value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })} className={selectClass} style={selectStyle}>
-            <option>Free</option><option>Pro</option><option>Premium</option>
+            <PlanOptions />
           </select>
         </Field>
         <Field label="Bio" icon={FileText}>
@@ -352,7 +364,7 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
   const [form, setForm] = useState({ 
     full_name: "", 
     email: "", 
-    plan: "Free", 
+    plan: PENDING_PLAN, 
     bio: "", 
     status: "active",
     phone: "",
@@ -503,9 +515,7 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
             className={selectClass}
             style={selectStyle}
           >
-            <option value="Free">Free</option>
-            <option value="Pro">Pro</option>
-            <option value="Premium">Premium</option>
+            <PlanOptions />
           </select>
         </Field>
 
@@ -582,7 +592,7 @@ function MemberDetailsModal({ member, onClose, onEdit }: { member: Member; onClo
             <h3 className="text-lg font-bold text-foreground truncate leading-snug">{member.full_name ?? "Sem nome"}</h3>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-muted/40 border border-border text-foreground">
-                {member.plan ?? "Free"}
+                {isPendingPlan(member.plan) ? "Pendente" : member.plan}
               </span>
               <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${
                 member.status === "active" 
