@@ -612,7 +612,7 @@ export function AppShell() {
             {hasAccess ? (
               <Outlet />
             ) : (
-              <PlanLockScreen />
+              <PlanLockScreen pending={planPending} />
             )}
           </div>
         </main>
@@ -661,7 +661,7 @@ export function AppShell() {
   );
 }
 
-function PlanLockScreen() {
+function PlanLockScreen({ pending }: { pending?: boolean }) {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 max-w-md mx-auto space-y-5 animate-fade-in relative z-10">
       <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
@@ -669,9 +669,13 @@ function PlanLockScreen() {
         <Shield className="h-8 w-8 stroke-[1.5]" />
       </div>
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Recurso Premium</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          {pending ? "Acesso pendente" : "Recurso indisponível"}
+        </h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Esta funcionalidade não está disponível no seu plano atual. Faça upgrade para continuar evoluindo na sua jornada.
+          {pending
+            ? "Sua conta ainda não tem um nível de acesso definido. Assim que um administrador liberar seu acesso, todas as áreas serão desbloqueadas."
+            : "Esta funcionalidade não está disponível no seu nível de acesso atual."}
         </p>
       </div>
       <div className="pt-2 flex flex-col gap-2 w-full">
