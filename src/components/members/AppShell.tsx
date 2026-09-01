@@ -270,7 +270,7 @@ export function AppShell() {
     <div className="min-h-screen flex">
       {/* Sidebar - single element with smooth width transition */}
       <aside
-        className={`hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-white/5 bg-background/40 backdrop-blur-2xl flex-col transition-all duration-300 ease-in-out overflow-visible ${
+        className={`hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-border bg-background flex-col transition-all duration-300 ease-in-out overflow-visible ${
           collapsed ? "w-14" : "w-72"
         }`}
       >
@@ -310,7 +310,7 @@ export function AppShell() {
                   <Link
                     to={item.to}
                     className={`relative p-2.5 rounded-xl transition-colors ${
-                      active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -382,10 +382,10 @@ export function AppShell() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setOpen(false)}
-                        className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm ${
+                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
                           active
-                            ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                            ? "bg-primary/10 text-primary border border-primary/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
                         }`}
                       >
                         {active && (
@@ -408,7 +408,7 @@ export function AppShell() {
                 <a
                   href="/admin/dashboard"
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
                 >
                   <Shield className="h-4 w-4" />
                   <span className="font-medium">Painel Admin</span>
@@ -417,7 +417,7 @@ export function AppShell() {
             )}
           </nav>
 
-          <div className="mt-4 rounded-2xl p-3 flex items-center gap-3 bg-white/[0.03] border border-white/5">
+          <div className="mt-4 rounded-2xl p-4 flex items-center gap-3 bg-card border border-border">
             <div
               role="img"
               aria-label={`Avatar de ${name}`}
@@ -445,7 +445,7 @@ export function AppShell() {
         role="dialog"
         aria-modal="true"
         aria-label="Menu de navegação"
-        className={`fixed md:hidden top-0 left-0 z-40 h-screen w-72 border-r border-white/5 bg-background/40 backdrop-blur-2xl transition-transform duration-300 ${
+        className={`fixed md:hidden top-0 left-0 z-40 h-screen w-72 border-r border-border bg-background transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -481,7 +481,7 @@ export function AppShell() {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
                     return (
-                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm ${active ? "bg-gradient-to-r from-primary/15 via-primary/5 to-transparent text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
+                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
                         {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />}
                         <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         <span className="font-medium">{item.label}</span>
@@ -501,7 +501,7 @@ export function AppShell() {
 
       <div className="flex-1 min-w-0 flex flex-col">
         {!isFunnelsPage && (
-        <header className="sticky top-0 z-20 h-16 border-b border-white/5 bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
+        <header className="sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
             <button className="md:hidden p-2 rounded-lg hover:bg-white/5" onClick={() => setOpen(true)} aria-label="Abrir menu">
               <Menu className="h-5 w-5" />
             </button>
