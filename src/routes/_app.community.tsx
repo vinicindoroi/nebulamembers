@@ -1298,7 +1298,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
           <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
             <button
               onClick={() => setIsEditing(true)}
-              className="text-muted-foreground hover:text-[#8b5cf6] p-2 rounded-xl hover:bg-[#8b5cf6]/10 transition-all duration-200 cursor-pointer"
+              className="text-muted-foreground hover:text-primary p-2 rounded-xl hover:bg-primary/10 transition-all duration-200 cursor-pointer"
               aria-label="Editar"
               title="Editar publicação"
             >
@@ -1344,7 +1344,7 @@ function PostCard({ post, userId, saved, onLike, onDelete, onSave, onEdit }: {
                 await onEdit(post.id, editContent);
                 setIsEditing(false);
               }}
-              className="px-3.5 py-1.5 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-[11px] font-semibold text-white transition-all active:scale-95 cursor-pointer shadow-md shadow-primary/15"
+              className="px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-[11px] font-semibold text-primary-foreground transition-all active:scale-95 cursor-pointer shadow-md shadow-primary/15"
             >
               Salvar
             </button>
