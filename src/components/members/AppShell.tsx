@@ -363,7 +363,7 @@ export function AppShell() {
               )}
               <div>
                 <div className="font-semibold text-sm leading-none">{siteSettings.name}</div>
-                <div className="text-[10px] text-muted-foreground mt-1.5">área exclusiva</div>
+                <div className="text-[10px] text-muted-foreground mt-1.5">Members</div>
               </div>
             </Link>
           </div>
@@ -383,7 +383,8 @@ export function AppShell() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setOpen(false)}
-                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
+                        aria-current={active ? "page" : undefined}
+                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${
                           active
                             ? "bg-primary/10 text-primary border border-primary/20"
                             : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"
@@ -462,7 +463,7 @@ export function AppShell() {
               )}
               <div>
                 <div className="font-semibold text-sm leading-none">{siteSettings.name}</div>
-                <div className="text-[10px] text-muted-foreground mt-1.5">área exclusiva</div>
+                <div className="text-[10px] text-muted-foreground mt-1.5">Members</div>
               </div>
             </Link>
             <button
@@ -482,7 +483,8 @@ export function AppShell() {
                     const active = path === item.to || path.startsWith(item.to + "/");
                     const Icon = item.icon;
                     return (
-                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
+                      <Link key={item.to} to={item.to} onClick={() => setOpen(false)} aria-current={active ? "page" : undefined}
+                        className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${active ? "bg-primary/10 text-primary border border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-card border border-transparent"}`}>
                         {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />}
                         <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         <span className="font-medium">{item.label}</span>
