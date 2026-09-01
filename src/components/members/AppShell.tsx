@@ -13,7 +13,7 @@ import { NotificationBell } from "@/components/members/NotificationBell";
 import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES } from "@/hooks/use-plans";
+import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } from "@/hooks/use-plans";
 
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
@@ -90,14 +90,14 @@ export function AppShell() {
         );
 
         if (!userPlan) {
-          // Plano não reconhecido — trata como pendente (sem acesso)
-          setPlanPending(true);
-          setUserPlanFeatures(NO_ACCESS_FEATURES);
+          // Plano definido pelo admin mas não listado na config — libera acesso total
+          setPlanPending(false);
+          setUserPlanFeatures(FULL_ACCESS_FEATURES);
           return;
         }
 
         setPlanPending(false);
-        setUserPlanFeatures(userPlan.features ?? NO_ACCESS_FEATURES);
+        setUserPlanFeatures(userPlan.features ?? FULL_ACCESS_FEATURES);
       } catch (err) {
         console.error("Error loading user plan features:", err);
         setPlanPending(true);
