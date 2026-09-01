@@ -247,17 +247,17 @@
   pointer-events: auto;
 }
 .react-flow__node.selected .funnel-node-wrapper {
-  outline: 2px solid oklch(0.65 0.22 290 / 0.6);
+  outline: 2px solid oklch(0.82 0.07 195 / 0.6);
   outline-offset: 4px;
   border-radius: 12px;
 }
 .react-flow__nodesselection-rect {
   background: transparent !important;
-  border: 1px solid oklch(0.65 0.22 290 / 0.4) !important;
+  border: 1px solid oklch(0.82 0.07 195 / 0.4) !important;
 }
 .react-flow__selection {
-  background: oklch(0.65 0.22 290 / 0.06) !important;
-  border: 1px solid oklch(0.65 0.22 290 / 0.4) !important;
+  background: oklch(0.82 0.07 195 / 0.06) !important;
+  border: 1px solid oklch(0.82 0.07 195 / 0.4) !important;
 }
 .react-flow__edge-interaction {
   stroke: transparent;
@@ -265,14 +265,14 @@
 }
 /* Multi-connect source highlight */
 .react-flow__node.multi-connect-source {
-  outline: 2px solid oklch(0.65 0.22 290) !important;
+  outline: 2px solid oklch(0.82 0.07 195) !important;
   outline-offset: 6px;
   border-radius: 12px;
   animation: multi-connect-pulse 1.5s ease-in-out infinite;
 }
 @keyframes multi-connect-pulse {
-  0%, 100% { outline-color: oklch(0.65 0.22 290 / 0.8); }
-  50% { outline-color: oklch(0.65 0.22 290 / 0.4); }
+  0%, 100% { outline-color: oklch(0.82 0.07 195 / 0.8); }
+  50% { outline-color: oklch(0.82 0.07 195 / 0.4); }
 }
 
 @keyframes wiggle {
@@ -390,7 +390,7 @@
     border-radius: var(--radius-md);
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
-  .glow-primary { box-shadow: 0 0 24px rgba(139, 92, 246, 0.35); }
+  .glow-primary { box-shadow: 0 0 24px color-mix(in oklab, var(--primary) 25%, transparent); }
   .bento-card {
     border-radius: var(--radius-2xl);
     background: var(--card);
