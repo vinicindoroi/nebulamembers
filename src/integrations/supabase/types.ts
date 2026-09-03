@@ -840,6 +840,7 @@ export type Database = {
       }
       lessons: {
         Row: {
+          access_level: string
           allow_download: boolean | null
           autoplay_next: boolean | null
           captions_url: string | null
@@ -863,6 +864,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          access_level?: string
           allow_download?: boolean | null
           autoplay_next?: boolean | null
           captions_url?: string | null
@@ -886,6 +888,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          access_level?: string
           allow_download?: boolean | null
           autoplay_next?: boolean | null
           captions_url?: string | null
@@ -934,6 +937,7 @@ export type Database = {
       }
       modules: {
         Row: {
+          access_level: string
           course_id: string
           cover_url: string | null
           created_at: string
@@ -945,6 +949,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          access_level?: string
           course_id: string
           cover_url?: string | null
           created_at?: string
@@ -956,6 +961,7 @@ export type Database = {
           title: string
         }
         Update: {
+          access_level?: string
           course_id?: string
           cover_url?: string | null
           created_at?: string
