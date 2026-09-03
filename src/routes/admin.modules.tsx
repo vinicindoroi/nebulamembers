@@ -386,11 +386,12 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint="Quem pode acessar este módulo">
-          <select value={f.is_premium ? (f.offer_id || "pro") : "free"} onChange={(e) => { const v = e.target.value; if (v === "free") { setF({ ...f, is_premium: false, offer_id: "" }); } else { setF({ ...f, is_premium: true, offer_id: v }); } }} className={inputClass}>
+          <select value={f.is_premium ? (f.offer_id || "pro") : "free"} onChange={(e) => { const v = e.target.value; if (v === "free") { setF({ ...f, is_premium: false, offer_id: "" }); } else { setF({ ...f, is_premium: true, offer_id: (v === "pro" || v === "premium") ? "" : v }); } }} className={inputClass}>
             <option value="free">Free — Todos os membros</option>
             <option value="pro">Pro</option>
-            <option value="premium">Premium</option>
+            {offers.map((o) => <option key={o.id} value={o.id}>Oferta — {o.name}</option>)}
           </select>
+
         </Field>
       </div>
     </Modal>
