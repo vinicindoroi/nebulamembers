@@ -108,6 +108,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
     cover_url: initial.cover_url ?? "", gradient_from: initial.gradient_from ?? "#6366f1", gradient_to: initial.gradient_to ?? "#8b5cf6",
     is_premium: initial.is_premium ?? false, offer_id: initial.offer_id ?? "", access_level: (initial as any).access_level ?? "free",
   });
+  const [noGradient, setNoGradient] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -121,7 +122,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     setSaving(true);
-    const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: f.access_level };
+    const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: f.access_level, gradient_from: noGradient ? null : f.gradient_from, gradient_to: noGradient ? null : f.gradient_to };
     const { error } = initial.id
       ? await supabase.from("courses").update(payload).eq("id", initial.id)
       : await supabase.from("courses").insert(payload);
