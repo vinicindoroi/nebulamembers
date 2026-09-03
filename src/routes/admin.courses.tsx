@@ -293,6 +293,8 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                   </div>
                 </div>
               </div>
+              )}
+              {!noGradient && (
               <div className="mt-3 flex gap-2 flex-wrap">
                 {[
                   ["#6366f1", "#8b5cf6"],
