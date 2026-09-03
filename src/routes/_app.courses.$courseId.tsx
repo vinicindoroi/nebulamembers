@@ -38,6 +38,7 @@ type Lesson = {
   is_free: boolean | null;
   is_premium: boolean | null;
   offer_id: string | null;
+  access_level: string | null;
   module_id: string | null;
 };
 
@@ -48,6 +49,7 @@ type Module = {
   position: number;
   is_premium: boolean | null;
   offer_id: string | null;
+  access_level: string | null;
   cover_url: string | null;
 };
 
@@ -140,7 +142,7 @@ function CourseDetail() {
   const activeModule = modules.find((m) => m.id === activeLesson?.module_id);
   const requiredLevel = Math.max(courseLevel, levelOf(activeModule?.access_level), levelOf(activeLesson?.access_level));
   const isLocked = userLevel < requiredLevel;
-  const premiumOffer = null as null | { id: string; name: string; price: number; checkout_url: string; badge_text: string | null };
+  const premiumOffer = null as null | { id: string; name: string; description: string | null; price: number; checkout_url: string; badge_text: string | null };
   void offers;
 
   // group lessons by module, plus orphans (no module_id)
