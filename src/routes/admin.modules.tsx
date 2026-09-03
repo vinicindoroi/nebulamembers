@@ -353,7 +353,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
         </>
       }
     >
-      <Field label="Título" icon={FileText} required>
+      <Field label="Título" icon={FileText} hint="Opcional se houver capa.">
         <input autoFocus value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} className={inputClass} placeholder="Ex: Fundamentos" />
       </Field>
       <Field label="Descrição" icon={FileText} hint="Opcional. Aparece como subtítulo do módulo.">
