@@ -119,7 +119,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   }, [onClose]);
 
   const save = async () => {
-    if (!f.title.trim()) return toast.error("Informe um título");
+    if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     setSaving(true);
     const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: f.access_level };
     const { error } = initial.id
@@ -162,7 +162,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
           </div>
 
           <div className="px-6 py-5 space-y-5 max-h-[min(70vh,640px)] overflow-y-auto">
-            <Field label="Título" icon={FileText} required>
+            <Field label="Título" icon={FileText}>
               <input
                 value={f.title}
                 onChange={(e) => setF({ ...f, title: e.target.value })}
