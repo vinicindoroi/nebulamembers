@@ -244,6 +244,17 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
             </Field>
 
             <Field label="Cores do degradê" icon={Palette}>
+              <button
+                type="button"
+                onClick={() => setNoGradient((v) => !v)}
+                className={`w-full mb-3 flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-sm transition ${noGradient ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-muted/20 text-muted-foreground hover:bg-muted/40"}`}
+              >
+                <span>Sem degradê (capa limpa)</span>
+                <span className={`h-5 w-9 rounded-full p-0.5 transition-colors ${noGradient ? "bg-primary" : "bg-muted"}`}>
+                  <span className={`block h-4 w-4 rounded-full bg-white shadow transition-transform ${noGradient ? "translate-x-4" : "translate-x-0"}`} />
+                </span>
+              </button>
+              {!noGradient && (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 flex-1">
                   <label className="text-[11px] text-muted-foreground whitespace-nowrap">De:</label>
