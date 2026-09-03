@@ -129,21 +129,19 @@ function CourseDetail() {
   const progress = total ? Math.round((completed / total) * 100) : 0;
   const activeLesson = lessons.find((l) => l.id === activeLessonId) ?? lessons[0];
 
-  // Access level logic: check user plan against course access_level
+  // Access level logic: free < pro < premium
   const planHierarchy: Record<string, number> = { free: 0, pro: 1, premium: 2 };
-  const userLevel = planHierarchy[userPlan] ?? 0;
+  const userLevel = planHierarchy[(userPlan ?? "free").toLowerCase()] ?? 0;
+  const levelOf = (v: string | null | undefined) => planHierarchy[(v ?? "free").toLowerCase()] ?? 0;
   const courseAccessLevel = (course.access_level ?? "free").toLowerCase();
-  const courseLevel = planHierarchy[courseAccessLevel] ?? 0;
+  const courseLevel = levelOf(courseAccessLevel);
   const accessDenied = userLevel < courseLevel;
 
-  // Premium offer logic (for individual lessons/modules with offer_id)
-  const getOffer = (offerId: string | null | undefined) => offers.find((o) => o.id === offerId);
   const activeModule = modules.find((m) => m.id === activeLesson?.module_id);
-  const modulePremium = activeModule?.is_premium && activeModule?.offer_id;
-  const lessonPremium = activeLesson?.is_premium && activeLesson?.offer_id;
-  const premiumOfferId = lessonPremium ? activeLesson.offer_id : modulePremium ? activeModule.offer_id : null;
-  const premiumOffer = premiumOfferId ? getOffer(premiumOfferId) : null;
-  const isLocked = accessDenied || !!premiumOffer;
+  const requiredLevel = Math.max(courseLevel, levelOf(activeModule?.access_level), levelOf(activeLesson?.access_level));
+  const isLocked = userLevel < requiredLevel;
+  const premiumOffer = null as null | { id: string; name: string; price: number; checkout_url: string; badge_text: string | null };
+  void offers;
 
   // group lessons by module, plus orphans (no module_id)
   const orphans = lessons.filter((l) => !l.module_id);
