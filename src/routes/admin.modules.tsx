@@ -14,8 +14,8 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 export const Route = createFileRoute("/admin/modules")({ component: Page });
 
 type Course = { id: string; title: string };
-type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; cover_url: string | null };
-type Lesson = { id: string; title: string; description: string | null; video_url: string | null; duration: number | null; position: number; module_id: string; course_id: string; is_free: boolean | null; is_premium: boolean | null; offer_id: string | null };
+type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; cover_url: string | null };
+type Lesson = { id: string; title: string; description: string | null; video_url: string | null; duration: number | null; position: number; module_id: string; course_id: string; is_free: boolean | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null };
 type Offer = { id: string; name: string };
 
 function Page() {
@@ -323,12 +323,12 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 }
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
-  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", is_premium: initial.is_premium ?? false, offer_id: initial.offer_id ?? "", cover_url: initial.cover_url ?? "" });
+  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", access_level: (initial.access_level ?? "free").toLowerCase(), cover_url: initial.cover_url ?? "" });
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim()) return toast.error("Informe um título");
     setSaving(true);
-    const payload = { title: f.title, description: f.description || null, course_id: courseId, is_premium: f.is_premium, offer_id: f.offer_id || null, cover_url: f.cover_url || null };
+    const payload = { title: f.title, description: f.description || null, course_id: courseId, access_level: f.access_level, is_premium: f.access_level !== "free", offer_id: null, cover_url: f.cover_url || null };
     const { error } = initial.id
       ? await supabase.from("modules").update(payload).eq("id", initial.id)
       : await supabase.from("modules").insert({ ...payload, position: nextPos });
@@ -386,10 +386,10 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint="Quem pode acessar este módulo">
-          <select value={f.is_premium ? (f.offer_id || "pro") : "free"} onChange={(e) => { const v = e.target.value; if (v === "free") { setF({ ...f, is_premium: false, offer_id: "" }); } else { setF({ ...f, is_premium: true, offer_id: (v === "pro" || v === "premium") ? "" : v }); } }} className={inputClass}>
+          <select value={f.access_level} onChange={(e) => setF({ ...f, access_level: e.target.value })} className={inputClass}>
             <option value="free">Free — Todos os membros</option>
-            <option value="pro">Pro</option>
-            {offers.map((o) => <option key={o.id} value={o.id}>Oferta — {o.name}</option>)}
+            <option value="pro">Pro — Membros Pro e Premium</option>
+            <option value="premium">Premium — Somente Premium</option>
           </select>
 
         </Field>
@@ -405,8 +405,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
     video_url: initial.video_url ?? "",
     duration: initial.duration ?? 0,
     is_free: initial.is_free ?? false,
-    is_premium: initial.is_premium ?? false,
-    offer_id: initial.offer_id ?? "",
+    access_level: (initial.access_level ?? "free").toLowerCase(),
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
@@ -485,8 +484,9 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       video_url: f.video_url || null,
       duration: f.duration || null,
       is_free: f.is_free,
-      is_premium: f.is_premium,
-      offer_id: f.offer_id || null,
+      access_level: f.access_level,
+      is_premium: f.access_level !== "free",
+      offer_id: null,
       module_id: f.module_id,
       course_id: courseId,
     };

@@ -271,7 +271,7 @@ function CourseDetail() {
                         <span className="text-[9px] uppercase tracking-wider text-white/80 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-border">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
-                        {mod?.is_premium && (
+                        {levelOf(mod?.access_level) > 0 && (
                           <span className="p-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-400">
                             <Lock className="h-3 w-3" />
                           </span>
@@ -327,7 +327,7 @@ function CourseDetail() {
                         </span>
                         <h3 className="text-xl font-bold text-white flex items-center gap-2 mt-2">
                           {mod?.title ?? "Aulas sem módulo"}
-                          {mod?.is_premium && <Lock className="h-4 w-4 text-amber-400" />}
+                          {levelOf(mod?.access_level) > 0 && <Lock className="h-4 w-4 text-amber-400" />}
                         </h3>
                         {mod?.description && <p className="text-sm text-muted-foreground mt-1">{mod.description}</p>}
                       </div>
@@ -361,7 +361,7 @@ function CourseDetail() {
                       {modLessons.map((l, idx) => {
                         const isDone = done.has(l.id);
                         const lMod = modules.find((m) => m.id === l.module_id);
-                        const lLocked = accessDenied || (l.is_premium && l.offer_id) || (lMod?.is_premium && lMod?.offer_id);
+                        const lLocked = userLevel < Math.max(courseLevel, levelOf(lMod?.access_level), levelOf(l.access_level));
                         return (
                           <div key={l.id} className="relative group">
                             {/* Bullet centered exactly on the vertical border line */}
@@ -535,7 +535,7 @@ function CourseDetail() {
                   {mod && (
                     <div className="px-2 pt-2 pb-1 text-xs font-medium text-foreground/80 flex items-center gap-2">
                       {mod.title}
-                      {mod.is_premium && <Lock className="h-3 w-3 text-amber-400" />}
+                      {levelOf(mod.access_level) > 0 && <Lock className="h-3 w-3 text-amber-400" />}
                     </div>
                   )}
                   <div className="space-y-0.5">
@@ -543,7 +543,7 @@ function CourseDetail() {
                       const isDone = done.has(l.id);
                       const isActive = l.id === activeLesson.id;
                       const lMod = modules.find((m) => m.id === l.module_id);
-                      const lLocked = accessDenied || (l.is_premium && l.offer_id) || (lMod?.is_premium && lMod?.offer_id);
+                      const lLocked = userLevel < Math.max(courseLevel, levelOf(lMod?.access_level), levelOf(l.access_level));
                       return (
                         <button
                           key={l.id}
