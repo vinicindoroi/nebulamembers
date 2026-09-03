@@ -158,7 +158,9 @@ function CoursesList() {
                 {c.cover_url && (
                   <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                 )}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${c.gradient_from || "#6366f1"}, ${(c.gradient_to || "#8b5cf6")}00)` }} />
+                {c.gradient_from && c.gradient_to && (
+                  <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${c.gradient_from}, ${c.gradient_to}00)` }} />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                   {c.tag && (

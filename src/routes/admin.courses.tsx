@@ -47,6 +47,7 @@ function Page() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((c) => {
+          const hasGradient = !!(c.gradient_from && c.gradient_to);
           const gFrom = c.gradient_from || "#6366f1";
           const gTo = c.gradient_to || "#8b5cf6";
           const catName = cats.find((cat) => cat.id === c.category_id)?.name;
@@ -56,7 +57,7 @@ function Page() {
                 {c.cover_url && (
                   <img src={c.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
                 )}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${gFrom}, ${gTo}00)` }} />
+                {hasGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${gFrom}, ${gTo}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                   {catName && (
@@ -108,6 +109,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
     cover_url: initial.cover_url ?? "", gradient_from: initial.gradient_from ?? "#6366f1", gradient_to: initial.gradient_to ?? "#8b5cf6",
     is_premium: initial.is_premium ?? false, offer_id: initial.offer_id ?? "", access_level: (initial as any).access_level ?? "free",
   });
+  const [noGradient, setNoGradient] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -121,7 +123,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     setSaving(true);
-    const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: f.access_level };
+    const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: f.access_level, gradient_from: noGradient ? null : f.gradient_from, gradient_to: noGradient ? null : f.gradient_to };
     const { error } = initial.id
       ? await supabase.from("courses").update(payload).eq("id", initial.id)
       : await supabase.from("courses").insert(payload);
@@ -243,6 +245,17 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
             </Field>
 
             <Field label="Cores do degradê" icon={Palette}>
+              <button
+                type="button"
+                onClick={() => setNoGradient((v) => !v)}
+                className={`w-full mb-3 flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-sm transition ${noGradient ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-muted/20 text-muted-foreground hover:bg-muted/40"}`}
+              >
+                <span>Sem degradê (capa limpa)</span>
+                <span className={`h-5 w-9 rounded-full p-0.5 transition-colors ${noGradient ? "bg-primary" : "bg-muted"}`}>
+                  <span className={`block h-4 w-4 rounded-full bg-white shadow transition-transform ${noGradient ? "translate-x-4" : "translate-x-0"}`} />
+                </span>
+              </button>
+              {!noGradient && (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 flex-1">
                   <label className="text-[11px] text-muted-foreground whitespace-nowrap">De:</label>
@@ -281,6 +294,8 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                   </div>
                 </div>
               </div>
+              )}
+              {!noGradient && (
               <div className="mt-3 flex gap-2 flex-wrap">
                 {[
                   ["#6366f1", "#8b5cf6"],
@@ -300,6 +315,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                   />
                 ))}
               </div>
+              )}
             </Field>
 
             <div>
@@ -311,7 +327,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                 {f.cover_url && (
                   <img src={f.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
                 )}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${f.gradient_from}, ${f.gradient_to}00)` }} />
+                {!noGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${f.gradient_from}, ${f.gradient_to}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
                   {f.category_id && (
