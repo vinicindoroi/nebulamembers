@@ -314,6 +314,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                   />
                 ))}
               </div>
+              )}
             </Field>
 
             <div>
