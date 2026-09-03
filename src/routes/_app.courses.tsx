@@ -163,17 +163,9 @@ function CoursesList() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  {c.tag && (
-                    <span className="text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white/90 mb-2 font-medium">{c.tag}</span>
-                  )}
                   <h3 className="text-white font-semibold text-sm leading-tight drop-shadow-lg">{c.title}</h3>
                   {c.description && <p className="text-white/70 text-[11px] mt-1 line-clamp-2 max-w-[85%]">{c.description}</p>}
                 </div>
-                {c.tag && (
-                  <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md text-[10px] uppercase tracking-wider px-2 py-1 rounded-md font-medium">
-                    {c.tag}
-                  </span>
-                )}
                 {c.progress === 100 && (
                   <span className="absolute top-3 right-3 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-[10px] uppercase tracking-wider px-2 py-1 rounded-md font-medium text-emerald-300 flex items-center gap-1">
                     <CheckCircle2 className="h-3 w-3" />Concluído

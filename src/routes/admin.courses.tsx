@@ -60,9 +60,6 @@ function Page() {
                 {hasGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${gFrom}, ${gTo}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  {catName && (
-                    <span className="text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white/90 mb-2 font-medium">{catName}</span>
-                  )}
                   <h3 className="text-white font-semibold text-base leading-tight drop-shadow-lg">{c.title}</h3>
                   {c.description && <p className="text-white/70 text-xs mt-1 line-clamp-2 max-w-[85%]">{c.description}</p>}
                 </div>
@@ -330,11 +327,6 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                 {!noGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${f.gradient_from}, ${f.gradient_to}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-                  {f.category_id && (
-                    <span className="text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white/90 mb-2 font-medium">
-                      {cats.find((c) => c.id === f.category_id)?.name ?? "Categoria"}
-                    </span>
-                  )}
                   <h3 className="text-white font-bold text-lg leading-tight drop-shadow-lg">
                     {f.title || "Título do curso"}
                   </h3>
