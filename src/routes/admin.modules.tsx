@@ -554,11 +554,11 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
 
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint="Quem pode acessar esta aula">
-          <select value={f.is_free ? "free_preview" : f.is_premium ? (f.offer_id || "pro") : "free"} onChange={(e) => { const v = e.target.value; if (v === "free") { setF({ ...f, is_free: false, is_premium: false, offer_id: "" }); } else if (v === "free_preview") { setF({ ...f, is_free: true, is_premium: false, offer_id: "" }); } else { setF({ ...f, is_free: false, is_premium: true, offer_id: (v === "pro" || v === "premium") ? "" : v }); } }} className={inputClass}>
+          <select value={f.is_free ? "free_preview" : f.access_level} onChange={(e) => { const v = e.target.value; if (v === "free_preview") { setF({ ...f, is_free: true, access_level: "free" }); } else { setF({ ...f, is_free: false, access_level: v }); } }} className={inputClass}>
             <option value="free">Free — Todos os membros</option>
             <option value="free_preview">Gratuita — Preview aberto</option>
-            <option value="pro">Pro</option>
-            {offers.map((o) => <option key={o.id} value={o.id}>Oferta — {o.name}</option>)}
+            <option value="pro">Pro — Membros Pro e Premium</option>
+            <option value="premium">Premium — Somente Premium</option>
           </select>
 
         </Field>
