@@ -47,6 +47,7 @@ function Page() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((c) => {
+          const hasGradient = !!(c.gradient_from && c.gradient_to);
           const gFrom = c.gradient_from || "#6366f1";
           const gTo = c.gradient_to || "#8b5cf6";
           const catName = cats.find((cat) => cat.id === c.category_id)?.name;
@@ -56,7 +57,7 @@ function Page() {
                 {c.cover_url && (
                   <img src={c.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
                 )}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${gFrom}, ${gTo}00)` }} />
+                {hasGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${gFrom}, ${gTo}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                   {catName && (
@@ -326,7 +327,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                 {f.cover_url && (
                   <img src={f.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
                 )}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${f.gradient_from}, ${f.gradient_to}00)` }} />
+                {!noGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${f.gradient_from}, ${f.gradient_to}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
                   {f.category_id && (
