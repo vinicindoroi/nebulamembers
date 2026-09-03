@@ -326,9 +326,9 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
   const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", access_level: (initial.access_level ?? "free").toLowerCase(), cover_url: initial.cover_url ?? "" });
   const [saving, setSaving] = useState(false);
   const save = async () => {
-    if (!f.title.trim()) return toast.error("Informe um título");
+    if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     setSaving(true);
-    const payload = { title: f.title, description: f.description || null, course_id: courseId, access_level: f.access_level, is_premium: f.access_level !== "free", offer_id: null, cover_url: f.cover_url || null };
+    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: f.access_level, is_premium: f.access_level !== "free", offer_id: null, cover_url: f.cover_url || null };
     const { error } = initial.id
       ? await supabase.from("modules").update(payload).eq("id", initial.id)
       : await supabase.from("modules").insert({ ...payload, position: nextPos });
@@ -353,7 +353,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
         </>
       }
     >
-      <Field label="Título" icon={FileText} required>
+      <Field label="Título" icon={FileText} hint="Opcional se houver capa.">
         <input autoFocus value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} className={inputClass} placeholder="Ex: Fundamentos" />
       </Field>
       <Field label="Descrição" icon={FileText} hint="Opcional. Aparece como subtítulo do módulo.">
