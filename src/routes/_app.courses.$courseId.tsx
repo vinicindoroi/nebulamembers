@@ -76,7 +76,7 @@ function CourseDetail() {
       const [c, m, l, lc, p, o, prof] = await Promise.all([
         supabase.from("courses").select("*").eq("id", courseId).eq("status", "published").single(),
         supabase.from("modules").select("*").eq("course_id", courseId).order("position"),
-        supabase.from("lessons").select("*").eq("course_id", courseId).order("position"),
+        supabase.from("lessons_public").select("*").eq("course_id", courseId).order("position"),
         (supabase as any).from("lesson_content").select("*").eq("course_id", courseId),
         supabase.from("lesson_progress").select("lesson_id").eq("user_id", user!.id),
         supabase.from("offers").select("*").eq("active", true),

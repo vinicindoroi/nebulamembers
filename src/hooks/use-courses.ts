@@ -23,7 +23,7 @@ export function useCourses() {
     queryFn: async (): Promise<CourseWithProgress[]> => {
       const [coursesRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from("courses").select("*").eq("status", "published").order("created_at"),
-        supabase.from("lessons").select("id, course_id"),
+        supabase.from("lessons_public").select("id, course_id"),
         supabase.from("lesson_progress").select("lesson_id").eq("user_id", user!.id),
       ]);
       if (coursesRes.error) throw coursesRes.error;
@@ -33,7 +33,7 @@ export function useCourses() {
       const completedSet = new Set((progressRes.data ?? []).map((p) => p.lesson_id));
       return (coursesRes.data ?? []).map((c) => {
         const lessons = (lessonsRes.data ?? []).filter((l) => l.course_id === c.id);
-        const completed = lessons.filter((l) => completedSet.has(l.id)).length;
+        const completed = lessons.filter((l) => l.id && completedSet.has(l.id)).length;
         const total = lessons.length || 1;
         return {
           id: c.id,

@@ -149,6 +149,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "comments_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
@@ -748,6 +755,13 @@ export type Database = {
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lesson_attachments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       lesson_bookmarks: {
@@ -790,6 +804,13 @@ export type Database = {
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "lesson_bookmarks_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       lesson_progress: {
@@ -827,6 +848,13 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
             referencedColumns: ["id"]
           },
         ]
@@ -869,6 +897,13 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_video_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1434,6 +1469,13 @@ export type Database = {
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_notes_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -1489,6 +1531,78 @@ export type Database = {
           poster_url?: string | null
           video_path?: string | null
           video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons_public: {
+        Row: {
+          access_level: string | null
+          allow_download: boolean | null
+          autoplay_next: boolean | null
+          chapters: Json | null
+          course_id: string | null
+          created_at: string | null
+          default_playback_rate: number | null
+          description: string | null
+          duration: number | null
+          duration_min: number | null
+          id: string | null
+          is_free: boolean | null
+          is_premium: boolean | null
+          module_id: string | null
+          position: number | null
+          title: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          allow_download?: boolean | null
+          autoplay_next?: boolean | null
+          chapters?: Json | null
+          course_id?: string | null
+          created_at?: string | null
+          default_playback_rate?: number | null
+          description?: string | null
+          duration?: number | null
+          duration_min?: number | null
+          id?: string | null
+          is_free?: boolean | null
+          is_premium?: boolean | null
+          module_id?: string | null
+          position?: number | null
+          title?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          allow_download?: boolean | null
+          autoplay_next?: boolean | null
+          chapters?: Json | null
+          course_id?: string | null
+          created_at?: string | null
+          default_playback_rate?: number | null
+          description?: string | null
+          duration?: number | null
+          duration_min?: number | null
+          id?: string | null
+          is_free?: boolean | null
+          is_premium?: boolean | null
+          module_id?: string | null
+          position?: number | null
+          title?: string | null
         }
         Relationships: [
           {
