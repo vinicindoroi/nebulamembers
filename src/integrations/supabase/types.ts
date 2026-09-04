@@ -1478,6 +1478,10 @@ export type Database = {
         }
       }
       can_access_lesson: { Args: { _lesson_id: string }; Returns: boolean }
+      can_read_lesson_content: {
+        Args: { _lesson_id: string }
+        Returns: boolean
+      }
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
       generate_tracking_token: { Args: never; Returns: string }
       has_role: {
