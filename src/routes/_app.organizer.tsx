@@ -2399,7 +2399,12 @@ function OrganizerPage() {
 
           {/* Subtasks builder */}
           <div>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-1">Subtarefas (Checklist)</span>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Subtarefas (Checklist)</span>
+              {taskSubtasks.length > 0 && (
+                <span className="text-[10px] font-semibold text-primary/80">{taskSubtasks.length} etapa(s)</span>
+              )}
+            </div>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -2417,28 +2422,33 @@ function OrganizerPage() {
               <button
                 type="button"
                 onClick={addSubtaskToAddModal}
-                className="px-3.5 py-2 rounded-lg bg-card border border-border hover:bg-muted/50 text-xs font-bold transition text-foreground"
+                disabled={!newSubtaskText.trim()}
+                className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25 disabled:opacity-35 disabled:cursor-not-allowed transition"
+                aria-label="Adicionar subtarefa"
               >
-                +
+                <Plus className="h-4 w-4" />
               </button>
             </div>
             {taskSubtasks.length > 0 && (
-              <div className="space-y-1.5 max-h-[120px] overflow-y-auto bg-black/20 p-2.5 rounded-lg border border-border stagger-enter">
+              <div className="space-y-1 max-h-[160px] overflow-y-auto rounded-xl border border-border bg-card/60 p-1.5">
                 {taskSubtasks.map((st) => (
-                  <div key={st.id} className="flex items-center justify-between gap-2 text-xs text-foreground/80">
-                    <span className="truncate">{st.text}</span>
+                  <div key={st.id} className="group flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-muted/40 transition">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+                    <span className="flex-1 truncate text-xs text-foreground/90">{st.text}</span>
                     <button
                       type="button"
                       onClick={() => removeSubtaskFromAddModal(st.id)}
-                      className="text-muted-foreground/50 hover:text-red-400 transition"
+                      className="opacity-0 group-hover:opacity-100 text-muted-foreground/60 hover:text-destructive transition"
+                      aria-label="Remover subtarefa"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
 
           <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <button
