@@ -418,7 +418,7 @@ function CommunityPage() {
         db.from("posts").select("*").order("created_at", { ascending: false }).limit(limit),
         db.from("post_likes").select("post_id, user_id"),
         db.from("comments").select("*").order("created_at", { ascending: true }),
-        db.from("profiles").select("id, full_name, avatar_url, instagram, xp"),
+        db.from("public_profiles").select("id, full_name, avatar_url, instagram, xp"),
       ]);
       if (pRes.error) throw pRes.error;
       const profs = new Map((profRes.data ?? []).map((p: any) => [p.id, p]));
@@ -1478,7 +1478,7 @@ function CommentSection({ postId, postOwnerId, comments, userId }: { postId: str
       if (error) throw error;
 
       // Notificar o autor do post
-      const { data: profile } = await db.from("profiles").select("full_name").eq("id", userId).maybeSingle();
+      const { data: profile } = await db.from("public_profiles").select("full_name").eq("id", userId).maybeSingle();
       const actorName = profile?.full_name || "Alguém";
       notifyUser({ recipientId: postOwnerId, actorId: userId, title: "Novo comentário no seu post", content: `${actorName} comentou no seu post` });
     },

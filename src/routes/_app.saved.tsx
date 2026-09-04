@@ -55,7 +55,7 @@ function SavedPage() {
       const [forumRes, communityRes, profRes] = await Promise.all([
         forumIds.length ? db.from("forum_posts").select("id, title, content, image_url, created_at, user_id").in("id", forumIds) : { data: [] },
         communityIds.length ? db.from("posts").select("id, content, image_url, created_at, user_id").in("id", communityIds) : { data: [] },
-        db.from("profiles").select("id, full_name, avatar_url, instagram"),
+        db.from("public_profiles").select("id, full_name, avatar_url, instagram"),
       ]);
 
       const profs = new Map((profRes.data ?? []).map((p: any) => [p.id, p]));

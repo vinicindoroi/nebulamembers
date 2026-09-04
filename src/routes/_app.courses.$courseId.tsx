@@ -73,21 +73,24 @@ function CourseDetail() {
     queryKey: ["course", courseId, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [c, m, l, p, o, prof] = await Promise.all([
+      const [c, m, l, lc, p, o, prof] = await Promise.all([
         supabase.from("courses").select("*").eq("id", courseId).eq("status", "published").single(),
         supabase.from("modules").select("*").eq("course_id", courseId).order("position"),
         supabase.from("lessons").select("*").eq("course_id", courseId).order("position"),
+        (supabase as any).from("lesson_content").select("*").eq("course_id", courseId),
         supabase.from("lesson_progress").select("lesson_id").eq("user_id", user!.id),
         supabase.from("offers").select("*").eq("active", true),
         (supabase as any).from("profiles").select("plan").eq("id", user!.id).maybeSingle(),
       ]);
       if (c.error) throw c.error;
       if (l.error) throw l.error;
+      const contentById = new Map<string, any>((lc.data ?? []).map((x: any) => [x.id, x]));
+      const lessons = ((l.data ?? []) as any[]).map((lesson) => ({ ...lesson, ...(contentById.get(lesson.id) ?? {}) }));
       const done = new Set((p.data ?? []).map((x) => x.lesson_id));
       return {
         course: c.data,
         modules: (m.data ?? []) as Module[],
-        lessons: (l.data ?? []) as unknown as Lesson[],
+        lessons: lessons as unknown as Lesson[],
         done,
         offers: (o.data ?? []) as Array<{ id: string; name: string; description: string | null; price: number; checkout_url: string; badge_text: string | null }>,
         userPlan: ((prof.data?.plan as string) ?? "free").toLowerCase(),

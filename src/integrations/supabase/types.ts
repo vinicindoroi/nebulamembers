@@ -138,6 +138,13 @@ export type Database = {
             foreignKeyName: "comments_lesson_id_fkey"
             columns: ["lesson_id"]
             isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
@@ -731,6 +738,13 @@ export type Database = {
             foreignKeyName: "lesson_attachments_lesson_id_fkey"
             columns: ["lesson_id"]
             isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_attachments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
@@ -762,6 +776,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lesson_bookmarks_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lesson_bookmarks_lesson_id_fkey"
             columns: ["lesson_id"]
@@ -798,6 +819,13 @@ export type Database = {
             foreignKeyName: "lesson_progress_lesson_id_fkey"
             columns: ["lesson_id"]
             isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
@@ -829,6 +857,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lesson_video_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lesson_video_progress_lesson_id_fkey"
             columns: ["lesson_id"]
@@ -1389,6 +1424,13 @@ export type Database = {
             foreignKeyName: "user_notes_lesson_id_fkey"
             columns: ["lesson_id"]
             isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_notes_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
             referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
@@ -1417,7 +1459,87 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      lesson_content: {
+        Row: {
+          captions_url: string | null
+          content: string | null
+          course_id: string | null
+          id: string | null
+          module_id: string | null
+          poster_url: string | null
+          video_path: string | null
+          video_url: string | null
+        }
+        Insert: {
+          captions_url?: string | null
+          content?: string | null
+          course_id?: string | null
+          id?: string | null
+          module_id?: string | null
+          poster_url?: string | null
+          video_path?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          captions_url?: string | null
+          content?: string | null
+          course_id?: string | null
+          id?: string | null
+          module_id?: string | null
+          poster_url?: string | null
+          video_path?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          full_name: string | null
+          id: string | null
+          instagram: string | null
+          last_seen_at: string | null
+          status: string | null
+          xp: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          full_name?: string | null
+          id?: string | null
+          instagram?: string | null
+          last_seen_at?: string | null
+          status?: string | null
+          xp?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          full_name?: string | null
+          id?: string | null
+          instagram?: string | null
+          last_seen_at?: string | null
+          status?: string | null
+          xp?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_list_profiles: {
@@ -1444,6 +1566,11 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      can_access_lesson: { Args: { _lesson_id: string }; Returns: boolean }
+      can_read_lesson_content: {
+        Args: { _lesson_id: string }
+        Returns: boolean
       }
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
       generate_tracking_token: { Args: never; Returns: string }

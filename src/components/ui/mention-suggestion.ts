@@ -8,7 +8,7 @@ export const getMentionSuggestions = () => {
     items: async ({ query }: { query: string }): Promise<MentionItem[]> => {
       // Fetch users from profiles table matching the query
       let dbQuery = supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('id, full_name, avatar_url')
         .limit(10);
       
