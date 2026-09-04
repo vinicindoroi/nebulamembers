@@ -33,7 +33,7 @@ export function useCourses() {
       const completedSet = new Set((progressRes.data ?? []).map((p) => p.lesson_id));
       return (coursesRes.data ?? []).map((c) => {
         const lessons = (lessonsRes.data ?? []).filter((l) => l.course_id === c.id);
-        const completed = lessons.filter((l) => completedSet.has(l.id)).length;
+        const completed = lessons.filter((l) => l.id && completedSet.has(l.id)).length;
         const total = lessons.length || 1;
         return {
           id: c.id,
