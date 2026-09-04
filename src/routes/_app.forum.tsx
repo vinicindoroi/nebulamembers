@@ -79,7 +79,7 @@ function ForumPage() {
         db.from("forum_post_tags").select("post_id, tag_id"),
         db.from("forum_likes").select("post_id, user_id"),
         db.from("forum_replies").select("post_id"),
-        db.from("profiles").select("id, full_name, avatar_url, xp"),
+        db.from("public_profiles").select("id, full_name, avatar_url, xp"),
       ]);
       if (pRes.error) throw pRes.error;
       const profs = new Map((profRes.data ?? []).map((p: any) => [p.id, p]));
@@ -419,7 +419,7 @@ function PostDetailModal({ post, userId, onClose, onLike }: { post: ForumPost; u
     queryFn: async (): Promise<Reply[]> => {
       const [rRes, profRes] = await Promise.all([
         db.from("forum_replies").select("*").eq("post_id", post.id).order("created_at"),
-        db.from("profiles").select("id, full_name, avatar_url, xp"),
+        db.from("public_profiles").select("id, full_name, avatar_url, xp"),
       ]);
       const profs = new Map((profRes.data ?? []).map((p: any) => [p.id, p]));
       return (rRes.data ?? []).map((r: any) => ({ ...r, author: profs.get(r.user_id) ?? null }));
