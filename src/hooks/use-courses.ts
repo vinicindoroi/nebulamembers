@@ -23,7 +23,7 @@ export function useCourses() {
     queryFn: async (): Promise<CourseWithProgress[]> => {
       const [coursesRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from("courses").select("*").eq("status", "published").order("created_at"),
-        (supabase as any).from("lessons_public").select("id, course_id"),
+        supabase.from("lessons_public").select("id, course_id"),
         supabase.from("lesson_progress").select("lesson_id").eq("user_id", user!.id),
       ]);
       if (coursesRes.error) throw coursesRes.error;
