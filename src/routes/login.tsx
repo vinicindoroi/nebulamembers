@@ -93,7 +93,17 @@ function LoginPage() {
       }
       navigate({ to: "/dashboard" });
     } catch (err: any) {
-      toast.error(err.message || "Erro ao autenticar");
+      const raw = String(err?.message || "");
+      const map: Array<[RegExp, string]> = [
+        [/known to be weak/i, "Essa senha é muito fraca ou já vazou em outros sites. Escolha uma senha diferente."],
+        [/password should be at least/i, "A senha deve ter pelo menos 6 caracteres."],
+        [/invalid login credentials/i, "E-mail ou senha incorretos."],
+        [/user already registered/i, "Este e-mail já possui conta. Faça login."],
+        [/email rate limit|over_email_send_rate/i, "Muitas tentativas. Aguarde alguns minutos e tente de novo."],
+        [/unable to validate email|invalid email/i, "E-mail inválido."],
+      ];
+      const friendly = map.find(([re]) => re.test(raw))?.[1];
+      toast.error(friendly || raw || "Erro ao autenticar");
     } finally {
       setLoading(false);
     }
