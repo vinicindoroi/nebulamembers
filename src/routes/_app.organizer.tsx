@@ -1929,6 +1929,7 @@ function OrganizerPage() {
                         key={t.id} 
                         task={t} 
                         columnColor={col.color}
+                        isDone={col.id === doneColId}
                         onMove={moveTask} 
                         onDelete={deleteTask} 
                         onDragStart={handleDragStart} 
@@ -2766,6 +2767,7 @@ function OrganizerPage() {
 interface KanbanCardProps {
   task: Task;
   columnColor?: string;
+  isDone?: boolean;
   onMove: (taskId: string, direction: "left" | "right") => void;
   onDelete: (taskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
@@ -2774,7 +2776,7 @@ interface KanbanCardProps {
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
 }
 
-function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEnd, onEdit, onToggleSubtask }: KanbanCardProps) {
+function KanbanCard({ task, columnColor, isDone, onMove, onDelete, onDragStart, onDragEnd, onEdit, onToggleSubtask }: KanbanCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const subtasks = task.subtasks || [];
   const completedSubtasks = subtasks.filter((st) => st.completed).length;
@@ -2799,7 +2801,10 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
     media: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     baixa: "bg-primary/20 text-primary border-primary/30"
   };
-  const prioData = priorityColors[task.priority as keyof typeof priorityColors] || priorityColors.media;
+  const prioData = isDone
+    ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+    : priorityColors[task.priority as keyof typeof priorityColors] || priorityColors.media;
+  const prioLabel = isDone ? "Concluído" : task.priority;
 
   return (
     <div
@@ -2818,7 +2823,7 @@ function KanbanCard({ task, columnColor, onMove, onDelete, onDragStart, onDragEn
             {task.category}
           </span>
           <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider border ${prioData}`}>
-            {task.priority}
+            {prioLabel}
           </span>
         </div>
 
