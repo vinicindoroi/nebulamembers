@@ -188,7 +188,7 @@ function CourseDetail() {
         </div>
         <div className="relative p-6">
           {course.tag && <span className="text-[10px] uppercase tracking-wider text-primary bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">{course.tag}</span>}
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 text-white drop-shadow-lg">{course.title}</h1>
+          {(course as any).title_visible !== false && <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 text-white drop-shadow-lg">{course.title}</h1>}
           {course.description && <p className="text-sm text-white/70 mt-2">{course.description}</p>}
           <div className="mt-4 flex items-center gap-3">
             <div className="flex-1 h-1.5 rounded-full bg-white/20 overflow-hidden">
