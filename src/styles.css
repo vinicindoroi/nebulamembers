@@ -37,6 +37,7 @@
 }
 
 :root {
+  color-scheme: dark;
   /* Editorial dark — monochrome + single desaturated cyan accent */
   --background: oklch(0.16 0 0);
   --foreground: oklch(0.96 0 0);
