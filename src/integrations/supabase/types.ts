@@ -249,6 +249,7 @@ export type Database = {
           status: string
           tag: string | null
           title: string
+          title_visible: boolean
         }
         Insert: {
           access_level?: string
@@ -265,6 +266,7 @@ export type Database = {
           status?: string
           tag?: string | null
           title: string
+          title_visible?: boolean
         }
         Update: {
           access_level?: string
@@ -281,6 +283,7 @@ export type Database = {
           status?: string
           tag?: string | null
           title?: string
+          title_visible?: boolean
         }
         Relationships: [
           {
