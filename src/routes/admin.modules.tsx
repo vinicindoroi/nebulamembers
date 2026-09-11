@@ -117,7 +117,7 @@ function Page() {
               style={selectStyle}
             >
               {courses.length === 0 && <option value="">Nenhum curso</option>}
-              {courses.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+              {courses.map((c, i) => <option key={c.id} value={c.id}>{c.title?.trim() || `Curso sem título ${i + 1}`}</option>)}
             </select>
           </div>
         </div>
