@@ -107,7 +107,9 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
     is_premium: initial.is_premium ?? false, offer_id: initial.offer_id ?? "", access_level: (initial as any).access_level ?? "free",
     title_visible: (initial as any).title_visible ?? true,
   });
-  const [noGradient, setNoGradient] = useState(false);
+  const [noGradient, setNoGradient] = useState(
+    initial.id ? !(initial.gradient_from && initial.gradient_to) : false,
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
