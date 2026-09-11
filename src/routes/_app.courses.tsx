@@ -163,7 +163,7 @@ function CoursesList() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  <h3 className="text-white font-semibold text-sm leading-tight drop-shadow-lg">{c.title}</h3>
+                  {(c as any).title_visible !== false && <h3 className="text-white font-semibold text-sm leading-tight drop-shadow-lg">{c.title}</h3>}
                   {c.description && <p className="text-white/70 text-[11px] mt-1 line-clamp-2 max-w-[85%]">{c.description}</p>}
                 </div>
                 {c.progress === 100 && (

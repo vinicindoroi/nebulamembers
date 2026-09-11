@@ -1,0 +1,1 @@
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS title_visible boolean NOT NULL DEFAULT true;

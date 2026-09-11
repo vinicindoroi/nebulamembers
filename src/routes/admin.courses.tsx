@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/admin/courses")({ component: Page });
 
-type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null };
+type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; title_visible: boolean | null };
 type Cat = { id: string; name: string };
 type Offer = { id: string; name: string };
 
@@ -60,7 +60,7 @@ function Page() {
                 {hasGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${gFrom}, ${gTo}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  <h3 className="text-white font-semibold text-base leading-tight drop-shadow-lg">{c.title}</h3>
+                  {c.title_visible !== false && <h3 className="text-white font-semibold text-base leading-tight drop-shadow-lg">{c.title}</h3>}
                   {c.description && <p className="text-white/70 text-xs mt-1 line-clamp-2 max-w-[85%]">{c.description}</p>}
                 </div>
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
@@ -105,6 +105,7 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
     status: initial.status ?? "draft", price: Number(initial.price ?? 0), category_id: initial.category_id ?? "",
     cover_url: initial.cover_url ?? "", gradient_from: initial.gradient_from ?? "#6366f1", gradient_to: initial.gradient_to ?? "#8b5cf6",
     is_premium: initial.is_premium ?? false, offer_id: initial.offer_id ?? "", access_level: (initial as any).access_level ?? "free",
+    title_visible: (initial as any).title_visible ?? true,
   });
   const [noGradient, setNoGradient] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -315,6 +316,22 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
               )}
             </Field>
 
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3 cursor-pointer select-none">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <Eye className="h-3.5 w-3.5" />
+                Mostrar título sobre a capa
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={f.title_visible}
+                onClick={() => setF({ ...f, title_visible: !f.title_visible })}
+                className={`relative h-5 w-9 rounded-full transition-colors ${f.title_visible ? "bg-primary" : "bg-muted"}`}
+              >
+                <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${f.title_visible ? "translate-x-4" : "translate-x-0.5"}`} />
+              </button>
+            </label>
+
             <div>
               <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
                 <Eye className="h-3.5 w-3.5" />
@@ -327,9 +344,11 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
                 {!noGradient && <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${f.gradient_from}, ${f.gradient_to}00)` }} />}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                  {f.title_visible && (
                   <h3 className="text-white font-bold text-lg leading-tight drop-shadow-lg">
                     {f.title || "Título do curso"}
                   </h3>
+                  )}
                   {f.description && (
                     <p className="text-white/70 text-sm mt-1.5 line-clamp-2 max-w-[80%]">{f.description}</p>
                   )}
