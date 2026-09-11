@@ -10,6 +10,7 @@ export type CourseWithProgress = {
   cover_url: string | null;
   gradient_from: string | null;
   gradient_to: string | null;
+  title_visible: boolean;
   totalLessons: number;
   completedLessons: number;
   progress: number;
