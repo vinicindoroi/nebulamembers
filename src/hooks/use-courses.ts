@@ -10,6 +10,7 @@ export type CourseWithProgress = {
   cover_url: string | null;
   gradient_from: string | null;
   gradient_to: string | null;
+  title_visible: boolean;
   totalLessons: number;
   completedLessons: number;
   progress: number;
@@ -43,6 +44,7 @@ export function useCourses() {
           cover_url: c.cover_url ?? null,
           gradient_from: c.gradient_from ?? null,
           gradient_to: c.gradient_to ?? null,
+          title_visible: (c as any).title_visible !== false,
           totalLessons: lessons.length,
           completedLessons: completed,
           progress: Math.round((completed / total) * 100),
