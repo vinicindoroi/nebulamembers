@@ -530,15 +530,9 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
         </Field>
 
         <Field label="Plano" icon={Shield}>
-          <select
-            value={form.plan}
-            onChange={(e) => setForm({ ...form, plan: e.target.value })}
-            className={selectClass}
-            style={selectStyle}
-          >
-            <PlanOptions />
-          </select>
+          <PlanSelect value={form.plan} onChange={(v) => setForm({ ...form, plan: v })} />
         </Field>
+
 
         <Field label="Status" icon={Activity}>
           <select
