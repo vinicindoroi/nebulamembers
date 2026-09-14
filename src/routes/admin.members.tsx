@@ -369,10 +369,9 @@ function EditModal({ member, onClose, onSaved }: { member: Member; onClose: () =
           <input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" className={inputClass} />
         </Field>
         <Field label="Plano" icon={Shield}>
-          <select value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })} className={selectClass} style={selectStyle}>
-            <PlanOptions />
-          </select>
+          <PlanSelect value={form.plan} onChange={(v) => setForm({ ...form, plan: v })} />
         </Field>
+
         <Field label="Bio" icon={FileText}>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className={inputClass} />
         </Field>
