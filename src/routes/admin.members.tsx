@@ -18,6 +18,28 @@ function PlanOptions({ includePending = true }: { includePending?: boolean }) {
   );
 }
 
+function PlanSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { plans, loading } = usePlans();
+  const names = plans.map((p) => p.name);
+  const orphan = value && !isPendingPlan(value) && !names.includes(value) ? value : null;
+  return (
+    <select
+      key={`plan-${plans.length}-${loading ? "l" : "r"}-${orphan ?? ""}`}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={selectClass}
+      style={selectStyle}
+    >
+      <option value={PENDING_PLAN}>Pendente (sem acesso)</option>
+      {orphan && <option value={orphan}>{orphan}</option>}
+      {plans.map((p) => (
+        <option key={p.id} value={p.name}>{p.name}</option>
+      ))}
+    </select>
+  );
+}
+
+
 export const Route = createFileRoute("/admin/members")({ component: Page });
 
 type Member = { 
@@ -347,10 +369,9 @@ function EditModal({ member, onClose, onSaved }: { member: Member; onClose: () =
           <input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" className={inputClass} />
         </Field>
         <Field label="Plano" icon={Shield}>
-          <select value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })} className={selectClass} style={selectStyle}>
-            <PlanOptions />
-          </select>
+          <PlanSelect value={form.plan} onChange={(v) => setForm({ ...form, plan: v })} />
         </Field>
+
         <Field label="Bio" icon={FileText}>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className={inputClass} />
         </Field>
@@ -509,15 +530,9 @@ function AddMemberModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
         </Field>
 
         <Field label="Plano" icon={Shield}>
-          <select
-            value={form.plan}
-            onChange={(e) => setForm({ ...form, plan: e.target.value })}
-            className={selectClass}
-            style={selectStyle}
-          >
-            <PlanOptions />
-          </select>
+          <PlanSelect value={form.plan} onChange={(v) => setForm({ ...form, plan: v })} />
         </Field>
+
 
         <Field label="Status" icon={Activity}>
           <select
