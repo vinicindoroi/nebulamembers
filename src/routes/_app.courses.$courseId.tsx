@@ -136,7 +136,12 @@ function CourseDetail() {
 
   // Access level logic: free < pro < premium
   const planHierarchy: Record<string, number> = { free: 0, pro: 1, premium: 2 };
-  const userLevel = planHierarchy[(userPlan ?? "free").toLowerCase()] ?? 0;
+  const normalizedUserPlan = (userPlan ?? "free").trim().toLowerCase();
+  const isPendingUserPlan = normalizedUserPlan === "" || normalizedUserPlan === "pending" || normalizedUserPlan === "pendente";
+  // Planos personalizados (ex.: "Individual") têm acesso total; apenas "pending" fica sem acesso.
+  const userLevel = isPendingUserPlan
+    ? 0
+    : (planHierarchy[normalizedUserPlan] ?? 2);
   const levelOf = (v: string | null | undefined) => planHierarchy[(v ?? "free").toLowerCase()] ?? 0;
   const courseAccessLevel = (course.access_level ?? "free").toLowerCase();
   const courseLevel = levelOf(courseAccessLevel);
