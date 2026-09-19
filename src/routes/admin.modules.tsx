@@ -347,6 +347,7 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
   const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", access_level: (initial.access_level ?? "free").toLowerCase(), cover_url: initial.cover_url ?? "" });
+  const accessOptions = useAccessOptions(f.access_level);
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
