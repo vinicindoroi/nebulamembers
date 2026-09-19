@@ -10,6 +10,29 @@ import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 import { uploadAttachment, removeAttachment } from "@/lib/storage";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { usePlans } from "@/hooks/use-plans";
+
+/** Opções de acesso: níveis padrão + planos personalizados criados no admin. */
+function useAccessOptions(current?: string | null) {
+  const { plans } = usePlans();
+  return useMemo(() => {
+    const opts = [
+      { value: "free", label: "Free — Todos os membros" },
+      { value: "pro", label: "Pro — Membros Pro e Premium" },
+      { value: "premium", label: "Premium — Somente Premium" },
+    ];
+    for (const p of plans) {
+      const slug = (p.slug || "").toLowerCase();
+      if (!slug || ["free", "pro", "premium", "pending", "pendente"].includes(slug)) continue;
+      if (!opts.some((o) => o.value === slug)) opts.push({ value: slug, label: `${p.name} — Plano personalizado` });
+    }
+    const cur = (current ?? "").toLowerCase();
+    if (cur && !["free_preview", ""].includes(cur) && !opts.some((o) => o.value === cur)) {
+      opts.push({ value: cur, label: `${cur} — Plano personalizado` });
+    }
+    return opts;
+  }, [plans, current]);
+}
 
 export const Route = createFileRoute("/admin/modules")({ component: Page });
 
@@ -324,6 +347,7 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
   const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", access_level: (initial.access_level ?? "free").toLowerCase(), cover_url: initial.cover_url ?? "" });
+  const accessOptions = useAccessOptions(f.access_level);
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
@@ -387,9 +411,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint="Quem pode acessar este módulo">
           <select value={f.access_level} onChange={(e) => setF({ ...f, access_level: e.target.value })} className={inputClass}>
-            <option value="free">Free — Todos os membros</option>
-            <option value="pro">Pro — Membros Pro e Premium</option>
-            <option value="premium">Premium — Somente Premium</option>
+            {accessOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
 
         </Field>
@@ -409,6 +431,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
+  const accessOptions = useAccessOptions(f.access_level);
 
   // Attachments state
   type Attachment = { id: string; file_name: string; file_path: string; file_size: number; mime_type: string | null };
@@ -555,10 +578,8 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint="Quem pode acessar esta aula">
           <select value={f.is_free ? "free_preview" : f.access_level} onChange={(e) => { const v = e.target.value; if (v === "free_preview") { setF({ ...f, is_free: true, access_level: "free" }); } else { setF({ ...f, is_free: false, access_level: v }); } }} className={inputClass}>
-            <option value="free">Free — Todos os membros</option>
             <option value="free_preview">Gratuita — Preview aberto</option>
-            <option value="pro">Pro — Membros Pro e Premium</option>
-            <option value="premium">Premium — Somente Premium</option>
+            {accessOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
 
         </Field>
