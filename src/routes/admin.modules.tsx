@@ -431,6 +431,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
+  const accessOptions = useAccessOptions(f.access_level);
 
   // Attachments state
   type Attachment = { id: string; file_name: string; file_path: string; file_size: number; mime_type: string | null };
