@@ -10,6 +10,29 @@ import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 import { uploadAttachment, removeAttachment } from "@/lib/storage";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { usePlans } from "@/hooks/use-plans";
+
+/** Opções de acesso: níveis padrão + planos personalizados criados no admin. */
+function useAccessOptions(current?: string | null) {
+  const { plans } = usePlans();
+  return useMemo(() => {
+    const opts = [
+      { value: "free", label: "Free — Todos os membros" },
+      { value: "pro", label: "Pro — Membros Pro e Premium" },
+      { value: "premium", label: "Premium — Somente Premium" },
+    ];
+    for (const p of plans) {
+      const slug = (p.slug || "").toLowerCase();
+      if (!slug || ["free", "pro", "premium", "pending", "pendente"].includes(slug)) continue;
+      if (!opts.some((o) => o.value === slug)) opts.push({ value: slug, label: `${p.name} — Plano personalizado` });
+    }
+    const cur = (current ?? "").toLowerCase();
+    if (cur && !["free_preview", ""].includes(cur) && !opts.some((o) => o.value === cur)) {
+      opts.push({ value: cur, label: `${cur} — Plano personalizado` });
+    }
+    return opts;
+  }, [plans, current]);
+}
 
 export const Route = createFileRoute("/admin/modules")({ component: Page });
 
