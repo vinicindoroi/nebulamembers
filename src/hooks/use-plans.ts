@@ -15,6 +15,8 @@ export type PlanOption = {
   id: string;
   name: string;
   slug: string;
+  /** Hierarquia: níveis maiores herdam acesso dos menores. */
+  level?: number;
   features?: PlanFeatureFlags;
 };
 
