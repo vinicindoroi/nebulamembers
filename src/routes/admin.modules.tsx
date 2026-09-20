@@ -539,14 +539,17 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       }
     }
 
+    if (!f.is_free && f.access_levels.length === 0) { setSaving(false); return toast.error("Selecione ao menos um plano com acesso"); }
+    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)), 0);
     const payload: any = {
       title: f.title,
       description: f.description || null,
       video_url: f.video_url || null,
       duration: f.duration || null,
       is_free: f.is_free,
-      access_level: f.access_level,
-      is_premium: f.access_level !== "free",
+      access_level: "free",
+      access_levels: f.access_levels,
+      is_premium: !f.is_free && minLevel > 0,
       offer_id: null,
       module_id: f.module_id,
       course_id: courseId,
