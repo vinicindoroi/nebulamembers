@@ -31,6 +31,23 @@ function usePlanChecklist() {
   }, [plans]);
 }
 
+/** Expande a hierarquia antiga (access_level) para a lista de planos, esperando os planos carregarem. */
+function useAccessLevelsState(initial: { access_levels?: string[] | null; access_level?: string | null }) {
+  const planOptions = usePlanChecklist();
+  const { loading } = usePlans();
+  const [selected, setSelected] = useState<string[] | null>(
+    initial.access_levels && initial.access_levels.length > 0
+      ? initial.access_levels.map((s) => (s ?? "").trim().toLowerCase()).filter(Boolean)
+      : null
+  );
+  useEffect(() => {
+    if (selected === null && !loading) {
+      setSelected(initialSelectedPlans(planOptions, null, initial.access_level));
+    }
+  }, [selected, loading, planOptions, initial.access_level]);
+  return { planOptions, selected: selected ?? [], loading: selected === null, setSelected };
+}
+
 /** Nível de um slug dentro da checklist (fallback hierárquico). */
 function checklistLevel(options: Array<{ slug: string; level: number }>, slug: string) {
   return options.find((o) => o.slug === slug)?.level ?? ({ free: 0, pro: 1, premium: 2 } as Record<string, number>)[slug] ?? 0;
@@ -61,8 +78,7 @@ function PlanMultiSelect({ options, selected, onChange, disabled }: { options: A
               active ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"
             }`}
           >
-            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
-              {active && <X className="h-3 w-3 rotate-45 hidden" />}
+            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center text-[11px] font-bold ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
               {active && "✓"}
             </span>
             <span className="truncate">{o.name}</span>
@@ -385,15 +401,15 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 }
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
-  const planOptions = usePlanChecklist();
-  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "", access_levels: initialSelectedPlans(planOptions, initial.access_levels, initial.access_level) });
+  const { planOptions, selected: selectedPlans, loading: plansLoading, setSelected: setSelectedPlans } = useAccessLevelsState(initial);
+  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "" });
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
-    if (f.access_levels.length === 0) return toast.error("Selecione ao menos um plano com acesso");
+    if (selectedPlans.length === 0) return toast.error("Selecione ao menos um plano com acesso");
     setSaving(true);
-    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)));
-    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: f.access_levels, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null };
+    const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)));
+    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null };
     const { error } = initial.id
       ? await supabase.from("modules").update(payload).eq("id", initial.id)
       : await supabase.from("modules").insert({ ...payload, position: nextPos });
@@ -451,7 +467,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint="Marque um ou mais planos que podem acessar este módulo.">
-          <PlanMultiSelect options={planOptions} selected={f.access_levels} onChange={(next) => setF({ ...f, access_levels: next })} />
+          <PlanMultiSelect options={planOptions} selected={selectedPlans} onChange={setSelectedPlans} disabled={plansLoading} />
         </Field>
       </div>
     </Modal>
@@ -459,14 +475,13 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
 }
 
 function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, onClose, onSaved }: { initial: Partial<Lesson>; moduleId: string; courseId: string; nextPos: number; offers: Offer[]; modules: Module[]; onClose: () => void; onSaved: (savedModuleId?: string) => void }) {
-  const planOptions = usePlanChecklist();
+  const { planOptions, selected: selectedPlans, loading: plansLoading, setSelected: setSelectedPlans } = useAccessLevelsState(initial);
   const [f, setF] = useState({
     title: initial.title ?? "",
     description: initial.description ?? "",
     video_url: initial.video_url ?? "",
     duration: initial.duration ?? 0,
     is_free: initial.is_free ?? false,
-    access_levels: initialSelectedPlans(planOptions, initial.access_levels, initial.access_level),
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
@@ -539,8 +554,8 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       }
     }
 
-    if (!f.is_free && f.access_levels.length === 0) { setSaving(false); return toast.error("Selecione ao menos um plano com acesso"); }
-    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)), 0);
+    if (!f.is_free && selectedPlans.length === 0) { setSaving(false); return toast.error("Selecione ao menos um plano com acesso"); }
+    const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)), 0);
     const payload: any = {
       title: f.title,
       description: f.description || null,
@@ -548,7 +563,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       duration: f.duration || null,
       is_free: f.is_free,
       access_level: "free",
-      access_levels: f.access_levels,
+      access_levels: selectedPlans,
       is_premium: !f.is_free && minLevel > 0,
       offer_id: null,
       module_id: f.module_id,
@@ -618,7 +633,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
 
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint={f.is_free ? "Aula gratuita: aberta para todos." : "Marque um ou mais planos que podem acessar esta aula."}>
-          <PlanMultiSelect options={planOptions} selected={f.access_levels} onChange={(next) => setF({ ...f, access_levels: next })} disabled={f.is_free} />
+          <PlanMultiSelect options={planOptions} selected={selectedPlans} onChange={setSelectedPlans} disabled={f.is_free || plansLoading} />
         </Field>
       </div>
 
