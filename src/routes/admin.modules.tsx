@@ -385,13 +385,15 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 }
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
-  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", access_level: (initial.access_level ?? "free").toLowerCase(), cover_url: initial.cover_url ?? "" });
-  const accessOptions = useAccessOptions(f.access_level);
+  const planOptions = usePlanChecklist();
+  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "", access_levels: initialSelectedPlans(planOptions, initial.access_levels, initial.access_level) });
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
+    if (f.access_levels.length === 0) return toast.error("Selecione ao menos um plano com acesso");
     setSaving(true);
-    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: f.access_level, is_premium: f.access_level !== "free", offer_id: null, cover_url: f.cover_url || null };
+    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)));
+    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: f.access_levels, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null };
     const { error } = initial.id
       ? await supabase.from("modules").update(payload).eq("id", initial.id)
       : await supabase.from("modules").insert({ ...payload, position: nextPos });
