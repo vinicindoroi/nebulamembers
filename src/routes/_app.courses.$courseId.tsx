@@ -40,6 +40,7 @@ type Lesson = {
   is_premium: boolean | null;
   offer_id: string | null;
   access_level: string | null;
+  access_levels: string[] | null;
   module_id: string | null;
 };
 
@@ -51,6 +52,7 @@ type Module = {
   is_premium: boolean | null;
   offer_id: string | null;
   access_level: string | null;
+  access_levels: string[] | null;
   cover_url: string | null;
 };
 
@@ -151,13 +153,25 @@ function CourseDetail() {
     ? -1
     : (planHierarchy[normalizedUserPlan] ?? 3);
   const levelOf = (v: string | null | undefined) => planHierarchy[(v ?? "free").trim().toLowerCase()] ?? 0;
+  // Se o conteúdo tem uma lista de planos (access_levels), o plano do usuário precisa estar nela.
+  // Caso contrário, vale a hierarquia do access_level (nível maior herda os menores).
+  const allowedBy = (levels: string[] | null | undefined, single: string | null | undefined) =>
+    levels && levels.length > 0
+      ? levels.some((s) => (s ?? "").trim().toLowerCase() === normalizedUserPlan)
+      : userLevel >= levelOf(single);
+  // Item é "restrito" (mostra cadeado) quando nem todos os planos têm acesso.
+  const totalPlans = Object.keys(planHierarchy).length;
+  const isRestricted = (levels: string[] | null | undefined, single: string | null | undefined) =>
+    levels && levels.length > 0 ? levels.length < totalPlans : levelOf(single) > 0;
   const courseAccessLevel = (course.access_level ?? "free").toLowerCase();
   const courseLevel = levelOf(courseAccessLevel);
   const accessDenied = userLevel < courseLevel;
 
   const activeModule = modules.find((m) => m.id === activeLesson?.module_id);
-  const requiredLevel = Math.max(courseLevel, levelOf(activeModule?.access_level), levelOf(activeLesson?.access_level));
-  const isLocked = userLevel < requiredLevel;
+  const isLocked =
+    userLevel < courseLevel ||
+    !allowedBy(activeModule?.access_levels, activeModule?.access_level) ||
+    !allowedBy(activeLesson?.access_levels, activeLesson?.access_level);
   const premiumOffer = null as null | { id: string; name: string; description: string | null; price: number; checkout_url: string; badge_text: string | null };
   void offers;
 
@@ -289,7 +303,7 @@ function CourseDetail() {
                         <span className="text-[9px] uppercase tracking-wider text-white/80 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-border">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
-                        {levelOf(mod?.access_level) > 0 && (
+                        {isRestricted(mod?.access_levels, mod?.access_level) && (
                           <span className="p-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-400">
                             <Lock className="h-3 w-3" />
                           </span>
@@ -345,7 +359,7 @@ function CourseDetail() {
                         </span>
                         <h3 className="text-xl font-bold text-white flex items-center gap-2 mt-2">
                           {mod?.title ?? "Aulas sem módulo"}
-                          {levelOf(mod?.access_level) > 0 && <Lock className="h-4 w-4 text-amber-400" />}
+                          {isRestricted(mod?.access_levels, mod?.access_level) && <Lock className="h-4 w-4 text-amber-400" />}
                         </h3>
                         {mod?.description && <p className="text-sm text-muted-foreground mt-1">{mod.description}</p>}
                       </div>
@@ -379,7 +393,10 @@ function CourseDetail() {
                       {modLessons.map((l, idx) => {
                         const isDone = done.has(l.id);
                         const lMod = modules.find((m) => m.id === l.module_id);
-                        const lLocked = userLevel < Math.max(courseLevel, levelOf(lMod?.access_level), levelOf(l.access_level));
+                        const lLocked =
+                          userLevel < courseLevel ||
+                          !allowedBy(lMod?.access_levels, lMod?.access_level) ||
+                          !allowedBy(l.access_levels, l.access_level);
                         return (
                           <div key={l.id} className="relative group">
                             {/* Bullet centered exactly on the vertical border line */}
@@ -553,7 +570,7 @@ function CourseDetail() {
                   {mod && (
                     <div className="px-2 pt-2 pb-1 text-xs font-medium text-foreground/80 flex items-center gap-2">
                       {mod.title}
-                      {levelOf(mod.access_level) > 0 && <Lock className="h-3 w-3 text-amber-400" />}
+                      {isRestricted(mod.access_levels, mod.access_level) && <Lock className="h-3 w-3 text-amber-400" />}
                     </div>
                   )}
                   <div className="space-y-0.5">
@@ -561,7 +578,10 @@ function CourseDetail() {
                       const isDone = done.has(l.id);
                       const isActive = l.id === activeLesson.id;
                       const lMod = modules.find((m) => m.id === l.module_id);
-                      const lLocked = userLevel < Math.max(courseLevel, levelOf(lMod?.access_level), levelOf(l.access_level));
+                      const lLocked =
+                        userLevel < courseLevel ||
+                        !allowedBy(lMod?.access_levels, lMod?.access_level) ||
+                        !allowedBy(l.access_levels, l.access_level);
                       return (
                         <button
                           key={l.id}
