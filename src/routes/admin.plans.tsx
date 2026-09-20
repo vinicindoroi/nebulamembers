@@ -421,6 +421,7 @@ function PlanModal({ initial, onClose, onSaved }: {
     slug: initial.slug ?? "",
     price: initial.price ?? 0,
     billing_period: initial.billing_period ?? "mensal",
+    level: initial.level ?? 0,
     is_active: initial.is_active ?? true,
     features: { ...DEFAULT_FEATURES, ...(initial.features ?? {}) },
   });
@@ -490,7 +491,10 @@ function PlanModal({ initial, onClose, onSaved }: {
         </Field>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <Field label="Nível de acesso" icon={Layers} hint="Maior herda os menores. Ex: Individual 3 > Nebula 2 > Pro 1 > Free 0">
+          <input type="number" min="0" step="1" value={f.level} onChange={(e) => setF({ ...f, level: Number(e.target.value) })} className={inputClass} />
+        </Field>
         <Field label="Preço (R$)" icon={Crown}>
           <input type="number" step="0.01" min="0" value={f.price} onChange={(e) => setF({ ...f, price: Number(e.target.value) })} className={inputClass} />
         </Field>
