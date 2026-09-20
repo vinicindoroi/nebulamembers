@@ -450,11 +450,8 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       )}
       
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-        <Field label="Acesso" icon={Crown} hint="Quem pode acessar este módulo">
-          <select value={f.access_level} onChange={(e) => setF({ ...f, access_level: e.target.value })} className={inputClass}>
-            {accessOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-
+        <Field label="Acesso" icon={Crown} hint="Marque um ou mais planos que podem acessar este módulo.">
+          <PlanMultiSelect options={planOptions} selected={f.access_levels} onChange={(next) => setF({ ...f, access_levels: next })} />
         </Field>
       </div>
     </Modal>
@@ -462,17 +459,17 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
 }
 
 function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, onClose, onSaved }: { initial: Partial<Lesson>; moduleId: string; courseId: string; nextPos: number; offers: Offer[]; modules: Module[]; onClose: () => void; onSaved: (savedModuleId?: string) => void }) {
+  const planOptions = usePlanChecklist();
   const [f, setF] = useState({
     title: initial.title ?? "",
     description: initial.description ?? "",
     video_url: initial.video_url ?? "",
     duration: initial.duration ?? 0,
     is_free: initial.is_free ?? false,
-    access_level: (initial.access_level ?? "free").toLowerCase(),
+    access_levels: initialSelectedPlans(planOptions, initial.access_levels, initial.access_level),
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
-  const accessOptions = useAccessOptions(f.access_level);
 
   // Attachments state
   type Attachment = { id: string; file_name: string; file_path: string; file_size: number; mime_type: string | null };
