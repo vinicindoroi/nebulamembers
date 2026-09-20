@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Play, ArrowLeft, Lock, Download, Paperclip, Clock, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { usePlans } from "@/hooks/use-plans";
 import { toast } from "sonner";
 import { useAddXp } from "@/hooks/use-xp";
 import { NebulaPlayer, type Chapter } from "@/components/player/NebulaPlayer";
@@ -65,6 +66,7 @@ const premiumGradients = [
 function CourseDetail() {
   const { courseId } = Route.useParams();
   const { user } = useAuth();
+  const { plans } = usePlans();
   const qc = useQueryClient();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
