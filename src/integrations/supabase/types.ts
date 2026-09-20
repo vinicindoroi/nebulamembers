@@ -914,6 +914,7 @@ export type Database = {
       lessons: {
         Row: {
           access_level: string
+          access_levels: string[] | null
           allow_download: boolean | null
           autoplay_next: boolean | null
           captions_url: string | null
@@ -938,6 +939,7 @@ export type Database = {
         }
         Insert: {
           access_level?: string
+          access_levels?: string[] | null
           allow_download?: boolean | null
           autoplay_next?: boolean | null
           captions_url?: string | null
@@ -962,6 +964,7 @@ export type Database = {
         }
         Update: {
           access_level?: string
+          access_levels?: string[] | null
           allow_download?: boolean | null
           autoplay_next?: boolean | null
           captions_url?: string | null
@@ -1011,6 +1014,7 @@ export type Database = {
       modules: {
         Row: {
           access_level: string
+          access_levels: string[] | null
           course_id: string
           cover_url: string | null
           created_at: string
@@ -1023,6 +1027,7 @@ export type Database = {
         }
         Insert: {
           access_level?: string
+          access_levels?: string[] | null
           course_id: string
           cover_url?: string | null
           created_at?: string
@@ -1035,6 +1040,7 @@ export type Database = {
         }
         Update: {
           access_level?: string
+          access_levels?: string[] | null
           course_id?: string
           cover_url?: string | null
           created_at?: string
@@ -1555,6 +1561,7 @@ export type Database = {
       lessons_public: {
         Row: {
           access_level: string | null
+          access_levels: string[] | null
           allow_download: boolean | null
           autoplay_next: boolean | null
           chapters: Json | null
@@ -1573,6 +1580,7 @@ export type Database = {
         }
         Insert: {
           access_level?: string | null
+          access_levels?: string[] | null
           allow_download?: boolean | null
           autoplay_next?: boolean | null
           chapters?: Json | null
@@ -1591,6 +1599,7 @@ export type Database = {
         }
         Update: {
           access_level?: string | null
+          access_levels?: string[] | null
           allow_download?: boolean | null
           autoplay_next?: boolean | null
           chapters?: Json | null

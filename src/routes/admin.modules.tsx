@@ -12,33 +12,72 @@ import { uploadAttachment, removeAttachment } from "@/lib/storage";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { usePlans } from "@/hooks/use-plans";
 
-/** Opções de acesso: níveis padrão + planos personalizados criados no admin. */
-function useAccessOptions(current?: string | null) {
+/** Lista de planos para seleção múltipla: planos do admin + padrões, ordenados por nível. */
+function usePlanChecklist() {
   const { plans } = usePlans();
   return useMemo(() => {
-    const opts = [
-      { value: "free", label: "Free — Todos os membros" },
-      { value: "pro", label: "Pro — Membros Pro e Premium" },
-      { value: "premium", label: "Premium — Somente Premium" },
-    ];
+    const list: Array<{ slug: string; name: string; level: number }> = [];
     for (const p of plans) {
-      const slug = (p.slug || "").toLowerCase();
-      if (!slug || ["free", "pro", "premium", "pending", "pendente"].includes(slug)) continue;
-      if (!opts.some((o) => o.value === slug)) opts.push({ value: slug, label: `${p.name} — Plano personalizado` });
+      const slug = (p.slug || "").trim().toLowerCase();
+      if (!slug || slug === "pending" || slug === "pendente") continue;
+      if (!list.some((x) => x.slug === slug)) {
+        list.push({ slug, name: p.name || slug, level: typeof p.level === "number" ? p.level : 0 });
+      }
     }
-    const cur = (current ?? "").toLowerCase();
-    if (cur && !["free_preview", ""].includes(cur) && !opts.some((o) => o.value === cur)) {
-      opts.push({ value: cur, label: `${cur} — Plano personalizado` });
+    for (const d of [{ slug: "free", name: "Free", level: 0 }, { slug: "pro", name: "Pro", level: 1 }, { slug: "premium", name: "Premium", level: 2 }]) {
+      if (!list.some((x) => x.slug === d.slug)) list.push(d);
     }
-    return opts;
-  }, [plans, current]);
+    return list.sort((a, b) => a.level - b.level);
+  }, [plans]);
+}
+
+/** Nível de um slug dentro da checklist (fallback hierárquico). */
+function checklistLevel(options: Array<{ slug: string; level: number }>, slug: string) {
+  return options.find((o) => o.slug === slug)?.level ?? ({ free: 0, pro: 1, premium: 2 } as Record<string, number>)[slug] ?? 0;
+}
+
+/** Seleção inicial: respeita access_levels salvo; senão expande a hierarquia do access_level antigo. */
+function initialSelectedPlans(options: Array<{ slug: string; level: number }>, accessLevels: string[] | null | undefined, accessLevel: string | null | undefined) {
+  if (accessLevels && accessLevels.length > 0) return accessLevels.map((s) => (s ?? "").trim().toLowerCase()).filter(Boolean);
+  const min = checklistLevel(options, (accessLevel ?? "free").trim().toLowerCase());
+  return options.filter((o) => o.level >= min).map((o) => o.slug);
+}
+
+function PlanMultiSelect({ options, selected, onChange, disabled }: { options: Array<{ slug: string; name: string }>; selected: string[]; onChange: (next: string[]) => void; disabled?: boolean }) {
+  const toggle = (slug: string) => {
+    if (disabled) return;
+    onChange(selected.includes(slug) ? selected.filter((s) => s !== slug) : [...selected, slug]);
+  };
+  return (
+    <div className={`grid grid-cols-2 gap-2 ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
+      {options.map((o) => {
+        const active = selected.includes(o.slug);
+        return (
+          <button
+            key={o.slug}
+            type="button"
+            onClick={() => toggle(o.slug)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-left transition ${
+              active ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"
+            }`}
+          >
+            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
+              {active && <X className="h-3 w-3 rotate-45 hidden" />}
+              {active && "✓"}
+            </span>
+            <span className="truncate">{o.name}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 export const Route = createFileRoute("/admin/modules")({ component: Page });
 
 type Course = { id: string; title: string };
-type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; cover_url: string | null };
-type Lesson = { id: string; title: string; description: string | null; video_url: string | null; duration: number | null; position: number; module_id: string; course_id: string; is_free: boolean | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null };
+type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; cover_url: string | null };
+type Lesson = { id: string; title: string; description: string | null; video_url: string | null; duration: number | null; position: number; module_id: string; course_id: string; is_free: boolean | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null };
 type Offer = { id: string; name: string };
 
 function Page() {
@@ -346,13 +385,15 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 }
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
-  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", access_level: (initial.access_level ?? "free").toLowerCase(), cover_url: initial.cover_url ?? "" });
-  const accessOptions = useAccessOptions(f.access_level);
+  const planOptions = usePlanChecklist();
+  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "", access_levels: initialSelectedPlans(planOptions, initial.access_levels, initial.access_level) });
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
+    if (f.access_levels.length === 0) return toast.error("Selecione ao menos um plano com acesso");
     setSaving(true);
-    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: f.access_level, is_premium: f.access_level !== "free", offer_id: null, cover_url: f.cover_url || null };
+    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)));
+    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: f.access_levels, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null };
     const { error } = initial.id
       ? await supabase.from("modules").update(payload).eq("id", initial.id)
       : await supabase.from("modules").insert({ ...payload, position: nextPos });
@@ -409,11 +450,8 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       )}
       
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-        <Field label="Acesso" icon={Crown} hint="Quem pode acessar este módulo">
-          <select value={f.access_level} onChange={(e) => setF({ ...f, access_level: e.target.value })} className={inputClass}>
-            {accessOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-
+        <Field label="Acesso" icon={Crown} hint="Marque um ou mais planos que podem acessar este módulo.">
+          <PlanMultiSelect options={planOptions} selected={f.access_levels} onChange={(next) => setF({ ...f, access_levels: next })} />
         </Field>
       </div>
     </Modal>
@@ -421,17 +459,17 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
 }
 
 function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, onClose, onSaved }: { initial: Partial<Lesson>; moduleId: string; courseId: string; nextPos: number; offers: Offer[]; modules: Module[]; onClose: () => void; onSaved: (savedModuleId?: string) => void }) {
+  const planOptions = usePlanChecklist();
   const [f, setF] = useState({
     title: initial.title ?? "",
     description: initial.description ?? "",
     video_url: initial.video_url ?? "",
     duration: initial.duration ?? 0,
     is_free: initial.is_free ?? false,
-    access_level: (initial.access_level ?? "free").toLowerCase(),
+    access_levels: initialSelectedPlans(planOptions, initial.access_levels, initial.access_level),
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
-  const accessOptions = useAccessOptions(f.access_level);
 
   // Attachments state
   type Attachment = { id: string; file_name: string; file_path: string; file_size: number; mime_type: string | null };
@@ -501,14 +539,17 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       }
     }
 
+    if (!f.is_free && f.access_levels.length === 0) { setSaving(false); return toast.error("Selecione ao menos um plano com acesso"); }
+    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)), 0);
     const payload: any = {
       title: f.title,
       description: f.description || null,
       video_url: f.video_url || null,
       duration: f.duration || null,
       is_free: f.is_free,
-      access_level: f.access_level,
-      is_premium: f.access_level !== "free",
+      access_level: "free",
+      access_levels: f.access_levels,
+      is_premium: !f.is_free && minLevel > 0,
       offer_id: null,
       module_id: f.module_id,
       course_id: courseId,
@@ -576,12 +617,8 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       </div>
 
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-        <Field label="Acesso" icon={Crown} hint="Quem pode acessar esta aula">
-          <select value={f.is_free ? "free_preview" : f.access_level} onChange={(e) => { const v = e.target.value; if (v === "free_preview") { setF({ ...f, is_free: true, access_level: "free" }); } else { setF({ ...f, is_free: false, access_level: v }); } }} className={inputClass}>
-            <option value="free_preview">Gratuita — Preview aberto</option>
-            {accessOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-
+        <Field label="Acesso" icon={Crown} hint={f.is_free ? "Aula gratuita: aberta para todos." : "Marque um ou mais planos que podem acessar esta aula."}>
+          <PlanMultiSelect options={planOptions} selected={f.access_levels} onChange={(next) => setF({ ...f, access_levels: next })} disabled={f.is_free} />
         </Field>
       </div>
 
