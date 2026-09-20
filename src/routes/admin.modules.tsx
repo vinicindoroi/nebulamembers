@@ -78,8 +78,7 @@ function PlanMultiSelect({ options, selected, onChange, disabled }: { options: A
               active ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"
             }`}
           >
-            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
-              {active && <X className="h-3 w-3 rotate-45 hidden" />}
+            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center text-[11px] font-bold ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
               {active && "✓"}
             </span>
             <span className="truncate">{o.name}</span>
