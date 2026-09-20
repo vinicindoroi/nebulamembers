@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Play, ArrowLeft, Lock, Download, Paperclip, Clock, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { usePlans } from "@/hooks/use-plans";
 import { toast } from "sonner";
 import { useAddXp } from "@/hooks/use-xp";
 import { NebulaPlayer, type Chapter } from "@/components/player/NebulaPlayer";
@@ -65,6 +66,7 @@ const premiumGradients = [
 function CourseDetail() {
   const { courseId } = Route.useParams();
   const { user } = useAuth();
+  const { plans } = usePlans();
   const qc = useQueryClient();
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
@@ -134,15 +136,21 @@ function CourseDetail() {
   const progress = total ? Math.round((completed / total) * 100) : 0;
   const activeLesson = lessons.find((l) => l.id === activeLessonId) ?? lessons[0];
 
-  // Access level logic: free < pro < premium
+  // Hierarquia dinâmica: nível de cada plano vem de plans_config (admin > Planos).
+  // Planos de nível maior herdam o acesso de todos os níveis menores.
   const planHierarchy: Record<string, number> = { free: 0, pro: 1, premium: 2 };
+  for (const p of plans) {
+    const slug = (p.slug ?? "").trim().toLowerCase();
+    if (!slug) continue;
+    planHierarchy[slug] = typeof p.level === "number" ? p.level : 2;
+  }
   const normalizedUserPlan = (userPlan ?? "free").trim().toLowerCase();
   const isPendingUserPlan = normalizedUserPlan === "" || normalizedUserPlan === "pending" || normalizedUserPlan === "pendente";
-  // Planos personalizados (ex.: "Individual") têm acesso total; apenas "pending" fica sem acesso.
+  // Planos personalizados sem nível configurado (ex.: "Individual") têm acesso alto; apenas "pending" fica sem acesso.
   const userLevel = isPendingUserPlan
-    ? 0
-    : (planHierarchy[normalizedUserPlan] ?? 2);
-  const levelOf = (v: string | null | undefined) => planHierarchy[(v ?? "free").toLowerCase()] ?? 0;
+    ? -1
+    : (planHierarchy[normalizedUserPlan] ?? 3);
+  const levelOf = (v: string | null | undefined) => planHierarchy[(v ?? "free").trim().toLowerCase()] ?? 0;
   const courseAccessLevel = (course.access_level ?? "free").toLowerCase();
   const courseLevel = levelOf(courseAccessLevel);
   const accessDenied = userLevel < courseLevel;
