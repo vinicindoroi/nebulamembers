@@ -31,6 +31,23 @@ function usePlanChecklist() {
   }, [plans]);
 }
 
+/** Expande a hierarquia antiga (access_level) para a lista de planos, esperando os planos carregarem. */
+function useAccessLevelsState(initial: { access_levels?: string[] | null; access_level?: string | null }) {
+  const planOptions = usePlanChecklist();
+  const { loading } = usePlans();
+  const [selected, setSelected] = useState<string[] | null>(
+    initial.access_levels && initial.access_levels.length > 0
+      ? initial.access_levels.map((s) => (s ?? "").trim().toLowerCase()).filter(Boolean)
+      : null
+  );
+  useEffect(() => {
+    if (selected === null && !loading) {
+      setSelected(initialSelectedPlans(planOptions, null, initial.access_level));
+    }
+  }, [selected, loading, planOptions, initial.access_level]);
+  return { planOptions, selected: selected ?? [], loading: selected === null, setSelected };
+}
+
 /** Nível de um slug dentro da checklist (fallback hierárquico). */
 function checklistLevel(options: Array<{ slug: string; level: number }>, slug: string) {
   return options.find((o) => o.slug === slug)?.level ?? ({ free: 0, pro: 1, premium: 2 } as Record<string, number>)[slug] ?? 0;
