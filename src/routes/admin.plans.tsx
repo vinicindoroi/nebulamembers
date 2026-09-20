@@ -16,6 +16,8 @@ type Plan = {
   slug: string;
   price: number;
   billing_period: string;
+  /** Hierarquia de acesso: níveis maiores herdam tudo dos menores. */
+  level?: number;
   features: PlanFeatures;
   is_active: boolean;
   created_at: string;
