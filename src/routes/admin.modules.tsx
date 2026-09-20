@@ -555,8 +555,8 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       }
     }
 
-    if (!f.is_free && f.access_levels.length === 0) { setSaving(false); return toast.error("Selecione ao menos um plano com acesso"); }
-    const minLevel = Math.min(...f.access_levels.map((s) => checklistLevel(planOptions, s)), 0);
+    if (!f.is_free && selectedPlans.length === 0) { setSaving(false); return toast.error("Selecione ao menos um plano com acesso"); }
+    const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)), 0);
     const payload: any = {
       title: f.title,
       description: f.description || null,
@@ -564,7 +564,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       duration: f.duration || null,
       is_free: f.is_free,
       access_level: "free",
-      access_levels: f.access_levels,
+      access_levels: selectedPlans,
       is_premium: !f.is_free && minLevel > 0,
       offer_id: null,
       module_id: f.module_id,
@@ -634,7 +634,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
 
       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
         <Field label="Acesso" icon={Crown} hint={f.is_free ? "Aula gratuita: aberta para todos." : "Marque um ou mais planos que podem acessar esta aula."}>
-          <PlanMultiSelect options={planOptions} selected={f.access_levels} onChange={(next) => setF({ ...f, access_levels: next })} disabled={f.is_free} />
+          <PlanMultiSelect options={planOptions} selected={selectedPlans} onChange={setSelectedPlans} disabled={f.is_free || plansLoading} />
         </Field>
       </div>
 
