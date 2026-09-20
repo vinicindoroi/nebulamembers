@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Plus, Edit3, Trash2, Package, Crown, Zap, Users, BookOpen,
-  Layers, GitFork, MessageSquare, BarChart3, Shield, Check, Trello, StickyNote
+  Layers, GitFork, MessageSquare, Check, Trello, StickyNote
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -23,21 +23,10 @@ type Plan = {
   created_at: string;
 };
 
+// Apenas features que o app realmente aplica (bloqueio de abas no AppShell).
 type PlanFeatures = {
-  max_courses: number;
-  max_modules: number;
-  max_posts_per_day: number;
-  max_members: number;
-  course_categories: string[];
-  funnel_types: string[];
-  community_access: boolean;
-  comments_access: boolean;
-  notifications_custom: boolean;
-  priority_support: boolean;
-  custom_domain: boolean;
-  analytics_access: boolean;
-  api_access: boolean;
   courses_access: boolean;
+  community_access: boolean;
   forum_access: boolean;
   organizer_access: boolean;
   notes_access: boolean;
@@ -45,49 +34,21 @@ type PlanFeatures = {
 };
 
 const DEFAULT_FEATURES: PlanFeatures = {
-  max_courses: 1,
-  max_modules: 5,
-  max_posts_per_day: 3,
-  max_members: 50,
-  course_categories: [],
-  funnel_types: [],
-  community_access: false,
-  comments_access: true,
-  notifications_custom: false,
-  priority_support: false,
-  custom_domain: false,
-  analytics_access: false,
-  api_access: false,
   courses_access: true,
+  community_access: true,
   forum_access: true,
   organizer_access: true,
   notes_access: true,
   funnels_access: false,
 };
 
-const ALL_CATEGORIES = [
-  "marketing", "copywriting", "trafego", "design",
-  "desenvolvimento", "negocios", "financas", "ia",
-];
-
-const ALL_FUNNEL_TYPES = [
-  "vsl", "webinar", "lancamento", "evergreen",
-  "tripwire", "high_ticket", "lead_magnet",
-];
-
-const FEATURE_LABELS: Record<string, { label: string; icon: typeof Zap }> = {
+const FEATURE_LABELS: Record<keyof PlanFeatures, { label: string; icon: typeof Zap }> = {
   courses_access: { label: "Acesso a Cursos (LMS)", icon: BookOpen },
   community_access: { label: "Acesso a Comunidade", icon: Users },
   forum_access: { label: "Acesso ao Fórum", icon: MessageSquare },
   organizer_access: { label: "Acesso ao Organizador (Trello)", icon: Trello },
   notes_access: { label: "Acesso a Notas (Tiptap)", icon: StickyNote },
   funnels_access: { label: "Acesso a Funis (Builder)", icon: GitFork },
-  comments_access: { label: "Comentários no LMS", icon: MessageSquare },
-  notifications_custom: { label: "Notificações customizadas", icon: Zap },
-  priority_support: { label: "Suporte prioritário", icon: Shield },
-  custom_domain: { label: "Domínio customizado", icon: Crown },
-  analytics_access: { label: "Analytics avançado", icon: BarChart3 },
-  api_access: { label: "Acesso à API", icon: Zap },
 };
 
 const DEFAULT_PLANS: Plan[] = [
@@ -97,28 +58,10 @@ const DEFAULT_PLANS: Plan[] = [
     slug: "free",
     price: 0,
     billing_period: "",
+    level: 0,
     is_active: true,
     created_at: new Date().toISOString(),
-    features: {
-      max_courses: 2,
-      max_modules: 5,
-      max_posts_per_day: 3,
-      max_members: 50,
-      course_categories: [],
-      funnel_types: [],
-      community_access: true,
-      comments_access: true,
-      notifications_custom: false,
-      priority_support: false,
-      custom_domain: false,
-      analytics_access: false,
-      api_access: false,
-      courses_access: true,
-      forum_access: true,
-      organizer_access: true,
-      notes_access: true,
-      funnels_access: false,
-    },
+    features: { ...DEFAULT_FEATURES },
   },
   {
     id: "plan-pro",
@@ -126,28 +69,10 @@ const DEFAULT_PLANS: Plan[] = [
     slug: "pro",
     price: 97,
     billing_period: "mensal",
+    level: 1,
     is_active: true,
     created_at: new Date().toISOString(),
-    features: {
-      max_courses: 10,
-      max_modules: 50,
-      max_posts_per_day: 20,
-      max_members: 500,
-      course_categories: ["marketing", "copywriting", "trafego", "design"],
-      funnel_types: ["vsl", "webinar", "lead_magnet"],
-      community_access: true,
-      comments_access: true,
-      notifications_custom: true,
-      priority_support: false,
-      custom_domain: false,
-      analytics_access: true,
-      api_access: false,
-      courses_access: true,
-      forum_access: true,
-      organizer_access: true,
-      notes_access: true,
-      funnels_access: true,
-    },
+    features: { ...DEFAULT_FEATURES, funnels_access: true },
   },
   {
     id: "plan-premium",
@@ -155,32 +80,14 @@ const DEFAULT_PLANS: Plan[] = [
     slug: "premium",
     price: 197,
     billing_period: "mensal",
+    level: 2,
     is_active: true,
     created_at: new Date().toISOString(),
-    features: {
-      max_courses: 999,
-      max_modules: 999,
-      max_posts_per_day: 999,
-      max_members: 9999,
-      course_categories: ["marketing", "copywriting", "trafego", "design", "desenvolvimento", "negocios", "financas", "ia"],
-      funnel_types: ["vsl", "webinar", "lancamento", "evergreen", "tripwire", "high_ticket", "lead_magnet"],
-      community_access: true,
-      comments_access: true,
-      notifications_custom: true,
-      priority_support: true,
-      custom_domain: true,
-      analytics_access: true,
-      api_access: true,
-      courses_access: true,
-      forum_access: true,
-      organizer_access: true,
-      notes_access: true,
-      funnels_access: true,
-    },
+    features: { ...DEFAULT_FEATURES, funnels_access: true },
   },
 ];
 
-// We store plans in app_settings as a JSON array since there's no plans table
+// Planos ficam em app_settings como array JSON (não há tabela de planos)
 const PLANS_KEY = "plans_config";
 
 async function loadPlans(): Promise<Plan[]> {
@@ -190,7 +97,6 @@ async function loadPlans(): Promise<Plan[]> {
     .eq("key", PLANS_KEY)
     .maybeSingle();
   if (error && error.code !== "PGRST116") {
-    // If table doesn't exist, try localStorage fallback
     const local = localStorage.getItem(PLANS_KEY);
     return local ? JSON.parse(local) : DEFAULT_PLANS;
   }
@@ -199,12 +105,10 @@ async function loadPlans(): Promise<Plan[]> {
 }
 
 async function savePlans(plans: Plan[]) {
-  // Try saving to app_settings
   const { error } = await (supabase
     .from("app_settings" as any) as any)
     .upsert({ key: PLANS_KEY, value: plans, updated_at: new Date().toISOString() }, { onConflict: "key" });
   if (error) {
-    // Fallback to localStorage
     localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
   }
 }
@@ -272,7 +176,7 @@ function Page() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Planos</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Gerencie planos de acesso, features e limites por nível.
+            Gerencie planos, nível de acesso e as áreas liberadas em cada um.
           </p>
         </div>
         <button
@@ -287,10 +191,12 @@ function Page() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {plans.map((p) => {
           const theme = getTheme(p.slug);
+          const activeFeatures = Object.entries(FEATURE_LABELS)
+            .filter(([key]) => p.features?.[key as keyof PlanFeatures]);
           return (
             <div
               key={p.id}
-              className="group relative rounded-2xl overflow-hidden border border-border bg-card backdrop-blur p-6 flex flex-col h-full min-h-[520px] transition-all duration-300 hover:scale-[1.02] hover:border-border"
+              className="group relative rounded-2xl overflow-hidden border border-border bg-card backdrop-blur p-6 flex flex-col h-full min-h-[420px] transition-all duration-300 hover:scale-[1.02] hover:border-border"
               style={{
                 boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
               }}
@@ -323,7 +229,7 @@ function Page() {
                 </span>
               </div>
 
-              {/* Price & Primary limits */}
+              {/* Price */}
               <div className="text-center my-6 flex flex-col items-center">
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-5xl font-black text-white tracking-tight">
@@ -333,48 +239,22 @@ function Page() {
                     <span className="text-xs text-white/40 font-medium">/{p.billing_period}</span>
                   )}
                 </div>
-                {p.price === 0 && <span className="text-xs text-white/40 font-semibold mt-1">acesso vitalício</span>}
-                <span className={`text-[10px] font-bold mt-3 ${theme.pill} px-3 py-1 rounded-full inline-block`}>
-                  {p.features.max_courses === 999 || p.features.max_courses > 100 ? "Cursos ilimitados" : `${p.features.max_courses} cursos liberados`}
-                </span>
+                {p.price === 0 && <span className="text-xs text-white/40 font-semibold mt-1">sem cobrança</span>}
               </div>
 
               <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent my-4" />
 
-              {/* Bullet list of features */}
+              {/* Áreas liberadas (reais) */}
               <ul className="space-y-3 px-1 mb-6">
-                <PlanCheckItem color={theme.text}>
-                  {p.features.max_courses === 999 || p.features.max_courses > 100 ? "Cursos ilimitados" : `${p.features.max_courses} cursos de faturamento`}
-                </PlanCheckItem>
-                <PlanCheckItem color={theme.text}>
-                  {p.features.max_modules === 999 || p.features.max_modules > 100 ? "Módulos ilimitados" : `${p.features.max_modules} módulos inclusos`}
-                </PlanCheckItem>
-                <PlanCheckItem color={theme.text}>
-                  {p.features.max_members === 9999 || p.features.max_members > 5000 ? "Membros ilimitados" : `${p.features.max_members} membros permitidos`}
-                </PlanCheckItem>
-                <PlanCheckItem color={theme.text}>
-                  {p.features.max_posts_per_day === 999 ? "Posts diários ilimitados" : `${p.features.max_posts_per_day} posts diários no fórum`}
-                </PlanCheckItem>
-                
-                {/* Dynamic boolean features */}
-                {p.features.funnels_access && (
-                  <PlanCheckItem color={theme.text}>Visual Funnel Builder</PlanCheckItem>
-                )}
-                {p.features.organizer_access && (
-                  <PlanCheckItem color={theme.text}>Organizador Trello (Kanban)</PlanCheckItem>
-                )}
-                {p.features.notes_access && (
-                  <PlanCheckItem color={theme.text}>Notas Tiptap com IA Híbrida</PlanCheckItem>
-                )}
-                {p.features.custom_domain && (
-                  <PlanCheckItem color={theme.text}>Domínio customizado do aluno</PlanCheckItem>
-                )}
-                {p.features.api_access && (
-                  <PlanCheckItem color={theme.text}>Acesso completo à API do Hub</PlanCheckItem>
+                {activeFeatures.map(([key, { label }]) => (
+                  <PlanCheckItem key={key} color={theme.text}>{label}</PlanCheckItem>
+                ))}
+                {activeFeatures.length === 0 && (
+                  <PlanCheckItem color={theme.text}>Nenhuma área liberada</PlanCheckItem>
                 )}
               </ul>
 
-              {/* Edit CTA button resembling public cards but as a manage button */}
+              {/* Edit CTA */}
               <button
                 onClick={() => setEditing(p)}
                 className={`w-full py-3 px-4 rounded-xl text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-auto border ${theme.buttonBorder}`}
@@ -389,7 +269,7 @@ function Page() {
             <Package className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <div className="text-sm font-medium">Nenhum plano configurado</div>
             <div className="text-xs text-muted-foreground mt-1">
-              Crie planos para controlar acesso a cursos, categorias e features.
+              Crie planos para controlar o acesso às áreas da plataforma.
             </div>
           </div>
         )}
@@ -439,20 +319,6 @@ function PlanModal({ initial, onClose, onSaved }: {
     setF({ ...f, features: { ...f.features, [key]: !f.features[key] } });
   };
 
-  const toggleCategory = (cat: string) => {
-    const cats = f.features.course_categories.includes(cat)
-      ? f.features.course_categories.filter(c => c !== cat)
-      : [...f.features.course_categories, cat];
-    setF({ ...f, features: { ...f.features, course_categories: cats } });
-  };
-
-  const toggleFunnel = (type: string) => {
-    const types = f.features.funnel_types.includes(type)
-      ? f.features.funnel_types.filter(t => t !== type)
-      : [...f.features.funnel_types, type];
-    setF({ ...f, features: { ...f.features, funnel_types: types } });
-  };
-
   const save = () => {
     if (!f.name.trim()) return toast.error("Informe o nome do plano");
     if (!f.slug.trim()) return toast.error("Informe o slug");
@@ -467,7 +333,7 @@ function PlanModal({ initial, onClose, onSaved }: {
       onClose={onClose}
       title={initial.id ? "Editar plano" : "Novo plano"}
       kicker={initial.id ? "Editar" : "Criar"}
-      description="Configure acesso, limites e features deste plano."
+      description="Configure o nível de acesso e as áreas liberadas deste plano."
       size="xl"
       footer={
         <>
@@ -512,28 +378,9 @@ function PlanModal({ initial, onClose, onSaved }: {
         </Field>
       </div>
 
-      {/* Limits */}
+      {/* Áreas da plataforma (as únicas features reais hoje) */}
       <div className="pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Limites</div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <Field label="Cursos" icon={BookOpen}>
-            <input type="number" min="0" value={f.features.max_courses} onChange={(e) => setF({ ...f, features: { ...f.features, max_courses: Number(e.target.value) } })} className={inputClass} />
-          </Field>
-          <Field label="Módulos" icon={Layers}>
-            <input type="number" min="0" value={f.features.max_modules} onChange={(e) => setF({ ...f, features: { ...f.features, max_modules: Number(e.target.value) } })} className={inputClass} />
-          </Field>
-          <Field label="Posts/dia" icon={MessageSquare}>
-            <input type="number" min="0" value={f.features.max_posts_per_day} onChange={(e) => setF({ ...f, features: { ...f.features, max_posts_per_day: Number(e.target.value) } })} className={inputClass} />
-          </Field>
-          <Field label="Membros" icon={Users}>
-            <input type="number" min="0" value={f.features.max_members} onChange={(e) => setF({ ...f, features: { ...f.features, max_members: Number(e.target.value) } })} className={inputClass} />
-          </Field>
-        </div>
-      </div>
-
-      {/* Boolean features */}
-      <div className="pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Features</div>
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Áreas liberadas</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {Object.entries(FEATURE_LABELS).map(([key, { label, icon: Icon }]) => (
             <label key={key} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-card border border-border hover:border-border cursor-pointer transition">
@@ -546,50 +393,6 @@ function PlanModal({ initial, onClose, onSaved }: {
               <Icon className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-sm">{label}</span>
             </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Course categories */}
-      <div className="pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Categorias de curso permitidas</div>
-        <div className="flex flex-wrap gap-2">
-          {ALL_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => toggleCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
-                f.features.course_categories.includes(cat)
-                  ? "bg-primary/15 border-primary/30 text-primary"
-                  : "bg-card border-border text-muted-foreground hover:border-white/20"
-              }`}
-            >
-              {f.features.course_categories.includes(cat) && <Check className="h-3 w-3 inline mr-1" />}
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Funnel types */}
-      <div className="pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Tipos de funil permitidos</div>
-        <div className="flex flex-wrap gap-2">
-          {ALL_FUNNEL_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => toggleFunnel(type)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
-                f.features.funnel_types.includes(type)
-                  ? "bg-primary/15 border-primary/30 text-primary"
-                  : "bg-card border-border text-muted-foreground hover:border-white/20"
-              }`}
-            >
-              {f.features.funnel_types.includes(type) && <Check className="h-3 w-3 inline mr-1" />}
-              {type}
-            </button>
           ))}
         </div>
       </div>
