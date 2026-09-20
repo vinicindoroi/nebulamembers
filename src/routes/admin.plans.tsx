@@ -318,6 +318,9 @@ function Page() {
               <div className="text-center mt-6">
                 <span className={`text-[9px] font-extrabold uppercase tracking-[0.25em] ${theme.brand}`}>NEBULA.HUB</span>
                 <h3 className="text-2xl font-black text-white tracking-tight mt-1">{p.name}</h3>
+                <span className={`text-[10px] font-bold mt-2 ${theme.pill} px-2.5 py-0.5 rounded-full inline-block`}>
+                  Nível {p.level ?? 0} · herda os níveis abaixo
+                </span>
               </div>
 
               {/* Price & Primary limits */}
