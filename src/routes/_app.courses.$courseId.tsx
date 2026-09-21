@@ -141,12 +141,18 @@ function CourseDetail() {
   // Hierarquia dinâmica: nível de cada plano vem de plans_config (admin > Planos).
   // Planos de nível maior herdam o acesso de todos os níveis menores.
   const planHierarchy: Record<string, number> = { free: 0, pro: 1, premium: 2 };
+  const nameToSlug: Record<string, string> = {};
   for (const p of plans) {
     const slug = (p.slug ?? "").trim().toLowerCase();
     if (!slug) continue;
     planHierarchy[slug] = typeof p.level === "number" ? p.level : 2;
+    nameToSlug[slug] = slug;
+    const name = ((p as any).name ?? "").trim().toLowerCase();
+    if (name) nameToSlug[name] = slug;
   }
-  const normalizedUserPlan = (userPlan ?? "free").trim().toLowerCase();
+  const rawUserPlan = (userPlan ?? "free").trim().toLowerCase();
+  // O perfil pode guardar o NOME do plano ("Nebula Members") enquanto o conteúdo guarda o slug ("nebula-members").
+  const normalizedUserPlan = nameToSlug[rawUserPlan] ?? rawUserPlan;
   const isPendingUserPlan = normalizedUserPlan === "" || normalizedUserPlan === "pending" || normalizedUserPlan === "pendente";
   // Planos personalizados sem nível configurado (ex.: "Individual") têm acesso alto; apenas "pending" fica sem acesso.
   const userLevel = isPendingUserPlan
