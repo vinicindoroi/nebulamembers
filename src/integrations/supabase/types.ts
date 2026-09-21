@@ -1708,6 +1708,7 @@ export type Database = {
         Returns: boolean
       }
       plan_level: { Args: { _plan: string }; Returns: number }
+      plan_slug: { Args: { _plan: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "member"
