@@ -92,7 +92,7 @@ function PlanMultiSelect({ options, selected, onChange, disabled }: { options: A
 export const Route = createFileRoute("/admin/modules")({ component: Page });
 
 type Course = { id: string; title: string };
-type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; cover_url: string | null; title_visible: boolean | null };
+type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; cover_url: string | null; title_visible?: boolean | null };
 type Lesson = { id: string; title: string; description: string | null; video_url: string | null; duration: number | null; position: number; module_id: string; course_id: string; is_free: boolean | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null };
 type Offer = { id: string; name: string };
 
@@ -409,7 +409,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
     if (selectedPlans.length === 0) return toast.error("Selecione ao menos um plano com acesso");
     setSaving(true);
     const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)));
-    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null, title_visible: f.title_visible };
+    const payload: Record<string, unknown> = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null, title_visible: f.title_visible };
     const { error } = initial.id
       ? await supabase.from("modules").update(payload).eq("id", initial.id)
       : await supabase.from("modules").insert({ ...payload, position: nextPos });
