@@ -411,8 +411,8 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
     const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)));
     const payload: Record<string, unknown> = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null, title_visible: f.title_visible };
     const { error } = initial.id
-      ? await supabase.from("modules").update(payload).eq("id", initial.id)
-      : await supabase.from("modules").insert({ ...payload, position: nextPos });
+      ? await supabase.from("modules").update(payload as any).eq("id", initial.id)
+      : await supabase.from("modules").insert({ ...(payload as any), position: nextPos });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Módulo salvo"); onSaved();
