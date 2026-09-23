@@ -54,6 +54,7 @@ type Module = {
   access_level: string | null;
   access_levels: string[] | null;
   cover_url: string | null;
+  title_visible?: boolean | null;
 };
 
 const premiumGradients = [
@@ -317,9 +318,11 @@ function CourseDetail() {
                       </div>
                       
                       <div className="space-y-1 mt-auto">
-                        <h4 className="font-bold text-white text-sm md:text-base leading-snug line-clamp-2 drop-shadow-md group-hover:text-primary-light transition-colors">
-                          {mod?.title ?? "Aulas sem módulo"}
-                        </h4>
+                        {(mod?.title_visible ?? true) && (
+                          <h4 className="font-bold text-white text-sm md:text-base leading-snug line-clamp-2 drop-shadow-md group-hover:text-primary-light transition-colors">
+                            {mod?.title ?? "Aulas sem módulo"}
+                          </h4>
+                        )}
                         <p className="text-[11px] text-white/50">
                           {modTotal} {modTotal === 1 ? "aula" : "aulas"}
                         </p>

@@ -92,7 +92,7 @@ function PlanMultiSelect({ options, selected, onChange, disabled }: { options: A
 export const Route = createFileRoute("/admin/modules")({ component: Page });
 
 type Course = { id: string; title: string };
-type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; cover_url: string | null };
+type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; cover_url: string | null; title_visible?: boolean | null };
 type Lesson = { id: string; title: string; description: string | null; video_url: string | null; duration: number | null; position: number; module_id: string; course_id: string; is_free: boolean | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null };
 type Offer = { id: string; name: string };
 
@@ -280,7 +280,7 @@ function Page() {
                   >
                     <Plus className="h-3 w-3" />Aula
                   </button>
-                  <button onClick={() => setEditingModule(m)} className="p-1.5 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-foreground transition">
+                  <button onClick={() => setEditingModule(m)} aria-label="Editar módulo" className="p-1.5 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-foreground transition">
                     <Edit3 className="h-3.5 w-3.5" />
                   </button>
                   <button onClick={() => removeModule(m.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition">
@@ -402,17 +402,17 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
 
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
   const { planOptions, selected: selectedPlans, loading: plansLoading, setSelected: setSelectedPlans } = useAccessLevelsState(initial);
-  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "" });
+  const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "", title_visible: (initial as any).title_visible ?? true });
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     if (selectedPlans.length === 0) return toast.error("Selecione ao menos um plano com acesso");
     setSaving(true);
     const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)));
-    const payload = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null };
+    const payload: Record<string, unknown> = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null, title_visible: f.title_visible };
     const { error } = initial.id
-      ? await supabase.from("modules").update(payload).eq("id", initial.id)
-      : await supabase.from("modules").insert({ ...payload, position: nextPos });
+      ? await supabase.from("modules").update(payload as any).eq("id", initial.id)
+      : await supabase.from("modules").insert({ ...(payload as any), position: nextPos });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Módulo salvo"); onSaved();
@@ -449,6 +449,24 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       </Field>
 
       {f.cover_url && (
+        <label className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3 cursor-pointer select-none">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Eye className="h-3.5 w-3.5" />
+            Mostrar título sobre a capa
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={f.title_visible}
+            onClick={() => setF({ ...f, title_visible: !f.title_visible })}
+            className={`relative h-5 w-9 rounded-full transition-colors ${f.title_visible ? "bg-primary" : "bg-muted"}`}
+          >
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${f.title_visible ? "translate-x-4" : "translate-x-0.5"}`} />
+          </button>
+        </label>
+      )}
+
+      {f.cover_url && (
         <div className="mt-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
             <Eye className="h-3.5 w-3.5" />
@@ -458,7 +476,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
             <img src={f.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute inset-x-3 bottom-3 text-left">
-              <h4 className="text-white font-semibold text-xs truncate">{f.title || "Título do módulo"}</h4>
+              {f.title_visible && <h4 className="text-white font-semibold text-xs truncate">{f.title || "Título do módulo"}</h4>}
               <p className="text-[10px] text-white/60">Preview do card</p>
             </div>
           </div>
