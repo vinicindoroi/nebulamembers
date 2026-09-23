@@ -280,7 +280,7 @@ function Page() {
                   >
                     <Plus className="h-3 w-3" />Aula
                   </button>
-                  <button onClick={() => setEditingModule(m)} className="p-1.5 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-foreground transition">
+                  <button onClick={() => setEditingModule(m)} aria-label="Editar módulo" className="p-1.5 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-foreground transition">
                     <Edit3 className="h-3.5 w-3.5" />
                   </button>
                   <button onClick={() => removeModule(m.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition">
