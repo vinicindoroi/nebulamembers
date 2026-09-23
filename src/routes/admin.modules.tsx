@@ -449,6 +449,24 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       </Field>
 
       {f.cover_url && (
+        <label className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3 cursor-pointer select-none">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Eye className="h-3.5 w-3.5" />
+            Mostrar título sobre a capa
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={f.title_visible}
+            onClick={() => setF({ ...f, title_visible: !f.title_visible })}
+            className={`relative h-5 w-9 rounded-full transition-colors ${f.title_visible ? "bg-primary" : "bg-muted"}`}
+          >
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${f.title_visible ? "translate-x-4" : "translate-x-0.5"}`} />
+          </button>
+        </label>
+      )}
+
+      {f.cover_url && (
         <div className="mt-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
             <Eye className="h-3.5 w-3.5" />
@@ -458,7 +476,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
             <img src={f.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute inset-x-3 bottom-3 text-left">
-              <h4 className="text-white font-semibold text-xs truncate">{f.title || "Título do módulo"}</h4>
+              {f.title_visible && <h4 className="text-white font-semibold text-xs truncate">{f.title || "Título do módulo"}</h4>}
               <p className="text-[10px] text-white/60">Preview do card</p>
             </div>
           </div>

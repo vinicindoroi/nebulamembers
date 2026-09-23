@@ -54,6 +54,7 @@ type Module = {
   access_level: string | null;
   access_levels: string[] | null;
   cover_url: string | null;
+  title_visible?: boolean | null;
 };
 
 const premiumGradients = [
