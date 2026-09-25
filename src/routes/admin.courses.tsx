@@ -127,6 +127,15 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   const hasCurrentAccess = accessOptions.some((plan) => plan.slug === f.access_level);
 
   useEffect(() => {
+    if (plansLoading || hasCurrentAccess) return;
+    const legacyLevel = f.access_level === "premium" ? 2 : f.access_level === "pro" ? 1 : f.access_level === "free" ? 0 : null;
+    if (legacyLevel === null) return;
+    const replacement = accessOptions.find((plan) => (plan.level ?? 0) === legacyLevel);
+    if (!replacement) return;
+    setF((current) => ({ ...current, access_level: replacement.slug, is_premium: legacyLevel > 0 }));
+  }, [plansLoading, hasCurrentAccess, f.access_level, accessOptions]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
