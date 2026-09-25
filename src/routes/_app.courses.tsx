@@ -141,9 +141,9 @@ function CoursesList() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-3 xl:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse">
+            <div key={i} className="w-[78%] shrink-0 snap-start sm:w-auto">
               <div className="aspect-video rounded-xl border border-border bg-card" />
               <div className="space-y-3 pt-4">
                 <div className="h-4 w-3/4 rounded bg-muted/40" />
@@ -161,13 +161,13 @@ function CoursesList() {
           </div>
         </div>
       ) : (
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((c) => (
             <Link
               key={c.id}
               to="/courses/$courseId"
               params={{ courseId: c.id }}
-              className="group min-w-0"
+              className="group min-w-0 w-[78%] shrink-0 snap-start sm:w-auto"
             >
               <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-card transition duration-500 group-hover:scale-[1.03] group-hover:border-primary/45 group-hover:shadow-[0_18px_50px_-24px_var(--primary)] motion-reduce:transform-none motion-reduce:transition-none">
                 {c.cover_url && (
@@ -181,8 +181,8 @@ function CoursesList() {
                     <CheckCircle2 className="h-3 w-3" />Concluído
                   </span>
                 )}
-                <div className="absolute inset-0 flex items-center justify-center bg-background/10 opacity-0 transition duration-300 group-hover:opacity-100">
-                  <div className="flex h-12 w-12 scale-90 items-center justify-center rounded-full bg-foreground text-background shadow-xl transition duration-300 group-hover:scale-100">
+                <div className="absolute inset-0 flex items-center justify-center bg-background/10 opacity-0 transition duration-300 group-hover:opacity-100 max-sm:opacity-100">
+                  <div className="flex h-12 w-12 scale-90 items-center justify-center rounded-full bg-foreground text-background shadow-xl transition duration-300 group-hover:scale-100 max-sm:scale-100">
                     <Play className="ml-0.5 h-5 w-5" fill="currentColor" />
                   </div>
                 </div>
