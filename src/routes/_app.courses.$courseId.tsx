@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAddXp } from "@/hooks/use-xp";
 import { NebulaPlayer, type Chapter } from "@/components/player/NebulaPlayer";
 import { LessonComments } from "@/components/lessons/LessonComments";
+import { Button } from "@/components/ui/button";
 import { getSignedVideoUrl, isStoragePath, getAttachmentDownloadUrl } from "@/lib/storage";
 import {
   usePlayerSettings,
@@ -21,6 +22,16 @@ import {
 
 export const Route = createFileRoute("/_app/courses/$courseId")({
   component: CourseDetail,
+  head: () => ({
+    meta: [
+      { title: "Assistir curso — Nebula Members" },
+      { name: "description", content: "Assista às aulas e acompanhe seu progresso na Nebula Members." },
+      { property: "og:title", content: "Assistir curso — Nebula Members" },
+      { property: "og:description", content: "Assista às aulas e acompanhe seu progresso na Nebula Members." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 });
 
 type Lesson = {
@@ -56,15 +67,6 @@ type Module = {
   cover_url: string | null;
   title_visible?: boolean | null;
 };
-
-const premiumGradients = [
-  "from-primary/30 via-primary/10 to-[#0c0c0e]/90 border-primary/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(99,102,241,0.15)]",
-  "from-rose-600/30 via-pink-600/10 to-[#0c0c0e]/90 border-rose-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(244,63,94,0.15)]",
-  "from-emerald-600/30 via-teal-600/10 to-[#0c0c0e]/90 border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(16,185,129,0.15)]",
-  "from-cyan-600/30 via-primary/10 to-[#0c0c0e]/90 border-cyan-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(6,182,212,0.15)]",
-  "from-amber-600/30 via-orange-600/10 to-[#0c0c0e]/90 border-amber-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(245,158,11,0.15)]",
-  "from-primary/30 via-primary/10 to-[#0c0c0e]/90 border-primary/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(217,70,239,0.15)]",
-];
 
 function CourseDetail() {
   const { courseId } = Route.useParams();
