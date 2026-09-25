@@ -141,9 +141,9 @@ function CoursesList() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-3 xl:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse">
+            <div key={i} className="w-[78%] shrink-0 snap-start sm:w-auto">
               <div className="aspect-video rounded-xl border border-border bg-card" />
               <div className="space-y-3 pt-4">
                 <div className="h-4 w-3/4 rounded bg-muted/40" />
