@@ -4,6 +4,7 @@ import { Mail, Lock, ArrowRight, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
 
 type LoginSearch = {
   mode?: "signin" | "signup";
@@ -16,7 +17,14 @@ export const Route = createFileRoute("/login")({
     };
   },
   component: LoginPage,
-  head: () => ({ meta: [{ title: "Entrar — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Entrar — Nebula Members" },
+    { name: "description", content: "Acesse sua área exclusiva Nebula Members." },
+    { property: "og:title", content: "Entrar — Nebula Members" },
+    { property: "og:description", content: "Acesse sua área exclusiva Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function LoginPage() {
@@ -114,7 +122,7 @@ function LoginPage() {
       <div className="w-full max-w-md animate-fade-up">
         <div className="glass-strong rounded-2xl p-8 md:p-10">
           <div className="flex flex-col items-center text-center mb-6">
-            <img src="/nebula_logo.png?v=2" alt="Nebula Members" className="h-16 w-16 rounded-2xl glow mb-4" />
+            <img src={brandLogo.url} alt="Nebula Members" className="mb-4 h-20 w-auto max-w-full object-contain" />
             <h1 className="text-2xl font-semibold">
               {mode === "signin" ? "Bem-vindo de volta" : "Crie sua conta"}
             </h1>

@@ -14,6 +14,7 @@ import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } from "@/hooks/use-plans";
+import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
 
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
@@ -191,7 +192,7 @@ export function AppShell() {
   const searchRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   useScrollRestore(mainRef);
-  const [siteSettings, setSiteSettings] = useState({ name: "Membros", logoUrl: "/nebula_logo.png?v=2", primaryColor: "#7ad3d8" });
+  const [siteSettings, setSiteSettings] = useState({ name: "Nebula Members", logoUrl: brandLogo.url, primaryColor: "#7ad3d8" });
 
   useEffect(() => {
     // Try to load from localStorage first for instant initial render
@@ -201,8 +202,8 @@ export function AppShell() {
         const parsed = JSON.parse(raw);
         if (parsed.general) {
           setSiteSettings({
-            name: parsed.general.name || "Membros",
-            logoUrl: parsed.general.logoUrl || "/nebula_logo.png?v=2",
+            name: parsed.general.name || "Nebula Members",
+            logoUrl: parsed.general.logoUrl || brandLogo.url,
             primaryColor: parsed.general.primaryColor || "#7ad3d8"
           });
         }
@@ -369,16 +370,16 @@ export function AppShell() {
           <div className="flex items-center justify-between mb-8">
             <Link to="/dashboard" className="flex items-center gap-3 px-2 py-2">
               {siteSettings.logoUrl ? (
-                <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-10 w-10 rounded-xl object-cover shadow-[0_0_24px_-4px_oklch(0.65_0.22_290/0.6)]" />
+               <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-11 w-44 object-contain object-left" />
               ) : (
                 <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-[0_0_24px_-4px_oklch(0.65_0.22_290/0.6)]">
                   <Orbit className="h-5 w-5 text-primary-foreground" />
                 </div>
               )}
-              <div>
+               {!siteSettings.logoUrl && <div>
                 <div className="font-semibold text-sm leading-none">{siteSettings.name}</div>
                 <div className="text-[10px] text-muted-foreground mt-1.5">Members</div>
-              </div>
+               </div>}
             </Link>
           </div>
 
@@ -485,16 +486,16 @@ export function AppShell() {
           <div className="flex items-center justify-between mb-8">
             <Link to="/dashboard" className="flex items-center gap-3 px-2 py-2" onClick={() => setOpen(false)}>
               {siteSettings.logoUrl ? (
-                <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-10 w-10 rounded-xl object-cover" />
+                 <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-11 w-44 object-contain object-left" />
               ) : (
                 <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center">
                   <Orbit className="h-5 w-5 text-primary-foreground" />
                 </div>
               )}
-              <div>
+               {!siteSettings.logoUrl && <div>
                 <div className="font-semibold text-sm leading-none">{siteSettings.name}</div>
                 <div className="text-[10px] text-muted-foreground mt-1.5">Members</div>
-              </div>
+               </div>}
             </Link>
             <button
               onClick={() => setOpen(false)}

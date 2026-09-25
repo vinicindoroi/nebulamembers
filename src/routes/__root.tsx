@@ -77,14 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Membros — Área exclusiva" },
-      { name: "description", content: "Área de membros minimalista e moderna" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Membros — Área exclusiva" },
-      { property: "og:description", content: "Área de membros minimalista e moderna" },
+      { title: "Nebula Members — Área exclusiva" },
+      { name: "description", content: "Aprenda, evolua e acompanhe seu progresso na Nebula Members." },
+      { name: "author", content: "Nebula Members" },
+      { property: "og:title", content: "Nebula Members — Área exclusiva" },
+      { property: "og:description", content: "Aprenda, evolua e acompanhe seu progresso na Nebula Members." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
       { name: "theme-color", content: "#7c3aed" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -99,7 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/nebula_logo.png?v=2" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -147,7 +146,7 @@ function RootComponent() {
           if (enabled && "Notification" in window && Notification.permission === "granted") {
             new Notification(title, {
               body,
-              icon: "/nebula_logo.png?v=2"
+              icon: "/favicon.png"
             });
           }
         } catch (_) {}

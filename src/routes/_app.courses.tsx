@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useChildMatches } from "@tanstack/react-router";
 import { useMemo, useState, useDeferredValue } from "react";
-import { Play, Search, BookOpen, CheckCircle2, Clock, X } from "lucide-react";
+import { Play, Search, BookOpen, CheckCircle2, Clock, X, ArrowRight } from "lucide-react";
 import { useCourses } from "@/hooks/use-courses";
 import { Button } from "@/components/ui/button";
 
@@ -55,8 +55,10 @@ function CoursesList() {
     });
   }, [courses, filter, tag, deferredSearch]);
 
+  const featured = visible[0];
+
   return (
-    <div className="courses-catalog mx-auto w-full max-w-[1600px] space-y-10 pb-10 sm:space-y-12">
+    <div className="courses-catalog mx-auto w-full max-w-[1600px] space-y-8 pb-12">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 pt-1 sm:flex sm:justify-between">
         <div className="min-w-0 space-y-2">
           <h1 className="font-course-display text-3xl font-bold sm:text-4xl">Cursos</h1>
@@ -67,7 +69,7 @@ function CoursesList() {
         </div>
       </header>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative w-full lg:max-w-sm">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -141,10 +143,10 @@ function CoursesList() {
       </div>
 
       {isLoading ? (
-        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-6 sm:mx-0 sm:px-0">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="w-[78%] shrink-0 snap-start sm:w-auto">
-              <div className="aspect-video rounded-xl border border-border bg-card" />
+            <div key={i} className="w-[82%] shrink-0 snap-start sm:w-[42%] lg:w-[29%] xl:w-[23%]">
+              <div className="aspect-video rounded-md border border-border bg-card" />
               <div className="space-y-3 pt-4">
                 <div className="h-4 w-3/4 rounded bg-muted/40" />
                 <div className="h-2 w-full rounded bg-muted/40" />
@@ -160,51 +162,52 @@ function CoursesList() {
             {search ? "Tente ajustar os filtros ou a busca." : "Nenhum curso corresponde a estes filtros."}
           </div>
         </div>
-      ) : (
-        <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map((c) => (
-            <Link
-              key={c.id}
-              to="/courses/$courseId"
-              params={{ courseId: c.id }}
-              className="group min-w-0 w-[78%] shrink-0 snap-start sm:w-auto"
-            >
-              <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-card transition duration-500 group-hover:scale-[1.03] group-hover:border-primary/45 group-hover:shadow-[0_18px_50px_-24px_var(--primary)] motion-reduce:transform-none motion-reduce:transition-none">
-                {c.cover_url && (
-                  <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105 motion-reduce:transform-none" />
-                )}
-                {c.gradient_from && c.gradient_to && (
-                  <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${c.gradient_from}, ${c.gradient_to}00)` }} />
-                )}
-                {c.progress === 100 && (
-                  <span className="absolute right-3 top-3 flex items-center gap-1 rounded-md border border-primary/30 bg-background/75 px-2 py-1 text-[10px] font-semibold uppercase text-primary backdrop-blur-md">
-                    <CheckCircle2 className="h-3 w-3" />Concluído
-                  </span>
-                )}
-                <div className="absolute inset-0 flex items-center justify-center bg-background/10 opacity-0 transition duration-300 group-hover:opacity-100 max-sm:opacity-100">
-                  <div className="flex h-12 w-12 scale-90 items-center justify-center rounded-full bg-foreground text-background shadow-xl transition duration-300 group-hover:scale-100 max-sm:scale-100">
-                    <Play className="ml-0.5 h-5 w-5" fill="currentColor" />
-                  </div>
-                </div>
+      ) : featured && (
+        <div className="space-y-8">
+          <Link
+            to="/courses/$courseId"
+            params={{ courseId: featured.id }}
+            className="group relative block min-h-72 overflow-hidden rounded-md border border-border bg-card sm:min-h-96 lg:min-h-[28rem]"
+          >
+            {featured.cover_url && <img src={featured.cover_url} alt={featured.title} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.025] motion-reduce:transform-none" />}
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--background)_0%,color-mix(in_oklab,var(--background)_88%,transparent)_32%,color-mix(in_oklab,var(--background)_28%,transparent)_72%,transparent_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,transparent_55%)]" />
+            <div className="relative flex min-h-72 max-w-xl flex-col justify-end p-6 sm:min-h-96 sm:p-10 lg:min-h-[28rem] lg:p-12">
+              <span className="mb-3 text-xs font-bold uppercase text-primary">Em destaque</span>
+              {(featured as any).title_visible !== false && <h2 className="font-course-display text-3xl font-bold sm:text-5xl">{featured.title}</h2>}
+              {featured.description && <p className="mt-3 line-clamp-2 max-w-lg text-sm text-foreground/75 sm:text-base">{featured.description}</p>}
+              <div className="mt-6 flex items-center gap-3">
+                <Button className="h-11 px-5"><Play className="h-4 w-4" fill="currentColor" />{featured.progress > 0 ? "Continuar" : "Assistir agora"}</Button>
+                <span className="text-xs font-semibold text-muted-foreground">{featured.progress > 0 ? `${featured.progress}% concluído` : "Comece agora"}</span>
               </div>
-              <div className="space-y-3 pt-4">
-                {(c as any).title_visible !== false && (
-                  <div className="min-w-0">
-                    <h2 className="font-course-display truncate text-base font-bold transition-colors group-hover:text-primary sm:text-lg">{c.title}</h2>
-                    {c.description && <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">{c.description}</p>}
+            </div>
+          </Link>
+
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-course-display text-xl font-bold sm:text-2xl">Explore o catálogo</h2>
+              <span className="hidden items-center gap-1 text-xs font-semibold text-muted-foreground sm:flex">Arraste para explorar <ArrowRight className="h-3.5 w-3.5" /></span>
+            </div>
+            <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-8 pt-2 sm:mx-0 sm:px-0">
+              {visible.map((c) => (
+                <Link key={c.id} to="/courses/$courseId" params={{ courseId: c.id }} className="group min-w-0 w-[82%] shrink-0 snap-start sm:w-[42%] lg:w-[29%] xl:w-[23%]">
+                  <div className="relative aspect-video overflow-hidden rounded-md border border-border bg-card transition duration-300 group-hover:z-10 group-hover:scale-[1.06] group-hover:border-primary/50 group-hover:shadow-[0_22px_60px_-25px_var(--primary)] motion-reduce:transform-none">
+                    {c.cover_url && <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105 motion-reduce:transform-none" />}
+                    <div className="absolute inset-0 bg-[linear-gradient(0deg,color-mix(in_oklab,var(--background)_92%,transparent)_0%,transparent_55%)] opacity-70 transition group-hover:opacity-100" />
+                    {c.progress === 100 && <span className="absolute right-2 top-2 flex items-center gap-1 rounded border border-primary/30 bg-background/80 px-2 py-1 text-[9px] font-bold uppercase text-primary backdrop-blur-md"><CheckCircle2 className="h-3 w-3" />Concluído</span>}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 transition duration-200 group-hover:opacity-100 max-sm:opacity-100">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground text-background shadow-xl"><Play className="ml-0.5 h-4 w-4" fill="currentColor" /></div>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <div className="h-1 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full bg-primary transition-all" style={{ width: `${c.progress}%` }} />
+                  <div className="space-y-2 pt-3">
+                    {(c as any).title_visible !== false && <h3 className="font-course-display truncate text-sm font-bold transition-colors group-hover:text-primary sm:text-base">{c.title}</h3>}
+                    <div className="h-0.5 overflow-hidden bg-muted"><div className="h-full bg-primary transition-all" style={{ width: `${c.progress}%` }} /></div>
+                    <div className="text-[9px] font-semibold uppercase text-muted-foreground">{c.progress === 0 ? "Não iniciado" : c.progress === 100 ? "Concluído" : `${c.progress}% concluído`}</div>
                   </div>
-                  <div className="mt-2 text-[10px] font-semibold uppercase text-muted-foreground">
-                    {c.progress === 0 ? "Não iniciado" : c.progress === 100 ? "Concluído" : `${c.progress}% concluído`}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
       )}
     </div>
