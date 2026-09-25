@@ -1114,15 +1114,13 @@ function ProfileSidebarWidget() {
   const rankColor = getRankColor(levelInfo.level);
 
   return (
-    <div className="sticky top-4 rounded-2xl border border-border bg-card backdrop-blur-md overflow-hidden shadow-xl transition-all duration-300 hover:shadow-glow hover:border-primary/30 group/profile">
-      {/* Banner Capa Premium com Efeito Nebulosa Animado */}
-      <div className="h-24 w-full bg-gradient-to-tr from-primary via-primary to-pink-500 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent opacity-80 animate-ambient-pulse" />
-        <div className="absolute inset-0 bg-black/20" />
+    <div className="group/profile sticky top-4 overflow-hidden rounded-lg border border-border bg-card/45 backdrop-blur-md transition-colors hover:border-primary/25">
+      <div className="relative h-20 w-full overflow-hidden bg-primary/12">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-primary/35" />
       </div>
 
       {/* Avatar flutuante e Informações básicas */}
-      <div className="relative px-4 pb-4 pt-12 text-center flex flex-col items-center border-b border-border bg-card">
+      <div className="relative flex flex-col items-center border-b border-border bg-card/45 px-4 pb-4 pt-11 text-center">
         <div className="absolute -top-10 left-1/2 -translate-x-1/2">
           <div className="relative">
             <Avatar initials={initials} size="lg" xp={xp} avatarUrl={myProfile?.avatar_url} />
@@ -1146,14 +1144,14 @@ function ProfileSidebarWidget() {
         )}
         
         {myProfile?.plan && myProfile.plan !== "Free" && (
-          <span className="mt-2.5 inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-[9px] font-bold text-primary uppercase tracking-wider shadow-[0_2px_8px_rgba(var(--primary),0.1)]">
+          <span className="mt-2.5 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[9px] font-bold uppercase text-primary">
             {myProfile.plan}
           </span>
         )}
       </div>
 
       {/* XP e Gamificação */}
-      <div className="p-4 space-y-3.5 bg-card">
+      <div className="space-y-3.5 bg-card/30 p-4">
         <div className="flex items-center justify-between">
           <div className="flex flex-col items-start gap-0.5">
             <span className="text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">Patente</span>
@@ -1166,13 +1164,11 @@ function ProfileSidebarWidget() {
 
         {/* Barra de Progresso Premium */}
         <div className="relative">
-          <div className="h-2.5 w-full rounded-full bg-muted/40 overflow-hidden border border-border p-[1px]">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/40">
             <div
-              className={`h-full rounded-full bg-gradient-to-r ${rankColor} transition-all duration-500 relative`}
+              className="relative h-full rounded-full bg-primary transition-all duration-500"
               style={{ width: `${Math.min(100, (levelInfo.currentXp / levelInfo.nextLevelXp) * 100)}%` }}
-            >
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.15)_50%,transparent_100%)] animate-pulse" />
-            </div>
+            />
           </div>
           <div className="absolute right-0 -bottom-5 text-[9px] text-muted-foreground/40 font-medium">
             {Math.round((levelInfo.currentXp / levelInfo.nextLevelXp) * 100)}% concluído
