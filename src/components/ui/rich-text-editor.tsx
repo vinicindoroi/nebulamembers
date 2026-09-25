@@ -13,7 +13,7 @@ import { getMentionSuggestions } from "./mention-suggestion";
 import {
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, AlignLeft, AlignCenter, AlignRight, Palette, Highlighter,
-  Link2 as LinkIcon,
+  Link2 as LinkIcon, Code2,
 } from "lucide-react";
 
 const COLORS = [
@@ -136,6 +136,9 @@ export function RichTextEditor({ content, onChange, placeholder = "Escreva aqui.
         </ToolBtn>
         <ToolBtn active={editor.isActive("link")} onClick={setLink} title="Inserir Link">
           <LinkIcon className="h-4 w-4" />
+        </ToolBtn>
+        <ToolBtn active={editor.isActive("codeBlock")} onClick={() => editor.chain().focus().toggleCodeBlock().run()} title="Bloco de código">
+          <Code2 className="h-4 w-4" />
         </ToolBtn>
 
         <div className="w-px h-5 bg-white/10 mx-1" />

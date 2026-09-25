@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, Play, ArrowLeft, Lock, Download, Paperclip, Clock, ChevronRight } from "lucide-react";
+import { Check, Play, ArrowLeft, Lock, Download, Paperclip, Clock, ChevronRight, Copy, CheckCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { usePlans } from "@/hooks/use-plans";
@@ -67,6 +67,45 @@ type Module = {
   cover_url: string | null;
   title_visible?: boolean | null;
 };
+
+function LessonDescription({ html }: { html: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const hasCode = /<(pre|code)(\s|>)/i.test(html);
+  const isLong = html.replace(/<[^>]*>/g, "").length > 700 || html.split("\n").length > 12;
+
+  const copyCode = async () => {
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    const blocks = Array.from(container.querySelectorAll("pre, code"));
+    const code = blocks.map((block) => block.textContent ?? "").filter(Boolean).join("\n\n");
+    await navigator.clipboard.writeText(code || container.textContent || "");
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  };
+
+  return (
+    <div className="mt-4 overflow-hidden rounded-lg border border-border bg-background/40">
+      {hasCode && (
+        <div className="flex h-9 items-center justify-between border-b border-border px-3">
+          <span className="font-mono text-[10px] font-semibold uppercase text-muted-foreground">Código</span>
+          <Button type="button" variant="ghost" size="sm" onClick={copyCode} className="h-7 gap-1.5 px-2 text-xs">
+            {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? "Copiado" : "Copiar"}
+          </Button>
+        </div>
+      )}
+      <div className={`lesson-description prose prose-invert max-w-none px-4 py-3 text-sm text-muted-foreground ${!expanded && isLong ? "max-h-64 overflow-hidden" : ""}`} dangerouslySetInnerHTML={{ __html: html }} />
+      {isLong && (
+        <div className="border-t border-border px-3 py-2">
+          <Button type="button" variant="ghost" size="sm" onClick={() => setExpanded((value) => !value)} className="h-7 px-2 text-xs text-primary">
+            {expanded ? "Recolher conteúdo" : "Ver conteúdo completo"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function CourseDetail() {
   const { courseId } = Route.useParams();
@@ -549,10 +588,7 @@ function CourseDetail() {
               </div>
 
               {activeLesson.description && (
-                <div 
-                  className="text-sm text-muted-foreground mt-4 prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: activeLesson.description }}
-                />
+                <LessonDescription html={activeLesson.description} />
               )}
               {activeLesson.content && (
                 <div className="mt-4 text-sm whitespace-pre-wrap leading-relaxed">
