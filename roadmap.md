@@ -1,2 +1,2 @@
 # Roadmap
-- [ ] Refinar a tela de Cursos com experiência mais dinâmica inspirada na Netflix
+- [x] Tela de Cursos estilo Netflix
