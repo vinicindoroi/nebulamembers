@@ -227,6 +227,15 @@
   line-height: 1.6;
   white-space: pre;
 }
+/* Code block compacto no editor: rola internamente e expande ao clicar */
+.tiptap pre {
+  max-height: 14rem;
+  overflow-y: auto;
+  transition: max-height 0.2s ease;
+}
+.tiptap pre:focus-within {
+  max-height: 65vh;
+}
 .tiptap code:not(pre code),
 .lesson-description code:not(pre code) {
   border-radius: 4px;
