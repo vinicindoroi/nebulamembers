@@ -198,7 +198,7 @@ function CourseDetail() {
   const activeGroup = grouped.find((g) => (g.mod?.id ?? "orphans") === currentModuleId) ?? grouped[0];
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="courses-catalog mx-auto w-full max-w-[1600px] space-y-8 pb-12 animate-fade-up">
       {activeLessonId ? (
         <button
           onClick={() => setActiveLessonId(null)}
@@ -212,7 +212,7 @@ function CourseDetail() {
         </Link>
       )}
 
-      <header className="glass-strong rounded-2xl overflow-hidden relative">
+      <header className="relative min-h-48 overflow-hidden rounded-xl border border-border bg-card sm:min-h-64">
         <div className="absolute inset-0">
           {course.cover_url && (
             <img src={course.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -220,17 +220,17 @@ function CourseDetail() {
           {course.gradient_from && course.gradient_to && (
             <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${course.gradient_from}, ${course.gradient_to}00)` }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/35 to-background/10" />
         </div>
-        <div className="relative p-6">
-          {course.tag && <span className="text-[10px] uppercase tracking-wider text-primary bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">{course.tag}</span>}
-          {(course as any).title_visible !== false && <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 text-white drop-shadow-lg">{course.title}</h1>}
-          {course.description && <p className="text-sm text-white/70 mt-2">{course.description}</p>}
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex-1 h-1.5 rounded-full bg-white/20 overflow-hidden">
-              <div className="h-full gradient-primary" style={{ width: `${progress}%` }} />
+        <div className="relative flex min-h-48 flex-col justify-end p-5 sm:min-h-64 sm:p-8">
+          {course.tag && <span className="mb-2 w-fit rounded-md border border-primary/25 bg-background/70 px-2 py-1 text-[10px] font-semibold uppercase text-primary backdrop-blur-md">{course.tag}</span>}
+          {(course as any).title_visible !== false && <h1 className="font-course-display max-w-3xl text-2xl font-bold text-foreground sm:text-4xl">{course.title}</h1>}
+          {course.description && <p className="mt-2 max-w-2xl text-sm text-foreground/70">{course.description}</p>}
+          <div className="mt-5 flex max-w-2xl items-center gap-3">
+            <div className="h-1 flex-1 overflow-hidden rounded-full bg-foreground/15">
+              <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
             </div>
-            <span className="text-xs text-white/80">{completed}/{total} • {progress}%</span>
+            <span className="shrink-0 text-xs font-semibold text-foreground/80">{completed}/{total} • {progress}%</span>
           </div>
         </div>
       </header>
@@ -240,34 +240,37 @@ function CourseDetail() {
           Este curso ainda não possui aulas. Adicione aulas em <span className="text-foreground">Admin → Módulos & Aulas</span>.
         </div>
       ) : activeLessonId === null ? (
-        <div className="space-y-6">
-          {/* CTA Card */}
-          <div className="relative overflow-hidden rounded-2xl p-6 border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_12px_40px_-12px_rgba(99,102,241,0.25)]">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
-            <div className="relative z-10 space-y-1">
-              <span className="text-[10px] uppercase tracking-wider text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-full">Status do Progresso</span>
-              <h2 className="text-xl font-bold text-white mt-2">Navegue pelos módulos</h2>
-              <p className="text-sm text-muted-foreground mt-1">
+        <div className="space-y-10">
+          <section className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-y border-border py-6">
+            <div className="min-w-0">
+              <span className="text-[10px] font-semibold uppercase text-primary">Seu progresso</span>
+              <h2 className="font-course-display mt-1 text-xl font-bold sm:text-2xl">{isStarted ? "Continue assistindo" : "Comece sua jornada"}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
                 {isStarted ? `Você completou ${completed} de ${total} aulas. Continue de onde parou!` : "Comece a sua jornada agora mesmo!"}
               </p>
             </div>
             {firstUncompletedLesson && (
-              <button
+              <Button
                 onClick={() => setActiveLessonId(firstUncompletedLesson.id)}
-                className="relative z-10 gradient-primary text-primary-foreground px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 hover:scale-[1.02] transition active:scale-[0.98] shadow-[0_8px_24px_-8px_oklch(0.65_0.22_290/0.6)] shrink-0 cursor-pointer group"
+                className="h-11 shrink-0 px-4 sm:px-6"
               >
-                <Play className="h-4 w-4 transition-transform group-hover:scale-110" fill="currentColor" />
-                {isStarted ? "Continuar de onde parou" : "Começar a Assistir"}
-              </button>
+                <Play className="h-4 w-4" fill="currentColor" />
+                <span className="hidden sm:inline">{isStarted ? "Continuar assistindo" : "Começar a assistir"}</span>
+                <span className="sm:hidden">Assistir</span>
+              </Button>
             )}
-          </div>
+          </section>
 
           {/* Módulos do Curso - Estilo Netflix */}
-          <div className="space-y-4">
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold px-1">
-              Selecione o Módulo
-            </h3>
-            <div className="flex overflow-x-auto gap-4 pt-2 pb-5 px-2 -mx-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          <section className="space-y-4">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-semibold uppercase text-primary">Conteúdo</span>
+                <h3 className="font-course-display mt-1 text-xl font-bold">Módulos do curso</h3>
+              </div>
+              <span className="text-xs text-muted-foreground">{grouped.length} {grouped.length === 1 ? "módulo" : "módulos"}</span>
+            </div>
+            <div className="flex snap-x gap-4 overflow-x-auto pb-5">
               {grouped.map(({ mod, items }, idx) => {
                 const isSelected = (mod?.id ?? "orphans") === currentModuleId;
                 const modLessons = items;
@@ -275,16 +278,14 @@ function CourseDetail() {
                 const modTotal = modLessons.length;
                 const modProgress = modTotal ? Math.round((modCompleted / modTotal) * 100) : 0;
                 
-                const gradient = premiumGradients[idx % premiumGradients.length];
-
                 return (
                   <button
                     key={mod?.id ?? "orphans"}
                     onClick={() => setSelectedModuleId(mod?.id ?? "orphans")}
-                    className={`relative w-64 aspect-[14/9] shrink-0 rounded-2xl border text-left overflow-hidden transition-all duration-300 group cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 ${
+                    className={`group relative aspect-video w-64 shrink-0 snap-start overflow-hidden rounded-lg border text-left transition duration-300 sm:w-72 ${
                       isSelected
-                        ? "border-primary shadow-[0_0_25px_rgba(99,102,241,0.25)] ring-1 ring-primary/50"
-                        : "border-border hover:border-border bg-card"
+                        ? "border-primary ring-1 ring-primary/50"
+                        : "border-border bg-card hover:scale-[1.02] hover:border-primary/40"
                     }`}
                   >
                     {/* Cover image if available */}
@@ -295,25 +296,20 @@ function CourseDetail() {
                           alt=""
                           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        {/* Dark glassmorphic/gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0e]/90 via-[#0c0c0e]/40 to-[#0c0c0e]/10 group-hover:from-[#0c0c0e]/95 transition-all" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
                       </>
                     ) : (
-                      /* Dynamic cover gradient overlay fallback */
-                      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90 group-hover:opacity-100 transition-opacity`} />
+                       <div className="absolute inset-0 bg-muted" />
                     )}
-                    
-                    {/* Nebula grid overlay */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
                     
                     {/* Content */}
                     <div className="absolute inset-0 p-4 flex flex-col justify-between z-10">
                       <div className="flex items-start justify-between">
-                        <span className="text-[9px] uppercase tracking-wider text-white/80 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-border">
+                         <span className="rounded-md border border-border bg-background/70 px-2 py-1 text-[9px] font-bold uppercase text-foreground/80 backdrop-blur-md">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
                         {isRestricted(mod?.access_levels, mod?.access_level) && (
-                          <span className="p-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-400">
+                           <span className="rounded-md border border-border bg-background/70 p-1 text-muted-foreground backdrop-blur-md">
                             <Lock className="h-3 w-3" />
                           </span>
                         )}
@@ -321,23 +317,23 @@ function CourseDetail() {
                       
                       <div className="space-y-1 mt-auto">
                         {(mod?.title_visible ?? true) && (
-                          <h4 className="font-bold text-white text-sm md:text-base leading-snug line-clamp-2 drop-shadow-md group-hover:text-primary-light transition-colors">
+                           <h4 className="line-clamp-2 text-sm font-bold leading-snug text-foreground transition-colors group-hover:text-primary md:text-base">
                             {mod?.title ?? "Aulas sem módulo"}
                           </h4>
                         )}
-                        <p className="text-[11px] text-white/50">
+                         <p className="text-[11px] text-foreground/60">
                           {modTotal} {modTotal === 1 ? "aula" : "aulas"}
                         </p>
                       </div>
                       
                       {/* Integrated progress bar at the bottom */}
                       <div className="space-y-1 mt-2">
-                        <div className="flex justify-between items-center text-[9px] text-white/60">
+                         <div className="flex items-center justify-between text-[9px] text-foreground/60">
                           <span>{modCompleted}/{modTotal} concluídas</span>
                           <span>{modProgress}%</span>
                         </div>
-                        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full gradient-primary" style={{ width: `${modProgress}%` }} />
+                         <div className="h-1 w-full overflow-hidden rounded-full bg-foreground/10">
+                           <div className="h-full bg-primary" style={{ width: `${modProgress}%` }} />
                         </div>
                       </div>
                     </div>
@@ -345,7 +341,7 @@ function CourseDetail() {
                 );
               })}
             </div>
-          </div>
+          </section>
 
           {/* Timeline do Módulo Ativo */}
           {activeGroup && (
