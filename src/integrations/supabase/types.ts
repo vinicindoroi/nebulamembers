@@ -1024,6 +1024,7 @@ export type Database = {
           offer_id: string | null
           position: number
           title: string
+          title_visible: boolean
         }
         Insert: {
           access_level?: string
@@ -1037,6 +1038,7 @@ export type Database = {
           offer_id?: string | null
           position?: number
           title: string
+          title_visible?: boolean
         }
         Update: {
           access_level?: string
@@ -1050,6 +1052,7 @@ export type Database = {
           offer_id?: string | null
           position?: number
           title?: string
+          title_visible?: boolean
         }
         Relationships: [
           {
