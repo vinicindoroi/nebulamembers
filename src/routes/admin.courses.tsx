@@ -5,8 +5,19 @@ import { Plus, Edit3, Trash2, BookOpen, X, ImageIcon, Tag as TagIcon, DollarSign
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { usePlans } from "@/hooks/use-plans";
 
-export const Route = createFileRoute("/admin/courses")({ component: Page });
+export const Route = createFileRoute("/admin/courses")({
+  component: Page,
+  head: () => ({ meta: [
+    { title: "Gerenciar cursos — Nebula Members" },
+    { name: "description", content: "Gerencie cursos e seus níveis de acesso na Nebula Members." },
+    { property: "og:title", content: "Gerenciar cursos — Nebula Members" },
+    { property: "og:description", content: "Gerencie cursos e seus níveis de acesso na Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; title_visible: boolean | null };
 type Cat = { id: string; name: string };
@@ -100,6 +111,7 @@ function toHex(color: string): string {
 }
 
 function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Partial<Course>; cats: Cat[]; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
+  const { plans, loading: plansLoading } = usePlans();
   const [f, setF] = useState({
     title: initial.title ?? "", description: initial.description ?? "", tag: initial.tag ?? "",
     status: initial.status ?? "draft", price: Number(initial.price ?? 0), category_id: initial.category_id ?? "",
@@ -111,6 +123,8 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
     initial.id ? !(initial.gradient_from && initial.gradient_to) : false,
   );
   const [saving, setSaving] = useState(false);
+  const accessOptions = [...plans].sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
+  const hasCurrentAccess = accessOptions.some((plan) => plan.slug === f.access_level);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -222,10 +236,25 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
 
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
               <Field label="Acesso" icon={Crown}>
-                <select value={f.access_level} onChange={(e) => { const v = e.target.value; setF({ ...f, access_level: v, is_premium: v !== "free" }); }} className="modal-inp">
-                  <option value="free">Free — Todos os membros</option>
-                  <option value="pro">Pro</option>
-                  <option value="premium">Premium</option>
+                <select
+                  value={f.access_level}
+                  disabled={plansLoading}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const selectedPlan = accessOptions.find((plan) => plan.slug === value);
+                    setF({ ...f, access_level: value, is_premium: (selectedPlan?.level ?? (value === "free" ? 0 : 1)) > 0 });
+                  }}
+                  className="modal-inp disabled:cursor-wait disabled:opacity-60"
+                >
+                  {plansLoading && <option value={f.access_level}>Carregando níveis...</option>}
+                  {!plansLoading && !hasCurrentAccess && f.access_level && (
+                    <option value={f.access_level}>{f.access_level} — nível salvo</option>
+                  )}
+                  {accessOptions.map((plan) => (
+                    <option key={plan.id || plan.slug} value={plan.slug}>
+                      {plan.name}{plan.slug === "free" ? " — Todos os membros" : ""}
+                    </option>
+                  ))}
                 </select>
               </Field>
             </div>
