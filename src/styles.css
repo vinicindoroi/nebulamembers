@@ -233,7 +233,8 @@
   overflow-y: auto;
   transition: max-height 0.2s ease;
 }
-.tiptap pre:focus-within {
+.tiptap pre:focus-within,
+.tiptap:focus-within pre {
   max-height: 65vh;
 }
 .tiptap code:not(pre code),
