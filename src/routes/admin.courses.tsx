@@ -110,6 +110,35 @@ function toHex(color: string): string {
   }
 }
 
+function PlanMultiSelect({ options, selected, onChange, disabled }: { options: Array<{ slug: string; name: string }>; selected: string[]; onChange: (next: string[]) => void; disabled?: boolean }) {
+  const toggle = (slug: string) => {
+    if (disabled) return;
+    onChange(selected.includes(slug) ? selected.filter((s) => s !== slug) : [...selected, slug]);
+  };
+  return (
+    <div className={`grid grid-cols-2 gap-2 ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
+      {options.map((o) => {
+        const active = selected.includes(o.slug);
+        return (
+          <button
+            key={o.slug}
+            type="button"
+            onClick={() => toggle(o.slug)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-left transition ${
+              active ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"
+            }`}
+          >
+            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center text-[11px] font-bold ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
+              {active && "✓"}
+            </span>
+            <span className="truncate">{o.name}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Partial<Course>; cats: Cat[]; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
   const { plans, loading: plansLoading } = usePlans();
   const [f, setF] = useState({
@@ -124,16 +153,19 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   );
   const [saving, setSaving] = useState(false);
   const accessOptions = [...plans].sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
-  const hasCurrentAccess = accessOptions.some((plan) => plan.slug === f.access_level);
+  const planOptions = accessOptions.map((p) => ({ slug: p.slug, name: p.name, level: p.level ?? 0 }));
+  const [selectedPlans, setSelectedPlans] = useState<string[] | null>(
+    (initial as any).access_levels && (initial as any).access_levels.length > 0
+      ? (initial as any).access_levels.map((s: string) => (s ?? "").trim().toLowerCase()).filter(Boolean)
+      : null
+  );
 
   useEffect(() => {
-    if (plansLoading || hasCurrentAccess) return;
-    const legacyLevel = f.access_level === "premium" ? 2 : f.access_level === "pro" ? 1 : f.access_level === "free" ? 0 : null;
-    if (legacyLevel === null) return;
-    const replacement = accessOptions.find((plan) => (plan.level ?? 0) === legacyLevel);
-    if (!replacement) return;
-    setF((current) => ({ ...current, access_level: replacement.slug, is_premium: legacyLevel > 0 }));
-  }, [plansLoading, hasCurrentAccess, f.access_level, accessOptions]);
+    if (selectedPlans !== null || plansLoading) return;
+    const legacyLevel = f.access_level === "premium" ? 2 : f.access_level === "pro" ? 1 : f.access_level === "free" ? 0
+      : (accessOptions.find((p) => p.slug === f.access_level)?.level ?? 0);
+    setSelectedPlans(planOptions.filter((o) => o.level >= legacyLevel).map((o) => o.slug));
+  }, [selectedPlans, plansLoading, planOptions, f.access_level, accessOptions]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
