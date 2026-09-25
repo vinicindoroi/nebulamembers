@@ -31,7 +31,6 @@ const QUICK_FILTERS = [
   { id: "new", label: "Não iniciados", icon: Play },
 ] as const;
 
-type Course = ReturnType<typeof useCourses>["data"] extends (infer T)[] | undefined ? T : any;
 
 function CoursesList() {
   const [filter, setFilter] = useState<string>("all");
