@@ -1,0 +1,2 @@
+- [x] Refinar /courses com experiência dinâmica estilo Netflix
+- [x] Aplicar nova logo em toda a plataforma e favicon
