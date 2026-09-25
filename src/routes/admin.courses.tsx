@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin/courses")({
   ] }),
 });
 
-type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; title_visible: boolean | null };
+type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; title_visible: boolean | null };
 type Cat = { id: string; name: string };
 type Offer = { id: string; name: string };
 
@@ -110,6 +110,35 @@ function toHex(color: string): string {
   }
 }
 
+function PlanMultiSelect({ options, selected, onChange, disabled }: { options: Array<{ slug: string; name: string }>; selected: string[]; onChange: (next: string[]) => void; disabled?: boolean }) {
+  const toggle = (slug: string) => {
+    if (disabled) return;
+    onChange(selected.includes(slug) ? selected.filter((s) => s !== slug) : [...selected, slug]);
+  };
+  return (
+    <div className={`grid grid-cols-2 gap-2 ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
+      {options.map((o) => {
+        const active = selected.includes(o.slug);
+        return (
+          <button
+            key={o.slug}
+            type="button"
+            onClick={() => toggle(o.slug)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-left transition ${
+              active ? "border-primary/50 bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"
+            }`}
+          >
+            <span className={`h-4 w-4 shrink-0 rounded border flex items-center justify-center text-[11px] font-bold ${active ? "bg-primary border-primary text-primary-foreground" : "border-border"}`}>
+              {active && "✓"}
+            </span>
+            <span className="truncate">{o.name}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Partial<Course>; cats: Cat[]; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
   const { plans, loading: plansLoading } = usePlans();
   const [f, setF] = useState({
@@ -124,16 +153,19 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   );
   const [saving, setSaving] = useState(false);
   const accessOptions = [...plans].sort((a, b) => (a.level ?? 0) - (b.level ?? 0));
-  const hasCurrentAccess = accessOptions.some((plan) => plan.slug === f.access_level);
+  const planOptions = accessOptions.map((p) => ({ slug: p.slug, name: p.name, level: p.level ?? 0 }));
+  const [selectedPlans, setSelectedPlans] = useState<string[] | null>(
+    (initial as any).access_levels && (initial as any).access_levels.length > 0
+      ? (initial as any).access_levels.map((s: string) => (s ?? "").trim().toLowerCase()).filter(Boolean)
+      : null
+  );
 
   useEffect(() => {
-    if (plansLoading || hasCurrentAccess) return;
-    const legacyLevel = f.access_level === "premium" ? 2 : f.access_level === "pro" ? 1 : f.access_level === "free" ? 0 : null;
-    if (legacyLevel === null) return;
-    const replacement = accessOptions.find((plan) => (plan.level ?? 0) === legacyLevel);
-    if (!replacement) return;
-    setF((current) => ({ ...current, access_level: replacement.slug, is_premium: legacyLevel > 0 }));
-  }, [plansLoading, hasCurrentAccess, f.access_level, accessOptions]);
+    if (selectedPlans !== null || plansLoading) return;
+    const legacyLevel = f.access_level === "premium" ? 2 : f.access_level === "pro" ? 1 : f.access_level === "free" ? 0
+      : (accessOptions.find((p) => p.slug === f.access_level)?.level ?? 0);
+    setSelectedPlans(planOptions.filter((o) => o.level >= legacyLevel).map((o) => o.slug));
+  }, [selectedPlans, plansLoading, planOptions, f.access_level, accessOptions]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -146,7 +178,10 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     setSaving(true);
-    const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: f.access_level, gradient_from: noGradient ? null : f.gradient_from, gradient_to: noGradient ? null : f.gradient_to };
+    const selected = selectedPlans ?? [];
+    const minLevel = selected.length > 0 ? Math.min(...selected.map((s) => planOptions.find((o) => o.slug === s)?.level ?? 0)) : 0;
+    const minPlan = planOptions.find((o) => o.level === minLevel);
+    const payload: any = { ...f, category_id: f.category_id || null, offer_id: f.offer_id || null, access_level: minPlan?.slug ?? "free", access_levels: selected, is_premium: minLevel > 0, gradient_from: noGradient ? null : f.gradient_from, gradient_to: noGradient ? null : f.gradient_to };
     const { error } = initial.id
       ? await supabase.from("courses").update(payload).eq("id", initial.id)
       : await supabase.from("courses").insert(payload);
@@ -245,26 +280,14 @@ function CourseModal({ initial, cats, offers, onClose, onSaved }: { initial: Par
 
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
               <Field label="Acesso" icon={Crown}>
-                <select
-                  value={f.access_level}
-                  disabled={plansLoading}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const selectedPlan = accessOptions.find((plan) => plan.slug === value);
-                    setF({ ...f, access_level: value, is_premium: (selectedPlan?.level ?? (value === "free" ? 0 : 1)) > 0 });
-                  }}
-                  className="modal-inp disabled:cursor-wait disabled:opacity-60"
-                >
-                  {plansLoading && <option value={f.access_level}>Carregando níveis...</option>}
-                  {!plansLoading && !hasCurrentAccess && f.access_level && (
-                    <option value={f.access_level}>{f.access_level} — nível salvo</option>
-                  )}
-                  {accessOptions.map((plan) => (
-                    <option key={plan.id || plan.slug} value={plan.slug}>
-                      {plan.name}{plan.slug === "free" ? " — Todos os membros" : ""}
-                    </option>
-                  ))}
-                </select>
+                {plansLoading || selectedPlans === null ? (
+                  <p className="text-xs text-muted-foreground">Carregando níveis...</p>
+                ) : (
+                  <>
+                    <PlanMultiSelect options={planOptions} selected={selectedPlans} onChange={setSelectedPlans} />
+                    <p className="mt-2 text-[11px] text-muted-foreground">Marque todos os planos que podem ver este curso.</p>
+                  </>
+                )}
               </Field>
             </div>
 

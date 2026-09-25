@@ -236,6 +236,7 @@ export type Database = {
       courses: {
         Row: {
           access_level: string
+          access_levels: string[] | null
           category_id: string | null
           cover_url: string | null
           created_at: string
@@ -253,6 +254,7 @@ export type Database = {
         }
         Insert: {
           access_level?: string
+          access_levels?: string[] | null
           category_id?: string | null
           cover_url?: string | null
           created_at?: string
@@ -270,6 +272,7 @@ export type Database = {
         }
         Update: {
           access_level?: string
+          access_levels?: string[] | null
           category_id?: string | null
           cover_url?: string | null
           created_at?: string
