@@ -271,7 +271,7 @@ function CourseDetail() {
               <span className="text-xs text-muted-foreground">{grouped.length} {grouped.length === 1 ? "módulo" : "módulos"}</span>
             </div>
             <div className="flex snap-x gap-4 overflow-x-auto pb-5">
-              {grouped.map(({ mod, items }, idx) => {
+              {grouped.map(({ mod, items }) => {
                 const isSelected = (mod?.id ?? "orphans") === currentModuleId;
                 const modLessons = items;
                 const modCompleted = modLessons.filter((l) => done.has(l.id)).length;
@@ -345,7 +345,7 @@ function CourseDetail() {
 
           {/* Timeline do Módulo Ativo */}
           {activeGroup && (
-            <div className="glass rounded-2xl p-6 border border-border space-y-6 animate-fade-in">
+            <section className="rounded-xl border border-border bg-card/60 p-4 sm:p-6 animate-fade-in">
               {(() => {
                 const mod = activeGroup.mod;
                 const modLessons = activeGroup.items;
@@ -359,30 +359,30 @@ function CourseDetail() {
 
                 return (
                   <>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
-                      <div className="space-y-1">
-                        <span className="text-[10px] uppercase tracking-wider text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-full">
+                     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border pb-5">
+                       <div className="min-w-0 space-y-1">
+                         <span className="text-[10px] font-semibold uppercase text-primary">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
-                        <h3 className="text-xl font-bold text-white flex items-center gap-2 mt-2">
+                         <h3 className="font-course-display mt-1 flex items-center gap-2 truncate text-xl font-bold text-foreground">
                           {mod?.title ?? "Aulas sem módulo"}
                           {isRestricted(mod?.access_levels, mod?.access_level) && <Lock className="h-4 w-4 text-amber-400" />}
                         </h3>
                         {mod?.description && <p className="text-sm text-muted-foreground mt-1">{mod.description}</p>}
                       </div>
                       
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-muted-foreground">
+                       <div className="flex shrink-0 items-center gap-3">
+                         <span className="hidden text-xs text-muted-foreground sm:inline">
                           {modCompleted}/{modTotal} concluídas
                         </span>
-                        <div className="relative h-12 w-12 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.15)] rounded-full bg-card border border-border">
+                         <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-background">
                           <svg className="w-12 h-12 transform -rotate-90">
-                            <circle cx="24" cy="24" r={radius} className="stroke-white/5" strokeWidth="2.5" fill="transparent" />
+                             <circle cx="24" cy="24" r={radius} className="stroke-muted" strokeWidth="2.5" fill="transparent" />
                             <circle
                               cx="24"
                               cy="24"
                               r={radius}
-                              className="stroke-primary transition-all duration-500 drop-shadow-[0_0_4px_rgba(99,102,241,0.5)]"
+                               className="stroke-primary transition-all duration-500"
                               strokeWidth="2.5"
                               fill="transparent"
                               strokeDasharray={circumference}
@@ -390,13 +390,12 @@ function CourseDetail() {
                               strokeLinecap="round"
                             />
                           </svg>
-                          <span className="absolute text-[10px] font-bold text-white">{modProgress}%</span>
+                           <span className="absolute text-[10px] font-bold text-foreground">{modProgress}%</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Vertical Timeline pathway for Active Module's Lessons */}
-                    <div className="relative pl-6 sm:pl-8 border-l border-border space-y-4 ml-3 sm:ml-5 mt-4">
+                     <div className="mt-3 divide-y divide-border">
                       {modLessons.map((l, idx) => {
                         const isDone = done.has(l.id);
                         const lMod = modules.find((m) => m.id === l.module_id);
@@ -405,15 +404,17 @@ function CourseDetail() {
                           !allowedBy(lMod?.access_levels, lMod?.access_level) ||
                           !allowedBy(l.access_levels, l.access_level);
                         return (
-                          <div key={l.id} className="relative group">
-                            {/* Bullet centered exactly on the vertical border line */}
-                            <div className={`absolute -left-[38px] sm:-left-[46px] top-[12px] h-7 w-7 rounded-full flex items-center justify-center border transition-all duration-300 z-10 bg-[#0c0c0e] ${
-                              lLocked
-                                ? "border-amber-500/30 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
-                                : isDone
-                                  ? "gradient-primary border-transparent text-primary-foreground shadow-[0_0_12px_rgba(99,102,241,0.3)]"
-                                  : "border-border text-muted-foreground group-hover:border-primary/50 group-hover:text-primary group-hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]"
-                            }`}>
+                           <div key={l.id} className="group">
+                             <Button
+                               type="button"
+                               variant="ghost"
+                               size="icon"
+                               aria-label={lLocked ? `Aula bloqueada: ${l.title}` : `Assistir ${l.title}`}
+                               onClick={() => setActiveLessonId(l.id)}
+                               className={`absolute mt-3 h-8 w-8 rounded-full border ${
+                                 lLocked ? "border-border text-muted-foreground" : isDone ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground group-hover:border-primary group-hover:text-primary"
+                               }`}
+                             >
                               {lLocked ? (
                                 <Lock className="h-3 w-3" />
                               ) : isDone ? (
@@ -421,35 +422,35 @@ function CourseDetail() {
                               ) : (
                                 <Play className="h-3 w-3" fill="currentColor" />
                               )}
-                            </div>
+                             </Button>
 
                             <button
                               onClick={() => setActiveLessonId(l.id)}
-                              className="w-full text-left p-4 rounded-xl bg-card hover:bg-card border border-border hover:border-primary/20 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group-hover:translate-x-1"
+                               className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg py-4 pl-11 pr-2 text-left transition hover:bg-foreground/[0.03]"
                             >
-                              <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                               <div className="min-w-0 space-y-1">
+                                 <span className="text-[10px] font-medium uppercase text-muted-foreground">
                                   Aula {String(idx + 1).padStart(2, "0")}
                                 </span>
-                                <h4 className="text-sm font-semibold text-white group-hover:text-primary transition-colors">
+                                 <h4 className="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
                                   {l.title}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center gap-3 shrink-0">
-                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-card px-2.5 py-1 rounded-md border border-border">
+                               <div className="flex shrink-0 items-center gap-2">
+                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                   <Clock className="h-3.5 w-3.5" />
                                   <span>{l.duration ?? l.duration_min ?? 0} min</span>
                                 </div>
 
                                 {l.is_free && (
-                                  <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 uppercase font-semibold border border-emerald-500/20">
+                                   <span className="rounded border border-primary/20 bg-primary/10 px-2 py-0.5 text-[9px] font-semibold uppercase text-primary">
                                     Grátis
                                   </span>
                                 )}
                                 {lLocked && !l.is_free && (
-                                  <span className="text-[9px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 uppercase font-semibold border border-amber-500/20">
-                                    Premium
+                                   <span className="hidden rounded border border-border px-2 py-0.5 text-[9px] font-semibold uppercase text-muted-foreground sm:inline">
+                                     Bloqueada
                                   </span>
                                 )}
 
@@ -463,7 +464,7 @@ function CourseDetail() {
                   </>
                 );
               })()}
-            </div>
+            </section>
           )}
         </div>
       ) : (
