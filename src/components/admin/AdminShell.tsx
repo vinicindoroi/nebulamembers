@@ -72,7 +72,7 @@ export function AdminShell() {
       >
         <div className="h-full flex flex-col p-5">
           <Link to="/admin/dashboard" className="flex items-center gap-3 px-2 py-2 mb-8">
-            <img src={brandLogo.url} alt="Nebula Members" className="h-11 w-44 object-contain object-left" />
+            <img src={brandLogo.url} alt="Nebula Members" className="h-16 w-60 max-w-full object-contain object-left" />
             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/20">ADMIN</span>
           </Link>
 
