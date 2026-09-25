@@ -498,6 +498,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
     title: initial.title ?? "",
     description: initial.description ?? "",
     video_url: initial.video_url ?? "",
+    poster_url: (initial as any).poster_url ?? "",
     duration: initial.duration ?? 0,
     is_free: initial.is_free ?? false,
     module_id: initial.module_id ?? moduleId,
@@ -578,6 +579,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       title: f.title,
       description: f.description || null,
       video_url: f.video_url || null,
+      poster_url: f.poster_url || null,
       duration: f.duration || null,
       is_free: f.is_free,
       access_level: "free",
@@ -636,6 +638,12 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       </Field>
       <Field label="URL do vídeo" icon={Video} hint="YouTube, Vimeo, Bunny, etc.">
         <input value={f.video_url} onChange={(e) => setF({ ...f, video_url: e.target.value })} className={inputClass} placeholder="https://..." />
+      </Field>
+      <Field label="Capa da aula" icon={ImageIcon} hint="Opcional. Exibida antes de dar play — esconde a interface do YouTube.">
+        <input value={f.poster_url} onChange={(e) => setF({ ...f, poster_url: e.target.value })} className={inputClass} placeholder="https://... (imagem de capa)" />
+        {f.poster_url.trim() && (
+          <img src={f.poster_url} alt="Prévia da capa" className="mt-2 aspect-video w-full max-w-xs rounded-lg border border-border object-cover" />
+        )}
       </Field>
       <div className="grid grid-cols-2 gap-4">
         <Field label="Duração (min)" icon={Clock}>

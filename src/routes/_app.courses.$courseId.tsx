@@ -764,18 +764,7 @@ function LessonPlayer({ lesson, lessons, onNextLesson }: { lesson: Lesson; lesso
   // If it's an embeddable URL (YouTube, Vimeo, etc.), use iframe
   const embed = toEmbedUrl(url);
   if (embed) {
-    return (
-      <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border">
-        <iframe
-          key={embed}
-          src={embed}
-          title={lesson.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          className="w-full h-full"
-        />
-      </div>
-    );
+    return <EmbedPlayer embed={embed} title={lesson.title} poster={resolvedPoster} youtubeId={youtubeIdFromUrl(url)} />;
   }
 
   // Custom player for direct video files
@@ -805,6 +794,66 @@ function LessonPlayer({ lesson, lessons, onNextLesson }: { lesson: Lesson; lesso
   );
 }
 
+function youtubeIdFromUrl(raw: string): string | null {
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") return u.pathname.slice(1) || null;
+    if (host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
+      if (u.pathname.startsWith("/embed/")) return u.pathname.split("/")[2] || null;
+      const id = u.searchParams.get("v");
+      if (id) return id;
+      if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] || null;
+    }
+  } catch {}
+  return null;
+}
+
+const YT_PARAMS = "modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&color=white";
+
+function EmbedPlayer({ embed, title, poster, youtubeId }: { embed: string; title: string; poster: string | null; youtubeId: string | null }) {
+  const [started, setStarted] = useState(false);
+  const cover = poster || (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg` : null);
+
+  if (!started) {
+    return (
+      <button
+        type="button"
+        onClick={() => setStarted(true)}
+        className="group relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border text-left"
+        aria-label={`Assistir: ${title}`}
+      >
+        {cover ? (
+          <img src={cover} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        ) : (
+          <div className="absolute inset-0 bg-card" />
+        )}
+        <div className="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/20" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform duration-300 group-hover:scale-110">
+            <Play className="h-7 w-7 fill-current" />
+          </span>
+        </div>
+        <span className="absolute bottom-3 left-4 right-4 truncate text-sm font-medium text-white drop-shadow">{title}</span>
+      </button>
+    );
+  }
+
+  const src = embed.includes("?") ? `${embed}&autoplay=1` : `${embed}?autoplay=1`;
+  return (
+    <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border">
+      <iframe
+        key={src}
+        src={src}
+        title={title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        className="w-full h-full"
+      />
+    </div>
+  );
+}
+
 function toEmbedUrl(raw: string): string | null {
   try {
     const u = new URL(raw);
@@ -813,15 +862,15 @@ function toEmbedUrl(raw: string): string | null {
     // YouTube
     if (host === "youtu.be") {
       const id = u.pathname.slice(1);
-      return id ? `https://www.youtube.com/embed/${id}` : null;
+      return id ? `https://www.youtube.com/embed/${id}?${YT_PARAMS}` : null;
     }
     if (host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
-      if (u.pathname.startsWith("/embed/")) return raw;
+      if (u.pathname.startsWith("/embed/")) return raw.includes("?") ? `${raw}&${YT_PARAMS}` : `${raw}?${YT_PARAMS}`;
       const id = u.searchParams.get("v");
-      if (id) return `https://www.youtube.com/embed/${id}`;
+      if (id) return `https://www.youtube.com/embed/${id}?${YT_PARAMS}`;
       if (u.pathname.startsWith("/shorts/")) {
         const sid = u.pathname.split("/")[2];
-        return sid ? `https://www.youtube.com/embed/${sid}` : null;
+        return sid ? `https://www.youtube.com/embed/${sid}?${YT_PARAMS}` : null;
       }
     }
 
