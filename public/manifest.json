@@ -1,5 +1,5 @@
 {
-  "name": "Nebula Member Hub",
+  "name": "Nebula Members",
   "short_name": "Nebula",
   "description": "Área de membros minimalista, moderna e gamificada.",
   "start_url": "/",
@@ -10,7 +10,7 @@
   "icons": [
     {
       "src": "/nebula_logo.png?v=2",
-      "sizes": "512x512",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any maskable"
     }
