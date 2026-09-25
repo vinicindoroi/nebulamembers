@@ -1582,6 +1582,7 @@ export type Database = {
           is_premium: boolean | null
           module_id: string | null
           position: number | null
+          poster_url: string | null
           title: string | null
         }
         Insert: {
@@ -1601,6 +1602,7 @@ export type Database = {
           is_premium?: boolean | null
           module_id?: string | null
           position?: number | null
+          poster_url?: string | null
           title?: string | null
         }
         Update: {
@@ -1620,6 +1622,7 @@ export type Database = {
           is_premium?: boolean | null
           module_id?: string | null
           position?: number | null
+          poster_url?: string | null
           title?: string | null
         }
         Relationships: [
