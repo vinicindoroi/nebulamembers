@@ -34,7 +34,11 @@
   --color-glass-border: var(--glass-border);
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-course-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-course-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
+
+.courses-catalog { font-family: var(--font-course-body); }
 
 :root {
   color-scheme: dark;
