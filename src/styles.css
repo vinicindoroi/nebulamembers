@@ -39,6 +39,10 @@
 }
 
 .courses-catalog { font-family: var(--font-course-body); }
+.community-social { font-family: var(--font-course-body); }
+.community-social h1,
+.community-social h2,
+.community-social h3 { font-family: var(--font-course-display); }
 
 :root {
   color-scheme: dark;

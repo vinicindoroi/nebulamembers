@@ -38,11 +38,11 @@ export function MembersSidebar() {
   const visibleOffline = showAllOffline ? offline : offline.slice(0, OFFLINE_LIMIT);
 
   return (
-    <aside className="w-[260px] shrink-0 hidden xl:block animate-fade-up">
+    <aside className="hidden min-w-0 xl:block animate-fade-up">
       <div className="sticky top-4 space-y-4">
         {/* Painel Online */}
-        <div className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden shadow-lg hover:border-border transition-all duration-300">
-          <div className="px-4 py-3.5 border-b border-border flex items-center gap-2 bg-card">
+        <div className="overflow-hidden rounded-lg border border-border bg-card/40 backdrop-blur-md transition-colors hover:border-primary/20">
+          <div className="flex items-center gap-2 border-b border-border bg-card/55 px-4 py-3.5">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_6px_oklch(0.7_0.2_160)]"></span>
@@ -77,8 +77,8 @@ export function MembersSidebar() {
         </div>
 
         {/* Painel Offline */}
-        <div className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden shadow-lg hover:border-border transition-all duration-300">
-          <div className="px-4 py-3.5 border-b border-border flex items-center gap-2 bg-card">
+        <div className="overflow-hidden rounded-lg border border-border bg-card/40 backdrop-blur-md transition-colors hover:border-primary/20">
+          <div className="flex items-center gap-2 border-b border-border bg-card/55 px-4 py-3.5">
             <span className="h-2 w-2 rounded-full bg-white/20" />
             <span className="text-xs font-bold text-muted-foreground tracking-wide uppercase">Offline</span>
             <span className="text-[10px] font-bold font-mono text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-full ml-auto">
@@ -115,7 +115,7 @@ function MemberRow({ member, online }: { member: Member; online: boolean }) {
   const initials = name.slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-card transition-all duration-200 group/member cursor-default">
+    <div className="group/member flex cursor-default items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted/35">
       <div className="relative shrink-0">
         {member.avatar_url ? (
           <img 

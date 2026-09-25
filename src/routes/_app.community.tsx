@@ -21,7 +21,14 @@ import { useAdmin } from "@/hooks/use-admin";
 
 export const Route = createFileRoute("/_app/community")({
   component: CommunityPage,
-  head: () => ({ meta: [{ title: "Comunidade — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Comunidade Nebula — Membros" },
+    { name: "description", content: "Compartilhe ideias, acompanhe membros e participe da Comunidade Nebula." },
+    { property: "og:title", content: "Comunidade Nebula — Membros" },
+    { property: "og:description", content: "Compartilhe ideias, acompanhe membros e participe da Comunidade Nebula." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type Comment = {
@@ -551,27 +558,27 @@ function CommunityPage() {
   });
 
   return (
-    <div className="flex justify-center gap-6 max-w-7xl mx-auto px-4">
+    <div className="community-social mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-6 px-3 pb-10 sm:px-5 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[220px_minmax(0,1fr)_240px]">
       {/* Coluna Esquerda: Perfil & XP */}
-      <div className="hidden lg:block w-64 shrink-0">
+      <div className="hidden min-w-0 lg:block">
         <ProfileSidebarWidget />
       </div>
 
       {/* Coluna Central: Feed */}
-      <div className="flex-1 max-w-2xl space-y-5 py-2 min-w-0">
+      <main className="min-w-0 space-y-5 py-2">
         {/* Header da Comunidade */}
-        <div className="space-y-4 pb-2 animate-fade-up">
+        <div className="space-y-5 pb-1 animate-fade-up">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full shadow-[0_2px_12px_rgba(var(--primary),0.05)]">
-              <Sparkles className="h-3 w-3 animate-pulse" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-[10px] font-semibold uppercase text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               <span>{posts.length} publicações na rede</span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-foreground/90 to-white/60 bg-clip-text text-transparent">Comunidade Nebula</h1>
-            <p className="text-sm text-muted-foreground/80 max-w-md mx-auto">Compartilhe insights, conecte-se com membros e ganhe XP participando.</p>
+            <h1 className="font-course-display text-3xl font-bold text-foreground sm:text-4xl">Comunidade Nebula</h1>
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">Compartilhe insights, conecte-se com membros e ganhe XP participando.</p>
           </div>
 
           {/* Barra de Pesquisa & Filtros */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <div className="grid gap-3 rounded-lg border border-border bg-card/35 p-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             {/* Campo de Pesquisa */}
             <div className="relative flex-1 group">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/45 transition-colors group-hover:text-primary group-focus-within:text-primary" />
@@ -580,7 +587,7 @@ function CommunityPage() {
                 placeholder="Pesquisar publicações ou membros..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-border bg-card text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 focus:bg-card focus:shadow-glow transition-all duration-300"
+                className="w-full rounded-md border-0 bg-transparent py-2.5 pl-10 pr-9 text-xs placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/40"
               />
               {searchQuery && (
                 <button
@@ -593,7 +600,7 @@ function CommunityPage() {
             </div>
 
             {/* Abas do Feed */}
-            <div className="flex bg-card border border-border p-1 rounded-xl items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1 overflow-x-auto rounded-md bg-background/60 p-1">
               <button
                 onClick={() => setActiveTab("all")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 ${
@@ -632,7 +639,7 @@ function CommunityPage() {
         </div>
 
         {/* Composer (Novo Post) */}
-        <div className="rounded-3xl border border-border bg-white/[0.015] backdrop-blur-md overflow-hidden transition-all duration-300 focus-within:border-primary/40 focus-within:shadow-glow focus-within:bg-card animate-fade-up">
+        <div className="overflow-hidden rounded-lg border border-border bg-card/45 backdrop-blur-md transition-all duration-300 focus-within:border-primary/40 focus-within:bg-card/70 animate-fade-up">
           <div className="px-5 pt-4 pb-3">
             <div className="flex items-center gap-3 mb-3">
               <Avatar initials={initials} xp={myXp} avatarUrl={myProfile?.avatar_url} />
@@ -658,7 +665,7 @@ function CommunityPage() {
             </div>
           )}
 
-          <div className="px-5 py-3 border-t border-border bg-card flex items-center justify-between">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-border bg-background/25 px-5 py-3">
             <div className="flex gap-1 text-muted-foreground">
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleImageSelect} />
               <button type="button" onClick={() => fileRef.current?.click()} className="p-2 rounded-xl hover:bg-muted/50 hover:text-foreground transition-all duration-200 hover:scale-105 active:scale-95" title="Adicionar Imagem">
@@ -670,7 +677,7 @@ function CommunityPage() {
               <button
                 onClick={() => create.mutate()}
                 disabled={(!text.trim() && !imageFile) || create.isPending}
-                className="gradient-primary text-primary-foreground rounded-xl px-4 py-2 text-xs font-semibold flex items-center gap-2 disabled:opacity-40 transition-all hover:scale-102 hover:brightness-105 shadow-[0_4px_16px_-4px_oklch(0.65_0.22_290/0.5)] active:scale-98"
+                className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
               >
                 <Send className="h-3.5 w-3.5" />
                 {create.isPending ? "Publicando..." : "Publicar"}
@@ -680,10 +687,10 @@ function CommunityPage() {
         </div>
 
         {/* Stories Operacionais Rápidos (Feature 5) */}
-        <div className="relative overflow-hidden rounded-3xl border border-border bg-white/[0.015] p-4 flex flex-col gap-3">
+        <div className="relative flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-card/35 p-4">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-              <Sparkles className="h-3 w-3 text-primary animate-pulse" /> Stories Operacionais (24h)
+              <Sparkles className="h-3 w-3 text-primary" /> Stories Operacionais (24h)
             </span>
             <span className="text-[9px] text-muted-foreground/45 font-semibold">Poste faturamentos ou insights</span>
           </div>
@@ -1031,7 +1038,7 @@ function CommunityPage() {
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-white/[0.015] p-16 text-center animate-fade-up">
+          <div className="rounded-lg border border-dashed border-border bg-card/25 px-5 py-20 text-center animate-fade-up">
             <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground/20 mb-3" strokeWidth={1.2} />
             <div className="text-sm font-semibold">Nenhuma publicação encontrada</div>
             <p className="text-xs text-muted-foreground/70 mt-1">Experimente mudar o filtro ou fazer outra busca.</p>
@@ -1062,7 +1069,7 @@ function CommunityPage() {
             )}
           </div>
         )}
-      </div>
+      </main>
       <MembersSidebar />
       {confirmDialog}
     </div>
