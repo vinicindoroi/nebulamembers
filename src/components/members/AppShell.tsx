@@ -370,7 +370,7 @@ export function AppShell() {
           <div className="flex items-center justify-between mb-8">
             <Link to="/dashboard" className="flex items-center gap-3 px-2 py-2">
               {siteSettings.logoUrl ? (
-               <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-11 w-44 object-contain object-left" />
+                <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-16 w-60 max-w-full object-contain object-left" />
               ) : (
                 <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-[0_0_24px_-4px_oklch(0.65_0.22_290/0.6)]">
                   <Orbit className="h-5 w-5 text-primary-foreground" />
@@ -486,7 +486,7 @@ export function AppShell() {
           <div className="flex items-center justify-between mb-8">
             <Link to="/dashboard" className="flex items-center gap-3 px-2 py-2" onClick={() => setOpen(false)}>
               {siteSettings.logoUrl ? (
-                 <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-11 w-44 object-contain object-left" />
+                 <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-16 w-60 max-w-full object-contain object-left" />
               ) : (
                 <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center">
                   <Orbit className="h-5 w-5 text-primary-foreground" />
