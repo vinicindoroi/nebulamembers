@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin/courses")({
   ] }),
 });
 
-type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; title_visible: boolean | null };
+type Course = { id: string; title: string; description: string | null; tag: string | null; cover_url: string | null; status: string; price: number | null; category_id: string | null; gradient_from: string | null; gradient_to: string | null; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; title_visible: boolean | null };
 type Cat = { id: string; name: string };
 type Offer = { id: string; name: string };
 
