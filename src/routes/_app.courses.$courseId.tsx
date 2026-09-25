@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAddXp } from "@/hooks/use-xp";
 import { NebulaPlayer, type Chapter } from "@/components/player/NebulaPlayer";
 import { LessonComments } from "@/components/lessons/LessonComments";
+import { Button } from "@/components/ui/button";
 import { getSignedVideoUrl, isStoragePath, getAttachmentDownloadUrl } from "@/lib/storage";
 import {
   usePlayerSettings,
@@ -21,6 +22,16 @@ import {
 
 export const Route = createFileRoute("/_app/courses/$courseId")({
   component: CourseDetail,
+  head: () => ({
+    meta: [
+      { title: "Assistir curso — Nebula Members" },
+      { name: "description", content: "Assista às aulas e acompanhe seu progresso na Nebula Members." },
+      { property: "og:title", content: "Assistir curso — Nebula Members" },
+      { property: "og:description", content: "Assista às aulas e acompanhe seu progresso na Nebula Members." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 });
 
 type Lesson = {
@@ -56,15 +67,6 @@ type Module = {
   cover_url: string | null;
   title_visible?: boolean | null;
 };
-
-const premiumGradients = [
-  "from-primary/30 via-primary/10 to-[#0c0c0e]/90 border-primary/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(99,102,241,0.15)]",
-  "from-rose-600/30 via-pink-600/10 to-[#0c0c0e]/90 border-rose-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(244,63,94,0.15)]",
-  "from-emerald-600/30 via-teal-600/10 to-[#0c0c0e]/90 border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(16,185,129,0.15)]",
-  "from-cyan-600/30 via-primary/10 to-[#0c0c0e]/90 border-cyan-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(6,182,212,0.15)]",
-  "from-amber-600/30 via-orange-600/10 to-[#0c0c0e]/90 border-amber-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(245,158,11,0.15)]",
-  "from-primary/30 via-primary/10 to-[#0c0c0e]/90 border-primary/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_8px_30px_rgba(217,70,239,0.15)]",
-];
 
 function CourseDetail() {
   const { courseId } = Route.useParams();
@@ -196,7 +198,7 @@ function CourseDetail() {
   const activeGroup = grouped.find((g) => (g.mod?.id ?? "orphans") === currentModuleId) ?? grouped[0];
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="courses-catalog mx-auto w-full max-w-[1600px] space-y-8 pb-12 animate-fade-up">
       {activeLessonId ? (
         <button
           onClick={() => setActiveLessonId(null)}
@@ -210,7 +212,7 @@ function CourseDetail() {
         </Link>
       )}
 
-      <header className="glass-strong rounded-2xl overflow-hidden relative">
+      <header className="relative min-h-48 overflow-hidden rounded-xl border border-border bg-card sm:min-h-64">
         <div className="absolute inset-0">
           {course.cover_url && (
             <img src={course.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -218,17 +220,17 @@ function CourseDetail() {
           {course.gradient_from && course.gradient_to && (
             <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${course.gradient_from}, ${course.gradient_to}00)` }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/35 to-background/10" />
         </div>
-        <div className="relative p-6">
-          {course.tag && <span className="text-[10px] uppercase tracking-wider text-primary bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full">{course.tag}</span>}
-          {(course as any).title_visible !== false && <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 text-white drop-shadow-lg">{course.title}</h1>}
-          {course.description && <p className="text-sm text-white/70 mt-2">{course.description}</p>}
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex-1 h-1.5 rounded-full bg-white/20 overflow-hidden">
-              <div className="h-full gradient-primary" style={{ width: `${progress}%` }} />
+        <div className="relative flex min-h-48 flex-col justify-end p-5 sm:min-h-64 sm:p-8">
+          {course.tag && <span className="mb-2 w-fit rounded-md border border-primary/25 bg-background/70 px-2 py-1 text-[10px] font-semibold uppercase text-primary backdrop-blur-md">{course.tag}</span>}
+          {(course as any).title_visible !== false && <h1 className="font-course-display max-w-3xl text-2xl font-bold text-foreground sm:text-4xl">{course.title}</h1>}
+          {course.description && <p className="mt-2 max-w-2xl text-sm text-foreground/70">{course.description}</p>}
+          <div className="mt-5 flex max-w-2xl items-center gap-3">
+            <div className="h-1 flex-1 overflow-hidden rounded-full bg-foreground/15">
+              <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
             </div>
-            <span className="text-xs text-white/80">{completed}/{total} • {progress}%</span>
+            <span className="shrink-0 text-xs font-semibold text-foreground/80">{completed}/{total} • {progress}%</span>
           </div>
         </div>
       </header>
@@ -238,51 +240,52 @@ function CourseDetail() {
           Este curso ainda não possui aulas. Adicione aulas em <span className="text-foreground">Admin → Módulos & Aulas</span>.
         </div>
       ) : activeLessonId === null ? (
-        <div className="space-y-6">
-          {/* CTA Card */}
-          <div className="relative overflow-hidden rounded-2xl p-6 border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_12px_40px_-12px_rgba(99,102,241,0.25)]">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
-            <div className="relative z-10 space-y-1">
-              <span className="text-[10px] uppercase tracking-wider text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-full">Status do Progresso</span>
-              <h2 className="text-xl font-bold text-white mt-2">Navegue pelos módulos</h2>
-              <p className="text-sm text-muted-foreground mt-1">
+        <div className="space-y-10">
+          <section className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-y border-border py-6">
+            <div className="min-w-0">
+              <span className="text-[10px] font-semibold uppercase text-primary">Seu progresso</span>
+              <h2 className="font-course-display mt-1 text-xl font-bold sm:text-2xl">{isStarted ? "Continue assistindo" : "Comece sua jornada"}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
                 {isStarted ? `Você completou ${completed} de ${total} aulas. Continue de onde parou!` : "Comece a sua jornada agora mesmo!"}
               </p>
             </div>
             {firstUncompletedLesson && (
-              <button
+              <Button
                 onClick={() => setActiveLessonId(firstUncompletedLesson.id)}
-                className="relative z-10 gradient-primary text-primary-foreground px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 hover:scale-[1.02] transition active:scale-[0.98] shadow-[0_8px_24px_-8px_oklch(0.65_0.22_290/0.6)] shrink-0 cursor-pointer group"
+                className="h-11 shrink-0 px-4 sm:px-6"
               >
-                <Play className="h-4 w-4 transition-transform group-hover:scale-110" fill="currentColor" />
-                {isStarted ? "Continuar de onde parou" : "Começar a Assistir"}
-              </button>
+                <Play className="h-4 w-4" fill="currentColor" />
+                <span className="hidden sm:inline">{isStarted ? "Continuar assistindo" : "Começar a assistir"}</span>
+                <span className="sm:hidden">Assistir</span>
+              </Button>
             )}
-          </div>
+          </section>
 
           {/* Módulos do Curso - Estilo Netflix */}
-          <div className="space-y-4">
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold px-1">
-              Selecione o Módulo
-            </h3>
-            <div className="flex overflow-x-auto gap-4 pt-2 pb-5 px-2 -mx-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-              {grouped.map(({ mod, items }, idx) => {
+          <section className="space-y-4">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <span className="text-[10px] font-semibold uppercase text-primary">Conteúdo</span>
+                <h3 className="font-course-display mt-1 text-xl font-bold">Módulos do curso</h3>
+              </div>
+              <span className="text-xs text-muted-foreground">{grouped.length} {grouped.length === 1 ? "módulo" : "módulos"}</span>
+            </div>
+            <div className="flex snap-x gap-4 overflow-x-auto pb-5">
+              {grouped.map(({ mod, items }) => {
                 const isSelected = (mod?.id ?? "orphans") === currentModuleId;
                 const modLessons = items;
                 const modCompleted = modLessons.filter((l) => done.has(l.id)).length;
                 const modTotal = modLessons.length;
                 const modProgress = modTotal ? Math.round((modCompleted / modTotal) * 100) : 0;
                 
-                const gradient = premiumGradients[idx % premiumGradients.length];
-
                 return (
                   <button
                     key={mod?.id ?? "orphans"}
                     onClick={() => setSelectedModuleId(mod?.id ?? "orphans")}
-                    className={`relative w-64 aspect-[14/9] shrink-0 rounded-2xl border text-left overflow-hidden transition-all duration-300 group cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5 ${
+                    className={`group relative aspect-video w-64 shrink-0 snap-start overflow-hidden rounded-lg border text-left transition duration-300 sm:w-72 ${
                       isSelected
-                        ? "border-primary shadow-[0_0_25px_rgba(99,102,241,0.25)] ring-1 ring-primary/50"
-                        : "border-border hover:border-border bg-card"
+                        ? "border-primary ring-1 ring-primary/50"
+                        : "border-border bg-card hover:scale-[1.02] hover:border-primary/40"
                     }`}
                   >
                     {/* Cover image if available */}
@@ -293,25 +296,20 @@ function CourseDetail() {
                           alt=""
                           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        {/* Dark glassmorphic/gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c0e]/90 via-[#0c0c0e]/40 to-[#0c0c0e]/10 group-hover:from-[#0c0c0e]/95 transition-all" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
                       </>
                     ) : (
-                      /* Dynamic cover gradient overlay fallback */
-                      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90 group-hover:opacity-100 transition-opacity`} />
+                       <div className="absolute inset-0 bg-muted" />
                     )}
-                    
-                    {/* Nebula grid overlay */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
                     
                     {/* Content */}
                     <div className="absolute inset-0 p-4 flex flex-col justify-between z-10">
                       <div className="flex items-start justify-between">
-                        <span className="text-[9px] uppercase tracking-wider text-white/80 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-border">
+                         <span className="rounded-md border border-border bg-background/70 px-2 py-1 text-[9px] font-bold uppercase text-foreground/80 backdrop-blur-md">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
                         {isRestricted(mod?.access_levels, mod?.access_level) && (
-                          <span className="p-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-400">
+                           <span className="rounded-md border border-border bg-background/70 p-1 text-muted-foreground backdrop-blur-md">
                             <Lock className="h-3 w-3" />
                           </span>
                         )}
@@ -319,23 +317,23 @@ function CourseDetail() {
                       
                       <div className="space-y-1 mt-auto">
                         {(mod?.title_visible ?? true) && (
-                          <h4 className="font-bold text-white text-sm md:text-base leading-snug line-clamp-2 drop-shadow-md group-hover:text-primary-light transition-colors">
+                           <h4 className="line-clamp-2 text-sm font-bold leading-snug text-foreground transition-colors group-hover:text-primary md:text-base">
                             {mod?.title ?? "Aulas sem módulo"}
                           </h4>
                         )}
-                        <p className="text-[11px] text-white/50">
+                         <p className="text-[11px] text-foreground/60">
                           {modTotal} {modTotal === 1 ? "aula" : "aulas"}
                         </p>
                       </div>
                       
                       {/* Integrated progress bar at the bottom */}
                       <div className="space-y-1 mt-2">
-                        <div className="flex justify-between items-center text-[9px] text-white/60">
+                         <div className="flex items-center justify-between text-[9px] text-foreground/60">
                           <span>{modCompleted}/{modTotal} concluídas</span>
                           <span>{modProgress}%</span>
                         </div>
-                        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full gradient-primary" style={{ width: `${modProgress}%` }} />
+                         <div className="h-1 w-full overflow-hidden rounded-full bg-foreground/10">
+                           <div className="h-full bg-primary" style={{ width: `${modProgress}%` }} />
                         </div>
                       </div>
                     </div>
@@ -343,11 +341,11 @@ function CourseDetail() {
                 );
               })}
             </div>
-          </div>
+          </section>
 
           {/* Timeline do Módulo Ativo */}
           {activeGroup && (
-            <div className="glass rounded-2xl p-6 border border-border space-y-6 animate-fade-in">
+            <section className="rounded-xl border border-border bg-card/60 p-4 sm:p-6 animate-fade-in">
               {(() => {
                 const mod = activeGroup.mod;
                 const modLessons = activeGroup.items;
@@ -361,30 +359,30 @@ function CourseDetail() {
 
                 return (
                   <>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
-                      <div className="space-y-1">
-                        <span className="text-[10px] uppercase tracking-wider text-primary font-bold bg-primary/10 px-2.5 py-1 rounded-full">
+                     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border pb-5">
+                       <div className="min-w-0 space-y-1">
+                         <span className="text-[10px] font-semibold uppercase text-primary">
                           {mod?.position !== undefined ? `Módulo ${String(mod.position + 1).padStart(2, "0")}` : "Extra"}
                         </span>
-                        <h3 className="text-xl font-bold text-white flex items-center gap-2 mt-2">
+                         <h3 className="font-course-display mt-1 flex items-center gap-2 truncate text-xl font-bold text-foreground">
                           {mod?.title ?? "Aulas sem módulo"}
                           {isRestricted(mod?.access_levels, mod?.access_level) && <Lock className="h-4 w-4 text-amber-400" />}
                         </h3>
                         {mod?.description && <p className="text-sm text-muted-foreground mt-1">{mod.description}</p>}
                       </div>
                       
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-muted-foreground">
+                       <div className="flex shrink-0 items-center gap-3">
+                         <span className="hidden text-xs text-muted-foreground sm:inline">
                           {modCompleted}/{modTotal} concluídas
                         </span>
-                        <div className="relative h-12 w-12 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.15)] rounded-full bg-card border border-border">
+                         <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-background">
                           <svg className="w-12 h-12 transform -rotate-90">
-                            <circle cx="24" cy="24" r={radius} className="stroke-white/5" strokeWidth="2.5" fill="transparent" />
+                             <circle cx="24" cy="24" r={radius} className="stroke-muted" strokeWidth="2.5" fill="transparent" />
                             <circle
                               cx="24"
                               cy="24"
                               r={radius}
-                              className="stroke-primary transition-all duration-500 drop-shadow-[0_0_4px_rgba(99,102,241,0.5)]"
+                               className="stroke-primary transition-all duration-500"
                               strokeWidth="2.5"
                               fill="transparent"
                               strokeDasharray={circumference}
@@ -392,13 +390,12 @@ function CourseDetail() {
                               strokeLinecap="round"
                             />
                           </svg>
-                          <span className="absolute text-[10px] font-bold text-white">{modProgress}%</span>
+                           <span className="absolute text-[10px] font-bold text-foreground">{modProgress}%</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Vertical Timeline pathway for Active Module's Lessons */}
-                    <div className="relative pl-6 sm:pl-8 border-l border-border space-y-4 ml-3 sm:ml-5 mt-4">
+                     <div className="mt-3 divide-y divide-border">
                       {modLessons.map((l, idx) => {
                         const isDone = done.has(l.id);
                         const lMod = modules.find((m) => m.id === l.module_id);
@@ -407,15 +404,17 @@ function CourseDetail() {
                           !allowedBy(lMod?.access_levels, lMod?.access_level) ||
                           !allowedBy(l.access_levels, l.access_level);
                         return (
-                          <div key={l.id} className="relative group">
-                            {/* Bullet centered exactly on the vertical border line */}
-                            <div className={`absolute -left-[38px] sm:-left-[46px] top-[12px] h-7 w-7 rounded-full flex items-center justify-center border transition-all duration-300 z-10 bg-[#0c0c0e] ${
-                              lLocked
-                                ? "border-amber-500/30 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
-                                : isDone
-                                  ? "gradient-primary border-transparent text-primary-foreground shadow-[0_0_12px_rgba(99,102,241,0.3)]"
-                                  : "border-border text-muted-foreground group-hover:border-primary/50 group-hover:text-primary group-hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]"
-                            }`}>
+                           <div key={l.id} className="group relative">
+                             <Button
+                               type="button"
+                               variant="ghost"
+                               size="icon"
+                               aria-label={lLocked ? `Aula bloqueada: ${l.title}` : `Assistir ${l.title}`}
+                               onClick={() => setActiveLessonId(l.id)}
+                               className={`absolute mt-3 h-8 w-8 rounded-full border ${
+                                 lLocked ? "border-border text-muted-foreground" : isDone ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground group-hover:border-primary group-hover:text-primary"
+                               }`}
+                             >
                               {lLocked ? (
                                 <Lock className="h-3 w-3" />
                               ) : isDone ? (
@@ -423,35 +422,35 @@ function CourseDetail() {
                               ) : (
                                 <Play className="h-3 w-3" fill="currentColor" />
                               )}
-                            </div>
+                             </Button>
 
                             <button
                               onClick={() => setActiveLessonId(l.id)}
-                              className="w-full text-left p-4 rounded-xl bg-card hover:bg-card border border-border hover:border-primary/20 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group-hover:translate-x-1"
+                               className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg py-4 pl-11 pr-2 text-left transition hover:bg-foreground/[0.03]"
                             >
-                              <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                               <div className="min-w-0 space-y-1">
+                                 <span className="text-[10px] font-medium uppercase text-muted-foreground">
                                   Aula {String(idx + 1).padStart(2, "0")}
                                 </span>
-                                <h4 className="text-sm font-semibold text-white group-hover:text-primary transition-colors">
+                                 <h4 className="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
                                   {l.title}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center gap-3 shrink-0">
-                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-card px-2.5 py-1 rounded-md border border-border">
+                               <div className="flex shrink-0 items-center gap-2">
+                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                   <Clock className="h-3.5 w-3.5" />
                                   <span>{l.duration ?? l.duration_min ?? 0} min</span>
                                 </div>
 
                                 {l.is_free && (
-                                  <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 uppercase font-semibold border border-emerald-500/20">
+                                   <span className="rounded border border-primary/20 bg-primary/10 px-2 py-0.5 text-[9px] font-semibold uppercase text-primary">
                                     Grátis
                                   </span>
                                 )}
                                 {lLocked && !l.is_free && (
-                                  <span className="text-[9px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 uppercase font-semibold border border-amber-500/20">
-                                    Premium
+                                   <span className="hidden rounded border border-border px-2 py-0.5 text-[9px] font-semibold uppercase text-muted-foreground sm:inline">
+                                     Bloqueada
                                   </span>
                                 )}
 
@@ -465,11 +464,11 @@ function CourseDetail() {
                   </>
                 );
               })()}
-            </div>
+            </section>
           )}
         </div>
       ) : (
-        <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* Player + content */}
           <div className="space-y-4 min-w-0">
             {isLocked ? (
@@ -523,8 +522,8 @@ function CourseDetail() {
               />
             )}
 
-            <div className="glass rounded-2xl p-5">
-              <div className="flex items-start justify-between gap-4">
+            <div className="rounded-xl border border-border bg-card/60 p-5">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                 <div className="min-w-0">
                   <div className="text-[11px] text-muted-foreground">
                     Aula {(activeLesson.position ?? 0) + 1}
@@ -534,20 +533,19 @@ function CourseDetail() {
                   </div>
                   <h2 className="text-lg font-semibold mt-1">{activeLesson.title}</h2>
                 </div>
-                <button
+                <Button
+                  type="button"
+                  variant={done.has(activeLesson.id) ? "outline" : "default"}
                   onClick={() =>
                     toggle.mutate({ lessonId: activeLesson.id, completed: done.has(activeLesson.id) })
                   }
                   disabled={toggle.isPending}
-                  className={`shrink-0 text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 transition ${
-                    done.has(activeLesson.id)
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                      : "gradient-primary text-primary-foreground"
-                  }`}
+                  className="shrink-0 px-3 text-xs"
                 >
                   <Check className="h-3.5 w-3.5" />
-                  {done.has(activeLesson.id) ? "Concluída" : "Marcar como concluída"}
-                </button>
+                  <span className="hidden sm:inline">{done.has(activeLesson.id) ? "Concluída" : "Marcar como concluída"}</span>
+                  <span className="sm:hidden">{done.has(activeLesson.id) ? "Concluída" : "Concluir"}</span>
+                </Button>
               </div>
 
               {activeLesson.description && (
@@ -569,8 +567,8 @@ function CourseDetail() {
           </div>
 
           {/* Sidebar com módulos/aulas */}
-          <aside className="glass rounded-2xl p-3 h-fit lg:sticky lg:top-4">
-            <div className="px-2 py-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+          <aside className="h-fit rounded-xl border border-border bg-card/60 p-3 lg:sticky lg:top-4">
+            <div className="px-2 py-2 text-[11px] font-semibold uppercase text-muted-foreground">
               Conteúdo do curso
             </div>
             <div className="space-y-3">
@@ -596,7 +594,7 @@ function CourseDetail() {
                           key={l.id}
                           onClick={() => setActiveLessonId(l.id)}
                           className={`w-full text-left px-2 py-2 rounded-lg flex items-center gap-3 transition ${
-                            isActive ? "bg-white/[0.08]" : "hover:bg-card"
+                            isActive ? "bg-primary/10 text-primary" : "hover:bg-foreground/[0.04]"
                           }`}
                         >
                           <div
