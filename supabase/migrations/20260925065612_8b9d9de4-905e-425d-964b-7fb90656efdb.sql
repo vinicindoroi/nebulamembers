@@ -1,0 +1,2 @@
+CREATE POLICY "progress admin read" ON public.lesson_progress FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "video_progress admin read" ON public.lesson_video_progress FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
