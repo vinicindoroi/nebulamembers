@@ -404,7 +404,7 @@ function CourseDetail() {
                           !allowedBy(lMod?.access_levels, lMod?.access_level) ||
                           !allowedBy(l.access_levels, l.access_level);
                         return (
-                           <div key={l.id} className="group">
+                           <div key={l.id} className="group relative">
                              <Button
                                type="button"
                                variant="ghost"
@@ -468,7 +468,7 @@ function CourseDetail() {
           )}
         </div>
       ) : (
-        <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* Player + content */}
           <div className="space-y-4 min-w-0">
             {isLocked ? (
@@ -522,8 +522,8 @@ function CourseDetail() {
               />
             )}
 
-            <div className="glass rounded-2xl p-5">
-              <div className="flex items-start justify-between gap-4">
+            <div className="rounded-xl border border-border bg-card/60 p-5">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
                 <div className="min-w-0">
                   <div className="text-[11px] text-muted-foreground">
                     Aula {(activeLesson.position ?? 0) + 1}
@@ -533,20 +533,19 @@ function CourseDetail() {
                   </div>
                   <h2 className="text-lg font-semibold mt-1">{activeLesson.title}</h2>
                 </div>
-                <button
+                <Button
+                  type="button"
+                  variant={done.has(activeLesson.id) ? "outline" : "default"}
                   onClick={() =>
                     toggle.mutate({ lessonId: activeLesson.id, completed: done.has(activeLesson.id) })
                   }
                   disabled={toggle.isPending}
-                  className={`shrink-0 text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 transition ${
-                    done.has(activeLesson.id)
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                      : "gradient-primary text-primary-foreground"
-                  }`}
+                  className="shrink-0 px-3 text-xs"
                 >
                   <Check className="h-3.5 w-3.5" />
-                  {done.has(activeLesson.id) ? "Concluída" : "Marcar como concluída"}
-                </button>
+                  <span className="hidden sm:inline">{done.has(activeLesson.id) ? "Concluída" : "Marcar como concluída"}</span>
+                  <span className="sm:hidden">{done.has(activeLesson.id) ? "Concluída" : "Concluir"}</span>
+                </Button>
               </div>
 
               {activeLesson.description && (
@@ -568,8 +567,8 @@ function CourseDetail() {
           </div>
 
           {/* Sidebar com módulos/aulas */}
-          <aside className="glass rounded-2xl p-3 h-fit lg:sticky lg:top-4">
-            <div className="px-2 py-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+          <aside className="h-fit rounded-xl border border-border bg-card/60 p-3 lg:sticky lg:top-4">
+            <div className="px-2 py-2 text-[11px] font-semibold uppercase text-muted-foreground">
               Conteúdo do curso
             </div>
             <div className="space-y-3">
@@ -595,7 +594,7 @@ function CourseDetail() {
                           key={l.id}
                           onClick={() => setActiveLessonId(l.id)}
                           className={`w-full text-left px-2 py-2 rounded-lg flex items-center gap-3 transition ${
-                            isActive ? "bg-white/[0.08]" : "hover:bg-card"
+                            isActive ? "bg-primary/10 text-primary" : "hover:bg-foreground/[0.04]"
                           }`}
                         >
                           <div
