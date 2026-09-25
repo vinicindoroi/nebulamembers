@@ -1,11 +1,21 @@
 import { createFileRoute, Link, Outlet, useChildMatches } from "@tanstack/react-router";
 import { useMemo, useState, useDeferredValue } from "react";
-import { Play, Search, Filter, BookOpen, CheckCircle2, Clock, X } from "lucide-react";
+import { Play, Search, BookOpen, CheckCircle2, Clock, X } from "lucide-react";
 import { useCourses } from "@/hooks/use-courses";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_app/courses")({
   component: CoursesPage,
-  head: () => ({ meta: [{ title: "Cursos — Membros" }] }),
+  head: () => ({
+    meta: [
+      { title: "Cursos — Nebula Members" },
+      { name: "description", content: "Explore os cursos disponíveis na área de membros Nebula." },
+      { property: "og:title", content: "Cursos — Nebula Members" },
+      { property: "og:description", content: "Explore os cursos disponíveis na área de membros Nebula." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 });
 
 function CoursesPage() {
@@ -46,79 +56,84 @@ function CoursesList() {
   }, [courses, filter, tag, deferredSearch]);
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Cursos</h1>
-          <p className="text-sm text-muted-foreground mt-1">Explore o catálogo e continue evoluindo.</p>
+    <div className="courses-catalog mx-auto w-full max-w-[1600px] space-y-10 pb-10 sm:space-y-12">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 pt-1 sm:flex sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <h1 className="font-course-display text-3xl font-bold sm:text-4xl">Cursos</h1>
+          <p className="text-sm font-medium text-muted-foreground sm:text-base">Explore o catálogo e continue evoluindo.</p>
         </div>
-        <div className="text-xs text-muted-foreground">
+        <div className="shrink-0 rounded-full border border-border bg-card/60 px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-sm">
           {visible.length} de {courses.length} {courses.length === 1 ? "curso" : "cursos"}
         </div>
       </header>
 
-      <div className="rounded-3xl border border-border bg-card p-4 space-y-3">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="space-y-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="relative w-full lg:max-w-sm">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               placeholder="Buscar por título ou descrição..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-card border border-border rounded-xl pl-9 pr-8 py-2 text-sm outline-none focus:border-primary/40 transition"
+              className="h-12 w-full rounded-xl border border-border bg-card pl-11 pr-10 text-sm outline-hidden transition focus:border-primary/60 focus:ring-2 focus:ring-primary/15"
             />
             {search && (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Limpar busca"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-md hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute right-1.5 top-1/2 h-9 w-9 -translate-y-1/2 text-muted-foreground"
               >
-                <X className="h-3.5 w-3.5" />
-              </button>
+                <X className="h-4 w-4" />
+              </Button>
             )}
           </div>
-          <div className="flex gap-1 p-1 rounded-xl bg-card border border-border">
+          <div className="flex w-full gap-2 overflow-x-auto pb-1 lg:pb-0">
             {QUICK_FILTERS.map((f) => {
               const Icon = f.icon;
               const active = filter === f.id;
               return (
-                <button
+                <Button
+                  type="button"
+                  variant={active ? "default" : "outline"}
                   key={f.id}
                   onClick={() => setFilter(f.id)}
-                  className={`text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition whitespace-nowrap ${
-                    active ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className="h-12 shrink-0 rounded-xl px-4 text-xs sm:text-sm"
                 >
-                  <Icon className="h-3 w-3" />
-                  <span className="hidden sm:inline">{f.label}</span>
-                </button>
+                  <Icon className="h-4 w-4" />
+                  <span>{f.label}</span>
+                </Button>
               );
             })}
           </div>
         </div>
 
         {tags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <Filter className="h-3 w-3 text-muted-foreground" />
-            <button
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <Button
+              type="button"
+              size="sm"
+              variant={!tag ? "default" : "outline"}
               onClick={() => setTag(null)}
-              className={`text-[11px] px-2.5 py-1 rounded-full transition ${
-                !tag ? "bg-primary/15 text-primary border border-primary/20" : "bg-muted/40 text-muted-foreground hover:text-foreground border border-transparent"
-              }`}
+              className="shrink-0 rounded-full px-4"
             >
               Todas categorias
-            </button>
+            </Button>
             {tags.map((t) => {
               const active = tag === t;
               return (
-                <button
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={active ? "default" : "outline"}
                   key={t}
                   onClick={() => setTag(active ? null : t)}
-                  className={`text-[11px] px-2.5 py-1 rounded-full transition ${
-                    active ? "bg-primary/15 text-primary border border-primary/20" : "bg-muted/40 text-muted-foreground hover:text-foreground border border-transparent"
-                  }`}
+                  className="shrink-0 rounded-full px-4"
                 >
                   {t}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -126,19 +141,19 @@ function CoursesList() {
       </div>
 
       {isLoading ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="rounded-3xl border border-border bg-card animate-pulse">
-              <div className="aspect-[16/10] bg-card" />
-              <div className="p-4 space-y-2">
-                <div className="h-3 w-3/4 bg-muted/40 rounded" />
-                <div className="h-2 w-full bg-muted/40 rounded" />
+            <div key={i} className="animate-pulse">
+              <div className="aspect-video rounded-xl border border-border bg-card" />
+              <div className="space-y-3 pt-4">
+                <div className="h-4 w-3/4 rounded bg-muted/40" />
+                <div className="h-2 w-full rounded bg-muted/40" />
               </div>
             </div>
           ))}
         </div>
       ) : visible.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+        <div className="rounded-xl border border-dashed border-border bg-card/40 p-12 text-center">
           <BookOpen className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
           <div className="text-sm font-medium">Nenhum curso encontrado</div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -146,41 +161,46 @@ function CoursesList() {
           </div>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((c) => (
             <Link
               key={c.id}
               to="/courses/$courseId"
               params={{ courseId: c.id }}
-              className="group rounded-2xl border border-border bg-card overflow-hidden hover:border-border transition"
+              className="group min-w-0"
             >
-              <div className="aspect-[16/10] relative overflow-hidden">
+              <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-card transition duration-500 group-hover:scale-[1.03] group-hover:border-primary/45 group-hover:shadow-[0_18px_50px_-24px_var(--primary)] motion-reduce:transform-none motion-reduce:transition-none">
                 {c.cover_url && (
-                  <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105 motion-reduce:transform-none" />
                 )}
                 {c.gradient_from && c.gradient_to && (
                   <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${c.gradient_from}, ${c.gradient_to}00)` }} />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  {(c as any).title_visible !== false && <h3 className="text-white font-semibold text-sm leading-tight drop-shadow-lg">{c.title}</h3>}
-                  {c.description && <p className="text-white/70 text-[11px] mt-1 line-clamp-2 max-w-[85%]">{c.description}</p>}
-                </div>
                 {c.progress === 100 && (
-                  <span className="absolute top-3 right-3 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-[10px] uppercase tracking-wider px-2 py-1 rounded-md font-medium text-emerald-300 flex items-center gap-1">
+                  <span className="absolute right-3 top-3 flex items-center gap-1 rounded-md border border-primary/30 bg-background/75 px-2 py-1 text-[10px] font-semibold uppercase text-primary backdrop-blur-md">
                     <CheckCircle2 className="h-3 w-3" />Concluído
                   </span>
                 )}
-                <div className="absolute bottom-3 right-3 h-11 w-11 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-90 transition">
-                  <Play className="h-4 w-4 text-white" fill="currentColor" />
+                <div className="absolute inset-0 flex items-center justify-center bg-background/10 opacity-0 transition duration-300 group-hover:opacity-100">
+                  <div className="flex h-12 w-12 scale-90 items-center justify-center rounded-full bg-foreground text-background shadow-xl transition duration-300 group-hover:scale-100">
+                    <Play className="ml-0.5 h-5 w-5" fill="currentColor" />
+                  </div>
                 </div>
               </div>
-              <div className="p-4">
-                <div className="mt-1 flex items-center gap-2">
-                  <div className="flex-1 h-1.5 rounded-full bg-muted/40 overflow-hidden">
-                    <div className="h-full gradient-primary transition-all" style={{ width: `${c.progress}%` }} />
+              <div className="space-y-3 pt-4">
+                {(c as any).title_visible !== false && (
+                  <div className="min-w-0">
+                    <h2 className="font-course-display truncate text-base font-bold transition-colors group-hover:text-primary sm:text-lg">{c.title}</h2>
+                    {c.description && <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">{c.description}</p>}
                   </div>
-                  <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">{c.progress}%</span>
+                )}
+                <div>
+                  <div className="h-1 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full bg-primary transition-all" style={{ width: `${c.progress}%` }} />
+                  </div>
+                  <div className="mt-2 text-[10px] font-semibold uppercase text-muted-foreground">
+                    {c.progress === 0 ? "Não iniciado" : c.progress === 100 ? "Concluído" : `${c.progress}% concluído`}
+                  </div>
                 </div>
               </div>
             </Link>
