@@ -627,7 +627,7 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
           ))}
         </select>
       </Field>
-      <Field label="Descrição" icon={FileText}>
+      <Field label="Descrição" icon={FileText} hint="Selecione o código e use o botão &lt;/&gt; para deixá-lo compacto e fácil de copiar.">
         <RichTextEditor
           content={f.description ?? ""}
           onChange={(html) => setF({ ...f, description: html })}
