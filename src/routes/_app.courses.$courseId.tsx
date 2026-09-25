@@ -764,18 +764,7 @@ function LessonPlayer({ lesson, lessons, onNextLesson }: { lesson: Lesson; lesso
   // If it's an embeddable URL (YouTube, Vimeo, etc.), use iframe
   const embed = toEmbedUrl(url);
   if (embed) {
-    return (
-      <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border">
-        <iframe
-          key={embed}
-          src={embed}
-          title={lesson.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          className="w-full h-full"
-        />
-      </div>
-    );
+    return <EmbedPlayer embed={embed} title={lesson.title} poster={resolvedPoster} youtubeId={youtubeIdFromUrl(url)} />;
   }
 
   // Custom player for direct video files
