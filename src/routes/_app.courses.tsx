@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useChildMatches } from "@tanstack/react-router";
-import { useMemo, useState, useDeferredValue } from "react";
-import { Play, Search, BookOpen, CheckCircle2, Clock, X, ArrowRight } from "lucide-react";
+import { useMemo, useState, useDeferredValue, useRef } from "react";
+import { Play, Search, BookOpen, CheckCircle2, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCourses } from "@/hooks/use-courses";
 import { Button } from "@/components/ui/button";
 
@@ -32,6 +32,7 @@ const QUICK_FILTERS = [
 ] as const;
 
 function CoursesList() {
+  const catalogRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<string>("all");
   const [tag, setTag] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -56,6 +57,12 @@ function CoursesList() {
   }, [courses, filter, tag, deferredSearch]);
 
   const featured = visible[0];
+
+  const scrollCatalog = (direction: -1 | 1) => {
+    const catalog = catalogRef.current;
+    if (!catalog) return;
+    catalog.scrollBy({ left: direction * Math.max(catalog.clientWidth * 0.8, 280), behavior: "smooth" });
+  };
 
   return (
     <div className="courses-catalog mx-auto w-full max-w-[1600px] space-y-8 pb-12">
@@ -169,7 +176,12 @@ function CoursesList() {
             params={{ courseId: featured.id }}
             className="group relative block min-h-72 overflow-hidden rounded-md border border-border bg-card sm:min-h-96 lg:min-h-[28rem]"
           >
-            {featured.cover_url && <img src={featured.cover_url} alt={featured.title} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.025] motion-reduce:transform-none" />}
+            {featured.cover_url && (
+              <>
+                <img src={featured.cover_url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-xl" />
+                <img src={featured.cover_url} alt={featured.title} className="absolute inset-0 h-full w-full object-contain" />
+              </>
+            )}
             <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--background)_0%,color-mix(in_oklab,var(--background)_88%,transparent)_32%,color-mix(in_oklab,var(--background)_28%,transparent)_72%,transparent_100%)]" />
             <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,transparent_55%)]" />
             <div className="relative flex min-h-72 max-w-xl flex-col justify-end p-6 sm:min-h-96 sm:p-10 lg:min-h-[28rem] lg:p-12">
@@ -184,11 +196,29 @@ function CoursesList() {
           </Link>
 
           <section className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <h2 className="font-course-display text-xl font-bold sm:text-2xl">Explore o catálogo</h2>
-              <span className="hidden items-center gap-1 text-xs font-semibold text-muted-foreground sm:flex">Arraste para explorar <ArrowRight className="h-3.5 w-3.5" /></span>
+              <div className="flex shrink-0 items-center gap-2">
+                <Button type="button" variant="outline" size="icon" aria-label="Cursos anteriores" onClick={() => scrollCatalog(-1)} className="h-9 w-9 rounded-full">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="outline" size="icon" aria-label="Próximos cursos" onClick={() => scrollCatalog(1)} className="h-9 w-9 rounded-full">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-8 pt-2 sm:mx-0 sm:px-0">
+            <div
+              ref={catalogRef}
+              onWheel={(event) => {
+                const catalog = catalogRef.current;
+                if (!catalog || catalog.scrollWidth <= catalog.clientWidth) return;
+                if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+                  event.preventDefault();
+                  catalog.scrollLeft += event.deltaY;
+                }
+              }}
+              className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pb-8 pt-2 touch-pan-x sm:mx-0 sm:px-0"
+            >
               {visible.map((c) => (
                 <Link key={c.id} to="/courses/$courseId" params={{ courseId: c.id }} className="group min-w-0 w-[82%] shrink-0 snap-start sm:w-[42%] lg:w-[29%] xl:w-[23%]">
                   <div className="relative aspect-video overflow-hidden rounded-md border border-border bg-card transition duration-300 group-hover:z-10 group-hover:scale-[1.06] group-hover:border-primary/50 group-hover:shadow-[0_22px_60px_-25px_var(--primary)] motion-reduce:transform-none">
