@@ -179,7 +179,7 @@ function CoursesList() {
             {featured.cover_url && (
               <>
                 <img src={featured.cover_url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-xl" />
-                <img src={featured.cover_url} alt={featured.title} className="absolute inset-0 h-full w-full object-contain" />
+                <img src={featured.cover_url} alt={featured.title} className="absolute inset-0 h-full w-full object-cover object-center" />
               </>
             )}
             <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--background)_0%,color-mix(in_oklab,var(--background)_88%,transparent)_32%,color-mix(in_oklab,var(--background)_28%,transparent)_72%,transparent_100%)]" />
