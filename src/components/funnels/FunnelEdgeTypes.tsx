@@ -160,7 +160,7 @@ function FunnelEdge({
       const distance = Math.max(Math.hypot(dx, dy), 1);
       const normalX = -dy / distance;
       const normalY = dx / distance;
-      const bend = Math.min(72, Math.max(32, distance * Math.max(currentCurvature, 0.16)));
+      const bend = (currentCurvature === 0 ? 0 : Math.min(72, Math.max(32, distance * Math.max(currentCurvature, 0.16))));
       const lead = Math.min(96, Math.max(36, distance * 0.28));
 
       const direction = (position: Position | undefined) => {
@@ -379,7 +379,7 @@ function FunnelEdge({
   const customEdgePath = useMemo(() => {
     const ddx = targetX - sourceX, ddy = targetY - sourceY;
     const dist = Math.max(Math.hypot(ddx, ddy), 1);
-    const bendQ = Math.min(144, Math.max(64, dist * Math.max(currentCurvature, 0.16) * 2));
+    const bendQ = (currentCurvature === 0 ? 0 : Math.min(144, Math.max(64, dist * currentCurvature * 2)));
     const midX = (sourceX + targetX) / 2 + (-ddy / dist) * bendQ + controlOffset.x;
     const midY = (sourceY + targetY) / 2 + (ddx / dist) * bendQ + controlOffset.y;
     
@@ -390,7 +390,7 @@ function FunnelEdge({
   // Control point position for dragging handle
   const hasOffset = controlOffset.x !== 0 || controlOffset.y !== 0;
   const qd = Math.max(Math.hypot(targetX - sourceX, targetY - sourceY), 1);
-  const qBend = Math.min(144, Math.max(64, qd * Math.max(currentCurvature, 0.16) * 2));
+  const qBend = (currentCurvature === 0 ? 0 : Math.min(144, Math.max(64, qd * currentCurvature * 2)));
   const controlPointX = hasOffset ? (sourceX + targetX) / 2 + ((-(targetY - sourceY) / qd) * qBend + controlOffset.x) / 2 : labelX;
   const controlPointY = hasOffset ? (sourceY + targetY) / 2 + (((targetX - sourceX) / qd) * qBend + controlOffset.y) / 2 : labelY;
 
