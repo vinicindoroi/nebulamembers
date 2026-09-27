@@ -16,6 +16,7 @@ import {
   ReactFlowInstance,
   ConnectionMode,
   SelectionMode,
+  type OnConnectEnd,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { toPng, toSvg } from 'html-to-image';
@@ -578,6 +579,79 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
       );
     },
     [setEdges]
+  );
+
+  const onConnectEnd = useCallback<OnConnectEnd<Node>>(
+    (event, connectionState) => {
+      // A handle-to-handle connection is already handled by onConnect.
+      if (connectionState.isValid || !connectionState.fromNode || !connectionState.fromHandle) return;
+
+      const pointer = 'changedTouches' in event
+        ? event.changedTouches.item(0)
+        : event;
+      if (!pointer) return;
+
+      const nodeElement = document
+        .elementFromPoint(pointer.clientX, pointer.clientY)
+        ?.closest<HTMLElement>('.react-flow__node');
+      const droppedNodeId = connectionState.toNode?.id || nodeElement?.dataset.id;
+      if (!droppedNodeId || droppedNodeId === connectionState.fromNode.id) return;
+
+      setNodes((currentNodes) => {
+        const fromNode = currentNodes.find((node) => node.id === connectionState.fromNode?.id);
+        const droppedNode = currentNodes.find((node) => node.id === droppedNodeId);
+        if (!fromNode || !droppedNode) return currentNodes;
+
+        const droppedRect = nodeElement?.getBoundingClientRect();
+        let nearestSide: 'top' | 'right' | 'bottom' | 'left' | null = null;
+
+        if (droppedRect) {
+          const distances = {
+            top: Math.abs(pointer.clientY - droppedRect.top),
+            right: Math.abs(pointer.clientX - droppedRect.right),
+            bottom: Math.abs(pointer.clientY - droppedRect.bottom),
+            left: Math.abs(pointer.clientX - droppedRect.left),
+          };
+          nearestSide = (Object.entries(distances).sort((a, b) => a[1] - b[1])[0]?.[0] as typeof nearestSide) || null;
+        }
+
+        const fallbackHandles = findNearestAnchors(fromNode, droppedNode);
+        const startedFromTarget = connectionState.fromHandle.type === 'target';
+        const droppedHandle = nearestSide
+          ? `${nearestSide}-${startedFromTarget ? 'source' : 'target'}`
+          : startedFromTarget
+            ? fallbackHandles.sourceHandle
+            : fallbackHandles.targetHandle;
+
+        const connection: Connection = startedFromTarget
+          ? {
+              source: droppedNode.id,
+              sourceHandle: droppedHandle,
+              target: fromNode.id,
+              targetHandle: connectionState.fromHandle.id,
+            }
+          : {
+              source: fromNode.id,
+              sourceHandle: connectionState.fromHandle.id,
+              target: droppedNode.id,
+              targetHandle: droppedHandle,
+            };
+
+        setEdges((currentEdges) =>
+          addEdge(
+            {
+              ...connection,
+              type: 'funnel',
+              data: { label: '' },
+            },
+            currentEdges
+          )
+        );
+
+        return currentNodes;
+      });
+    },
+    [findNearestAnchors, setEdges, setNodes]
   );
 
   // Multi-connection with Shift+Click
@@ -1667,6 +1741,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={isRestrictedMode ? undefined : onConnect}
+              onConnectEnd={isRestrictedMode ? undefined : onConnectEnd}
               onReconnectStart={onReconnectStart}
               onReconnect={isRestrictedMode ? undefined : onReconnect}
               onReconnectEnd={onReconnectEnd}
