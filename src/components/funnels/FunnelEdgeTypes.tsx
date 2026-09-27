@@ -377,19 +377,25 @@ function FunnelEdge({
   
   // Calculate custom bezier path with control point offset
   const customEdgePath = useMemo(() => {
-    const midX = (sourceX + targetX) / 2 + controlOffset.x;
-    const midY = (sourceY + targetY) / 2 + controlOffset.y;
+    const ddx = targetX - sourceX, ddy = targetY - sourceY;
+    const dist = Math.max(Math.hypot(ddx, ddy), 1);
+    const bendQ = Math.min(144, Math.max(64, dist * Math.max(currentCurvature, 0.16) * 2));
+    const midX = (sourceX + targetX) / 2 + (-ddy / dist) * bendQ + controlOffset.x;
+    const midY = (sourceY + targetY) / 2 + (ddx / dist) * bendQ + controlOffset.y;
     
     // Quadratic bezier curve through control point
     return `M ${sourceX},${sourceY} Q ${midX},${midY} ${targetX},${targetY}`;
   }, [sourceX, sourceY, targetX, targetY, controlOffset, currentCurvature]);
   
   // Control point position for dragging handle
-  const controlPointX = (sourceX + targetX) / 2 + controlOffset.x;
-  const controlPointY = (sourceY + targetY) / 2 + controlOffset.y;
+  const hasOffset = controlOffset.x !== 0 || controlOffset.y !== 0;
+  const qd = Math.max(Math.hypot(targetX - sourceX, targetY - sourceY), 1);
+  const qBend = Math.min(144, Math.max(64, qd * Math.max(currentCurvature, 0.16) * 2));
+  const controlPointX = hasOffset ? (sourceX + targetX) / 2 + ((-(targetY - sourceY) / qd) * qBend + controlOffset.x) / 2 : labelX;
+  const controlPointY = hasOffset ? (sourceY + targetY) / 2 + (((targetX - sourceX) / qd) * qBend + controlOffset.y) / 2 : labelY;
 
   // Use custom path when control point is offset, otherwise use standard bezier
-  const finalEdgePath = (controlOffset.x !== 0 || controlOffset.y !== 0) ? customEdgePath : edgePath;
+  const finalEdgePath = hasOffset ? customEdgePath : edgePath;
   const finalLabelX = controlPointX;
   const finalLabelY = controlPointY;
 
