@@ -917,7 +917,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
   );
 
   const onNodeDragStop = useCallback(
-    (_: React.MouseEvent, draggedNode: Node, draggedNodes: Node[]) => {
+    (_: React.MouseEvent, draggedNode: Node, _draggedNodes: Node[]) => {
       setHelperLines({ horizontal: null, vertical: null });
       
       // Apply the snap position on drag stop to ensure it sticks
