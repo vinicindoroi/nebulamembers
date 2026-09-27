@@ -1,7 +1,6 @@
 import { memo, useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   EdgeProps, 
-  getBezierPath, 
   EdgeLabelRenderer,
   BaseEdge,
   useReactFlow,
@@ -152,18 +151,37 @@ function FunnelEdge({
     return { sx, sy, tx, ty, sp, tp };
   }, [isSmartRouting, sourceNode, targetNode, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition]);
 
-  // Keep every connection curved so anchor changes can interpolate smoothly.
+  // Draw a deliberate arc. React Flow's default bezier becomes visually straight
+  // when opposite handles are aligned on the same axis.
   const [edgePath, labelX, labelY] = useMemo(() => {
     try {
-      return getBezierPath({
-        sourceX: sx,
-        sourceY: sy,
-        sourcePosition: sp || Position.Right,
-        targetX: tx,
-        targetY: ty,
-        targetPosition: tp || Position.Left,
-        curvature: Math.max(currentCurvature, 0.2),
-      });
+      const dx = tx - sx;
+      const dy = ty - sy;
+      const distance = Math.max(Math.hypot(dx, dy), 1);
+      const normalX = -dy / distance;
+      const normalY = dx / distance;
+      const bend = Math.min(72, Math.max(32, distance * Math.max(currentCurvature, 0.16)));
+      const lead = Math.min(96, Math.max(36, distance * 0.28));
+
+      const direction = (position: Position | undefined) => {
+        if (position === Position.Left) return { x: -1, y: 0 };
+        if (position === Position.Top) return { x: 0, y: -1 };
+        if (position === Position.Bottom) return { x: 0, y: 1 };
+        return { x: 1, y: 0 };
+      };
+
+      const sourceDirection = direction(sp);
+      const targetDirection = direction(tp);
+      const cp1x = sx + sourceDirection.x * lead + normalX * bend;
+      const cp1y = sy + sourceDirection.y * lead + normalY * bend;
+      const cp2x = tx + targetDirection.x * lead + normalX * bend;
+      const cp2y = ty + targetDirection.y * lead + normalY * bend;
+
+      return [
+        `M ${sx},${sy} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${tx},${ty}`,
+        (sx + tx) / 2 + normalX * bend * 0.75,
+        (sy + ty) / 2 + normalY * bend * 0.75,
+      ] as const;
     } catch (err) {
       console.error("Error computing edge path:", err);
       return [`M ${sourceX},${sourceY} L ${targetX},${targetY}`, (sourceX + targetX) / 2, (sourceY + targetY) / 2];
@@ -388,7 +406,7 @@ function FunnelEdge({
           strokeDasharray: styleConfig.strokeDasharray,
           strokeLinecap: 'round',
           filter: selected ? 'drop-shadow(0 0 6px oklch(0.65 0.22 290 / 0.5))' : 'none',
-          transition: 'd 180ms ease-out, stroke-width 150ms ease, filter 150ms ease',
+          transition: 'd 80ms linear, stroke-width 100ms ease, filter 100ms ease',
         }}
       />
 

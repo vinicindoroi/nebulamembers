@@ -384,7 +384,7 @@
   stroke-width: 20;
 }
 .funnel-studio .funnel-dynamic-edge {
-  transition: d 180ms ease-out, stroke-width 150ms ease, filter 150ms ease;
+  transition: d 80ms linear, stroke-width 100ms ease, filter 100ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
   .funnel-studio .funnel-dynamic-edge {
