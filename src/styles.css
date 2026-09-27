@@ -353,6 +353,10 @@
   border: none !important;
   outline: none !important;
 }
+.react-flow__node .funnel-page-node {
+  border: none !important;
+  outline: none !important;
+}
 /* Selection visual via CSS */
 .react-flow__node .funnel-node-delete {
   visibility: hidden;
