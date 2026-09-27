@@ -743,37 +743,6 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
 
-  // Update edge anchors only for edges connected to the moved nodes.
-  const updateEdgeAnchorsForNodes = useCallback((movedNodeIds: Set<string>) => {
-    setNodes((currentNodes) => {
-      setEdges((currentEdges) => {
-        return currentEdges.map((edge) => {
-          if (!movedNodeIds.has(edge.source) && !movedNodeIds.has(edge.target)) {
-            return edge;
-          }
-
-          const sourceNode = currentNodes.find((n) => n.id === edge.source);
-          const targetNode = currentNodes.find((n) => n.id === edge.target);
-
-          if (sourceNode && targetNode) {
-            const { sourceHandle, targetHandle } = findNearestAnchors(sourceNode, targetNode);
-            
-            // Only update if handles changed
-            if (edge.sourceHandle !== sourceHandle || edge.targetHandle !== targetHandle) {
-              return {
-                ...edge,
-                sourceHandle,
-                targetHandle,
-              };
-            }
-          }
-          return edge;
-        });
-      });
-      return currentNodes; // Return unchanged nodes
-    });
-  }, [setNodes, setEdges, findNearestAnchors]);
-
   // Edge reconnection handlers
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
@@ -841,7 +810,6 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
       if (event.ctrlKey || event.metaKey) {
         setHelperLines({ horizontal: null, vertical: null });
         snapPositionRef.current = { x: null, y: null };
-        updateEdgeAnchorsForNodes(draggedNodeIds);
         return;
       }
 
@@ -944,9 +912,8 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
         );
       }
 
-      updateEdgeAnchorsForNodes(draggedNodeIds);
     },
-    [nodes, setNodes, updateEdgeAnchorsForNodes]
+    [nodes, setNodes]
   );
 
   const onNodeDragStop = useCallback(
@@ -975,17 +942,8 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
       // Reset snap position ref
       snapPositionRef.current = { x: null, y: null };
 
-      const movedNodeIds = new Set(draggedNodes.map(node => node.id));
-      movedNodeIds.add(draggedNode.id);
-      const groupId = (draggedNode.data as FunnelNodeData).groupId;
-      if (groupId) {
-        nodes
-          .filter(node => (node.data as FunnelNodeData).groupId === groupId)
-          .forEach(node => movedNodeIds.add(node.id));
-      }
-      updateEdgeAnchorsForNodes(movedNodeIds);
     },
-    [nodes, setNodes, updateEdgeAnchorsForNodes]
+    [setNodes]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
