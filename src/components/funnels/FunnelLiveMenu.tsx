@@ -115,7 +115,7 @@ export function FunnelLiveMenu({
           )}
         >
           <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
-          <span className="font-medium">Live</span>
+          <span className="funnel-toolbar-label font-medium">Live</span>
           {liveMode && (
             <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-primary/20 text-[10px] font-semibold text-primary">
               {totalLive}

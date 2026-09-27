@@ -238,12 +238,12 @@ export function FunnelFloatingToolbar({
         {isSaving ? (
           <>
             <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
-            <span className="text-muted-foreground">Salvando...</span>
+            <span className="funnel-toolbar-label text-muted-foreground">Salvando...</span>
           </>
         ) : (
           <>
             <Check className="w-3 h-3 text-emerald-400" />
-            <span className="text-emerald-400 font-medium">Salvo</span>
+            <span className="funnel-toolbar-label text-emerald-400 font-medium">Salvo</span>
           </>
         )}
       </div>
@@ -255,7 +255,7 @@ export function FunnelFloatingToolbar({
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50 rounded-full text-foreground/80 hover:text-foreground">
             <Download className="w-3.5 h-3.5 mr-1.5" />
-            Exportar
+            <span className="funnel-toolbar-label">Exportar</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" className="bg-popover border-border shadow-2xl">
@@ -285,7 +285,7 @@ export function FunnelFloatingToolbar({
           <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50 rounded-full text-foreground/80 hover:text-foreground" asChild>
             <span>
               <Upload className="w-3.5 h-3.5 mr-1.5" />
-              Importar
+              <span className="funnel-toolbar-label">Importar</span>
             </span>
           </Button>
         </label>
@@ -309,7 +309,7 @@ export function FunnelFloatingToolbar({
             title="Gerar script de tracking"
           >
             <Code className="w-3.5 h-3.5 mr-1.5" />
-            Tracking
+            <span className="funnel-toolbar-label">Tracking</span>
             {hasTrackingToken && (
               <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             )}
@@ -331,7 +331,7 @@ export function FunnelFloatingToolbar({
             )}
           >
             <GraduationCap className={cn('w-3.5 h-3.5', educationalMode && 'animate-pulse')} />
-            <span className="font-medium">Educacional</span>
+            <span className="funnel-toolbar-label font-medium">Educacional</span>
             <Switch
               checked={educationalMode}
               onCheckedChange={onEducationalModeChange}
@@ -354,7 +354,7 @@ export function FunnelFloatingToolbar({
           )}
         >
           <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
-          <span className="font-medium">Live</span>
+          <span className="funnel-toolbar-label font-medium">Live</span>
           <Switch
             checked={liveMode}
             onCheckedChange={onLiveModeChange}

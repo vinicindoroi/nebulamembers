@@ -90,6 +90,10 @@
 .funnel-page-node { box-shadow: 0 12px 34px oklch(0 0 0 / 0.45), inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent); }
 .funnel-flow-controls button { background: transparent; border-bottom-color: var(--border); fill: var(--foreground); }
 .funnel-flow-controls button:hover { background: var(--accent); }
+@media (max-width: 1450px) {
+  .funnel-toolbar-label { display: none; }
+  .funnel-toolbar button { padding-left: 0.55rem; padding-right: 0.55rem; }
+}
 @media (max-width: 767px) {
   .funnel-list-panel { min-width: 100%; }
   .funnel-toolbar { left: 3.75rem; right: 0.75rem; max-width: none; transform: none; }
