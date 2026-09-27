@@ -1,10 +1,11 @@
 import { memo, useState, useMemo, useCallback, useEffect } from 'react';
-import { 
-  EdgeProps, 
+import {
+  EdgeProps,
   EdgeLabelRenderer,
   BaseEdge,
   useReactFlow,
-  Position
+  Position,
+  getBezierPath
 } from '@xyflow/react';
 import { Settings2, Trash2, GripHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -151,37 +152,19 @@ function FunnelEdge({
     return { sx, sy, tx, ty, sp, tp };
   }, [isSmartRouting, sourceNode, targetNode, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition]);
 
-  // Draw a deliberate arc. React Flow's default bezier becomes visually straight
-  // when opposite handles are aligned on the same axis.
+  // Directional bezier: the curve exits the source handle and enters the
+  // target handle following each anchor's direction (React Flow default).
   const [edgePath, labelX, labelY] = useMemo(() => {
     try {
-      const dx = tx - sx;
-      const dy = ty - sy;
-      const distance = Math.max(Math.hypot(dx, dy), 1);
-      const normalX = -dy / distance;
-      const normalY = dx / distance;
-      const bend = (currentCurvature === 0 ? 0 : Math.min(72, Math.max(32, distance * Math.max(currentCurvature, 0.16))));
-      const lead = Math.min(96, Math.max(36, distance * 0.28));
-
-      const direction = (position: Position | undefined) => {
-        if (position === Position.Left) return { x: -1, y: 0 };
-        if (position === Position.Top) return { x: 0, y: -1 };
-        if (position === Position.Bottom) return { x: 0, y: 1 };
-        return { x: 1, y: 0 };
-      };
-
-      const sourceDirection = direction(sp);
-      const targetDirection = direction(tp);
-      const cp1x = sx + sourceDirection.x * lead + normalX * bend;
-      const cp1y = sy + sourceDirection.y * lead + normalY * bend;
-      const cp2x = tx + targetDirection.x * lead + normalX * bend;
-      const cp2y = ty + targetDirection.y * lead + normalY * bend;
-
-      return [
-        `M ${sx},${sy} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${tx},${ty}`,
-        (sx + tx) / 2 + normalX * bend * 0.75,
-        (sy + ty) / 2 + normalY * bend * 0.75,
-      ] as const;
+      return getBezierPath({
+        sourceX: sx,
+        sourceY: sy,
+        sourcePosition: sp,
+        targetX: tx,
+        targetY: ty,
+        targetPosition: tp,
+        curvature: Math.max(currentCurvature, 0.25),
+      });
     } catch (err) {
       console.error("Error computing edge path:", err);
       return [`M ${sourceX},${sourceY} L ${targetX},${targetY}`, (sourceX + targetX) / 2, (sourceY + targetY) / 2];
