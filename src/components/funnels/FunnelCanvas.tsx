@@ -522,47 +522,48 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     );
   }, [liveMode, analyticsStats, edges.length, nodes, getConversionRates, setEdges]);
 
-  // Helper function to find the nearest anchor between two nodes
+  // Find the pair of cardinal anchors with the shortest visual distance.
   const findNearestAnchors = useCallback((sourceNode: Node, targetNode: Node) => {
     const sourceWidth = sourceNode.measured?.width || (sourceNode.width as number) || 80;
     const sourceHeight = sourceNode.measured?.height || (sourceNode.height as number) || 80;
     const targetWidth = targetNode.measured?.width || (targetNode.width as number) || 80;
     const targetHeight = targetNode.measured?.height || (targetNode.height as number) || 80;
 
-    // Use center points for direction calculation
-    const sourceCenterX = sourceNode.position.x + sourceWidth / 2;
-    const sourceCenterY = sourceNode.position.y + sourceHeight / 2;
-    const targetCenterX = targetNode.position.x + targetWidth / 2;
-    const targetCenterY = targetNode.position.y + targetHeight / 2;
+    const anchorPoints = (node: Node, width: number, height: number) => [
+      { side: 'top', x: node.position.x + width / 2, y: node.position.y },
+      { side: 'right', x: node.position.x + width, y: node.position.y + height / 2 },
+      { side: 'bottom', x: node.position.x + width / 2, y: node.position.y + height },
+      { side: 'left', x: node.position.x, y: node.position.y + height / 2 },
+    ];
 
-    const dx = targetCenterX - sourceCenterX;
-    const dy = targetCenterY - sourceCenterY;
+    const sourceAnchors = anchorPoints(sourceNode, sourceWidth, sourceHeight);
+    const targetAnchors = anchorPoints(targetNode, targetWidth, targetHeight);
+    let nearest = {
+      sourceHandle: 'right-source',
+      targetHandle: 'left-target',
+      distance: Number.POSITIVE_INFINITY,
+    };
 
-    let bestSourceHandle: string;
-    let bestTargetHandle: string;
-
-    // Determine primary direction based on angle
-    if (Math.abs(dx) > Math.abs(dy)) {
-      // Horizontal: use right/left
-      if (dx > 0) {
-        bestSourceHandle = 'right-source';
-        bestTargetHandle = 'left-target';
-      } else {
-        bestSourceHandle = 'left-source';
-        bestTargetHandle = 'right-target';
-      }
-    } else {
-      // Vertical: use bottom/top
-      if (dy > 0) {
-        bestSourceHandle = 'bottom-source';
-        bestTargetHandle = 'top-target';
-      } else {
-        bestSourceHandle = 'top-source';
-        bestTargetHandle = 'bottom-target';
+    for (const sourceAnchor of sourceAnchors) {
+      for (const targetAnchor of targetAnchors) {
+        const distance = Math.hypot(
+          targetAnchor.x - sourceAnchor.x,
+          targetAnchor.y - sourceAnchor.y
+        );
+        if (distance < nearest.distance) {
+          nearest = {
+            sourceHandle: `${sourceAnchor.side}-source`,
+            targetHandle: `${targetAnchor.side}-target`,
+            distance,
+          };
+        }
       }
     }
 
-    return { sourceHandle: bestSourceHandle, targetHandle: bestTargetHandle };
+    return {
+      sourceHandle: nearest.sourceHandle,
+      targetHandle: nearest.targetHandle,
+    };
   }, []);
 
   const onConnect = useCallback(
@@ -742,13 +743,12 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
 
-  // Update edge anchors ONLY for edges connected to the moved node
-  const updateEdgeAnchorsForNode = useCallback((movedNodeId: string) => {
+  // Update edge anchors only for edges connected to the moved nodes.
+  const updateEdgeAnchorsForNodes = useCallback((movedNodeIds: Set<string>) => {
     setNodes((currentNodes) => {
       setEdges((currentEdges) => {
         return currentEdges.map((edge) => {
-          // Only update edges connected to the moved node
-          if (edge.source !== movedNodeId && edge.target !== movedNodeId) {
+          if (!movedNodeIds.has(edge.source) && !movedNodeIds.has(edge.target)) {
             return edge;
           }
 
@@ -827,10 +827,21 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
   const onNodeDrag = useCallback(
     (event: React.MouseEvent, draggedNode: Node, draggedNodes: Node[]) => {
+      const draggedNodeIds = new Set(draggedNodes.map(n => n.id));
+      const draggedData = draggedNode.data as FunnelNodeData;
+      const groupId = draggedData.groupId;
+
+      if (groupId && isDraggingGroupRef.current) {
+        nodes
+          .filter(n => (n.data as FunnelNodeData).groupId === groupId)
+          .forEach(n => draggedNodeIds.add(n.id));
+      }
+
       // Ctrl held = free movement, no snapping
       if (event.ctrlKey || event.metaKey) {
         setHelperLines({ horizontal: null, vertical: null });
         snapPositionRef.current = { x: null, y: null };
+        updateEdgeAnchorsForNodes(draggedNodeIds);
         return;
       }
 
@@ -844,13 +855,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
       let helperLineX: number | null = null;
       let helperLineY: number | null = null;
 
-      // Get the IDs of all nodes being dragged
-      const draggedNodeIds = new Set(draggedNodes.map(n => n.id));
-
       // Check if any dragged node is in a group - if so, add all group members to draggedNodes
-      const draggedData = draggedNode.data as FunnelNodeData;
-      const groupId = draggedData.groupId;
-      
       if (groupId && isDraggingGroupRef.current) {
         // Get all nodes in the same group
         const groupNodes = nodes.filter(n => (n.data as FunnelNodeData).groupId === groupId);
@@ -938,8 +943,10 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
           })
         );
       }
+
+      updateEdgeAnchorsForNodes(draggedNodeIds);
     },
-    [nodes, setNodes]
+    [nodes, setNodes, updateEdgeAnchorsForNodes]
   );
 
   const onNodeDragStop = useCallback(
@@ -967,8 +974,18 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
       
       // Reset snap position ref
       snapPositionRef.current = { x: null, y: null };
+
+      const movedNodeIds = new Set(draggedNodes.map(node => node.id));
+      movedNodeIds.add(draggedNode.id);
+      const groupId = (draggedNode.data as FunnelNodeData).groupId;
+      if (groupId) {
+        nodes
+          .filter(node => (node.data as FunnelNodeData).groupId === groupId)
+          .forEach(node => movedNodeIds.add(node.id));
+      }
+      updateEdgeAnchorsForNodes(movedNodeIds);
     },
-    [nodes, setNodes]
+    [nodes, setNodes, updateEdgeAnchorsForNodes]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
