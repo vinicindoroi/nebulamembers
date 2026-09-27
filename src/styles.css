@@ -36,6 +36,8 @@
   --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-course-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-course-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-funnel-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-funnel-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 .courses-catalog { font-family: var(--font-course-body); }
@@ -43,6 +45,63 @@
 .community-social h1,
 .community-social h2,
 .community-social h3 { font-family: var(--font-course-display); }
+
+.funnel-studio {
+  --background: oklch(0.145 0.008 195);
+  --foreground: oklch(0.94 0.01 195);
+  --card: oklch(0.19 0.012 195);
+  --card-foreground: oklch(0.94 0.01 195);
+  --popover: oklch(0.18 0.012 195);
+  --popover-foreground: oklch(0.94 0.01 195);
+  --primary: oklch(0.79 0.09 190);
+  --primary-foreground: oklch(0.15 0.01 195);
+  --secondary: oklch(0.22 0.014 195);
+  --muted: oklch(0.21 0.012 195);
+  --muted-foreground: oklch(0.66 0.02 195);
+  --accent: oklch(0.24 0.018 195);
+  --border: oklch(0.28 0.02 195);
+  --ring: oklch(0.79 0.09 190);
+  font-family: var(--font-funnel-body);
+}
+.funnel-studio h1,
+.funnel-studio h2,
+.funnel-studio h3,
+.funnel-studio .font-display { font-family: var(--font-funnel-display); letter-spacing: 0; }
+.funnel-panel {
+  background: color-mix(in oklab, var(--card) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.15);
+  box-shadow: inset -1px 0 0 color-mix(in oklab, var(--foreground) 3%, transparent);
+}
+.funnel-list-panel { min-width: 18rem; }
+.funnel-elements-panel { min-width: 16rem; }
+.funnel-search { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 3%, transparent); }
+.funnel-list-item.is-active {
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent), 0 0 18px color-mix(in oklab, var(--primary) 7%, transparent);
+}
+.funnel-element-item:hover { transform: translateX(2px); }
+.funnel-toolbar {
+  box-shadow: 0 16px 48px oklch(0 0 0 / 0.48), inset 0 1px 0 color-mix(in oklab, var(--foreground) 7%, transparent);
+  scrollbar-width: none;
+}
+.funnel-toolbar::-webkit-scrollbar { display: none; }
+.funnel-panel-toggle { box-shadow: 0 10px 28px oklch(0 0 0 / 0.35); }
+.funnel-flow-canvas .react-flow__pane { cursor: crosshair; }
+.funnel-flow-canvas .react-flow__node:hover .funnel-node-wrapper { filter: brightness(1.08); }
+.funnel-page-node { box-shadow: 0 12px 34px oklch(0 0 0 / 0.45), inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent); }
+.funnel-flow-controls button { background: transparent; border-bottom-color: var(--border); fill: var(--foreground); }
+.funnel-flow-controls button:hover { background: var(--accent); }
+@media (max-width: 1450px) {
+  .funnel-toolbar-label { display: none; }
+  .funnel-toolbar button { padding-left: 0.55rem; padding-right: 0.55rem; }
+}
+@media (max-width: 767px) {
+  .funnel-list-panel { min-width: 100%; }
+  .funnel-toolbar { left: 3.75rem; right: 0.75rem; max-width: none; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .funnel-element-item { transition: none; }
+  .funnel-element-item:hover { transform: none; }
+}
 
 :root {
   color-scheme: dark;

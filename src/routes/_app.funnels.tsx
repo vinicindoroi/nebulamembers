@@ -18,7 +18,14 @@ import { Json } from '@/integrations/supabase/types';
 
 export const Route = createFileRoute("/_app/funnels")({
   component: FunnelsPage,
-  head: () => ({ meta: [{ title: "Funis — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Criador de Funis — Nebula Members" },
+    { name: "description", content: "Crie, organize e acompanhe seus funis visuais na Nebula Members." },
+    { property: "og:title", content: "Criador de Funis — Nebula Members" },
+    { property: "og:description", content: "Crie, organize e acompanhe seus funis visuais na Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function FunnelsPage() {
@@ -105,7 +112,7 @@ function FunnelsPage() {
   }, [queryClient, organization?.id]);
 
   return (
-    <div className={cn("flex flex-col bg-background overflow-hidden", isMobile ? "h-[calc(100dvh-4rem)]" : "h-[100dvh]")}>
+    <div className={cn("funnel-studio flex flex-col bg-background overflow-hidden", isMobile ? "h-[calc(100dvh-4rem)]" : "h-[100dvh]")}>
       <main className="flex-1 flex overflow-hidden h-full">
         <FunnelsSidebar 
           funnels={funnels} 

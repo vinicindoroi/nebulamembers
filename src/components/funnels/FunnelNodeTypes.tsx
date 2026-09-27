@@ -627,11 +627,10 @@ function PageNode({ data, selected }: { data: FunnelNodeData; selected: boolean 
   return (
     <div
       className={cn(
-        'rounded-xl overflow-hidden transition-all duration-200 group',
-        'bg-[#15151a] border border-white/[0.06]',
-        'shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.02)_inset]',
-        'hover:border-white/10 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.04)_inset]',
-        selected && 'ring-2 ring-primary ring-offset-2 ring-offset-[#08080a] border-primary/40'
+        'funnel-page-node rounded-xl overflow-hidden transition-all duration-200 group',
+        'bg-card/95 border border-border/70',
+        'shadow-xl hover:border-primary/25',
+        selected && 'ring-2 ring-primary/80 ring-offset-2 ring-offset-background border-primary/40'
       )}
       style={{ width, height }}
     >
@@ -1105,7 +1104,7 @@ function FunnelNode({ data, selected, id }: NodeProps) {
   }
 
   return (
-    <div className="relative group">
+    <div className="funnel-node-wrapper relative group">
       {/* Node Resizer - for pages and sticky notes */}
       {isResizable && (
         <NodeResizer
