@@ -383,6 +383,14 @@
   stroke: transparent;
   stroke-width: 20;
 }
+.funnel-studio .funnel-dynamic-edge {
+  transition: d 180ms ease-out, stroke-width 150ms ease, filter 150ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .funnel-studio .funnel-dynamic-edge {
+    transition: none;
+  }
+}
 /* Multi-connect source highlight */
 .react-flow__node.multi-connect-source {
   outline: 2px solid oklch(0.82 0.07 195) !important;

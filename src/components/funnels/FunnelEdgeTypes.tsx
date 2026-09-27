@@ -152,16 +152,9 @@ function FunnelEdge({
     return { sx, sy, tx, ty, sp, tp };
   }, [isSmartRouting, sourceNode, targetNode, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition]);
 
-  // Use getStraightPath for curvature 0, otherwise use getBezierPath
+  // Keep every connection curved so anchor changes can interpolate smoothly.
   const [edgePath, labelX, labelY] = useMemo(() => {
     try {
-      if (currentCurvature === 0) {
-        // Calculate straight path manually
-        const path = `M ${sx},${sy} L ${tx},${ty}`;
-        const midX = (sx + tx) / 2;
-        const midY = (sy + ty) / 2;
-        return [path, midX, midY];
-      }
       return getBezierPath({
         sourceX: sx,
         sourceY: sy,
@@ -169,7 +162,7 @@ function FunnelEdge({
         targetX: tx,
         targetY: ty,
         targetPosition: tp || Position.Left,
-        curvature: currentCurvature,
+        curvature: Math.max(currentCurvature, 0.2),
       });
     } catch (err) {
       console.error("Error computing edge path:", err);
@@ -369,11 +362,6 @@ function FunnelEdge({
     const midX = (sourceX + targetX) / 2 + controlOffset.x;
     const midY = (sourceY + targetY) / 2 + controlOffset.y;
     
-    if (currentCurvature === 0 && controlOffset.x === 0 && controlOffset.y === 0) {
-      // Straight line
-      return `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
-    }
-    
     // Quadratic bezier curve through control point
     return `M ${sourceX},${sourceY} Q ${midX},${midY} ${targetX},${targetY}`;
   }, [sourceX, sourceY, targetX, targetY, controlOffset, currentCurvature]);
@@ -393,6 +381,7 @@ function FunnelEdge({
       <BaseEdge
         id={id}
         path={finalEdgePath}
+        className="funnel-dynamic-edge"
         style={{
           stroke: selected ? 'oklch(0.65 0.22 290)' : styleConfig.stroke,
           strokeWidth: selected ? 2.5 : 2,
