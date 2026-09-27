@@ -612,7 +612,10 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
             bottom: Math.abs(pointer.clientY - droppedRect.bottom),
             left: Math.abs(pointer.clientX - droppedRect.left),
           };
-          nearestSide = (Object.entries(distances).sort((a, b) => a[1] - b[1])[0]?.[0] as typeof nearestSide) || null;
+          const closestSide = Object.entries(distances).sort((a, b) => a[1] - b[1])[0]?.[0];
+          if (closestSide === 'top' || closestSide === 'right' || closestSide === 'bottom' || closestSide === 'left') {
+            nearestSide = closestSide;
+          }
         }
 
         const fallbackHandles = findNearestAnchors(fromNode, droppedNode);
@@ -628,11 +631,11 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               source: droppedNode.id,
               sourceHandle: droppedHandle,
               target: fromNode.id,
-              targetHandle: connectionState.fromHandle.id,
+              targetHandle: connectionState.fromHandle.id ?? null,
             }
           : {
               source: fromNode.id,
-              sourceHandle: connectionState.fromHandle.id,
+              sourceHandle: connectionState.fromHandle.id ?? null,
               target: droppedNode.id,
               targetHandle: droppedHandle,
             };
