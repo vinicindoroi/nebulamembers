@@ -86,7 +86,7 @@ export function FunnelFloatingToolbar({
   };
 
   return (
-    <div className="funnel-toolbar absolute top-5 left-1/2 -translate-x-1/2 z-10 flex max-w-[calc(100%-6rem)] items-center gap-1.5 overflow-x-auto px-2 py-1.5 rounded-full border border-border/70 bg-card/80 backdrop-blur-xl">
+    <div className="funnel-toolbar absolute right-3 top-2 z-20 flex max-w-[calc(100%-14rem)] items-center gap-1 overflow-x-auto border border-border bg-card px-1.5 py-1">
       {/* Interaction Mode Toggle */}
       <div className="flex shrink-0 items-center bg-background/70 rounded-full p-0.5 border border-border/70">
         <Button

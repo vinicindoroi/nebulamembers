@@ -9,4 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Scope funnel-editor visual tokens under `.funnel-studio`; this keeps its denser Space Grotesk/DM Sans workspace styling isolated from the member platform.
+- Scope funnel-editor visual rules under `.funnel-studio`, but inherit the platform's semantic colors and Plus Jakarta Sans typography so the workspace stays visually consistent.
