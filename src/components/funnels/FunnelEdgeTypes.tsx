@@ -160,7 +160,7 @@ function FunnelEdge({
       const distance = Math.max(Math.hypot(dx, dy), 1);
       const normalX = -dy / distance;
       const normalY = dx / distance;
-      const bend = Math.min(72, Math.max(32, distance * Math.max(currentCurvature, 0.16)));
+      const bend = (currentCurvature === 0 ? 0 : Math.min(72, Math.max(32, distance * Math.max(currentCurvature, 0.16))));
       const lead = Math.min(96, Math.max(36, distance * 0.28));
 
       const direction = (position: Position | undefined) => {
@@ -377,19 +377,25 @@ function FunnelEdge({
   
   // Calculate custom bezier path with control point offset
   const customEdgePath = useMemo(() => {
-    const midX = (sourceX + targetX) / 2 + controlOffset.x;
-    const midY = (sourceY + targetY) / 2 + controlOffset.y;
+    const ddx = targetX - sourceX, ddy = targetY - sourceY;
+    const dist = Math.max(Math.hypot(ddx, ddy), 1);
+    const bendQ = (currentCurvature === 0 ? 0 : Math.min(144, Math.max(64, dist * currentCurvature * 2)));
+    const midX = (sourceX + targetX) / 2 + (-ddy / dist) * bendQ + controlOffset.x;
+    const midY = (sourceY + targetY) / 2 + (ddx / dist) * bendQ + controlOffset.y;
     
     // Quadratic bezier curve through control point
     return `M ${sourceX},${sourceY} Q ${midX},${midY} ${targetX},${targetY}`;
   }, [sourceX, sourceY, targetX, targetY, controlOffset, currentCurvature]);
   
   // Control point position for dragging handle
-  const controlPointX = (sourceX + targetX) / 2 + controlOffset.x;
-  const controlPointY = (sourceY + targetY) / 2 + controlOffset.y;
+  const hasOffset = controlOffset.x !== 0 || controlOffset.y !== 0;
+  const qd = Math.max(Math.hypot(targetX - sourceX, targetY - sourceY), 1);
+  const qBend = (currentCurvature === 0 ? 0 : Math.min(144, Math.max(64, qd * currentCurvature * 2)));
+  const controlPointX = hasOffset ? (sourceX + targetX) / 2 + ((-(targetY - sourceY) / qd) * qBend + controlOffset.x) / 2 : labelX;
+  const controlPointY = hasOffset ? (sourceY + targetY) / 2 + (((targetX - sourceX) / qd) * qBend + controlOffset.y) / 2 : labelY;
 
   // Use custom path when control point is offset, otherwise use standard bezier
-  const finalEdgePath = (controlOffset.x !== 0 || controlOffset.y !== 0) ? customEdgePath : edgePath;
+  const finalEdgePath = hasOffset ? customEdgePath : edgePath;
   const finalLabelX = controlPointX;
   const finalLabelY = controlPointY;
 
