@@ -744,9 +744,8 @@ function IconNode({ data, selected }: { data: FunnelNodeData; selected: boolean 
           'w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 overflow-hidden',
           !hasCustomIcon && !hasAdMedia && !isAiTool && colors.bg,
           colors.shadow,
-          'ring-1 ring-white/[0.06]',
           'hover:scale-[1.04]',
-          selected && 'ring-2 ring-white ring-offset-2 ring-offset-[#08080a] scale-[1.04]'
+          selected && 'ring-2 ring-primary/80 ring-offset-2 ring-offset-background scale-[1.04]'
         )}
         style={isAiTool && selectedAiTool ? { backgroundColor: selectedAiTool.color } : undefined}
       >
@@ -907,9 +906,9 @@ function ConditionNode({ data, selected }: { data: FunnelNodeData; selected: boo
           'w-14 h-14 flex items-center justify-center transition-all duration-200 rotate-45',
           colors.bg,
           colors.shadow,
-          'rounded-lg ring-1 ring-white/[0.08]',
+          'rounded-lg',
           'hover:scale-[1.04]',
-          selected && 'ring-2 ring-white ring-offset-2 ring-offset-[#08080a] scale-[1.04]'
+          selected && 'ring-2 ring-primary/80 ring-offset-2 ring-offset-background scale-[1.04]'
         )}
       >
         <Icon className={cn('w-6 h-6 -rotate-45', colors.icon)} />
@@ -984,7 +983,7 @@ function StickyNoteNode({ data, selected }: { data: FunnelNodeData; selected: bo
         'shadow-[0_10px_30px_rgba(0,0,0,0.35),0_2px_6px_rgba(0,0,0,0.2)]',
         'border-none overflow-hidden',
         'hover:rotate-0',
-        selected && 'ring-2 ring-white ring-offset-2 ring-offset-[#08080a]'
+        selected && 'ring-2 ring-primary/80 ring-offset-2 ring-offset-background'
       )}
       style={{
         transform: 'rotate(-1.5deg)',
