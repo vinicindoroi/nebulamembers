@@ -602,19 +602,31 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
         const droppedNode = currentNodes.find((node) => node.id === droppedNodeId);
         if (!fromNode || !droppedNode) return currentNodes;
 
-        const droppedRect = nodeElement?.getBoundingClientRect();
-        let nearestSide: 'top' | 'right' | 'bottom' | 'left' | null = null;
+        // Pick the dropped node's anchor closest to the anchor the cord started from,
+        // not the closest to the drop point.
+        const fromHandleEl = connectionState.fromHandle.id
+          ? document.querySelector<HTMLElement>(
+              `[data-nodeid="${connectionState.fromNode.id}"] [data-handleid="${connectionState.fromHandle.id}"]`
+            )
+          : null;
+        const fromRect = fromHandleEl?.getBoundingClientRect();
+        const fromX = fromRect ? fromRect.left + fromRect.width / 2 : pointer.clientX;
+        const fromY = fromRect ? fromRect.top + fromRect.height / 2 : pointer.clientY;
 
-        if (droppedRect) {
-          const distances = {
-            top: Math.abs(pointer.clientY - droppedRect.top),
-            right: Math.abs(pointer.clientX - droppedRect.right),
-            bottom: Math.abs(pointer.clientY - droppedRect.bottom),
-            left: Math.abs(pointer.clientX - droppedRect.left),
-          };
-          const closestSide = Object.entries(distances).sort((a, b) => a[1] - b[1])[0]?.[0];
-          if (closestSide === 'top' || closestSide === 'right' || closestSide === 'bottom' || closestSide === 'left') {
-            nearestSide = closestSide;
+        let nearestSide: 'top' | 'right' | 'bottom' | 'left' | null = null;
+        let bestDistance = Infinity;
+        for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+          const handleEl = document.querySelector<HTMLElement>(
+            `[data-nodeid="${droppedNode.id}"] [data-handleid^="${side}-"]`
+          );
+          const rect = handleEl?.getBoundingClientRect();
+          if (!rect) continue;
+          const dx = rect.left + rect.width / 2 - fromX;
+          const dy = rect.top + rect.height / 2 - fromY;
+          const distance = dx * dx + dy * dy;
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            nearestSide = side;
           }
         }
 
