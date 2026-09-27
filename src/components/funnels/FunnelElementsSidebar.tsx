@@ -64,8 +64,8 @@ function ElementItem({ element, isPageType, onDragStart, onExpandFacebook, isFac
       onDragStart={(e) => onDragStart(e, element.type, element.label)}
       onClick={() => hasSub && onExpandFacebook?.()}
       className={cn(
-        'group/item flex items-center gap-2.5 px-2 py-1.5 rounded-md cursor-grab active:cursor-grabbing',
-        'bg-transparent hover:bg-card border border-transparent hover:border-border',
+        'funnel-element-item group/item flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-grab active:cursor-grabbing',
+        'bg-transparent hover:bg-card/70 border border-transparent hover:border-border/80',
         'transition-all duration-150',
         hasSub && 'cursor-pointer'
       )}
@@ -150,7 +150,7 @@ function Section({
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 hover:bg-card rounded-md transition-colors group/section">
+      <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 hover:bg-card/60 rounded-md transition-colors group/section">
         <h4 className="text-[9px] font-semibold text-muted-foreground/80 uppercase tracking-[0.12em] group-hover/section:text-foreground/80 transition-colors">
           {title}
         </h4>
@@ -213,8 +213,8 @@ export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps)
   }
 
   return (
-    <div className="w-60 border-r border-border bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col">
-      <div className="px-4 py-4 border-b border-border">
+    <div className="funnel-panel funnel-elements-panel w-64 border-r border-border flex flex-col">
+      <div className="px-4 py-4 border-b border-border/70">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
             <MoveRight className="w-3 h-3 text-primary" />
@@ -229,7 +229,7 @@ export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps)
           <input
             type="text"
             placeholder="Filtrar elementos..."
-            className="w-full text-[11px] bg-card border border-border rounded-md px-2.5 py-1.5 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-colors"
+            className="funnel-search w-full text-[11px] bg-card/60 border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors"
             onChange={(e) => {
               const val = e.target.value.toLowerCase();
               document.querySelectorAll('[data-element-item]').forEach((el) => {

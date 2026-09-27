@@ -86,9 +86,9 @@ export function FunnelFloatingToolbar({
   };
 
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-2 py-1.5 rounded-full bg-[#0f0f12]/95 border border-border shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+    <div className="funnel-toolbar absolute top-5 left-1/2 -translate-x-1/2 z-10 flex max-w-[calc(100%-6rem)] items-center gap-1.5 overflow-x-auto px-2 py-1.5 rounded-full border border-border/70 bg-card/80 backdrop-blur-xl">
       {/* Interaction Mode Toggle */}
-      <div className="flex items-center bg-card rounded-full p-0.5 border border-border">
+      <div className="flex shrink-0 items-center bg-background/70 rounded-full p-0.5 border border-border/70">
         <Button
           variant="ghost"
           size="sm"
@@ -137,7 +137,7 @@ export function FunnelFloatingToolbar({
       {(onAddStickyNote || onAddFreeText || onAddImage) && (
         <>
           <div className="w-px h-5 bg-white/10" />
-          <div className="flex items-center bg-card rounded-full p-0.5 border border-border">
+          <div className="flex shrink-0 items-center bg-background/70 rounded-full p-0.5 border border-border/70">
             {onAddImage && (
               <>
                 <input 
@@ -232,7 +232,7 @@ export function FunnelFloatingToolbar({
 
       {/* Auto-save status indicator */}
       <div className={cn(
-        "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors",
+        "flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors",
         isSaving ? "bg-card" : "bg-emerald-500/10 border border-emerald-500/20"
       )}>
         {isSaving ? (

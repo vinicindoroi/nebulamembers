@@ -218,10 +218,10 @@ export function FunnelsSidebar({
         }}
         onClick={() => onSelectFunnel(funnel)}
         className={cn(
-          'w-full overflow-hidden group relative flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150',
+          'funnel-list-item w-full overflow-hidden group relative flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150',
           isNested && 'ml-4 w-[calc(100%-1rem)]',
           isSelected
-            ? 'bg-primary/[0.08] border border-primary/20 shadow-[0_0_0_1px_oklch(0.65_0.22_290/0.1)]'
+            ? 'is-active bg-primary/[0.08] border border-primary/25'
             : 'border border-transparent hover:bg-card hover:border-border'
         )}
       >
@@ -348,7 +348,7 @@ export function FunnelsSidebar({
 
   if (collapsed) {
     return (
-      <div className="w-14 border-r border-border bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col items-center py-4 gap-2 shrink-0 h-full">
+      <div className="funnel-panel w-14 border-r border-border flex flex-col items-center py-4 gap-2 shrink-0 h-full">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="hover:bg-muted/50">
@@ -393,9 +393,9 @@ export function FunnelsSidebar({
 
   return (
     <>
-      <div className="w-full sm:w-72 shrink-0 border-r border-border bg-gradient-to-b from-[#0a0a0c] to-[#08080a] flex flex-col h-full z-10">
+      <div className="funnel-panel funnel-list-panel w-full sm:w-72 shrink-0 border-r border-border flex flex-col h-full z-10">
         {/* Header */}
-        <div className="px-4 py-4 border-b border-border flex items-center justify-between">
+        <div className="px-4 py-4 border-b border-border/70 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
               <GitFork className="w-4 h-4 text-primary" />
@@ -476,7 +476,7 @@ export function FunnelsSidebar({
               placeholder="Buscar funis ou pastas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 h-9 bg-card border-border focus-visible:border-primary/40 focus-visible:ring-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 text-sm"
+              className="funnel-search pl-8 h-9 bg-card/60 border-border/70 focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 text-sm"
             />
           </div>
         </div>

@@ -1,3 +1,4 @@
 - [x] Refinar /courses com experiência dinâmica estilo Netflix
 - [x] Aplicar nova logo em toda a plataforma e favicon
 - [x] Corrigir o enquadramento do banner e a navegação horizontal do catálogo
+- [x] Redesenhar o criador de funis com três painéis, visual grafite/ciano e controles mais claros
