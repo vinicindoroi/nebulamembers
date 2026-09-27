@@ -11,3 +11,4 @@
 
 - Scope funnel-editor visual rules under `.funnel-studio`, but inherit the platform's semantic colors and Plus Jakarta Sans typography so the workspace stays visually consistent.
 - Route funnel connections between perpendicular anchors with corner-aware cubic curves so branches bend concavely toward their destination.
+- Keep existing funnel connection anchors fixed when nodes move; users reposition anchors manually.
