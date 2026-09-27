@@ -41,6 +41,12 @@ const edgeStyleMap: Record<string, { stroke: string; strokeDasharray: string }> 
   warning: { stroke: '#F59E0B', strokeDasharray: '0' },
 };
 
+const isHorizontalPosition = (position: Position) =>
+  position === Position.Left || position === Position.Right;
+
+const cubicPoint = (start: number, controlA: number, controlB: number, end: number) =>
+  (start + 3 * controlA + 3 * controlB + end) / 8;
+
 function FunnelEdge({
   id,
   source,
@@ -152,10 +158,29 @@ function FunnelEdge({
     return { sx, sy, tx, ty, sp, tp };
   }, [isSmartRouting, sourceNode, targetNode, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition]);
 
-  // Directional bezier: the curve exits the source handle and enters the
-  // target handle following each anchor's direction (React Flow default).
+  // Perpendicular anchors use a corner-aware cubic. This keeps diagonal
+  // branches concave toward their destination instead of bulging outward.
   const [edgePath, labelX, labelY] = useMemo(() => {
     try {
+      const sourceIsHorizontal = isHorizontalPosition(sp);
+      const targetIsHorizontal = isHorizontalPosition(tp);
+
+      if (currentCurvature > 0 && sourceIsHorizontal !== targetIsHorizontal) {
+        const cornerX = sourceIsHorizontal ? tx : sx;
+        const cornerY = sourceIsHorizontal ? sy : ty;
+        const curveStrength = Math.min(0.72, Math.max(0.42, currentCurvature + 0.28));
+        const control1X = sx + (cornerX - sx) * curveStrength;
+        const control1Y = sy + (cornerY - sy) * curveStrength;
+        const control2X = tx + (cornerX - tx) * curveStrength;
+        const control2Y = ty + (cornerY - ty) * curveStrength;
+
+        return [
+          `M ${sx},${sy} C ${control1X},${control1Y} ${control2X},${control2Y} ${tx},${ty}`,
+          cubicPoint(sx, control1X, control2X, tx),
+          cubicPoint(sy, control1Y, control2Y, ty),
+        ] as [string, number, number];
+      }
+
       return getBezierPath({
         sourceX: sx,
         sourceY: sy,
