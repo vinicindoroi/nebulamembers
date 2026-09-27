@@ -628,9 +628,7 @@ function PageNode({ data, selected }: { data: FunnelNodeData; selected: boolean 
     <div
       className={cn(
         'funnel-page-node rounded-xl overflow-hidden transition-all duration-200 group',
-        'bg-card/95 border-0 outline-none',
-        'shadow-xl',
-        selected && 'ring-2 ring-primary/80 ring-offset-2 ring-offset-background'
+        'bg-card/95 border-0 outline-none shadow-none ring-0'
       )}
       style={{ width, height }}
     >

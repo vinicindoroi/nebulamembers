@@ -77,7 +77,7 @@
 .funnel-panel-toggle { box-shadow: 0 4px 14px oklch(0 0 0 / 0.28); }
 .funnel-flow-canvas .react-flow__pane { cursor: crosshair; }
 .funnel-flow-canvas .react-flow__node:hover .funnel-node-wrapper { filter: brightness(1.04); }
-.funnel-page-node { box-shadow: 0 6px 18px oklch(0 0 0 / 0.32); }
+.funnel-page-node { box-shadow: none; }
 .funnel-flow-controls button { background: transparent; border-bottom-color: var(--border); fill: var(--foreground); }
 .funnel-flow-controls button:hover { background: var(--accent); }
 @media (max-width: 1450px) {
@@ -367,9 +367,8 @@
   pointer-events: auto;
 }
 .react-flow__node.selected .funnel-node-wrapper {
-  outline: 2px solid oklch(0.82 0.07 195 / 0.6);
-  outline-offset: 4px;
-  border-radius: 12px;
+  outline: none !important;
+  box-shadow: none !important;
 }
 .react-flow__nodesselection-rect {
   background: transparent !important;
