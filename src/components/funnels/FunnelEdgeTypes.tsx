@@ -1,10 +1,11 @@
 import { memo, useState, useMemo, useCallback, useEffect } from 'react';
-import { 
-  EdgeProps, 
+import {
+  EdgeProps,
   EdgeLabelRenderer,
   BaseEdge,
   useReactFlow,
-  Position
+  Position,
+  getBezierPath
 } from '@xyflow/react';
 import { Settings2, Trash2, GripHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
