@@ -393,7 +393,7 @@ export function FunnelsSidebar({
 
   return (
     <>
-      <div className="funnel-panel funnel-list-panel w-full sm:w-72 shrink-0 border-r border-border flex flex-col h-full z-10">
+      <div className="funnel-panel funnel-list-panel w-full sm:w-64 shrink-0 border-r border-border flex flex-col h-full z-10">
         {/* Header */}
         <div className="px-4 py-4 border-b border-border/70 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -401,7 +401,7 @@ export function FunnelsSidebar({
               <GitFork className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold text-sm font-display tracking-tight">Funis</h2>
+              <h2 className="font-semibold text-sm font-display">Funis</h2>
               <p className="text-[10px] text-muted-foreground">
                 {funnels.length} {funnels.length === 1 ? 'funil' : 'funis'}
               </p>
@@ -483,7 +483,7 @@ export function FunnelsSidebar({
 
         {/* Funnels List */}
         <ScrollArea className="flex-1 w-full overflow-hidden">
-          <div className="pl-2 pr-5 pb-3 space-y-0.5 w-full max-w-[calc(100vw-1rem)] sm:max-w-[260px] overflow-x-hidden">
+          <div className="px-2 pb-3 space-y-0.5 w-full max-w-[calc(100vw-1rem)] sm:max-w-[248px] overflow-x-hidden">
             {isLoading ? (
               <div className="space-y-2 px-1">
                 <Skeleton className="h-14 w-full rounded-lg" />

@@ -1473,12 +1473,19 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
       <FunnelElementsSidebar collapsed={sidebarCollapsed} />
 
       <div className="funnel-canvas flex-1 relative min-w-0 overflow-hidden">
+        <div className="funnel-canvas-header absolute inset-x-0 top-0 z-10 flex h-14 items-center border-b border-border px-4">
+          <div className="min-w-0 pr-3">
+            <p className="truncate text-sm font-semibold text-foreground">{funnel.name}</p>
+            <p className="text-[10px] text-muted-foreground">Editor visual</p>
+          </div>
+        </div>
+
         {/* Toggle sidebar button */}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="funnel-panel-toggle absolute top-5 left-4 z-10 bg-card/80 hover:bg-accent border border-border/70 backdrop-blur-xl"
+          className="funnel-panel-toggle absolute bottom-4 left-4 z-10 border border-border bg-card hover:bg-accent"
         >
           {sidebarCollapsed ? (
             <ChevronRight className="w-4 h-4" />
@@ -1690,7 +1697,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               deleteKeyCode={['Delete', 'Backspace']}
               snapToGrid
               snapGrid={[4, 4]}
-              className="funnel-flow-canvas bg-background"
+              className="funnel-flow-canvas bg-background pt-14"
               proOptions={{ hideAttribution: true }}
             >
               <Controls 
@@ -1701,7 +1708,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
                 variant={BackgroundVariant.Dots}
                 gap={28}
                 size={1.25}
-                color="oklch(0.72 0.03 195 / 0.12)"
+                color="var(--funnel-grid-dot)"
               />
             </ReactFlow>
 

@@ -213,13 +213,13 @@ export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps)
   }
 
   return (
-    <div className="funnel-panel funnel-elements-panel w-64 border-r border-border flex flex-col">
+    <div className="funnel-panel funnel-elements-panel w-60 border-r border-border flex flex-col">
       <div className="px-4 py-4 border-b border-border/70">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
             <MoveRight className="w-3 h-3 text-primary" />
           </div>
-          <h3 className="font-semibold text-sm text-foreground font-display tracking-tight">Elementos</h3>
+          <h3 className="font-semibold text-sm text-foreground font-display">Elementos</h3>
         </div>
         <p className="text-[10px] text-muted-foreground/70 ml-8">
           Arraste para o canvas
