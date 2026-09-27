@@ -388,7 +388,7 @@ function FunnelEdge({
           strokeDasharray: styleConfig.strokeDasharray,
           strokeLinecap: 'round',
           filter: selected ? 'drop-shadow(0 0 6px oklch(0.65 0.22 290 / 0.5))' : 'none',
-          transition: 'stroke-width 150ms ease, filter 150ms ease',
+          transition: 'd 180ms ease-out, stroke-width 150ms ease, filter 150ms ease',
         }}
       />
 
