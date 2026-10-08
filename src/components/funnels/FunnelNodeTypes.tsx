@@ -65,6 +65,9 @@ import {
   Webhook,
   Bell,
   ClipboardList,
+  Building2,
+  ContactRound,
+  Flag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MessageNode } from './MessageNode';
@@ -287,6 +290,9 @@ export interface FunnelNodeData {
 // Icon mapping
 export const iconMap: Record<string, LucideIcon | React.ComponentType<{ className?: string }>> = {
   'facebook-ads': Facebook,
+  'fb-business-manager': Building2,
+  'fb-ad-account': ContactRound,
+  'fb-page': Flag,
   'fb-campaign': Megaphone,
   'fb-adset': Layers,
   'fb-ad': ImageIcon,
@@ -341,6 +347,9 @@ export const iconMap: Record<string, LucideIcon | React.ComponentType<{ classNam
 // Category mapping
 export const categoryMap: Record<string, 'traffic' | 'page' | 'action' | 'payment' | 'automation' | 'condition' | 'note' | 'text' | 'fb-campaign' | 'fb-adset' | 'fb-ad' | 'connector'> = {
   'facebook-ads': 'traffic',
+  'fb-business-manager': 'traffic',
+  'fb-ad-account': 'traffic',
+  'fb-page': 'traffic',
   'fb-campaign': 'fb-campaign',
   'fb-adset': 'fb-adset',
   'fb-ad': 'fb-ad',
@@ -394,6 +403,9 @@ export const categoryMap: Record<string, 'traffic' | 'page' | 'action' | 'paymen
 
 // Color mapping for circular icons (Traffic/Actions/Payment/Automation)
 const iconColorMap: Record<string, { bg: string; icon: string; shadow: string }> = {
+  'fb-business-manager': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
+  'fb-ad-account': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
+  'fb-page': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
   'facebook-ads': { 
     bg: 'bg-[#1877F2]', 
     icon: 'text-white', 
@@ -1346,6 +1358,10 @@ export const funnelElements = {
     { type: 'affiliates', label: 'Afiliados', icon: Handshake },
   ],
   facebookSubcategories: [
+    { type: 'fb-business-manager', label: 'BM (Business Manager)', icon: Building2 },
+    { type: 'fb-ad-account', label: 'CA (Conta de anúncio)', icon: ContactRound },
+    { type: 'fb-page', label: 'Página do Facebook', icon: Flag },
+    { type: 'pixel', label: 'Pixel', icon: Crosshair },
     { type: 'fb-campaign', label: 'Campanha', icon: Megaphone },
     { type: 'fb-adset', label: 'Conjunto de Anúncio', icon: Layers },
     { type: 'fb-ad', label: 'Anúncio', icon: ImageIcon },
