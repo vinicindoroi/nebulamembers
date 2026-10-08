@@ -14,7 +14,14 @@ import { Field, inputClass } from "@/components/admin/Modal";
 
 export const Route = createFileRoute("/_app/profile")({
   component: ProfilePage,
-  head: () => ({ meta: [{ title: "Perfil — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Perfil — Nebula Members" },
+    { name: "description", content: "Perfil na plataforma Nebula Members." },
+    { property: "og:title", content: "Perfil — Nebula Members" },
+    { property: "og:description", content: "Perfil na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 const ACHIEVEMENT_ICONS: Record<

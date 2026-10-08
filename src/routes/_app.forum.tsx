@@ -19,7 +19,14 @@ import { useAddXp, getLevel } from "@/hooks/use-xp";
 
 export const Route = createFileRoute("/_app/forum")({
   component: ForumPage,
-  head: () => ({ meta: [{ title: "Fórum — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Fórum — Nebula Members" },
+    { name: "description", content: "Fórum na plataforma Nebula Members." },
+    { property: "og:title", content: "Fórum — Nebula Members" },
+    { property: "og:description", content: "Fórum na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type ForumTag = { id: string; name: string; slug: string; color: string };

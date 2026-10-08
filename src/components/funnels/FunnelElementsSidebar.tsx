@@ -11,6 +11,9 @@ interface FunnelElementsSidebarProps {
 
 // Color mappings for each element type
 const colorMap: Record<string, string> = {
+  'fb-business-manager': 'bg-facebook',
+  'fb-ad-account': 'bg-facebook',
+  'fb-page': 'bg-facebook',
   'facebook-ads': 'bg-[#1877F2]',
   'fb-campaign': 'bg-[#1877F2]',
   'fb-adset': 'bg-[#4267B2]',

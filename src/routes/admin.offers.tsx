@@ -5,7 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 
-export const Route = createFileRoute("/admin/offers")({ component: Page });
+export const Route = createFileRoute("/admin/offers")({
+  head: () => ({ meta: [
+    { title: "Gerenciar ofertas — Nebula Members" },
+    { name: "description", content: "Gerenciar ofertas na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar ofertas — Nebula Members" },
+    { property: "og:description", content: "Gerenciar ofertas na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Offer = {
   id: string;

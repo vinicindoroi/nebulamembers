@@ -6,7 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/forms")({
   component: FormsPage,
-  head: () => ({ meta: [{ title: "Formulário Interativo — Nebula" }] }),
+  head: () => ({ meta: [
+    { title: "Formulário interativo — Nebula Members" },
+    { name: "description", content: "Formulário interativo na plataforma Nebula Members." },
+    { property: "og:title", content: "Formulário interativo — Nebula Members" },
+    { property: "og:description", content: "Formulário interativo na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 const generateUUID = () => {

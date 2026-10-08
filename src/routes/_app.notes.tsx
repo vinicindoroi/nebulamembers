@@ -10,7 +10,14 @@ import { NotesGraphView } from '@/components/notes/NotesGraphView';
 
 export const Route = createFileRoute("/_app/notes")({
   component: NotesPage,
-  head: () => ({ meta: [{ title: "Notas — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Notas — Nebula Members" },
+    { name: "description", content: "Notas na plataforma Nebula Members." },
+    { property: "og:title", content: "Notas — Nebula Members" },
+    { property: "og:description", content: "Notas na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type ViewMode = 'grid' | 'list' | 'graph';

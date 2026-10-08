@@ -9,7 +9,14 @@ import { useSavedPosts, useToggleSave } from "@/hooks/use-saved-posts";
 
 export const Route = createFileRoute("/_app/saved")({
   component: SavedPage,
-  head: () => ({ meta: [{ title: "Salvos — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Salvos — Nebula Members" },
+    { name: "description", content: "Salvos na plataforma Nebula Members." },
+    { property: "og:title", content: "Salvos — Nebula Members" },
+    { property: "og:description", content: "Salvos na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 const db = supabase as any;

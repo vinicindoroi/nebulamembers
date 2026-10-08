@@ -4,7 +4,16 @@ import { Check, X, Trash2, MessageSquare, RefreshCw, Search, AlertTriangle, Shie
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/comments")({ component: Page });
+export const Route = createFileRoute("/admin/comments")({
+  head: () => ({ meta: [
+    { title: "Gerenciar comentários — Nebula Members" },
+    { name: "description", content: "Gerenciar comentários na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar comentários — Nebula Members" },
+    { property: "og:description", content: "Gerenciar comentários na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Comment = {
   id: string;

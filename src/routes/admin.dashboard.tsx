@@ -5,7 +5,16 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tool
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
 
-export const Route = createFileRoute("/admin/dashboard")({ component: Page });
+export const Route = createFileRoute("/admin/dashboard")({
+  head: () => ({ meta: [
+    { title: "Painel administrativo — Nebula Members" },
+    { name: "description", content: "Painel administrativo na plataforma Nebula Members." },
+    { property: "og:title", content: "Painel administrativo — Nebula Members" },
+    { property: "og:description", content: "Painel administrativo na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 const COLORS = ["#7ad3d8", "#9aa0a6", "#f59e0b", "#10b981"];
 

@@ -6,7 +6,16 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 
-export const Route = createFileRoute("/admin/notifications")({ component: Page });
+export const Route = createFileRoute("/admin/notifications")({
+  head: () => ({ meta: [
+    { title: "Gerenciar notificações — Nebula Members" },
+    { name: "description", content: "Gerenciar notificações na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar notificações — Nebula Members" },
+    { property: "og:description", content: "Gerenciar notificações na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Notif = {
   id: string;

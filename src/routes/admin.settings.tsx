@@ -6,7 +6,16 @@ import { Field, inputClass, selectClass, selectStyle } from "@/components/admin/
 import { supabase } from "@/integrations/supabase/client";
 import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
 
-export const Route = createFileRoute("/admin/settings")({ component: Page });
+export const Route = createFileRoute("/admin/settings")({
+  head: () => ({ meta: [
+    { title: "Configurações da plataforma — Nebula Members" },
+    { name: "description", content: "Configurações da plataforma na plataforma Nebula Members." },
+    { property: "og:title", content: "Configurações da plataforma — Nebula Members" },
+    { property: "og:description", content: "Configurações da plataforma na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 const STORAGE_KEY = "admin_settings_v1";
 

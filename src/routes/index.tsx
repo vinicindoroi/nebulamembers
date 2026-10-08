@@ -16,7 +16,14 @@ export const Route = createFileRoute("/")({
     };
   },
   component: LoginPage,
-  head: () => ({ meta: [{ title: "Entrar — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Acesso à plataforma — Nebula Members" },
+    { name: "description", content: "Acesso à plataforma na plataforma Nebula Members." },
+    { property: "og:title", content: "Acesso à plataforma — Nebula Members" },
+    { property: "og:description", content: "Acesso à plataforma na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function LoginPage() {

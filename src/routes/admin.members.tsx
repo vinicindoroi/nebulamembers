@@ -40,7 +40,16 @@ function PlanSelect({ value, onChange }: { value: string; onChange: (v: string) 
 }
 
 
-export const Route = createFileRoute("/admin/members")({ component: Page });
+export const Route = createFileRoute("/admin/members")({
+  head: () => ({ meta: [
+    { title: "Gerenciar membros — Nebula Members" },
+    { name: "description", content: "Gerenciar membros na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar membros — Nebula Members" },
+    { property: "og:description", content: "Gerenciar membros na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Member = { 
   id: string; 
