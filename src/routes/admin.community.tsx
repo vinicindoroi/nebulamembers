@@ -7,7 +7,16 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/community")({ component: Page });
+export const Route = createFileRoute("/admin/community")({
+  head: () => ({ meta: [
+    { title: "Gerenciar comunidade — Nebula Members" },
+    { name: "description", content: "Gerenciar comunidade na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar comunidade — Nebula Members" },
+    { property: "og:description", content: "Gerenciar comunidade na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Post = {
   id: string;

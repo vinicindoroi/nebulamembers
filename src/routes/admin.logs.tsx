@@ -3,7 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { ScrollText, Search, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/admin/logs")({ component: Page });
+export const Route = createFileRoute("/admin/logs")({
+  head: () => ({ meta: [
+    { title: "Registros de atividades — Nebula Members" },
+    { name: "description", content: "Registros de atividades na plataforma Nebula Members." },
+    { property: "og:title", content: "Registros de atividades — Nebula Members" },
+    { property: "og:description", content: "Registros de atividades na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Log = { id: string; action: string; target: string | null; ip: string | null; created_at: string; actor_id: string | null };
 

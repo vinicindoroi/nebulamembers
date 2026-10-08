@@ -8,7 +8,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass } from "@/components/admin/Modal";
 
-export const Route = createFileRoute("/admin/plans")({ component: Page });
+export const Route = createFileRoute("/admin/plans")({
+  head: () => ({ meta: [
+    { title: "Gerenciar níveis de acesso — Nebula Members" },
+    { name: "description", content: "Gerenciar níveis de acesso na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar níveis de acesso — Nebula Members" },
+    { property: "og:description", content: "Gerenciar níveis de acesso na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Plan = {
   id: string;

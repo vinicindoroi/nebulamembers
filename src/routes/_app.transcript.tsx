@@ -11,7 +11,16 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { analyzeCreativeCopyFn, transcribeAudioFn } from "@/lib/ai/functions";
 
-export const Route = createFileRoute("/_app/transcript")({ component: Page });
+export const Route = createFileRoute("/_app/transcript")({
+  head: () => ({ meta: [
+    { title: "Transcrição — Nebula Members" },
+    { name: "description", content: "Transcrição na plataforma Nebula Members." },
+    { property: "og:title", content: "Transcrição — Nebula Members" },
+    { property: "og:description", content: "Transcrição na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 const TRANSCRIPTION_COST = 20;
 

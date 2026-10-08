@@ -7,7 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/forms")({
   component: AdminFormsPage,
-  head: () => ({ meta: [{ title: "Respostas Formulários — Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Respostas dos formulários — Nebula Members" },
+    { name: "description", content: "Respostas dos formulários na plataforma Nebula Members." },
+    { property: "og:title", content: "Respostas dos formulários — Nebula Members" },
+    { property: "og:description", content: "Respostas dos formulários na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type Submission = {

@@ -13,7 +13,14 @@ import { useCourses } from "@/hooks/use-courses";
 
 export const Route = createFileRoute("/_app/organizer")({
   component: OrganizerPage,
-  head: () => ({ meta: [{ title: "Organização Operacional — Nebula" }] }),
+  head: () => ({ meta: [
+    { title: "Organização Operacional — Nebula Members" },
+    { name: "description", content: "Organização Operacional na plataforma Nebula Members." },
+    { property: "og:title", content: "Organização Operacional — Nebula Members" },
+    { property: "og:description", content: "Organização Operacional na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 

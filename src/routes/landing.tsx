@@ -9,6 +9,15 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/landing")({
+  head: () => ({ meta: [
+    { title: "Nebula Members — Aprendizado e comunidade" },
+    { name: "description", content: "Conheça a plataforma de aprendizado e comunidade Nebula Members." },
+    { property: "og:title", content: "Nebula Members — Aprendizado e comunidade" },
+    { property: "og:description", content: "Conheça a plataforma de aprendizado e comunidade Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+
   component: LandingPage,
 });
 

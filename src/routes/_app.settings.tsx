@@ -13,7 +13,14 @@ import { useTheme } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
-  head: () => ({ meta: [{ title: "Configurações — Membros" }] }),
+  head: () => ({ meta: [
+    { title: "Configurações da conta — Nebula Members" },
+    { name: "description", content: "Configurações da conta na plataforma Nebula Members." },
+    { property: "og:title", content: "Configurações da conta — Nebula Members" },
+    { property: "og:description", content: "Configurações da conta na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 const STORAGE_KEY = "member_prefs_v1";

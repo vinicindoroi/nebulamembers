@@ -89,7 +89,16 @@ function PlanMultiSelect({ options, selected, onChange, disabled }: { options: A
   );
 }
 
-export const Route = createFileRoute("/admin/modules")({ component: Page });
+export const Route = createFileRoute("/admin/modules")({
+  head: () => ({ meta: [
+    { title: "Gerenciar módulos e aulas — Nebula Members" },
+    { name: "description", content: "Gerenciar módulos e aulas na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar módulos e aulas — Nebula Members" },
+    { property: "og:description", content: "Gerenciar módulos e aulas na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Course = { id: string; title: string };
 type Module = { id: string; title: string; description: string | null; position: number; course_id: string; is_premium: boolean | null; offer_id: string | null; access_level: string | null; access_levels: string[] | null; cover_url: string | null; title_visible?: boolean | null };

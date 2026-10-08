@@ -5,7 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass } from "@/components/admin/Modal";
 
-export const Route = createFileRoute("/admin/categories")({ component: Page });
+export const Route = createFileRoute("/admin/categories")({
+  head: () => ({ meta: [
+    { title: "Gerenciar categorias — Nebula Members" },
+    { name: "description", content: "Gerenciar categorias na plataforma Nebula Members." },
+    { property: "og:title", content: "Gerenciar categorias — Nebula Members" },
+    { property: "og:description", content: "Gerenciar categorias na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Category = { id: string; name: string; slug: string; color: string | null; icon: string | null; courses?: { count: number }[] };
 

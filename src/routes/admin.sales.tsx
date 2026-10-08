@@ -6,7 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StatCard } from "@/components/admin/StatCard";
 
-export const Route = createFileRoute("/admin/sales")({ component: Page });
+export const Route = createFileRoute("/admin/sales")({
+  head: () => ({ meta: [
+    { title: "Transações — Nebula Members" },
+    { name: "description", content: "Transações na plataforma Nebula Members." },
+    { property: "og:title", content: "Transações — Nebula Members" },
+    { property: "og:description", content: "Transações na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 function Page() {
   const [rows, setRows] = useState<any[]>([]);

@@ -9,7 +9,16 @@ import { toast } from "sonner";
 import { Field, inputClass } from "@/components/admin/Modal";
 import { usePlayerSettings, useUpdatePlayerSettings, type PlayerSettings } from "@/hooks/use-player-settings";
 
-export const Route = createFileRoute("/admin/player")({ component: Page });
+export const Route = createFileRoute("/admin/player")({
+  head: () => ({ meta: [
+    { title: "Configurações do player — Nebula Members" },
+    { name: "description", content: "Configurações do player na plataforma Nebula Members." },
+    { property: "og:title", content: "Configurações do player — Nebula Members" },
+    { property: "og:description", content: "Configurações do player na plataforma Nebula Members." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+ component: Page });
 
 type Tab = "branding" | "protection" | "features";
 
