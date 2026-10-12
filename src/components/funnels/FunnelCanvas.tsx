@@ -1164,7 +1164,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     // Recreate connections between the duplicated blocks
     const newEdges = copiedEdgesRef.current
       .filter((edge) => idMap.has(edge.source) && idMap.has(edge.target))
-      .map((edge, index) => ({
+      .map((edge: Edge, index: number) => ({
         ...edge,
         id: `edge-${timestamp}-${index}`,
         source: idMap.get(edge.source)!,
