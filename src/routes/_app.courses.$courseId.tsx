@@ -133,7 +133,13 @@ function CourseDetail() {
       const contentById = new Map<string, any>((lc.data ?? []).map((x: any) => [x.id, x]));
       const lessons = ((l.data ?? []) as any[]).map((lesson) => ({ ...lesson, ...(contentById.get(lesson.id) ?? {}) }));
       const done = new Set((p.data ?? []).map((x) => x.lesson_id));
+      const [{ data: unl }, { data: adm }] = await Promise.all([
+        (supabase as any).from("content_unlocks").select("target_type, target_id").eq("user_id", user!.id),
+        (supabase as any).rpc("has_role", { _user_id: user!.id, _role: "admin" }),
+      ]);
       return {
+        unlocks: new Set<string>((unl ?? []).map((u: any) => `${u.target_type}:${u.target_id}`)),
+        isAdmin: !!adm,
         course: c.data,
         modules: (m.data ?? []) as Module[],
         lessons: lessons as unknown as Lesson[],
@@ -216,6 +222,13 @@ function CourseDetail() {
   const accessDenied = userLevel < courseLevel;
 
   const activeModule = modules.find((m) => m.id === activeLesson?.module_id);
+  const unlocks: Set<string> = (data as any).unlocks ?? new Set();
+  const pwTarget: { type: "module" | "lesson"; id: string } | null =
+    !isAdminUser && activeModule && (activeModule as any).password_protected && !unlocks.has(`module:${activeModule.id}`)
+      ? { type: "module", id: activeModule.id }
+      : !isAdminUser && activeLesson && (activeLesson as any).password_protected && !unlocks.has(`lesson:${activeLesson.id}`)
+        ? { type: "lesson", id: activeLesson.id }
+        : null;
   const isLocked =
     userLevel < courseLevel ||
     !allowedBy(activeModule?.access_levels, activeModule?.access_level) ||
@@ -553,6 +566,13 @@ function CourseDetail() {
                   )}
                 </div>
               </div>
+            ) : pwTarget ? (
+              <PasswordGate
+                key={`${pwTarget.type}-${pwTarget.id}`}
+                type={pwTarget.type}
+                id={pwTarget.id}
+                onUnlocked={() => qc.invalidateQueries({ queryKey: ["course", courseId] })}
+              />
             ) : (
               <LessonPlayer
                 lesson={activeLesson}

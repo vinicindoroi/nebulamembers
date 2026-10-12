@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Plus, Trash2, ChevronRight, Layers, BookOpen, Edit3, Video, Clock,
   GripVertical, ArrowUp, ArrowDown, FileText, Link as LinkIcon, Search,
-  Paperclip, Upload, X, Download, Crown, ImageIcon, Eye,
+  Paperclip, Upload, X, Download, Crown, ImageIcon, Eye, Lock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
