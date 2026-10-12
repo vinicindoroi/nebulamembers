@@ -197,6 +197,48 @@ export type Database = {
         }
         Relationships: []
       }
+      content_passwords: {
+        Row: {
+          password_hash: string
+          target_id: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          password_hash: string
+          target_id: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          password_hash?: string
+          target_id?: string
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      content_unlocks: {
+        Row: {
+          target_id: string
+          target_type: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          target_id: string
+          target_type: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          target_id?: string
+          target_type?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           active: boolean
@@ -934,6 +976,7 @@ export type Database = {
           is_premium: boolean
           module_id: string | null
           offer_id: string | null
+          password_protected: boolean
           position: number
           poster_url: string | null
           title: string
@@ -959,6 +1002,7 @@ export type Database = {
           is_premium?: boolean
           module_id?: string | null
           offer_id?: string | null
+          password_protected?: boolean
           position?: number
           poster_url?: string | null
           title: string
@@ -984,6 +1028,7 @@ export type Database = {
           is_premium?: boolean
           module_id?: string | null
           offer_id?: string | null
+          password_protected?: boolean
           position?: number
           poster_url?: string | null
           title?: string
@@ -1025,6 +1070,7 @@ export type Database = {
           id: string
           is_premium: boolean
           offer_id: string | null
+          password_protected: boolean
           position: number
           title: string
           title_visible: boolean
@@ -1039,6 +1085,7 @@ export type Database = {
           id?: string
           is_premium?: boolean
           offer_id?: string | null
+          password_protected?: boolean
           position?: number
           title: string
           title_visible?: boolean
@@ -1053,6 +1100,7 @@ export type Database = {
           id?: string
           is_premium?: boolean
           offer_id?: string | null
+          password_protected?: boolean
           position?: number
           title?: string
           title_visible?: boolean
@@ -1581,6 +1629,7 @@ export type Database = {
           is_free: boolean | null
           is_premium: boolean | null
           module_id: string | null
+          password_protected: boolean | null
           position: number | null
           poster_url: string | null
           title: string | null
@@ -1601,6 +1650,7 @@ export type Database = {
           is_free?: boolean | null
           is_premium?: boolean | null
           module_id?: string | null
+          password_protected?: boolean | null
           position?: number | null
           poster_url?: string | null
           title?: string | null
@@ -1621,6 +1671,7 @@ export type Database = {
           is_free?: boolean | null
           is_premium?: boolean | null
           module_id?: string | null
+          password_protected?: boolean | null
           position?: number | null
           poster_url?: string | null
           title?: string | null
@@ -1708,6 +1759,7 @@ export type Database = {
         Returns: boolean
       }
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
+      content_unlocked: { Args: { _lesson_id: string }; Returns: boolean }
       generate_tracking_token: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -1718,6 +1770,14 @@ export type Database = {
       }
       plan_level: { Args: { _plan: string }; Returns: number }
       plan_slug: { Args: { _plan: string }; Returns: string }
+      set_content_password: {
+        Args: { _id: string; _password: string; _type: string }
+        Returns: undefined
+      }
+      unlock_content: {
+        Args: { _id: string; _password: string; _type: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "member"

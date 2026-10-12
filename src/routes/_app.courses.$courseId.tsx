@@ -133,7 +133,13 @@ function CourseDetail() {
       const contentById = new Map<string, any>((lc.data ?? []).map((x: any) => [x.id, x]));
       const lessons = ((l.data ?? []) as any[]).map((lesson) => ({ ...lesson, ...(contentById.get(lesson.id) ?? {}) }));
       const done = new Set((p.data ?? []).map((x) => x.lesson_id));
+      const [{ data: unl }, { data: adm }] = await Promise.all([
+        (supabase as any).from("content_unlocks").select("target_type, target_id").eq("user_id", user!.id),
+        (supabase as any).rpc("has_role", { _user_id: user!.id, _role: "admin" }),
+      ]);
       return {
+        unlocks: new Set<string>((unl ?? []).map((u: any) => `${u.target_type}:${u.target_id}`)),
+        isAdmin: !!adm,
         course: c.data,
         modules: (m.data ?? []) as Module[],
         lessons: lessons as unknown as Lesson[],
@@ -216,6 +222,14 @@ function CourseDetail() {
   const accessDenied = userLevel < courseLevel;
 
   const activeModule = modules.find((m) => m.id === activeLesson?.module_id);
+  const isAdminUser = !!(data as any).isAdmin;
+  const unlocks: Set<string> = (data as any).unlocks ?? new Set();
+  const pwTarget: { type: "module" | "lesson"; id: string } | null =
+    !isAdminUser && activeModule && (activeModule as any).password_protected && !unlocks.has(`module:${activeModule.id}`)
+      ? { type: "module", id: activeModule.id }
+      : !isAdminUser && activeLesson && (activeLesson as any).password_protected && !unlocks.has(`lesson:${activeLesson.id}`)
+        ? { type: "lesson", id: activeLesson.id }
+        : null;
   const isLocked =
     userLevel < courseLevel ||
     !allowedBy(activeModule?.access_levels, activeModule?.access_level) ||
@@ -553,6 +567,13 @@ function CourseDetail() {
                   )}
                 </div>
               </div>
+            ) : pwTarget ? (
+              <PasswordGate
+                key={`${pwTarget.type}-${pwTarget.id}`}
+                type={pwTarget.type}
+                id={pwTarget.id}
+                onUnlocked={() => qc.invalidateQueries({ queryKey: ["course", courseId] })}
+              />
             ) : (
               <LessonPlayer
                 lesson={activeLesson}
@@ -972,5 +993,34 @@ function LessonAttachments({ lessonId }: { lessonId: string }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function PasswordGate({ type, id, onUnlocked }: { type: "module" | "lesson"; id: string; onUnlocked: () => void }) {
+  const [pw, setPw] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pw.trim()) return;
+    setBusy(true);
+    const { data, error } = await (supabase as any).rpc("unlock_content", { _type: type, _id: id, _password: pw });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    if (!data) return toast.error("Senha incorreta");
+    toast.success(type === "module" ? "Módulo desbloqueado" : "Aula desbloqueada");
+    onUnlocked();
+  };
+  return (
+    <form onSubmit={submit} className="aspect-video w-full rounded-2xl border border-border bg-card flex flex-col items-center justify-center text-center p-8">
+      <div className="h-14 w-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+        <Lock className="h-6 w-6 text-primary" />
+      </div>
+      <h3 className="text-lg font-semibold">{type === "module" ? "Módulo protegido" : "Aula protegida"}</h3>
+      <p className="text-sm text-muted-foreground mt-1">Digite a senha para acessar.</p>
+      <div className="mt-4 flex w-full max-w-xs gap-2">
+        <input type="password" autoFocus value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Senha" className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-sm outline-none focus:border-primary/60" />
+        <Button type="submit" disabled={busy} className="h-10">{busy ? "..." : "Entrar"}</Button>
+      </div>
+    </form>
   );
 }
