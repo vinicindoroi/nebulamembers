@@ -1124,13 +1124,18 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
   const handleCopy = useCallback(() => {
     const selectedNodes = nodes.filter((node) => node.selected);
     if (selectedNodes.length > 0) {
+      const selectedIds = new Set(selectedNodes.map((node) => node.id));
       copiedNodesRef.current = selectedNodes.map((node) => ({
         ...node,
         data: { ...node.data },
       }));
+      // Also copy connections whose both ends are inside the selection
+      copiedEdgesRef.current = edges
+        .filter((edge) => selectedIds.has(edge.source) && selectedIds.has(edge.target))
+        .map((edge) => ({ ...edge, data: edge.data ? { ...edge.data } : edge.data }));
       toast.success(`${selectedNodes.length} bloco(s) copiado(s)`);
     }
-  }, [nodes]);
+  }, [nodes, edges]);
 
   // Paste copied nodes (Ctrl+V)
   const handlePaste = useCallback(() => {
@@ -1139,22 +1144,42 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     const PASTE_OFFSET = 50;
     const timestamp = Date.now();
 
-    const newNodes = copiedNodesRef.current.map((node, index) => ({
-      ...node,
-      id: `${node.data.type}-${timestamp}-${index}`,
-      position: {
-        x: node.position.x + PASTE_OFFSET,
-        y: node.position.y + PASTE_OFFSET,
-      },
-      selected: true,
-      data: { ...node.data },
-    }));
+    const idMap = new Map<string, string>();
+    const newNodes = copiedNodesRef.current.map((node, index) => {
+      const newId = `${node.data.type}-${timestamp}-${index}`;
+      idMap.set(node.id, newId);
+      return {
+        ...node,
+        id: newId,
+        position: {
+          x: node.position.x + PASTE_OFFSET,
+          y: node.position.y + PASTE_OFFSET,
+        },
+        selected: true,
+        data: { ...node.data },
+      };
+    });
+
+    // Recreate connections between the duplicated blocks
+    const newEdges = copiedEdgesRef.current
+      .filter((edge) => idMap.has(edge.source) && idMap.has(edge.target))
+      .map((edge, index) => ({
+        ...edge,
+        id: `edge-${timestamp}-${index}`,
+        source: idMap.get(edge.source)!,
+        target: idMap.get(edge.target)!,
+        selected: false,
+        data: edge.data ? { ...edge.data } : edge.data,
+      }));
 
     // Deselect all existing nodes and add new ones
     setNodes((nds) => [
       ...nds.map((n) => ({ ...n, selected: false })),
       ...newNodes,
     ]);
+    if (newEdges.length > 0) {
+      setEdges((eds) => [...eds, ...newEdges]);
+    }
 
     // Update copied nodes positions for next paste
     copiedNodesRef.current = newNodes.map((node) => ({
@@ -1163,7 +1188,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     }));
 
     toast.success(`${newNodes.length} bloco(s) colado(s)`);
-  }, [setNodes]);
+  }, [setNodes, setEdges]);
 
   // --- UNDO/REDO HISTORY ---
   interface HistoryEntry {
