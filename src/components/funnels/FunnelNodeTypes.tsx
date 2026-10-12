@@ -68,6 +68,7 @@ import {
   Building2,
   ContactRound,
   Flag,
+  UserRound,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MessageNode } from './MessageNode';
@@ -293,6 +294,7 @@ export const iconMap: Record<string, LucideIcon | React.ComponentType<{ classNam
   'fb-business-manager': Building2,
   'fb-ad-account': ContactRound,
   'fb-page': Flag,
+  'fb-profile': UserRound,
   'fb-campaign': Megaphone,
   'fb-adset': Layers,
   'fb-ad': ImageIcon,
@@ -350,6 +352,7 @@ export const categoryMap: Record<string, 'traffic' | 'page' | 'action' | 'paymen
   'fb-business-manager': 'traffic',
   'fb-ad-account': 'traffic',
   'fb-page': 'traffic',
+  'fb-profile': 'traffic',
   'fb-campaign': 'fb-campaign',
   'fb-adset': 'fb-adset',
   'fb-ad': 'fb-ad',
@@ -406,6 +409,7 @@ const iconColorMap: Record<string, { bg: string; icon: string; shadow: string }>
   'fb-business-manager': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
   'fb-ad-account': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
   'fb-page': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
+  'fb-profile': { bg: 'bg-facebook', icon: 'text-facebook-foreground', shadow: '' },
   'facebook-ads': { 
     bg: 'bg-[#1877F2]', 
     icon: 'text-white', 
@@ -1361,6 +1365,7 @@ export const funnelElements = {
     { type: 'fb-business-manager', label: 'BM (Business Manager)', icon: Building2 },
     { type: 'fb-ad-account', label: 'CA (Conta de anúncio)', icon: ContactRound },
     { type: 'fb-page', label: 'Página do Facebook', icon: Flag },
+    { type: 'fb-profile', label: 'Perfil', icon: UserRound },
     { type: 'pixel', label: 'Pixel', icon: Crosshair },
     { type: 'fb-campaign', label: 'Campanha', icon: Megaphone },
     { type: 'fb-adset', label: 'Conjunto de Anúncio', icon: Layers },
