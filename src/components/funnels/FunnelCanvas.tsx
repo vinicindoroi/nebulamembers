@@ -69,6 +69,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
   });
   const edgeReconnectSuccessful = useRef(true);
   const copiedNodesRef = useRef<Node[]>([]);
+  const copiedEdgesRef = useRef<Edge[]>([]);
 
   // --- FREEHAND DRAWING STATES (MIRO STYLE) ---
   const [viewport, setViewport] = useState<Viewport>(() => funnel.viewport || { x: 0, y: 0, zoom: 1 });
