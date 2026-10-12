@@ -409,19 +409,45 @@ function Stat({ icon: Icon, label, value, text }: { icon: any; label: string; va
   );
 }
 
+async function applyPassword(type: "module" | "lesson", id: string, pw: string, remove: boolean): Promise<string | null> {
+  if (!pw.trim() && !remove) return null;
+  const { error } = await (supabase as any).rpc("set_content_password", { _type: type, _id: id, _password: remove ? "" : pw });
+  return error ? error.message : null;
+}
+
+function PasswordField({ protectedNow, pw, setPw, removePw, setRemovePw, label }: { protectedNow: boolean; pw: string; setPw: (v: string) => void; removePw: boolean; setRemovePw: (v: boolean) => void; label: string }) {
+  return (
+    <Field label={label} icon={Lock} hint={protectedNow ? "Protegido por senha. Deixe em branco para manter a senha atual." : "Opcional. Membros precisarão digitar esta senha para acessar."}>
+      <input type="password" autoComplete="new-password" value={pw} disabled={removePw} onChange={(e) => setPw(e.target.value)} className={inputClass} placeholder={protectedNow ? "Nova senha (opcional)" : "Sem senha"} />
+      {protectedNow && (
+        <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+          <input type="checkbox" checked={removePw} onChange={(e) => { setRemovePw(e.target.checked); if (e.target.checked) setPw(""); }} className="accent-primary" />
+          Remover senha
+        </label>
+      )}
+    </Field>
+  );
+}
+
 function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: { initial: Partial<Module>; courseId: string; nextPos: number; offers: Offer[]; onClose: () => void; onSaved: () => void }) {
   const { planOptions, selected: selectedPlans, loading: plansLoading, setSelected: setSelectedPlans } = useAccessLevelsState(initial);
   const [f, setF] = useState({ title: initial.title ?? "", description: initial.description ?? "", cover_url: initial.cover_url ?? "", title_visible: (initial as any).title_visible ?? true });
   const [saving, setSaving] = useState(false);
+  const [pw, setPw] = useState("");
+  const [removePw, setRemovePw] = useState(false);
   const save = async () => {
     if (!f.title.trim() && !f.cover_url.trim()) return toast.error("Informe um título ou uma capa");
     if (selectedPlans.length === 0) return toast.error("Selecione ao menos um plano com acesso");
     setSaving(true);
     const minLevel = Math.min(...selectedPlans.map((s) => checklistLevel(planOptions, s)));
     const payload: Record<string, unknown> = { title: f.title.trim(), description: f.description || null, course_id: courseId, access_level: "free", access_levels: selectedPlans, is_premium: minLevel > 0, offer_id: null, cover_url: f.cover_url || null, title_visible: f.title_visible };
-    const { error } = initial.id
-      ? await supabase.from("modules").update(payload as any).eq("id", initial.id)
-      : await supabase.from("modules").insert({ ...(payload as any), position: nextPos });
+    const { data: saved, error } = initial.id
+      ? await supabase.from("modules").update(payload as any).eq("id", initial.id).select("id").single()
+      : await supabase.from("modules").insert({ ...(payload as any), position: nextPos }).select("id").single();
+    if (!error && saved) {
+      const pwErr = await applyPassword("module", saved.id, pw, removePw);
+      if (pwErr) { setSaving(false); return toast.error(pwErr); }
+    }
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Módulo salvo"); onSaved();
@@ -449,6 +475,7 @@ function ModuleModal({ initial, courseId, nextPos, offers, onClose, onSaved }: {
       <Field label="Descrição" icon={FileText} hint="Opcional. Aparece como subtítulo do módulo.">
         <textarea value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} rows={3} className={`${inputClass} resize-none`} />
       </Field>
+      <PasswordField protectedNow={!!(initial as any).password_protected} pw={pw} setPw={setPw} removePw={removePw} setRemovePw={setRemovePw} label="Senha do módulo" />
       <Field label="URL da capa" icon={ImageIcon} hint="URL de imagem para capa do módulo.">
         <input value={f.cover_url} onChange={(e) => setF({ ...f, cover_url: e.target.value })} className={inputClass} placeholder="https://..." />
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
@@ -513,6 +540,8 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
     module_id: initial.module_id ?? moduleId,
   });
   const [saving, setSaving] = useState(false);
+  const [pw, setPw] = useState("");
+  const [removePw, setRemovePw] = useState(false);
 
   // Attachments state
   type Attachment = { id: string; file_name: string; file_path: string; file_size: number; mime_type: string | null };
@@ -598,9 +627,13 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
       module_id: f.module_id,
       course_id: courseId,
     };
-    const { error } = initial.id
-      ? await supabase.from("lessons").update(payload).eq("id", initial.id)
-      : await supabase.from("lessons").insert({ ...payload, position: targetPosition });
+    const { data: saved, error } = initial.id
+      ? await supabase.from("lessons").update(payload).eq("id", initial.id).select("id").single()
+      : await supabase.from("lessons").insert({ ...payload, position: targetPosition }).select("id").single();
+    if (!error && saved) {
+      const pwErr = await applyPassword("lesson", saved.id, pw, removePw);
+      if (pwErr) { setSaving(false); return toast.error(pwErr); }
+    }
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Aula salva"); onSaved(f.module_id);
@@ -671,6 +704,8 @@ function LessonModal({ initial, moduleId, courseId, nextPos, offers, modules, on
           <PlanMultiSelect options={planOptions} selected={selectedPlans} onChange={setSelectedPlans} disabled={f.is_free || plansLoading} />
         </Field>
       </div>
+
+      <PasswordField protectedNow={!!(initial as any).password_protected} pw={pw} setPw={setPw} removePw={removePw} setRemovePw={setRemovePw} label="Senha da aula" />
 
       {/* Attachments section */}
       {initial.id && (
