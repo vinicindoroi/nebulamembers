@@ -16,7 +16,7 @@ Antes de disponibilizar o frontend, aplique o arquivo `supabase/migrations/20261
 
 A migração cria duas tabelas com RLS e o bucket **privado** `member-offers`. Depende das funções existentes `public.has_role` e `public.plan_slug`, usadas pelo sistema atual de acesso. Não é necessário publicar Edge Functions. Não torne o bucket público: o download autenticado verifica o plano atual, o status da oferta e o vínculo do arquivo.
 
-O conector Supabase disponível durante a implementação não incluía esse projeto, portanto a migração não foi aplicada remotamente.
+O banco é o Supabase integrado ao próprio Lovable Cloud. O conector Supabase disponível durante a implementação não incluía esse projeto, portanto a migração não foi aplicada remotamente. Para finalizar pelo Lovable, siga [[lovable-ofertas]], na raiz do repositório, que detalha aplicação, permissões e testes no ambiente real. Não é necessário criar ou conectar um Supabase externo.
 
 ## Validação
 
