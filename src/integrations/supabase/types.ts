@@ -1059,6 +1059,68 @@ export type Database = {
           },
         ]
       }
+      member_offer_files: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          offer_id: string
+          size: number
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          offer_id: string
+          size: number
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          offer_id?: string
+          size?: number
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_offer_files_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "member_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_offers: {
+        Row: {
+          access_levels: string[]
+          active: boolean
+          created_at: string
+          description: string
+          id: string
+          title: string
+        }
+        Insert: {
+          access_levels: string[]
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          access_levels?: string[]
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       modules: {
         Row: {
           access_level: string
