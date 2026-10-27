@@ -46,9 +46,15 @@ export function formatFileSize(size: number) {
 }
 
 export async function downloadOfferFile(file: OfferFile) {
-  const { data, error } = await supabase.storage.from(OFFER_BUCKET).download(file.storage_path);
-  if (error) throw error;
-  const url = URL.createObjectURL(data);
+  // A fresh signed URL re-checks access on every download; the plain authenticated
+  // object URL can be served from the CDN cache after access was revoked.
+  const { data: signed, error } = await supabase.storage
+    .from(OFFER_BUCKET)
+    .createSignedUrl(file.storage_path, 60);
+  if (error || !signed?.signedUrl) throw error ?? new Error("Arquivo indisponível");
+  const res = await fetch(signed.signedUrl, { cache: "no-store" });
+  if (!res.ok) throw new Error("Arquivo indisponível");
+  const url = URL.createObjectURL(await res.blob());
   const link = document.createElement("a");
   link.href = url;
   link.download = file.name;
