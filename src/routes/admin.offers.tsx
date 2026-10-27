@@ -1,3 +1,5 @@
+import { MemberOffers } from "@/components/admin/MemberOffers";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plus, Edit3, Trash2, Link as LinkIcon, DollarSign, Tag, Package, Crown } from "lucide-react";
@@ -14,7 +16,15 @@ export const Route = createFileRoute("/admin/offers")({
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
- component: Page });
+ component: OffersTabs });
+
+function OffersTabs() {
+  return <Tabs defaultValue="materials" className="space-y-6">
+    <TabsList><TabsTrigger value="materials">Ofertas para alunos</TabsTrigger><TabsTrigger value="checkout">Links de pagamento</TabsTrigger></TabsList>
+    <TabsContent value="materials"><MemberOffers /></TabsContent>
+    <TabsContent value="checkout"><Page /></TabsContent>
+  </Tabs>;
+}
 
 type Offer = {
   id: string;
