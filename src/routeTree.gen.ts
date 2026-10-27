@@ -23,6 +23,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppForumRouteImport } from './routes/_app.forum'
 import { Route as AppFunnelsRouteImport } from './routes/_app.funnels'
 import { Route as AppNotesRouteImport } from './routes/_app.notes'
+import { Route as AppOffersRouteImport } from './routes/_app.offers'
 import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppSavedRouteImport } from './routes/_app.saved'
@@ -114,6 +115,11 @@ const AppFunnelsRoute = AppFunnelsRouteImport.update({
 const AppNotesRoute = AppNotesRouteImport.update({
   id: '/notes',
   path: '/notes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOffersRoute = AppOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOrganizerRoute = AppOrganizerRouteImport.update({
@@ -246,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/forum': typeof AppForumRoute
   '/funnels': typeof AppFunnelsRoute
   '/notes': typeof AppNotesRoute
+  '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/forum': typeof AppForumRoute
   '/funnels': typeof AppFunnelsRoute
   '/notes': typeof AppNotesRoute
+  '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
@@ -324,6 +332,7 @@ export interface FileRoutesById {
   '/_app/forum': typeof AppForumRoute
   '/_app/funnels': typeof AppFunnelsRoute
   '/_app/notes': typeof AppNotesRoute
+  '/_app/offers': typeof AppOffersRoute
   '/_app/organizer': typeof AppOrganizerRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/saved': typeof AppSavedRoute
@@ -364,6 +373,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/funnels'
     | '/notes'
+    | '/offers'
     | '/organizer'
     | '/profile'
     | '/saved'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/funnels'
     | '/notes'
+    | '/offers'
     | '/organizer'
     | '/profile'
     | '/saved'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/_app/forum'
     | '/_app/funnels'
     | '/_app/notes'
+    | '/_app/offers'
     | '/_app/organizer'
     | '/_app/profile'
     | '/_app/saved'
@@ -575,6 +587,13 @@ declare module '@tanstack/react-router' {
       path: '/notes'
       fullPath: '/notes'
       preLoaderRoute: typeof AppNotesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/offers': {
+      id: '/_app/offers'
+      path: '/offers'
+      fullPath: '/offers'
+      preLoaderRoute: typeof AppOffersRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/organizer': {
@@ -760,6 +779,7 @@ interface AppRouteChildren {
   AppForumRoute: typeof AppForumRoute
   AppFunnelsRoute: typeof AppFunnelsRoute
   AppNotesRoute: typeof AppNotesRoute
+  AppOffersRoute: typeof AppOffersRoute
   AppOrganizerRoute: typeof AppOrganizerRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSavedRoute: typeof AppSavedRoute
@@ -774,6 +794,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppForumRoute: AppForumRoute,
   AppFunnelsRoute: AppFunnelsRoute,
   AppNotesRoute: AppNotesRoute,
+  AppOffersRoute: AppOffersRoute,
   AppOrganizerRoute: AppOrganizerRoute,
   AppProfileRoute: AppProfileRoute,
   AppSavedRoute: AppSavedRoute,

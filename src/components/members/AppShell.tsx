@@ -2,7 +2,7 @@ import { Link, useRouterState, Outlet, useNavigate } from "@tanstack/react-route
 import {
   LayoutDashboard, GraduationCap, Users, User, Settings, Search, Bell,
   Menu, X, Orbit, LogOut, Shield, MessageSquare, Bookmark, GitBranch,
-  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock,
+  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock, Package,
 } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -32,6 +32,7 @@ const navGroups: NavGroup[] = [
     label: "Aprendizado",
     items: [
       { to: "/courses", label: "Cursos", icon: GraduationCap },
+      { to: "/offers", label: "Ofertas", icon: Package },
       { to: "/community", label: "Comunidade", icon: Users },
       { to: "/forum", label: "Fórum", icon: MessageSquare },
       { to: "/saved", label: "Salvos", icon: Bookmark },
