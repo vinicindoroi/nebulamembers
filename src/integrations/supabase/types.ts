@@ -1184,18 +1184,6 @@ export type Database = {
         }
         Relationships: []
       }
-      member_offers: {
-        Row: { id: string; title: string; description: string; active: boolean; access_levels: string[]; created_at: string }
-        Insert: { id?: string; title: string; description?: string; active?: boolean; access_levels: string[]; created_at?: string }
-        Update: { title?: string; description?: string; active?: boolean; access_levels?: string[] }
-        Relationships: []
-      }
-      member_offer_files: {
-        Row: { id: string; offer_id: string; name: string; storage_path: string; size: number; created_at: string }
-        Insert: { id?: string; offer_id: string; name: string; storage_path: string; size: number }
-        Update: { name?: string }
-        Relationships: [{ foreignKeyName: "member_offer_files_offer_id_fkey"; columns: ["offer_id"]; isOneToOne: false; referencedRelation: "member_offers"; referencedColumns: ["id"] }]
-      }
       offers: {
         Row: {
           active: boolean
