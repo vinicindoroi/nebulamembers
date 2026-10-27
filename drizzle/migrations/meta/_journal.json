@@ -15,6 +15,13 @@
       "when": 1793121293683,
       "tag": "0001_member_offers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793121413706,
+      "tag": "0002_restore_signup_triggers",
+      "breakpoints": true
     }
   ]
 }
