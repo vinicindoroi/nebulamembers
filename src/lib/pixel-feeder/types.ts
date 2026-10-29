@@ -1,20 +1,6 @@
-export type SupportedCountry =
-  | "BR"
-  | "US"
-  | "PT"
-  | "ES"
-  | "GB"
-  | "FR"
-  | "MX"
-  | "IT"
-  | "DE"
-  | "CA"
-  | "AU"
-  | "AR"
-  | "CL"
-  | "CO";
+export type SupportedCountry = string;
 
-export type SupportedCurrency = "BRL" | "USD" | "EUR" | "GBP" | "MXN" | "CAD" | "AUD" | "ARS" | "CLP" | "COP";
+export type SupportedCurrency = string;
 
 export type GenderFilter = "all" | "female" | "male";
 

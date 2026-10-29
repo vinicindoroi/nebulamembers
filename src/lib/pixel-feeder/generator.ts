@@ -33,7 +33,7 @@ interface CountryData {
   emailDomains: string[];
 }
 
-const COUNTRY_DATA: Record<SupportedCountry, CountryData> = {
+const COUNTRY_DATA: Record<string, CountryData> = {
   BR: {
     phonePrefix: "55",
     phoneFormat: () => {

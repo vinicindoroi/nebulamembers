@@ -86,6 +86,13 @@ export function CountrySelectDropdown({
       if (matched && !selectedCountries.includes(matched.code)) {
         onChange([...selectedCountries, matched.code]);
         setTypedInput("");
+      } else if (query.trim().length === 2) {
+        // Direct ISO 2-letter code fallback
+        const upper = query.trim().toUpperCase();
+        if (!selectedCountries.includes(upper)) {
+          onChange([...selectedCountries, upper]);
+          setTypedInput("");
+        }
       }
     }
   };
@@ -95,7 +102,11 @@ export function CountrySelectDropdown({
   };
 
   const selectTop = () => {
-    onChange(["BR", "US", "PT", "ES"]);
+    onChange(["BR", "US", "PT", "ES", "GB", "FR", "DE", "IT", "MX", "AR", "CL", "CO"]);
+  };
+
+  const clearAll = () => {
+    onChange(["BR"]);
   };
 
   const filteredCatalog = COUNTRIES_CATALOG.filter((c) => {
@@ -202,13 +213,13 @@ export function CountrySelectDropdown({
           </div>
 
           {/* Quick presets */}
-          <div className="flex items-center gap-1.5 pt-0.5 border-b border-border/40 pb-2">
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5 border-b border-border/40 pb-2">
             <button
               type="button"
               onClick={selectTop}
               className="text-[10px] px-2 py-0.5 rounded border border-border bg-background/40 hover:bg-muted/40 text-muted-foreground hover:text-foreground transition-colors"
             >
-              Principais (BR, US, PT, ES)
+              Principais (Américas + Europa)
             </button>
             <button
               type="button"
@@ -216,6 +227,13 @@ export function CountrySelectDropdown({
               className="text-[10px] px-2 py-0.5 rounded border border-border bg-background/40 hover:bg-muted/40 text-muted-foreground hover:text-foreground transition-colors"
             >
               Marcar Todos ({COUNTRIES_CATALOG.length})
+            </button>
+            <button
+              type="button"
+              onClick={clearAll}
+              className="text-[10px] px-2 py-0.5 rounded border border-border bg-background/40 hover:bg-rose-500/10 text-muted-foreground hover:text-rose-400 transition-colors ml-auto"
+            >
+              Resetar (BR)
             </button>
           </div>
 
