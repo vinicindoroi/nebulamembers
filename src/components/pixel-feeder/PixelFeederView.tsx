@@ -11,17 +11,20 @@ import {
   Eye,
   EyeOff,
   Globe,
-  Coins,
   Sliders,
   Sparkles,
-  ArrowRight,
   Terminal,
+  HelpCircle,
+  Check,
+  Send,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 import {
   LogEntry,
   PixelEventName,
@@ -35,6 +38,7 @@ import {
 } from "@/lib/pixel-feeder/generator";
 import { sendMetaEvent } from "@/lib/pixel-feeder/sender";
 import { CountrySelectDropdown } from "./CountrySelectDropdown";
+import { COUNTRIES_CATALOG } from "@/lib/pixel-feeder/countries";
 
 const ALL_EVENTS: { name: PixelEventName; label: string }[] = [
   { name: "PageView", label: "PageView" },
@@ -75,8 +79,12 @@ export function PixelFeederView() {
 
   // Runtime state
   const [isRunning, setIsRunning] = useState(false);
+  const [isTestingSingle, setIsTestingSingle] = useState(false);
+  const [progressPercent, setProgressPercent] = useState(0);
+  const [currentStepInfo, setCurrentStepInfo] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [stats, setStats] = useState({ sent: 0, success: 0, error: 0 });
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const isRunningRef = useRef(false);
   isRunningRef.current = isRunning;
@@ -110,7 +118,7 @@ export function PixelFeederView() {
           currency,
         }),
       );
-      toast.success("Credenciais salvas.");
+      toast.success("Credenciais salvas no seu navegador!");
     } catch {
       toast.error("Erro ao salvar.");
     }
@@ -133,6 +141,63 @@ export function PixelFeederView() {
     return Math.round(randomVal * 100) / 100;
   };
 
+  // Quick single test event
+  const handleTestSingle = async () => {
+    if (!pixelId.trim()) {
+      toast.error("Preencha o Pixel ID.");
+      return;
+    }
+    if (!accessToken.trim()) {
+      toast.error("Preencha o Access Token.");
+      return;
+    }
+    setIsTestingSingle(true);
+    saveCredentials();
+
+    try {
+      const pickedCountry = selectedCountries[0] || "BR";
+      const customer = generateCustomer(pickedCountry, gender);
+      const hashedUser = await hashCustomerData(customer);
+      const orderValue = getEffectiveValue();
+      const payload = buildEventPayload("Purchase", hashedUser, currency, orderValue);
+
+      const logId = Math.random().toString(36).substring(2, 9);
+      const newLog: LogEntry = {
+        id: logId,
+        timestamp: "Agora",
+        eventName: "Purchase",
+        status: "sending",
+        country: pickedCountry,
+        currency,
+        value: orderValue,
+        customerName: `${customer.firstName} ${customer.lastName}`,
+        eventId: payload.event_id,
+        matchScoreEstimate: 9.8,
+      };
+
+      setLogs((prev) => [newLog, ...prev]);
+
+      const res = await sendMetaEvent(pixelId, accessToken, payload, testEventCode || undefined);
+      if (res.ok) {
+        newLog.status = "success";
+        newLog.httpCode = 200;
+        newLog.fbtraceId = res.fbtraceId;
+        setStats((s) => ({ ...s, sent: s.sent + 1, success: s.success + 1 }));
+        toast.success("Disparo de teste realizado com sucesso! (HTTP 200)");
+      } else {
+        newLog.status = "error";
+        newLog.httpCode = res.httpStatus;
+        newLog.responseMessage = res.errorMessage;
+        newLog.fbtraceId = res.fbtraceId;
+        setStats((s) => ({ ...s, sent: s.sent + 1, error: s.error + 1 }));
+        toast.error(`Falha: ${res.errorMessage}`);
+      }
+      setLogs((prev) => prev.map((l) => (l.id === logId ? { ...newLog } : l)));
+    } finally {
+      setIsTestingSingle(false);
+    }
+  };
+
   const handleStart = async () => {
     if (!pixelId.trim()) {
       toast.error("Informe o Pixel ID.");
@@ -150,7 +215,8 @@ export function PixelFeederView() {
     saveCredentials();
     setIsRunning(true);
     isRunningRef.current = true;
-    toast.success("Disparos iniciados.");
+    setProgressPercent(0);
+    toast.success("Aquecimento iniciado! Acompanhe o feed de eventos.");
 
     let localSent = stats.sent;
     let localSuccess = stats.success;
@@ -174,9 +240,9 @@ export function PixelFeederView() {
       // Retroactive time distribution
       let windowSeconds = 0;
       if (timeDistribution === "7days") {
-        windowSeconds = 6 * 86400 + Math.floor(Math.random() * 86400); // spread up to 7 days
+        windowSeconds = 6 * 86400 + Math.floor(Math.random() * 86400);
       } else if (timeDistribution === "3days") {
-        windowSeconds = 2 * 86400 + Math.floor(Math.random() * 86400); // spread up to 3 days
+        windowSeconds = 2 * 86400 + Math.floor(Math.random() * 86400);
       }
 
       const nowSec = Math.floor(Date.now() / 1000);
@@ -185,6 +251,8 @@ export function PixelFeederView() {
         : nowSec;
 
       let stepOffset = 0;
+
+      setCurrentStepInfo(`Pessoa ${round} de ${totalRounds}: ${customer.firstName} ${customer.lastName} (${pickedCountry})`);
 
       for (const evtName of eventsToRun) {
         if (!isRunningRef.current) break;
@@ -225,7 +293,7 @@ export function PixelFeederView() {
           matchScoreEstimate: 9.8,
         };
 
-        setLogs((prev) => [newLog, ...prev.slice(0, 149)]);
+        setLogs((prev) => [newLog, ...prev.slice(0, 199)]);
 
         const res = await sendMetaEvent(
           pixelId,
@@ -255,27 +323,37 @@ export function PixelFeederView() {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
         }
       }
+
+      setProgressPercent(Math.round((round / totalRounds) * 100));
     }
 
     setIsRunning(false);
     isRunningRef.current = false;
+    setCurrentStepInfo(null);
+    toast.success("Aquecimento concluído com sucesso!");
   };
 
   const handlePause = () => {
     setIsRunning(false);
     isRunningRef.current = false;
+    setCurrentStepInfo(null);
     toast.info("Pausado.");
   };
 
   const handleReset = () => {
     setIsRunning(false);
     isRunningRef.current = false;
+    setProgressPercent(0);
+    setCurrentStepInfo(null);
     setLogs([]);
     setStats({ sent: 0, success: 0, error: 0 });
+    toast.info("Logs e estatísticas zeradas.");
   };
 
+  const totalCalculatedEvents = (simulateFunnel ? 5 : selectedEvents.length) * totalRounds;
+
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -289,36 +367,26 @@ export function PixelFeederView() {
             </span>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Aquecedor de Pixel Meta Conversions API com SHA-256 e personas geolocalizadas.
+            Aquecedor de Pixel Meta Conversions API com hashing SHA-256 e personas geolocalizadas.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          {isRunning ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handlePause}
-              className="gap-2 text-rose-400 border-rose-500/40 hover:bg-rose-500/10"
-            >
-              <Pause className="h-3.5 w-3.5" /> Pausar
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              onClick={handleStart}
-              className="gap-2 bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              <Play className="h-3.5 w-3.5 fill-current" /> Iniciar
-            </Button>
-          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowHelpModal(true)}
+            className="text-xs gap-1.5 h-8 text-muted-foreground hover:text-foreground"
+          >
+            <HelpCircle className="h-3.5 w-3.5" /> Como pegar o Token
+          </Button>
 
           <Button
             size="sm"
             variant="ghost"
             onClick={handleReset}
             disabled={isRunning}
-            className="text-muted-foreground hover:text-foreground h-9 px-3"
+            className="text-muted-foreground hover:text-foreground h-8 px-2.5"
             title="Limpar logs"
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -367,13 +435,27 @@ export function PixelFeederView() {
           <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-primary">
             9.8 <span className="text-xs text-muted-foreground font-normal">/ 10</span>
           </div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">qualidade de dados</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">qualidade máxima</div>
         </div>
       </section>
 
-      {/* Main Grid */}
+      {/* Active Running Progress Banner */}
+      {isRunning && (
+        <div className="rounded-xl border border-primary/40 bg-primary/5 p-4 space-y-2 animate-fade-in shadow-sm">
+          <div className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-2 font-medium text-primary">
+              <Zap className="h-4 w-4 animate-spin text-primary" />
+              {currentStepInfo || "Disparando eventos no Meta..."}
+            </span>
+            <span className="font-mono text-muted-foreground">{progressPercent}%</span>
+          </div>
+          <Progress value={progressPercent} className="h-2 bg-primary/20" />
+        </div>
+      )}
+
+      {/* Main Grid: Settings Left, Console Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left column: Parameters */}
+        {/* Left column: Parameters + Primary Action Button */}
         <div className="lg:col-span-5 space-y-4">
           {/* Box 1: Conexão */}
           <div className="rounded-xl border border-border bg-card p-4 space-y-3.5">
@@ -426,7 +508,7 @@ export function PixelFeederView() {
 
             <div className="space-y-1">
               <Label htmlFor="pf-test" className="text-xs text-muted-foreground">
-                Test Event Code <span className="text-[10px] opacity-60">(opcional)</span>
+                Test Event Code <span className="text-[10px] opacity-60">(opcional para ver ao vivo)</span>
               </Label>
               <Input
                 id="pf-test"
@@ -615,7 +697,7 @@ export function PixelFeederView() {
 
             <div className="grid grid-cols-2 gap-2.5 pt-1">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Ciclos</Label>
+                <Label className="text-xs text-muted-foreground">Ciclos (Pessoas)</Label>
                 <select
                   value={totalRounds}
                   onChange={(e) => setTotalRounds(Number(e.target.value))}
@@ -623,15 +705,15 @@ export function PixelFeederView() {
                   aria-label="Ciclos"
                   className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
                 >
-                  <option value={10}>10 pessoas</option>
-                  <option value={25}>25 pessoas</option>
-                  <option value={50}>50 pessoas</option>
-                  <option value={100}>100 pessoas</option>
+                  <option value={10}>10 pessoas (~50 evts)</option>
+                  <option value={25}>25 pessoas (~125 evts)</option>
+                  <option value={50}>50 pessoas (~250 evts)</option>
+                  <option value={100}>100 pessoas (~500 evts)</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Delay</Label>
+                <Label className="text-xs text-muted-foreground">Delay entre disparos</Label>
                 <select
                   value={delayMs}
                   onChange={(e) => setDelayMs(Number(e.target.value))}
@@ -639,10 +721,10 @@ export function PixelFeederView() {
                   aria-label="Delay"
                   className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
                 >
-                  <option value={500}>0.5s</option>
-                  <option value={1000}>1.0s</option>
-                  <option value={2000}>2.0s</option>
-                  <option value={3000}>3.0s</option>
+                  <option value={500}>0.5s (Rápido)</option>
+                  <option value={1000}>1.0s (Normal)</option>
+                  <option value={2000}>2.0s (Seguro)</option>
+                  <option value={3000}>3.0s (Ultra)</option>
                 </select>
               </div>
             </div>
@@ -667,11 +749,48 @@ export function PixelFeederView() {
               </span>
             </div>
           </div>
+
+          {/* Primary Action Button Box */}
+          <div className="space-y-2 pt-1">
+            {isRunning ? (
+              <Button
+                size="lg"
+                variant="destructive"
+                onClick={handlePause}
+                className="w-full gap-2 text-sm font-semibold shadow-md h-11"
+              >
+                <Pause className="h-4 w-4" /> Pausar Aquecimento ({progressPercent}%)
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                onClick={handleStart}
+                className="w-full gap-2 bg-primary text-primary-foreground hover:opacity-90 font-semibold shadow-md shadow-primary/20 h-11"
+              >
+                <Play className="h-4 w-4 fill-current" />
+                <span>Iniciar Aquecimento ({totalCalculatedEvents} eventos)</span>
+              </Button>
+            )}
+
+            <div className="flex items-center justify-between gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleTestSingle}
+                disabled={isRunning || isTestingSingle}
+                className="flex-1 text-xs text-muted-foreground hover:text-foreground h-8 gap-1.5 border-border/80"
+              >
+                <Send className="h-3 w-3" />
+                {isTestingSingle ? "Enviando teste..." : "Disparar 1 Teste Rápido"}
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Right column: Clean Minimalist Event Feed with internal scroll */}
         <div className="lg:col-span-7">
-          <div className="rounded-xl border border-border bg-card p-4 space-y-3 h-[590px] max-h-[590px] flex flex-col sticky top-6">
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3 h-[640px] max-h-[640px] flex flex-col sticky top-6">
             <div className="flex items-center justify-between pb-2 border-b border-border/50 shrink-0">
               <div className="flex items-center gap-2">
                 <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
@@ -692,12 +811,39 @@ export function PixelFeederView() {
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 font-mono text-[11px] pr-1.5">
               {logs.length === 0 ? (
-                <div className="h-96 flex flex-col items-center justify-center text-center text-muted-foreground">
-                  <Flame className="h-8 w-8 text-muted-foreground/30 mb-2" />
-                  <p className="text-xs text-foreground font-medium">Aguardando início</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 max-w-xs">
-                    Preencha o Pixel ID e Token e clique em Iniciar para disparar os eventos.
+                <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground px-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mb-3">
+                    <Flame className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-sm text-foreground font-medium">Pronto para aquecer</h3>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                    Configure os parâmetros à esquerda e clique em <strong>Iniciar Aquecimento</strong> para elevar a nota do pixel ao máximo.
                   </p>
+
+                  <div className="mt-4 p-3 rounded-lg border border-border/60 bg-background/50 text-[11px] text-left space-y-1.5 max-w-xs w-full">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Meta prevista:</span>
+                      <span className="font-semibold text-emerald-400">EMQ 9.8 / 10</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Volume previsto:</span>
+                      <span className="font-mono text-foreground">{totalCalculatedEvents} eventos</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Tempo estimado:</span>
+                      <span className="font-mono text-foreground">~{Math.round((totalCalculatedEvents * delayMs) / 1000)}s</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTestSingle}
+                    disabled={isTestingSingle}
+                    className="mt-4 text-xs gap-1.5"
+                  >
+                    <Send className="h-3 w-3" /> Testar 1 Evento Agora
+                  </Button>
                 </div>
               ) : (
                 logs.map((log) => {
@@ -759,6 +905,67 @@ export function PixelFeederView() {
           </div>
         </div>
       </div>
+
+      {/* Help Modal */}
+      {showHelpModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setShowHelpModal(false)}
+        >
+          <div
+            className="rounded-2xl border border-border bg-card p-6 max-w-lg w-full space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-base">Onde pegar o Token e Pixel ID?</h3>
+              </div>
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-muted-foreground leading-relaxed">
+              <div className="p-3 rounded-xl border border-border/60 bg-background/50 space-y-1">
+                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  <span className="h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-mono">1</span>
+                  Acesse o Gerenciador de Eventos
+                </div>
+                <p className="pl-6">Abra o Meta Business Suite &gt; Gerenciador de Eventos e selecione o seu Pixel.</p>
+              </div>
+
+              <div className="p-3 rounded-xl border border-border/60 bg-background/50 space-y-1">
+                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  <span className="h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-mono">2</span>
+                  Copie o Pixel ID
+                </div>
+                <p className="pl-6">Na aba <strong>Configurações</strong>, você verá o campo <strong>Identificação do Conjunto de Dados (Pixel ID)</strong>.</p>
+              </div>
+
+              <div className="p-3 rounded-xl border border-border/60 bg-background/50 space-y-1">
+                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  <span className="h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-mono">3</span>
+                  Gere o Access Token do CAPI
+                </div>
+                <p className="pl-6">
+                  Ainda em <strong>Configurações</strong>, desça até a seção <strong>API de Conversões</strong> e clique no link azul <strong>"Gerar token de acesso"</strong>. Cole o token aqui no Pixel Feeder.
+                </p>
+              </div>
+            </div>
+
+            <Button
+              className="w-full text-xs h-9 font-medium"
+              onClick={() => setShowHelpModal(false)}
+            >
+              Entendi, vamos aquecer!
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
