@@ -418,7 +418,7 @@ async function applyPassword(type: "module" | "lesson", id: string, pw: string, 
 function PasswordField({ protectedNow, pw, setPw, removePw, setRemovePw, label }: { protectedNow: boolean; pw: string; setPw: (v: string) => void; removePw: boolean; setRemovePw: (v: boolean) => void; label: string }) {
   return (
     <Field label={label} icon={Lock} hint={protectedNow ? "Protegido por senha. Deixe em branco para manter a senha atual." : "Opcional. Membros precisarão digitar esta senha para acessar."}>
-      <input type="password" autoComplete="new-password" value={pw} disabled={removePw} onChange={(e) => setPw(e.target.value)} className={inputClass} placeholder={protectedNow ? "Nova senha (opcional)" : "Sem senha"} />
+      <input type="text" name="content-access-code" autoComplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other" spellCheck={false} style={{ WebkitTextSecurity: "disc" } as React.CSSProperties} value={pw} disabled={removePw} onChange={(e) => setPw(e.target.value)} className={inputClass} placeholder={protectedNow ? "Nova senha (opcional)" : "Sem senha"} />
       {protectedNow && (
         <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
           <input type="checkbox" checked={removePw} onChange={(e) => { setRemovePw(e.target.checked); if (e.target.checked) setPw(""); }} className="accent-primary" />
