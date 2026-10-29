@@ -500,9 +500,10 @@ export function buildEventPayload(
   currency: SupportedCurrency,
   value: number,
   eventId: string = generateEventId(),
+  eventTime?: number,
 ): MetaEventPayload {
   const product = SAMPLE_PRODUCTS[Math.floor(Math.random() * SAMPLE_PRODUCTS.length)];
-  const now = Math.floor(Date.now() / 1000);
+  const now = eventTime !== undefined ? eventTime : Math.floor(Date.now() / 1000);
 
   const payload: MetaEventPayload = {
     event_name: eventName,

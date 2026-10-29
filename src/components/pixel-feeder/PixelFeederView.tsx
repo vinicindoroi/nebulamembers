@@ -62,6 +62,7 @@ export function PixelFeederView() {
   const [valueMax, setValueMax] = useState(497);
   const [gender, setGender] = useState<"all" | "female" | "male">("all");
   const [simulateFunnel, setSimulateFunnel] = useState(true);
+  const [timeDistribution, setTimeDistribution] = useState<"realtime" | "3days" | "7days">("7days");
   const [selectedEvents, setSelectedEvents] = useState<PixelEventName[]>([
     "PageView",
     "ViewContent",
@@ -170,15 +171,50 @@ export function PixelFeederView() {
 
       const orderValue = getEffectiveValue();
 
+      // Retroactive time distribution
+      let windowSeconds = 0;
+      if (timeDistribution === "7days") {
+        windowSeconds = 6 * 86400 + Math.floor(Math.random() * 86400); // spread up to 7 days
+      } else if (timeDistribution === "3days") {
+        windowSeconds = 2 * 86400 + Math.floor(Math.random() * 86400); // spread up to 3 days
+      }
+
+      const nowSec = Math.floor(Date.now() / 1000);
+      const sessionBaseTime = windowSeconds > 0
+        ? nowSec - Math.floor(Math.random() * windowSeconds)
+        : nowSec;
+
+      let stepOffset = 0;
+
       for (const evtName of eventsToRun) {
         if (!isRunningRef.current) break;
 
-        const eventPayload = buildEventPayload(evtName, hashedUser, currency, orderValue);
+        if (evtName === "PageView") stepOffset = 0;
+        else if (evtName === "ViewContent") stepOffset += Math.floor(20 + Math.random() * 40);
+        else if (evtName === "AddToCart") stepOffset += Math.floor(30 + Math.random() * 60);
+        else if (evtName === "InitiateCheckout") stepOffset += Math.floor(40 + Math.random() * 80);
+        else if (evtName === "Purchase") stepOffset += Math.floor(50 + Math.random() * 100);
+
+        const eventTime = Math.min(nowSec, sessionBaseTime + stepOffset);
+        const eventPayload = buildEventPayload(
+          evtName,
+          hashedUser,
+          currency,
+          orderValue,
+          generateEventId(),
+          eventTime,
+        );
         const logId = Math.random().toString(36).substring(2, 9);
+
+        const eventDate = new Date(eventTime * 1000);
+        const isToday = eventDate.toDateString() === new Date().toDateString();
+        const timeFormatted = isToday
+          ? eventDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+          : `${eventDate.getDate().toString().padStart(2, "0")}/${(eventDate.getMonth() + 1).toString().padStart(2, "0")} ${eventDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
 
         const newLog: LogEntry = {
           id: logId,
-          timestamp: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+          timestamp: timeFormatted,
           eventName: evtName,
           status: "sending",
           country: pickedCountry,
@@ -609,6 +645,26 @@ export function PixelFeederView() {
                   <option value={3000}>3.0s</option>
                 </select>
               </div>
+            </div>
+
+            <div className="space-y-1 pt-1">
+              <Label className="text-xs text-muted-foreground">Distribuição Temporal</Label>
+              <select
+                value={timeDistribution}
+                onChange={(e) => setTimeDistribution(e.target.value as any)}
+                disabled={isRunning}
+                aria-label="Distribuição Temporal"
+                className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
+              >
+                <option value="7days">Últimos 7 dias (Retroativo inteligente)</option>
+                <option value="3days">Últimos 3 dias (Retroativo)</option>
+                <option value="realtime">Tempo Real (Hoje / Agora)</option>
+              </select>
+              <span className="text-[10px] text-muted-foreground block">
+                {timeDistribution === "realtime"
+                  ? "Eventos marcados com o horário exato de agora."
+                  : "Distribui os eventos ao longo dos últimos dias para criar histórico orgânico natural."}
+              </span>
             </div>
           </div>
         </div>
