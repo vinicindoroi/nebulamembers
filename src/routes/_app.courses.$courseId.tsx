@@ -213,10 +213,15 @@ function CourseDetail() {
     levels && levels.length > 0
       ? levels.some((s) => (s ?? "").trim().toLowerCase() === normalizedUserPlan)
       : userLevel >= levelOf(single);
-  // Item é "restrito" (mostra cadeado) quando nem todos os planos têm acesso.
+  // Item é "restrito" quando nem todos os planos têm acesso.
   const totalPlans = Object.keys(planHierarchy).length;
   const isRestricted = (levels: string[] | null | undefined, single: string | null | undefined) =>
     levels && levels.length > 0 ? levels.length < totalPlans : levelOf(single) > 0;
+  // Etiqueta discreta com os planos que têm acesso (substitui o cadeado quando o usuário já tem acesso).
+  const planBadgeLabel = (levels: string[] | null | undefined, single: string | null | undefined) =>
+    levels && levels.length > 0
+      ? levels.map((s) => (s ?? "").replace(/-/g, " ")).join(" · ")
+      : (single ?? "free").replace(/-/g, " ");
   const courseAccessLevel = (course.access_level ?? "free").toLowerCase();
   const courseLevel = levelOf(courseAccessLevel);
   const accessDenied = userLevel < courseLevel;
@@ -419,7 +424,13 @@ function CourseDetail() {
                         </span>
                          <h3 className="font-course-display mt-1 flex items-center gap-2 truncate text-xl font-bold text-foreground">
                           {mod?.title ?? "Aulas sem módulo"}
-                          {isRestricted(mod?.access_levels, mod?.access_level) && <Lock className="h-4 w-4 text-amber-400" />}
+                          {!isAdminUser && mod && !allowedBy(mod.access_levels, mod.access_level) ? (
+                            <Lock className="h-4 w-4 text-amber-400" />
+                          ) : isRestricted(mod?.access_levels, mod?.access_level) ? (
+                            <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              {planBadgeLabel(mod?.access_levels, mod?.access_level)}
+                            </span>
+                          ) : null}
                         </h3>
                         {mod?.description && <p className="text-sm text-muted-foreground mt-1">{mod.description}</p>}
                       </div>
@@ -634,7 +645,13 @@ function CourseDetail() {
                   {mod && (
                     <div className="px-2 pt-2 pb-1 text-xs font-medium text-foreground/80 flex items-center gap-2">
                       {mod.title}
-                      {isRestricted(mod.access_levels, mod.access_level) && <Lock className="h-3 w-3 text-amber-400" />}
+                      {!isAdminUser && !allowedBy(mod.access_levels, mod.access_level) ? (
+                        <Lock className="h-3 w-3 text-amber-400" />
+                      ) : isRestricted(mod.access_levels, mod.access_level) ? (
+                        <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          {planBadgeLabel(mod.access_levels, mod.access_level)}
+                        </span>
+                      ) : null}
                     </div>
                   )}
                   <div className="space-y-0.5">
