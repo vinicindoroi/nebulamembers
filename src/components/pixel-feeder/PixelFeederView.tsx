@@ -36,6 +36,7 @@ import {
   generateCustomer,
   hashCustomerData,
 } from "@/lib/pixel-feeder/generator";
+import { generateEventId } from "@/lib/pixel-feeder/crypto";
 import { sendMetaEvent } from "@/lib/pixel-feeder/sender";
 import { CountrySelectDropdown } from "./CountrySelectDropdown";
 import { COUNTRIES_CATALOG } from "@/lib/pixel-feeder/countries";
