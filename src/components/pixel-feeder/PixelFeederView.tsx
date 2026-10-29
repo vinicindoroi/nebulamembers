@@ -479,22 +479,28 @@ export function PixelFeederView() {
                 />
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="number"
-                    placeholder="Min"
-                    value={valueMin}
-                    onChange={(e) => setValueMin(Number(e.target.value))}
-                    disabled={isRunning}
-                    className="h-8 text-xs bg-background/50 font-mono"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Max"
-                    value={valueMax}
-                    onChange={(e) => setValueMax(Number(e.target.value))}
-                    disabled={isRunning}
-                    className="h-8 text-xs bg-background/50 font-mono"
-                  />
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground block">Mínimo</span>
+                    <Input
+                      type="number"
+                      placeholder="Mínimo"
+                      value={valueMin}
+                      onChange={(e) => setValueMin(Number(e.target.value))}
+                      disabled={isRunning}
+                      className="h-8 text-xs bg-background/50 font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground block">Máximo</span>
+                    <Input
+                      type="number"
+                      placeholder="Máximo"
+                      value={valueMax}
+                      onChange={(e) => setValueMax(Number(e.target.value))}
+                      disabled={isRunning}
+                      className="h-8 text-xs bg-background/50 font-mono"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -579,15 +585,18 @@ export function PixelFeederView() {
           </div>
         </div>
 
-        {/* Right column: Clean Minimalist Event Feed */}
+        {/* Right column: Clean Minimalist Event Feed with internal scroll */}
         <div className="lg:col-span-7">
-          <div className="rounded-xl border border-border bg-card p-4 space-y-3 min-h-[580px] flex flex-col">
-            <div className="flex items-center justify-between pb-2 border-b border-border/50">
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3 h-[590px] max-h-[590px] flex flex-col sticky top-6">
+            <div className="flex items-center justify-between pb-2 border-b border-border/50 shrink-0">
               <div className="flex items-center gap-2">
                 <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Feed de Eventos
                 </h2>
+                <span className="text-[10px] text-muted-foreground/60 font-mono">
+                  ({logs.length})
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`inline-block h-2 w-2 rounded-full ${isRunning ? "bg-emerald-400 animate-pulse" : "bg-muted-foreground/40"}`} />
@@ -597,7 +606,7 @@ export function PixelFeederView() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-1.5 font-mono text-[11px] pr-1">
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 font-mono text-[11px] pr-1.5">
               {logs.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center text-center text-muted-foreground">
                   <Flame className="h-8 w-8 text-muted-foreground/30 mb-2" />
