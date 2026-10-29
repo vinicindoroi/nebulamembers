@@ -38,7 +38,6 @@ export function CountrySelectDropdown({
 
   const toggleCountry = (code: SupportedCountry) => {
     if (selectedCountries.includes(code)) {
-      if (selectedCountries.length === 1) return; // keep at least 1
       onChange(selectedCountries.filter((c) => c !== code));
     } else {
       onChange([...selectedCountries, code]);
@@ -47,7 +46,6 @@ export function CountrySelectDropdown({
 
   const removeCountry = (code: SupportedCountry, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (selectedCountries.length === 1) return;
     onChange(selectedCountries.filter((c) => c !== code));
   };
 
@@ -66,7 +64,7 @@ export function CountrySelectDropdown({
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       commitTypedQuery(typedInput);
-    } else if (e.key === "Backspace" && !typedInput && selectedCountries.length > 1) {
+    } else if (e.key === "Backspace" && !typedInput && selectedCountries.length > 0) {
       // remove last tag
       removeCountry(selectedCountries[selectedCountries.length - 1]);
     }
@@ -143,11 +141,11 @@ export function CountrySelectDropdown({
             >
               <span>{name}</span>
               <span className="text-[9px] text-muted-foreground uppercase">({code})</span>
-              {selectedCountries.length > 1 && !disabled && (
+              {!disabled && (
                 <button
                   type="button"
                   onClick={(e) => removeCountry(code, e)}
-                  className="text-muted-foreground hover:text-foreground ml-0.5"
+                  className="text-muted-foreground hover:text-rose-400 ml-0.5 transition-colors"
                   title={`Remover ${name}`}
                 >
                   <X className="h-3 w-3" />
@@ -191,10 +189,24 @@ export function CountrySelectDropdown({
         </button>
       </div>
 
-      {/* Helper hint */}
+      {/* Helper hint & actions */}
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-0.5">
         <span>Digite nomes separados por vírgula (reconhece erros e sinônimos).</span>
-        <span className="font-mono">{selectedCountries.length} selecionado(s)</span>
+        <div className="flex items-center gap-2">
+          {selectedCountries.length > 0 && !disabled && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange([]);
+              }}
+              className="text-rose-400 hover:text-rose-300 transition-colors font-medium hover:underline"
+            >
+              Limpar seleção
+            </button>
+          )}
+          <span className="font-mono">{selectedCountries.length} selecionado(s)</span>
+        </div>
       </div>
 
       {/* Dropdown menu */}
@@ -230,8 +242,15 @@ export function CountrySelectDropdown({
             </button>
             <button
               type="button"
+              onClick={() => onChange([])}
+              className="text-[10px] px-2 py-0.5 rounded border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+            >
+              Desmarcar Todos
+            </button>
+            <button
+              type="button"
               onClick={clearAll}
-              className="text-[10px] px-2 py-0.5 rounded border border-border bg-background/40 hover:bg-rose-500/10 text-muted-foreground hover:text-rose-400 transition-colors ml-auto"
+              className="text-[10px] px-2 py-0.5 rounded border border-border bg-background/40 hover:bg-muted/40 text-muted-foreground hover:text-foreground transition-colors ml-auto"
             >
               Resetar (BR)
             </button>
