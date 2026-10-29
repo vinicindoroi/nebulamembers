@@ -17,7 +17,7 @@ import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } f
 import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
 
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; badge?: string };
 type NavGroup = { label: string; items: NavItem[] };
 
 const navGroups: NavGroup[] = [
@@ -38,7 +38,7 @@ const navGroups: NavGroup[] = [
       { to: "/saved", label: "Salvos", icon: Bookmark },
       { to: "/notes", label: "Notas", icon: StickyNote },
       { to: "/funnels", label: "Funis", icon: GitBranch },
-      { to: "/pixel-feeder", label: "Pixel Feeder", icon: Flame },
+      { to: "/pixel-feeder", label: "Pixel Feeder", icon: Flame, badge: "BETA" },
       { to: "/transcript", label: "Transcrição", icon: Mic },
     ],
   },
@@ -428,6 +428,11 @@ export function AppShell() {
                         )}
                         <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         <span className="font-medium">{item.label}</span>
+                        {item.badge && (
+                          <span className="ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-[0_0_8px_rgba(6,182,212,0.2)]">
+                            {item.badge}
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
@@ -530,6 +535,11 @@ export function AppShell() {
                         {active && <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r gradient-primary" />}
                         <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
                         <span className="font-medium">{item.label}</span>
+                        {item.badge && (
+                          <span className="ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-[0_0_8px_rgba(6,182,212,0.2)]">
+                            {item.badge}
+                          </span>
+                        )}
                       </Link>
                     );
                   })}

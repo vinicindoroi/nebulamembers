@@ -266,8 +266,11 @@ export function PixelFeederView() {
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Pixel Feeder</h1>
+            <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+              BETA
+            </span>
             <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border text-muted-foreground bg-muted/30">
               EMQ 9.8+
             </span>
