@@ -25,6 +25,7 @@ import { Route as AppFunnelsRouteImport } from './routes/_app.funnels'
 import { Route as AppNotesRouteImport } from './routes/_app.notes'
 import { Route as AppOffersRouteImport } from './routes/_app.offers'
 import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
+import { Route as AppPixelFeederRouteImport } from './routes/_app.pixel-feeder'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppSavedRouteImport } from './routes/_app.saved'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
@@ -125,6 +126,11 @@ const AppOffersRoute = AppOffersRouteImport.update({
 const AppOrganizerRoute = AppOrganizerRouteImport.update({
   id: '/organizer',
   path: '/organizer',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPixelFeederRoute = AppPixelFeederRouteImport.update({
+  id: '/pixel-feeder',
+  path: '/pixel-feeder',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -254,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
+  '/pixel-feeder': typeof AppPixelFeederRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
+  '/pixel-feeder': typeof AppPixelFeederRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
   '/settings': typeof AppSettingsRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/_app/notes': typeof AppNotesRoute
   '/_app/offers': typeof AppOffersRoute
   '/_app/organizer': typeof AppOrganizerRoute
+  '/_app/pixel-feeder': typeof AppPixelFeederRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/saved': typeof AppSavedRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -375,6 +384,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/offers'
     | '/organizer'
+    | '/pixel-feeder'
     | '/profile'
     | '/saved'
     | '/settings'
@@ -414,6 +424,7 @@ export interface FileRouteTypes {
     | '/notes'
     | '/offers'
     | '/organizer'
+    | '/pixel-feeder'
     | '/profile'
     | '/saved'
     | '/settings'
@@ -454,6 +465,7 @@ export interface FileRouteTypes {
     | '/_app/notes'
     | '/_app/offers'
     | '/_app/organizer'
+    | '/_app/pixel-feeder'
     | '/_app/profile'
     | '/_app/saved'
     | '/_app/settings'
@@ -601,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/organizer'
       fullPath: '/organizer'
       preLoaderRoute: typeof AppOrganizerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/pixel-feeder': {
+      id: '/_app/pixel-feeder'
+      path: '/pixel-feeder'
+      fullPath: '/pixel-feeder'
+      preLoaderRoute: typeof AppPixelFeederRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile': {
@@ -781,6 +800,7 @@ interface AppRouteChildren {
   AppNotesRoute: typeof AppNotesRoute
   AppOffersRoute: typeof AppOffersRoute
   AppOrganizerRoute: typeof AppOrganizerRoute
+  AppPixelFeederRoute: typeof AppPixelFeederRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSavedRoute: typeof AppSavedRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -796,6 +816,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppNotesRoute: AppNotesRoute,
   AppOffersRoute: AppOffersRoute,
   AppOrganizerRoute: AppOrganizerRoute,
+  AppPixelFeederRoute: AppPixelFeederRoute,
   AppProfileRoute: AppProfileRoute,
   AppSavedRoute: AppSavedRoute,
   AppSettingsRoute: AppSettingsRoute,
