@@ -41,6 +41,7 @@ import { generateEventId } from "@/lib/pixel-feeder/crypto";
 import { sendMetaEvent } from "@/lib/pixel-feeder/sender";
 import { CountrySelectDropdown } from "./CountrySelectDropdown";
 import { NICHE_PRESETS } from "@/lib/pixel-feeder/niches";
+import { getCountryCurrency, convertCurrency } from "@/lib/pixel-feeder/currency";
 import { COUNTRIES_CATALOG } from "@/lib/pixel-feeder/countries";
 
 const ALL_EVENTS: { name: PixelEventName; label: string }[] = [
@@ -66,6 +67,7 @@ export function PixelFeederView() {
   const [nicheId, setNicheId] = useState("general");
   const [customCategory, setCustomCategory] = useState("");
   const [productName, setProductName] = useState("");
+  const [autoConvertCurrency, setAutoConvertCurrency] = useState(true);
   const [valueMode, setValueMode] = useState<"fixed" | "range">("fixed");
   const [valueFixed, setValueFixed] = useState(97);
   const [valueMin, setValueMin] = useState(97);
@@ -109,6 +111,7 @@ export function PixelFeederView() {
         if (parsed.nicheId) setNicheId(parsed.nicheId);
         if (parsed.customCategory) setCustomCategory(parsed.customCategory);
         if (parsed.productName) setProductName(parsed.productName);
+        if (typeof parsed.autoConvertCurrency === "boolean") setAutoConvertCurrency(parsed.autoConvertCurrency);
       }
     } catch {
       // ignore
@@ -128,6 +131,7 @@ export function PixelFeederView() {
           nicheId,
           customCategory,
           productName,
+          autoConvertCurrency,
         }),
       );
       toast.success("Credenciais salvas no seu navegador!");
@@ -170,11 +174,15 @@ export function PixelFeederView() {
       const pickedCountry = selectedCountries[0] || "BR";
       const customer = generateCustomer(pickedCountry, gender);
       const hashedUser = await hashCustomerData(customer);
-      const orderValue = getEffectiveValue();
+      const baseOrderValue = getEffectiveValue();
+      const { value: orderValue, currency: eventCurrency } = autoConvertCurrency
+        ? convertCurrency(baseOrderValue, currency, getCountryCurrency(pickedCountry))
+        : { value: baseOrderValue, currency };
+
       const payload = buildEventPayload(
         "Purchase",
         hashedUser,
-        currency,
+        eventCurrency,
         orderValue,
         generateEventId(),
         undefined,
@@ -192,7 +200,7 @@ export function PixelFeederView() {
         eventName: "Purchase",
         status: "sending",
         country: pickedCountry,
-        currency,
+        currency: eventCurrency,
         value: orderValue,
         customerName: `${customer.firstName} ${customer.lastName}`,
         productName: payload.custom_data?.content_name,
@@ -261,7 +269,10 @@ export function PixelFeederView() {
         ? ["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase"]
         : selectedEvents;
 
-      const orderValue = getEffectiveValue();
+      const baseOrderValue = getEffectiveValue();
+      const { value: orderValue, currency: eventCurrency } = autoConvertCurrency
+        ? convertCurrency(baseOrderValue, currency, getCountryCurrency(pickedCountry))
+        : { value: baseOrderValue, currency };
 
       // Retroactive time distribution
       let windowSeconds = 0;
@@ -293,7 +304,7 @@ export function PixelFeederView() {
         const eventPayload = buildEventPayload(
           evtName,
           hashedUser,
-          currency,
+          eventCurrency,
           orderValue,
           generateEventId(),
           eventTime,
@@ -317,7 +328,7 @@ export function PixelFeederView() {
           eventName: evtName,
           status: "sending",
           country: pickedCountry,
-          currency,
+          currency: eventCurrency,
           value: evtName === "Purchase" || evtName === "AddToCart" ? orderValue : undefined,
           customerName: `${customer.firstName} ${customer.lastName}`,
           productName: eventPayload.custom_data?.content_name,
@@ -608,9 +619,53 @@ export function PixelFeederView() {
               </div>
             </div>
 
+            {/* Auto currency conversion toggle & preview */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-background/40 border border-border/50">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-medium flex items-center gap-1.5">
+                    <span>Converter para moeda local</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 font-mono">
+                      Câmbio real
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {autoConvertCurrency
+                      ? `Converte ${currency} ${valueFixed} para a moeda oficial do país sorteado (ex: EUA = USD, Europa = EUR, Colômbia = COP).`
+                      : `Todos os países receberão o valor fixo em ${currency}.`}
+                  </div>
+                </div>
+                <Switch
+                  checked={autoConvertCurrency}
+                  onCheckedChange={setAutoConvertCurrency}
+                  disabled={isRunning}
+                />
+              </div>
+
+              {autoConvertCurrency && selectedCountries.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono text-muted-foreground bg-muted/20 p-2 rounded-md border border-border/30">
+                  <span className="text-muted-foreground/70">Prévia cambial:</span>
+                  {selectedCountries.slice(0, 4).map((code) => {
+                    const targetCurr = getCountryCurrency(code);
+                    const sampleVal = convertCurrency(valueFixed, currency, targetCurr);
+                    return (
+                      <span key={code} className="px-1.5 py-0.5 rounded bg-background/60 border border-border/50 text-foreground">
+                        {code}: {sampleVal.currency} {sampleVal.value.toLocaleString("pt-BR")}
+                      </span>
+                    );
+                  })}
+                  {selectedCountries.length > 4 && (
+                    <span className="text-muted-foreground/50">+{selectedCountries.length - 4} países</span>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
-                <Label className="text-xs text-muted-foreground">Valor por compra ({currency})</Label>
+                <Label className="text-xs text-muted-foreground">
+                  Valor por compra {autoConvertCurrency ? `(${currency} base)` : `(${currency})`}
+                </Label>
                 <div className="flex items-center gap-1 p-0.5 rounded-lg border border-border bg-background/40">
                   <button
                     type="button"
