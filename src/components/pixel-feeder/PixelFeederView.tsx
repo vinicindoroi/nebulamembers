@@ -56,8 +56,8 @@ export function PixelFeederView() {
   const [testEventCode, setTestEventCode] = useState("");
   const [selectedCountries, setSelectedCountries] = useState<SupportedCountry[]>(["BR"]);
   const [currency, setCurrency] = useState<SupportedCurrency>("BRL");
-  const [valueMode, setValueMode] = useState<"fixed" | "range">("range");
-  const [valueFixed, setValueFixed] = useState(197);
+  const [valueMode, setValueMode] = useState<"fixed" | "range">("fixed");
+  const [valueFixed, setValueFixed] = useState(97);
   const [valueMin, setValueMin] = useState(97);
   const [valueMax, setValueMax] = useState(497);
   const [gender, setGender] = useState<"all" | "female" | "male">("all");
@@ -457,50 +457,78 @@ export function PixelFeederView() {
               </div>
             </div>
 
-            <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Valor por compra ({currency})</span>
-                <button
-                  type="button"
-                  onClick={() => setValueMode(valueMode === "range" ? "fixed" : "range")}
-                  className="text-[10px] hover:text-foreground"
-                >
-                  {valueMode === "range" ? "Mudar p/ fixo" : "Mudar p/ faixa"}
-                </button>
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Valor por compra ({currency})</Label>
+                <div className="flex items-center gap-1 p-0.5 rounded-lg border border-border bg-background/40">
+                  <button
+                    type="button"
+                    onClick={() => setValueMode("fixed")}
+                    className={`text-[10px] px-2 py-0.5 rounded transition-colors ${
+                      valueMode === "fixed"
+                        ? "bg-primary/15 text-primary font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Fixo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setValueMode("range")}
+                    className={`text-[10px] px-2 py-0.5 rounded transition-colors ${
+                      valueMode === "range"
+                        ? "bg-primary/15 text-primary font-medium"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Faixa aleatória
+                  </button>
+                </div>
               </div>
 
               {valueMode === "fixed" ? (
-                <Input
-                  type="number"
-                  value={valueFixed}
-                  onChange={(e) => setValueFixed(Number(e.target.value))}
-                  disabled={isRunning}
-                  className="h-8 text-xs bg-background/50 font-mono"
-                />
+                <div className="space-y-1">
+                  <Input
+                    type="number"
+                    placeholder="Valor da compra (ex: 97)"
+                    value={valueFixed}
+                    onChange={(e) => setValueFixed(Number(e.target.value))}
+                    disabled={isRunning}
+                    className="h-8 text-xs bg-background/50 font-mono"
+                  />
+                  <span className="text-[10px] text-muted-foreground block">
+                    Todas as compras serão enviadas com o valor exato de {currency} {valueFixed}.
+                  </span>
+                </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground block">Mínimo</span>
-                    <Input
-                      type="number"
-                      placeholder="Mínimo"
-                      value={valueMin}
-                      onChange={(e) => setValueMin(Number(e.target.value))}
-                      disabled={isRunning}
-                      className="h-8 text-xs bg-background/50 font-mono"
-                    />
+                <div className="space-y-1">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-muted-foreground block">Mínimo ({currency})</span>
+                      <Input
+                        type="number"
+                        placeholder="Mínimo"
+                        value={valueMin}
+                        onChange={(e) => setValueMin(Number(e.target.value))}
+                        disabled={isRunning}
+                        className="h-8 text-xs bg-background/50 font-mono"
+                      />
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] text-muted-foreground block">Máximo ({currency})</span>
+                      <Input
+                        type="number"
+                        placeholder="Máximo"
+                        value={valueMax}
+                        onChange={(e) => setValueMax(Number(e.target.value))}
+                        disabled={isRunning}
+                        className="h-8 text-xs bg-background/50 font-mono"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground block">Máximo</span>
-                    <Input
-                      type="number"
-                      placeholder="Máximo"
-                      value={valueMax}
-                      onChange={(e) => setValueMax(Number(e.target.value))}
-                      disabled={isRunning}
-                      className="h-8 text-xs bg-background/50 font-mono"
-                    />
-                  </div>
+                  <span className="text-[10px] text-muted-foreground block">
+                    Valores sorteados aleatoriamente entre {currency} {valueMin} e {currency} {valueMax}.
+                  </span>
                 </div>
               )}
             </div>
