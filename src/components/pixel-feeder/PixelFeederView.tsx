@@ -6,32 +6,25 @@ import {
   RotateCcw,
   CheckCircle2,
   XCircle,
-  ShieldCheck,
-  Zap,
-  Globe,
-  Coins,
-  Sliders,
-  Terminal,
+  Activity,
   KeyRound,
   Eye,
   EyeOff,
-  Activity,
-  Layers,
+  Globe,
+  Coins,
+  Sliders,
   Sparkles,
-  Info,
+  ArrowRight,
+  Terminal,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Progress } from "@/components/ui/progress";
 import {
   LogEntry,
   PixelEventName,
-  PixelFeederConfig,
   SupportedCountry,
   SupportedCurrency,
 } from "@/lib/pixel-feeder/types";
@@ -52,21 +45,20 @@ const ALL_COUNTRIES: { code: SupportedCountry; label: string; flag: string; defa
   { code: "MX", label: "México", flag: "🇲🇽", defaultCurrency: "MXN" },
 ];
 
-const ALL_EVENTS: { name: PixelEventName; label: string; desc: string }[] = [
-  { name: "PageView", label: "PageView", desc: "Visualização de página" },
-  { name: "ViewContent", label: "ViewContent", desc: "Visualização do produto" },
-  { name: "AddToCart", label: "AddToCart", desc: "Adição ao carrinho" },
-  { name: "InitiateCheckout", label: "InitiateCheckout", desc: "Início do checkout" },
-  { name: "Purchase", label: "Purchase", desc: "Compra confirmada com valor" },
-  { name: "Lead", label: "Lead", desc: "Cadastro de lead / formulário" },
-  { name: "AddPaymentInfo", label: "AddPaymentInfo", desc: "Inserção de dados de pagamento" },
-  { name: "CompleteRegistration", label: "CompleteRegistration", desc: "Registro completo" },
+const ALL_EVENTS: { name: PixelEventName; label: string }[] = [
+  { name: "PageView", label: "PageView" },
+  { name: "ViewContent", label: "ViewContent" },
+  { name: "AddToCart", label: "AddToCart" },
+  { name: "InitiateCheckout", label: "InitiateCheckout" },
+  { name: "Purchase", label: "Purchase" },
+  { name: "Lead", label: "Lead" },
+  { name: "AddPaymentInfo", label: "AddPaymentInfo" },
+  { name: "CompleteRegistration", label: "CompleteRegistration" },
 ];
 
 const STORAGE_KEY = "nebula_pixel_feeder_config";
 
 export function PixelFeederView() {
-  // Config state
   const [pixelId, setPixelId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [showToken, setShowToken] = useState(false);
@@ -89,20 +81,15 @@ export function PixelFeederView() {
   const [totalRounds, setTotalRounds] = useState(25);
   const [delayMs, setDelayMs] = useState(1000);
 
-  // Execution state
+  // Runtime state
   const [isRunning, setIsRunning] = useState(false);
-  const [currentProgress, setCurrentProgress] = useState(0);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [stats, setStats] = useState({
-    sent: 0,
-    success: 0,
-    error: 0,
-  });
+  const [stats, setStats] = useState({ sent: 0, success: 0, error: 0 });
 
   const isRunningRef = useRef(false);
   isRunningRef.current = isRunning;
 
-  // Load saved credentials
+  // Load saved config
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -114,7 +101,7 @@ export function PixelFeederView() {
         if (parsed.selectedCountries?.length) setSelectedCountries(parsed.selectedCountries);
         if (parsed.currency) setCurrency(parsed.currency);
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);
@@ -131,23 +118,19 @@ export function PixelFeederView() {
           currency,
         }),
       );
-      toast.success("Configurações salvas no seu navegador!");
+      toast.success("Credenciais salvas.");
     } catch {
-      toast.error("Erro ao salvar configurações.");
+      toast.error("Erro ao salvar.");
     }
   };
 
   const toggleCountry = (code: SupportedCountry) => {
     if (selectedCountries.includes(code)) {
-      if (selectedCountries.length === 1) {
-        toast.info("Selecione pelo menos um país.");
-        return;
-      }
+      if (selectedCountries.length === 1) return;
       setSelectedCountries(selectedCountries.filter((c) => c !== code));
     } else {
       const next = [...selectedCountries, code];
       setSelectedCountries(next);
-      // Auto-adapt currency if single country selected
       if (next.length === 1) {
         const match = ALL_COUNTRIES.find((c) => c.code === code);
         if (match) setCurrency(match.defaultCurrency);
@@ -157,10 +140,7 @@ export function PixelFeederView() {
 
   const toggleEvent = (eventName: PixelEventName) => {
     if (selectedEvents.includes(eventName)) {
-      if (selectedEvents.length === 1) {
-        toast.info("Selecione pelo menos um evento.");
-        return;
-      }
+      if (selectedEvents.length === 1) return;
       setSelectedEvents(selectedEvents.filter((e) => e !== eventName));
     } else {
       setSelectedEvents([...selectedEvents, eventName]);
@@ -177,38 +157,33 @@ export function PixelFeederView() {
 
   const handleStart = async () => {
     if (!pixelId.trim()) {
-      toast.error("Preencha o Pixel ID da Meta.");
+      toast.error("Informe o Pixel ID.");
       return;
     }
     if (!accessToken.trim()) {
-      toast.error("Preencha o Access Token do Conversions API (CAPI).");
+      toast.error("Informe o Access Token do CAPI.");
       return;
     }
     if (selectedCountries.length === 0) {
-      toast.error("Selecione pelo menos um país de destino.");
+      toast.error("Selecione ao menos um país.");
       return;
     }
 
     saveCredentials();
     setIsRunning(true);
     isRunningRef.current = true;
-    toast.success("Aquecimento iniciado! Acompanhe o feed de eventos.");
+    toast.success("Disparos iniciados.");
 
-    // Execution loop
     let localSent = stats.sent;
     let localSuccess = stats.success;
     let localError = stats.error;
 
-    const totalSteps = totalRounds;
-
     for (let round = 1; round <= totalRounds; round++) {
       if (!isRunningRef.current) break;
 
-      // Random country among selected
       const pickedCountry =
         selectedCountries[Math.floor(Math.random() * selectedCountries.length)];
 
-      // Generate realistic persona
       const customer = generateCustomer(pickedCountry, gender);
       const hashedUser = await hashCustomerData(customer);
 
@@ -222,11 +197,11 @@ export function PixelFeederView() {
         if (!isRunningRef.current) break;
 
         const eventPayload = buildEventPayload(evtName, hashedUser, currency, orderValue);
-
         const logId = Math.random().toString(36).substring(2, 9);
+
         const newLog: LogEntry = {
           id: logId,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
           eventName: evtName,
           status: "sending",
           country: pickedCountry,
@@ -237,7 +212,7 @@ export function PixelFeederView() {
           matchScoreEstimate: 9.8,
         };
 
-        setLogs((prev) => [newLog, ...prev.slice(0, 199)]);
+        setLogs((prev) => [newLog, ...prev.slice(0, 149)]);
 
         const res = await sendMetaEvent(
           pixelId,
@@ -261,590 +236,465 @@ export function PixelFeederView() {
         }
 
         setLogs((prev) => prev.map((l) => (l.id === logId ? { ...newLog } : l)));
-        setStats({
-          sent: localSent,
-          success: localSuccess,
-          error: localError,
-        });
+        setStats({ sent: localSent, success: localSuccess, error: localError });
 
-        // Delay between events
         if (delayMs > 0) {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
         }
       }
-
-      setCurrentProgress(Math.round((round / totalSteps) * 100));
     }
 
     setIsRunning(false);
     isRunningRef.current = false;
-    toast.info("Ciclo de aquecimento finalizado.");
   };
 
   const handlePause = () => {
     setIsRunning(false);
     isRunningRef.current = false;
-    toast.warning("Aquecimento pausado.");
+    toast.info("Pausado.");
   };
 
   const handleReset = () => {
     setIsRunning(false);
     isRunningRef.current = false;
-    setCurrentProgress(0);
     setLogs([]);
     setStats({ sent: 0, success: 0, error: 0 });
-    toast.info("Logs e estatísticas zeradas.");
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 animate-fade-up pb-16">
+    <div className="space-y-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 pb-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 via-primary/20 to-orange-500/10 border border-primary/30 text-primary shadow-inner">
-              <Flame className="h-6 w-6 text-primary animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-extrabold tracking-tight">Pixel Feeder</h1>
-                <Badge variant="outline" className="border-primary/40 bg-primary/10 text-primary text-xs font-semibold px-2.5 py-0.5">
-                  Meta CAPI 9.8+ EMQ
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Aquecedor inteligente de Pixel Meta com hashing SHA-256 oficial, personas geolocalizadas e sessões de funil completas.
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Pixel Feeder</h1>
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-border text-muted-foreground bg-muted/30">
+              EMQ 9.8+
+            </span>
           </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Aquecedor de Pixel Meta Conversions API com SHA-256 e personas geolocalizadas.
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
           {isRunning ? (
             <Button
-              variant="destructive"
+              size="sm"
+              variant="outline"
               onClick={handlePause}
-              className="gap-2 font-medium shadow-md"
+              className="gap-2 text-rose-400 border-rose-500/40 hover:bg-rose-500/10"
             >
-              <Pause className="h-4 w-4" /> Pausar Aquecimento
+              <Pause className="h-3.5 w-3.5" /> Pausar
             </Button>
           ) : (
             <Button
+              size="sm"
               onClick={handleStart}
-              className="gap-2 bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20"
+              className="gap-2 bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              <Play className="h-4 w-4 fill-current" /> Iniciar Aquecimento
+              <Play className="h-3.5 w-3.5 fill-current" /> Iniciar
             </Button>
           )}
 
           <Button
-            variant="outline"
+            size="sm"
+            variant="ghost"
             onClick={handleReset}
             disabled={isRunning}
-            className="gap-1.5"
-            title="Resetar contadores e logs"
+            className="text-muted-foreground hover:text-foreground h-9 px-3"
+            title="Limpar logs"
           >
-            <RotateCcw className="h-4 w-4" /> Limpar
+            <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         </div>
-      </div>
+      </header>
 
-      {/* KPI Stats Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Total Enviados</p>
-              <h3 className="text-2xl font-bold mt-1">{stats.sent}</h3>
-            </div>
-            <Activity className="h-7 w-7 text-primary/60" />
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-emerald-500/80 font-medium">Sucessos (200)</p>
-              <h3 className="text-2xl font-bold mt-1 text-emerald-500">{stats.success}</h3>
-            </div>
-            <CheckCircle2 className="h-7 w-7 text-emerald-500/60" />
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-rose-500/80 font-medium">Erros / Rejeições</p>
-              <h3 className="text-2xl font-bold mt-1 text-rose-500">{stats.error}</h3>
-            </div>
-            <XCircle className="h-7 w-7 text-rose-500/60" />
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/60 bg-card/60 backdrop-blur-sm border-primary/20 bg-primary/5">
-          <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-wider text-primary font-medium">EMQ Score Estimado</p>
-              <div className="flex items-baseline gap-1.5 mt-1">
-                <span className="text-2xl font-black text-primary">9.8</span>
-                <span className="text-xs text-muted-foreground font-medium">/ 10.0</span>
-              </div>
-            </div>
-            <ShieldCheck className="h-7 w-7 text-primary" />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Progress Bar */}
-      {isRunning && (
-        <div className="space-y-2 rounded-xl border border-primary/30 bg-primary/5 p-4 animate-fade-in">
-          <div className="flex justify-between text-xs font-medium">
-            <span className="flex items-center gap-1.5 text-primary">
-              <Zap className="h-3.5 w-3.5 animate-spin" /> Processando disparos de alta correspondência...
-            </span>
-            <span className="text-muted-foreground">{currentProgress}% concluído</span>
+      {/* Stats row */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-xl overflow-hidden border border-border bg-border">
+        <div className="bg-card p-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Activity className="h-3.5 w-3.5" />
+            <span className="text-xs">Total enviados</span>
           </div>
-          <Progress value={currentProgress} className="h-2 bg-primary/20" />
+          <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight">{stats.sent}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">eventos CAPI</div>
         </div>
-      )}
 
-      {/* Main Grid: Form Left, Console Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Config */}
-        <div className="lg:col-span-5 space-y-6">
-          {/* Card 1: Credenciais */}
-          <Card className="border-border/80 shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <KeyRound className="h-4 w-4 text-primary" /> Credenciais da Meta Graph API
-              </CardTitle>
-              <CardDescription>
-                Pegue no Gerenciador de Eventos &gt; Configurações do seu Pixel.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="pixel-id" className="text-xs">Pixel ID <span className="text-rose-500">*</span></Label>
-                <Input
-                  id="pixel-id"
-                  placeholder="Ex: 123456789012345"
-                  value={pixelId}
-                  onChange={(e) => setPixelId(e.target.value)}
-                  disabled={isRunning}
-                />
-              </div>
+        <div className="bg-card p-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+            <span className="text-xs">Sucessos</span>
+          </div>
+          <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-emerald-500">
+            {stats.success}
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">HTTP 200 recebidos</div>
+        </div>
 
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="capi-token" className="text-xs">
-                    Access Token (CAPI) <span className="text-rose-500">*</span>
-                  </Label>
-                  <button
-                    type="button"
-                    onClick={() => setShowToken(!showToken)}
-                    className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
-                  >
-                    {showToken ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                    {showToken ? "Ocultar" : "Mostrar"}
-                  </button>
-                </div>
-                <Input
-                  id="capi-token"
-                  type={showToken ? "text" : "password"}
-                  placeholder="EAAG..."
-                  value={accessToken}
-                  onChange={(e) => setAccessToken(e.target.value)}
-                  disabled={isRunning}
-                />
-              </div>
+        <div className="bg-card p-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <XCircle className="h-3.5 w-3.5 text-rose-500" />
+            <span className="text-xs">Rejeições</span>
+          </div>
+          <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-rose-500">
+            {stats.error}
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">erros ou rate-limit</div>
+        </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="test-code" className="text-xs">
-                    Código de Teste (Opcional)
-                  </Label>
-                  <span className="text-[10px] text-muted-foreground">Aba Eventos de Teste</span>
-                </div>
-                <Input
-                  id="test-code"
-                  placeholder="Ex: TEST12345"
-                  value={testEventCode}
-                  onChange={(e) => setTestEventCode(e.target.value)}
-                  disabled={isRunning}
-                />
-              </div>
+        <div className="bg-card p-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs">EMQ Estimado</span>
+          </div>
+          <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-primary">
+            9.8 <span className="text-xs text-muted-foreground font-normal">/ 10</span>
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">qualidade de dados</div>
+        </div>
+      </section>
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs"
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left column: Parameters */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Box 1: Conexão */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <KeyRound className="h-3.5 w-3.5" /> Conexão Meta
+              </h2>
+              <button
+                type="button"
                 onClick={saveCredentials}
-                disabled={isRunning}
+                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
               >
-                Salvar Credenciais no Navegador
-              </Button>
-            </CardContent>
-          </Card>
+                Salvar
+              </button>
+            </div>
 
-          {/* Card 2: Países & Gênero */}
-          <Card className="border-border/80 shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Globe className="h-4 w-4 text-primary" /> Segmentação Geográfica & Gênero
-              </CardTitle>
-              <CardDescription>
-                Selecione um ou múltiplos países. Nomes, CEPs, DDDs e IPs serão adaptados automaticamente.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold">País(es) de Destino ({selectedCountries.length})</Label>
-                <div className="flex flex-wrap gap-2">
-                  {ALL_COUNTRIES.map((c) => {
-                    const active = selectedCountries.includes(c.code);
-                    return (
-                      <button
-                        key={c.code}
-                        type="button"
-                        onClick={() => toggleCountry(c.code)}
-                        disabled={isRunning}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
-                          active
-                            ? "bg-primary/15 border-primary text-primary shadow-sm"
-                            : "bg-muted/30 border-border text-muted-foreground hover:border-foreground/30"
-                        }`}
-                      >
-                        <span>{c.flag}</span>
-                        <span>{c.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+            <div className="space-y-1">
+              <Label htmlFor="pf-id" className="text-xs text-muted-foreground">Pixel ID</Label>
+              <Input
+                id="pf-id"
+                placeholder="Ex: 123456789012345"
+                value={pixelId}
+                onChange={(e) => setPixelId(e.target.value)}
+                disabled={isRunning}
+                className="h-8 text-xs bg-background/50 font-mono"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="pf-token" className="text-xs text-muted-foreground">Access Token (CAPI)</Label>
+                <button
+                  type="button"
+                  onClick={() => setShowToken(!showToken)}
+                  className="text-[10px] text-muted-foreground hover:text-foreground"
+                >
+                  {showToken ? "Ocultar" : "Ver"}
+                </button>
               </div>
+              <Input
+                id="pf-token"
+                type={showToken ? "text" : "password"}
+                placeholder="EAAG..."
+                value={accessToken}
+                onChange={(e) => setAccessToken(e.target.value)}
+                disabled={isRunning}
+                className="h-8 text-xs bg-background/50 font-mono"
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold">Gênero das Personas</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: "all", label: "Misto / Ambos" },
-                    { id: "female", label: "Feminino" },
-                    { id: "male", label: "Masculino" },
-                  ].map((g) => (
+            <div className="space-y-1">
+              <Label htmlFor="pf-test" className="text-xs text-muted-foreground">
+                Test Event Code <span className="text-[10px] opacity-60">(opcional)</span>
+              </Label>
+              <Input
+                id="pf-test"
+                placeholder="Ex: TEST12345"
+                value={testEventCode}
+                onChange={(e) => setTestEventCode(e.target.value)}
+                disabled={isRunning}
+                className="h-8 text-xs bg-background/50 font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Box 2: Segmentação & Moeda */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5" /> Audiência & Moeda
+            </h2>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">País de destino</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {ALL_COUNTRIES.map((c) => {
+                  const active = selectedCountries.includes(c.code);
+                  return (
                     <button
-                      key={g.id}
+                      key={c.code}
                       type="button"
-                      onClick={() => setGender(g.id as any)}
+                      onClick={() => toggleCountry(c.code)}
                       disabled={isRunning}
-                      className={`py-2 px-3 rounded-xl border text-xs font-medium text-center transition-all ${
-                        gender === g.id
-                          ? "bg-primary/15 border-primary text-primary"
-                          : "bg-muted/30 border-border text-muted-foreground hover:border-foreground/30"
+                      className={`text-xs px-2.5 py-1 rounded-md border transition-colors flex items-center gap-1.5 ${
+                        active
+                          ? "bg-primary/10 border-primary/50 text-foreground font-medium"
+                          : "border-border bg-background/40 text-muted-foreground hover:text-foreground hover:bg-muted/30"
                       }`}
                     >
-                      {g.label}
+                      <span>{c.flag}</span>
+                      <span>{c.code}</span>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Card 3: Valor & Moeda */}
-          <Card className="border-border/80 shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Coins className="h-4 w-4 text-primary" /> Valor & Moeda da Compra
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Moeda</Label>
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-                    disabled={isRunning}
-                    aria-label="Moeda"
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    <option value="BRL">BRL (R$ - Real)</option>
-                    <option value="USD">USD ($ - Dólar)</option>
-                    <option value="EUR">EUR (€ - Euro)</option>
-                    <option value="GBP">GBP (£ - Libra)</option>
-                    <option value="MXN">MXN ($ - Peso MX)</option>
-                  </select>
-                </div>
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Moeda</Label>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
+                  disabled={isRunning}
+                  aria-label="Moeda"
+                  className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
+                >
+                  <option value="BRL">BRL (R$)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="MXN">MXN ($)</option>
+                </select>
+              </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Comportamento de Valor</Label>
-                  <select
-                    value={valueMode}
-                    onChange={(e) => setValueMode(e.target.value as any)}
-                    disabled={isRunning}
-                    aria-label="Comportamento de Valor"
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    <option value="range">Faixa Aleatória (Min - Max)</option>
-                    <option value="fixed">Valor Fixo</option>
-                  </select>
-                </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Gênero</Label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value as any)}
+                  disabled={isRunning}
+                  aria-label="Gênero"
+                  className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
+                >
+                  <option value="all">Misto / Ambos</option>
+                  <option value="female">Feminino</option>
+                  <option value="male">Masculino</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Valor por compra ({currency})</span>
+                <button
+                  type="button"
+                  onClick={() => setValueMode(valueMode === "range" ? "fixed" : "range")}
+                  className="text-[10px] hover:text-foreground"
+                >
+                  {valueMode === "range" ? "Mudar p/ fixo" : "Mudar p/ faixa"}
+                </button>
               </div>
 
               {valueMode === "fixed" ? (
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Valor por Evento ({currency})</Label>
+                <Input
+                  type="number"
+                  value={valueFixed}
+                  onChange={(e) => setValueFixed(Number(e.target.value))}
+                  disabled={isRunning}
+                  className="h-8 text-xs bg-background/50 font-mono"
+                />
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
                   <Input
                     type="number"
-                    value={valueFixed}
-                    onChange={(e) => setValueFixed(Number(e.target.value))}
+                    placeholder="Min"
+                    value={valueMin}
+                    onChange={(e) => setValueMin(Number(e.target.value))}
                     disabled={isRunning}
+                    className="h-8 text-xs bg-background/50 font-mono"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Max"
+                    value={valueMax}
+                    onChange={(e) => setValueMax(Number(e.target.value))}
+                    disabled={isRunning}
+                    className="h-8 text-xs bg-background/50 font-mono"
                   />
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Valor Mínimo ({currency})</Label>
-                    <Input
-                      type="number"
-                      value={valueMin}
-                      onChange={(e) => setValueMin(Number(e.target.value))}
-                      disabled={isRunning}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Valor Máximo ({currency})</Label>
-                    <Input
-                      type="number"
-                      value={valueMax}
-                      onChange={(e) => setValueMax(Number(e.target.value))}
-                      disabled={isRunning}
-                    />
-                  </div>
-                </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Card 4: Estratégia de Disparo */}
-          <Card className="border-border/80 shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Sliders className="h-4 w-4 text-primary" /> Estratégia & Automação
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              {/* Funnel simulation toggle */}
-              <div className="flex items-start justify-between gap-3 p-3.5 rounded-xl border border-primary/20 bg-primary/5">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5 font-semibold text-xs text-primary">
-                    <Sparkles className="h-3.5 w-3.5" /> Modo Funil Completo (Recomendado)
-                  </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Simula a jornada orgânica completa conectada pelo mesmo cookie:
-                    <span className="block font-medium text-foreground mt-0.5">
-                      PageView → ViewContent → AddToCart → Checkout → Purchase
-                    </span>
-                  </p>
+          {/* Box 3: Estratégia */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Sliders className="h-3.5 w-3.5" /> Disparos & Funil
+            </h2>
+
+            <div className="flex items-center justify-between py-1">
+              <div>
+                <div className="text-xs font-medium">Funil Completo</div>
+                <div className="text-[11px] text-muted-foreground">
+                  PageView → ViewContent → Cart → Checkout → Purchase
                 </div>
-                <Switch
-                  checked={simulateFunnel}
-                  onCheckedChange={setSimulateFunnel}
+              </div>
+              <Switch
+                checked={simulateFunnel}
+                onCheckedChange={setSimulateFunnel}
+                disabled={isRunning}
+              />
+            </div>
+
+            {!simulateFunnel && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {ALL_EVENTS.map((e) => {
+                  const active = selectedEvents.includes(e.name);
+                  return (
+                    <button
+                      key={e.name}
+                      type="button"
+                      onClick={() => toggleEvent(e.name)}
+                      disabled={isRunning}
+                      className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
+                        active
+                          ? "bg-primary/10 border-primary/50 text-foreground font-medium"
+                          : "border-border bg-background/40 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {e.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Ciclos</Label>
+                <select
+                  value={totalRounds}
+                  onChange={(e) => setTotalRounds(Number(e.target.value))}
                   disabled={isRunning}
-                />
+                  aria-label="Ciclos"
+                  className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
+                >
+                  <option value={10}>10 pessoas</option>
+                  <option value={25}>25 pessoas</option>
+                  <option value={50}>50 pessoas</option>
+                  <option value={100}>100 pessoas</option>
+                </select>
               </div>
 
-              {!simulateFunnel && (
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">Eventos Avulsos</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {ALL_EVENTS.map((e) => {
-                      const checked = selectedEvents.includes(e.name);
-                      return (
-                        <button
-                          key={e.name}
-                          type="button"
-                          onClick={() => toggleEvent(e.name)}
-                          disabled={isRunning}
-                          className={`p-2 rounded-lg border text-left text-xs transition-all ${
-                            checked
-                              ? "bg-primary/10 border-primary text-foreground font-medium"
-                              : "bg-muted/20 border-border text-muted-foreground"
-                          }`}
-                        >
-                          <div className="font-semibold">{e.label}</div>
-                          <div className="text-[10px] text-muted-foreground truncate">{e.desc}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Ciclos / Pessoas ({totalRounds})</Label>
-                  <select
-                    value={totalRounds}
-                    onChange={(e) => setTotalRounds(Number(e.target.value))}
-                    disabled={isRunning}
-                    aria-label="Ciclos ou Pessoas"
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    <option value={10}>10 ciclos</option>
-                    <option value={25}>25 ciclos</option>
-                    <option value={50}>50 ciclos</option>
-                    <option value={100}>100 ciclos</option>
-                    <option value={200}>200 ciclos</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Intervalo entre Disparos</Label>
-                  <select
-                    value={delayMs}
-                    onChange={(e) => setDelayMs(Number(e.target.value))}
-                    disabled={isRunning}
-                    aria-label="Intervalo entre Disparos"
-                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    <option value={500}>500 ms (Rápido)</option>
-                    <option value={1000}>1 segundo (Normal)</option>
-                    <option value={2000}>2 segundos (Seguro)</option>
-                    <option value={3000}>3 segundos (Orgânico)</option>
-                  </select>
-                </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Delay</Label>
+                <select
+                  value={delayMs}
+                  onChange={(e) => setDelayMs(Number(e.target.value))}
+                  disabled={isRunning}
+                  aria-label="Delay"
+                  className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
+                >
+                  <option value={500}>0.5s</option>
+                  <option value={1000}>1.0s</option>
+                  <option value={2000}>2.0s</option>
+                  <option value={3000}>3.0s</option>
+                </select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Right Column: Console / Live Logs */}
-        <div className="lg:col-span-7 space-y-4">
-          <Card className="border-border/80 shadow-sm flex flex-col h-[750px]">
-            <CardHeader className="py-3 px-5 border-b border-border/60 flex flex-row items-center justify-between">
+        {/* Right column: Clean Minimalist Event Feed */}
+        <div className="lg:col-span-7">
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3 min-h-[580px] flex flex-col">
+            <div className="flex items-center justify-between pb-2 border-b border-border/50">
               <div className="flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-primary" />
-                <CardTitle className="text-sm font-semibold">Feed de Eventos em Tempo Real</CardTitle>
-                <Badge variant="secondary" className="text-[10px] py-0 px-2 font-mono">
-                  {logs.length} registros
-                </Badge>
+                <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Feed de Eventos
+                </h2>
               </div>
-
               <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 relative">
-                  <span
-                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                      isRunning ? "bg-emerald-400" : "bg-muted-foreground"
-                    }`}
-                  />
-                  <span
-                    className={`relative inline-flex rounded-full h-2 w-2 ${
-                      isRunning ? "bg-emerald-500" : "bg-muted-foreground/60"
-                    }`}
-                  />
-                </span>
-                <span className="text-[11px] text-muted-foreground font-medium">
-                  {isRunning ? "Disparando..." : "Standby"}
+                <span className={`inline-block h-2 w-2 rounded-full ${isRunning ? "bg-emerald-400 animate-pulse" : "bg-muted-foreground/40"}`} />
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  {isRunning ? "disparando" : "parado"}
                 </span>
               </div>
-            </CardHeader>
+            </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-2.5 font-mono text-xs">
+            <div className="flex-1 overflow-y-auto space-y-1.5 font-mono text-[11px] pr-1">
               {logs.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-8">
-                  <Layers className="h-10 w-10 text-muted-foreground/30 mb-3" />
-                  <p className="font-sans font-medium text-sm text-foreground">
-                    Nenhum evento disparado ainda
-                  </p>
-                  <p className="font-sans text-xs max-w-sm mt-1">
-                    Configure seu Pixel ID e Access Token à esquerda e clique em{" "}
-                    <strong className="text-primary">Iniciar Aquecimento</strong> para começar a alimentar o algoritmo.
+                <div className="h-96 flex flex-col items-center justify-center text-center text-muted-foreground">
+                  <Flame className="h-8 w-8 text-muted-foreground/30 mb-2" />
+                  <p className="text-xs text-foreground font-medium">Aguardando início</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 max-w-xs">
+                    Preencha o Pixel ID e Token e clique em Iniciar para disparar os eventos.
                   </p>
                 </div>
               ) : (
                 logs.map((log) => {
                   const isSuccess = log.status === "success";
                   const isError = log.status === "error";
-                  const isSending = log.status === "sending";
 
                   return (
                     <div
                       key={log.id}
-                      className={`p-3 rounded-xl border transition-all ${
-                        isSuccess
-                          ? "bg-emerald-950/20 border-emerald-500/30 text-emerald-100"
-                          : isError
-                          ? "bg-rose-950/25 border-rose-500/40 text-rose-200"
-                          : "bg-muted/30 border-border text-muted-foreground animate-pulse"
-                      }`}
+                      className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-background/40 hover:bg-muted/30 border border-border/40 transition-colors"
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-muted-foreground">{log.timestamp}</span>
-                          <Badge
-                            variant="outline"
-                            className={`text-[10px] px-1.5 py-0 font-bold ${
-                              log.eventName === "Purchase"
-                                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                                : log.eventName === "InitiateCheckout"
-                                ? "bg-blue-500/20 text-blue-400 border-blue-500/40"
-                                : log.eventName === "AddToCart"
-                                ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
-                                : "bg-muted text-foreground border-border"
-                            }`}
-                          >
-                            {log.eventName}
-                          </Badge>
-                          <span className="font-semibold text-foreground">{log.customerName}</span>
-                          <span className="text-[10px] text-muted-foreground">({log.country})</span>
-                        </div>
-
-                        <div className="flex items-center gap-2 text-right">
-                          {log.value !== undefined && (
-                            <span className="font-bold text-foreground">
-                              {log.currency} {log.value.toFixed(2)}
-                            </span>
-                          )}
-                          {isSuccess && (
-                            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px]">
-                              200 OK
-                            </Badge>
-                          )}
-                          {isError && (
-                            <Badge className="bg-rose-500/20 text-rose-400 border-rose-500/40 text-[10px]">
-                              Erro {log.httpCode || "CORS/Rede"}
-                            </Badge>
-                          )}
-                          {isSending && (
-                            <span className="text-[10px] text-amber-400">Enviando...</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Detail row */}
-                      <div className="mt-2 pt-2 border-t border-border/30 flex flex-wrap items-center justify-between text-[11px] text-muted-foreground">
-                        <span className="truncate max-w-[280px]">evt_id: {log.eventId}</span>
-                        {log.fbtraceId && (
-                          <span className="text-[10px] text-muted-foreground/80">
-                            trace: {log.fbtraceId}
-                          </span>
-                        )}
-                        <span className="text-emerald-400/90 font-medium">
-                          EMQ Est.: {log.matchScoreEstimate}/10
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-muted-foreground/70 shrink-0 text-[10px]">{log.timestamp}</span>
+                        <span
+                          className={`shrink-0 font-medium ${
+                            log.eventName === "Purchase"
+                              ? "text-emerald-400"
+                              : log.eventName === "InitiateCheckout"
+                              ? "text-blue-400"
+                              : log.eventName === "AddToCart"
+                              ? "text-amber-400"
+                              : "text-foreground/90"
+                          }`}
+                        >
+                          {log.eventName}
+                        </span>
+                        <span className="text-muted-foreground truncate max-w-[140px] hidden sm:inline">
+                          {log.customerName}
+                        </span>
+                        <span className="text-muted-foreground/60 text-[10px]">
+                          [{log.country}]
                         </span>
                       </div>
 
-                      {log.responseMessage && (
-                        <div className="mt-1.5 text-[11px] text-rose-400 bg-rose-950/40 p-2 rounded border border-rose-800/40">
-                          {log.responseMessage}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        {log.value !== undefined && (
+                          <span className="text-foreground/90 tabular-nums">
+                            {log.currency} {log.value.toFixed(2)}
+                          </span>
+                        )}
+
+                        {isSuccess && (
+                          <span className="text-emerald-500 text-[10px]">200 OK</span>
+                        )}
+                        {isError && (
+                          <span className="text-rose-500 text-[10px]" title={log.responseMessage}>
+                            {log.httpCode ? `Erro ${log.httpCode}` : "Falha"}
+                          </span>
+                        )}
+                        {log.status === "sending" && (
+                          <span className="text-amber-400 text-[10px]">...</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })
               )}
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
