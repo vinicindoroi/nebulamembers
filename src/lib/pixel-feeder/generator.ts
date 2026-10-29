@@ -7,6 +7,7 @@ import {
   SupportedCountry,
   SupportedCurrency,
 } from "./types";
+import { NICHE_PRESETS } from "./niches";
 import {
   generateEventId,
   generateFbc,
@@ -501,15 +502,37 @@ export function buildEventPayload(
   value: number,
   eventId: string = generateEventId(),
   eventTime?: number,
+  nicheConfig?: {
+    nicheId?: string;
+    customCategory?: string;
+    productName?: string;
+  },
 ): MetaEventPayload {
-  const product = SAMPLE_PRODUCTS[Math.floor(Math.random() * SAMPLE_PRODUCTS.length)];
+  // Determine niche and product
+  const selectedPreset =
+    NICHE_PRESETS.find((p) => p.id === nicheConfig?.nicheId) || NICHE_PRESETS[0];
+
+  const category =
+    nicheConfig?.customCategory?.trim() ||
+    (selectedPreset.id === "custom" ? "E-commerce & Varejo" : selectedPreset.category);
+
+  const productName =
+    nicheConfig?.productName?.trim() ||
+    selectedPreset.sampleProducts[
+      Math.floor(Math.random() * selectedPreset.sampleProducts.length)
+    ];
+
+  const sku = `SKU-${Math.floor(1000 + Math.random() * 9000)}`;
   const now = eventTime !== undefined ? eventTime : Math.floor(Date.now() / 1000);
 
   const payload: MetaEventPayload = {
     event_name: eventName,
     event_time: now,
     event_id: eventId,
-    event_source_url: typeof window !== "undefined" ? window.location.origin + "/checkout" : "https://nebulamembers.com/checkout",
+    event_source_url:
+      typeof window !== "undefined"
+        ? window.location.origin + "/checkout"
+        : "https://nebulamembers.com/checkout",
     action_source: "website",
     user_data: hashedUser,
   };
@@ -523,13 +546,17 @@ export function buildEventPayload(
     payload.custom_data = {
       currency,
       value,
-      content_name: product.name,
+      content_name: productName,
+      content_category: category,
       content_type: "product",
+      content_ids: [sku],
       contents: [
         {
-          id: product.id,
+          id: sku,
           quantity: 1,
           item_price: value,
+          title: productName,
+          category,
         },
       ],
       num_items: 1,
@@ -538,6 +565,8 @@ export function buildEventPayload(
     payload.custom_data = {
       currency,
       value: Math.round(value * 0.2 * 100) / 100,
+      content_name: productName,
+      content_category: category,
       status: true,
     };
   }

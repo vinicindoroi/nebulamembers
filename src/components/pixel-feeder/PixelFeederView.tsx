@@ -18,6 +18,7 @@ import {
   Check,
   Send,
   Zap,
+  Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ import {
 import { generateEventId } from "@/lib/pixel-feeder/crypto";
 import { sendMetaEvent } from "@/lib/pixel-feeder/sender";
 import { CountrySelectDropdown } from "./CountrySelectDropdown";
+import { NICHE_PRESETS } from "@/lib/pixel-feeder/niches";
 import { COUNTRIES_CATALOG } from "@/lib/pixel-feeder/countries";
 
 const ALL_EVENTS: { name: PixelEventName; label: string }[] = [
@@ -61,6 +63,9 @@ export function PixelFeederView() {
   const [testEventCode, setTestEventCode] = useState("");
   const [selectedCountries, setSelectedCountries] = useState<SupportedCountry[]>(["BR"]);
   const [currency, setCurrency] = useState<SupportedCurrency>("BRL");
+  const [nicheId, setNicheId] = useState("general");
+  const [customCategory, setCustomCategory] = useState("");
+  const [productName, setProductName] = useState("");
   const [valueMode, setValueMode] = useState<"fixed" | "range">("fixed");
   const [valueFixed, setValueFixed] = useState(97);
   const [valueMin, setValueMin] = useState(97);
@@ -101,6 +106,9 @@ export function PixelFeederView() {
         if (parsed.testEventCode) setTestEventCode(parsed.testEventCode);
         if (parsed.selectedCountries?.length) setSelectedCountries(parsed.selectedCountries);
         if (parsed.currency) setCurrency(parsed.currency);
+        if (parsed.nicheId) setNicheId(parsed.nicheId);
+        if (parsed.customCategory) setCustomCategory(parsed.customCategory);
+        if (parsed.productName) setProductName(parsed.productName);
       }
     } catch {
       // ignore
@@ -117,6 +125,9 @@ export function PixelFeederView() {
           testEventCode,
           selectedCountries,
           currency,
+          nicheId,
+          customCategory,
+          productName,
         }),
       );
       toast.success("Credenciais salvas no seu navegador!");
@@ -160,7 +171,19 @@ export function PixelFeederView() {
       const customer = generateCustomer(pickedCountry, gender);
       const hashedUser = await hashCustomerData(customer);
       const orderValue = getEffectiveValue();
-      const payload = buildEventPayload("Purchase", hashedUser, currency, orderValue);
+      const payload = buildEventPayload(
+        "Purchase",
+        hashedUser,
+        currency,
+        orderValue,
+        generateEventId(),
+        undefined,
+        {
+          nicheId,
+          customCategory,
+          productName,
+        },
+      );
 
       const logId = Math.random().toString(36).substring(2, 9);
       const newLog: LogEntry = {
@@ -172,6 +195,8 @@ export function PixelFeederView() {
         currency,
         value: orderValue,
         customerName: `${customer.firstName} ${customer.lastName}`,
+        productName: payload.custom_data?.content_name,
+        category: payload.custom_data?.content_category,
         eventId: payload.event_id,
         matchScoreEstimate: 9.8,
       };
@@ -272,6 +297,11 @@ export function PixelFeederView() {
           orderValue,
           generateEventId(),
           eventTime,
+          {
+            nicheId,
+            customCategory,
+            productName,
+          },
         );
         const logId = Math.random().toString(36).substring(2, 9);
 
@@ -290,6 +320,8 @@ export function PixelFeederView() {
           currency,
           value: evtName === "Purchase" || evtName === "AddToCart" ? orderValue : undefined,
           customerName: `${customer.firstName} ${customer.lastName}`,
+          productName: eventPayload.custom_data?.content_name,
+          category: eventPayload.custom_data?.content_category,
           eventId: eventPayload.event_id,
           matchScoreEstimate: 9.8,
         };
@@ -653,7 +685,67 @@ export function PixelFeederView() {
             </div>
           </div>
 
-          {/* Box 3: Estratégia */}
+                    {/* Box 3: Nicho & Segmentação do Produto */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5" /> Nicho & Segmentação
+              </h2>
+              <span className="text-[10px] text-primary/80 font-mono">content_category & name</span>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Nicho / Categoria de Interesse</Label>
+              <select
+                value={nicheId}
+                onChange={(e) => setNicheId(e.target.value)}
+                disabled={isRunning}
+                className="w-full h-8 rounded-md border border-border bg-background/50 px-2 text-xs focus:outline-none"
+              >
+                {NICHE_PRESETS.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {nicheId === "custom" && (
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Nome da Categoria Personalizada</Label>
+                <Input
+                  placeholder="Ex: Cripto, Pets, Imóveis, etc."
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  disabled={isRunning}
+                  className="h-8 text-xs bg-background/50"
+                />
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Nome do Produto</Label>
+                <span className="text-[10px] text-muted-foreground/60">(opcional — gera do nicho)</span>
+              </div>
+              <Input
+                placeholder={`Ex: ${
+                  NICHE_PRESETS.find((p) => p.id === nicheId)?.sampleProducts[0] || "Nome do produto..."
+                }`}
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                disabled={isRunning}
+                className="h-8 text-xs bg-background/50"
+              />
+            </div>
+
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
+              O Meta CAPI enviará estes dados em <code className="text-primary/90 font-mono">content_category</code> e{" "}
+              <code className="text-primary/90 font-mono">content_name</code>, associando os compradores ao nicho do seu produto.
+            </p>
+          </div>
+
+{/* Box 4: Estratégia */}
           <div className="rounded-xl border border-border bg-card p-4 space-y-3.5">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <Sliders className="h-3.5 w-3.5" /> Disparos & Funil
@@ -871,9 +963,14 @@ export function PixelFeederView() {
                         >
                           {log.eventName}
                         </span>
-                        <span className="text-muted-foreground truncate max-w-[140px] hidden sm:inline">
+                        <span className="text-muted-foreground truncate max-w-[130px] hidden sm:inline">
                           {log.customerName}
                         </span>
+                        {log.productName && (
+                          <span className="text-muted-foreground/60 text-[10px] truncate max-w-[120px] hidden md:inline" title={log.productName}>
+                            • {log.productName}
+                          </span>
+                        )}
                         <span className="text-muted-foreground/60 text-[10px]">
                           [{log.country}]
                         </span>

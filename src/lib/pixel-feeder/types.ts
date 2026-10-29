@@ -20,6 +20,9 @@ export interface PixelFeederConfig {
   testEventCode?: string;
   countries: SupportedCountry[];
   currency: SupportedCurrency;
+  nicheId?: string;
+  customCategory?: string;
+  productName?: string;
   valueMode: "fixed" | "range";
   valueFixed: number;
   valueMin: number;
@@ -67,11 +70,15 @@ export interface MetaCustomData {
   currency?: string;
   value?: number;
   content_name?: string;
+  content_category?: string;
   content_type?: string;
+  content_ids?: string[];
   contents?: Array<{
     id: string;
     quantity: number;
     item_price?: number;
+    title?: string;
+    category?: string;
   }>;
   num_items?: number;
   status?: boolean;
@@ -101,6 +108,8 @@ export interface LogEntry {
   country: string;
   currency: string;
   value?: number;
+  productName?: string;
+  category?: string;
   customerName: string;
   eventId: string;
   matchScoreEstimate: number;
