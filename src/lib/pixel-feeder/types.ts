@@ -1,6 +1,20 @@
-export type SupportedCountry = "BR" | "US" | "PT" | "ES" | "GB" | "FR" | "MX";
+export type SupportedCountry =
+  | "BR"
+  | "US"
+  | "PT"
+  | "ES"
+  | "GB"
+  | "FR"
+  | "MX"
+  | "IT"
+  | "DE"
+  | "CA"
+  | "AU"
+  | "AR"
+  | "CL"
+  | "CO";
 
-export type SupportedCurrency = "BRL" | "USD" | "EUR" | "GBP" | "MXN";
+export type SupportedCurrency = "BRL" | "USD" | "EUR" | "GBP" | "MXN" | "CAD" | "AUD" | "ARS" | "CLP" | "COP";
 
 export type GenderFilter = "all" | "female" | "male";
 
@@ -26,7 +40,7 @@ export interface PixelFeederConfig {
   valueMax: number;
   gender: GenderFilter;
   events: PixelEventName[];
-  simulateFunnel: boolean; // if true, simulates connected sessions (PageView -> ViewContent -> AddToCart -> Purchase)
+  simulateFunnel: boolean;
   totalEvents: number;
   delayMs: number;
 }
@@ -103,7 +117,7 @@ export interface LogEntry {
   value?: number;
   customerName: string;
   eventId: string;
-  matchScoreEstimate: number; // e.g. 9.8
+  matchScoreEstimate: number;
   responseMessage?: string;
   fbtraceId?: string;
 }

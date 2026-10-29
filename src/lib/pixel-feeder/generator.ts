@@ -260,19 +260,150 @@ const COUNTRY_DATA: Record<SupportedCountry, CountryData> = {
     ipRanges: ["187.130.", "189.200.", "200.68.", "201.140."],
     emailDomains: ["gmail.com", "hotmail.com", "yahoo.com.mx", "outlook.com"],
   },
+  IT: {
+    phonePrefix: "39",
+    phoneFormat: () => {
+      const num = Math.floor(3200000000 + Math.random() * 799999999);
+      return `39${num}`;
+    },
+    states: ["lombardia", "lazio", "campania", "veneto", "piemonte"],
+    cities: [
+      { city: "Milano", state: "lombardia", zip: "20121" },
+      { city: "Roma", state: "lazio", zip: "00185" },
+      { city: "Napoli", state: "campania", zip: "80138" },
+      { city: "Torino", state: "piemonte", zip: "10121" },
+      { city: "Firenze", state: "toscana", zip: "50123" },
+    ],
+    firstNamesFemale: ["Giulia", "Sofia", "Aurora", "Ginevra", "Alice", "Emma", "Giorgia", "Beatrice"],
+    firstNamesMale: ["Leonardo", "Francesco", "Alessandro", "Lorenzo", "Mattia", "Andrea", "Gabriele"],
+    lastNames: ["Rossi", "Russo", "Ferrari", "Esposito", "Bianchi", "Romano", "Colombo", "Ricci"],
+    ipRanges: ["79.16.", "93.32.", "151.10.", "188.10."],
+    emailDomains: ["libero.it", "gmail.com", "virgilio.it", "tiscali.it"],
+  },
+  DE: {
+    phonePrefix: "49",
+    phoneFormat: () => {
+      const num = Math.floor(1510000000 + Math.random() * 489999999);
+      return `49${num}`;
+    },
+    states: ["berlin", "bayern", "nordrhein-westfalen", "hamburg", "hessen"],
+    cities: [
+      { city: "Berlin", state: "berlin", zip: "10115" },
+      { city: "München", state: "bayern", zip: "80331" },
+      { city: "Hamburg", state: "hamburg", zip: "20095" },
+      { city: "Köln", state: "nordrhein-westfalen", zip: "50667" },
+      { city: "Frankfurt", state: "hessen", zip: "60311" },
+    ],
+    firstNamesFemale: ["Mia", "Emma", "Hannah", "Sophia", "Emilia", "Lina", "Marie", "Mila"],
+    firstNamesMale: ["Noah", "Matteo", "Leon", "Finn", "Paul", "Elias", "Emil", "Lukas"],
+    lastNames: ["Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker"],
+    ipRanges: ["85.214.", "88.64.", "91.0.", "178.63."],
+    emailDomains: ["gmx.de", "web.de", "gmail.com", "t-online.de"],
+  },
+  CA: {
+    phonePrefix: "1",
+    phoneFormat: () => {
+      const areas = ["416", "647", "514", "604", "403", "613"];
+      const area = areas[Math.floor(Math.random() * areas.length)];
+      const num = Math.floor(2000000 + Math.random() * 7999999);
+      return `1${area}${num}`;
+    },
+    states: ["on", "qc", "bc", "ab"],
+    cities: [
+      { city: "Toronto", state: "on", zip: "M5H 2N2" },
+      { city: "Montreal", state: "qc", zip: "H3B 1A7" },
+      { city: "Vancouver", state: "bc", zip: "V6B 1A1" },
+      { city: "Calgary", state: "ab", zip: "T2P 1J9" },
+    ],
+    firstNamesFemale: ["Olivia", "Emma", "Charlotte", "Amelia", "Ava", "Chloe", "Isla"],
+    firstNamesMale: ["Liam", "Noah", "Oliver", "Jack", "Theodore", "Lucas", "Leo"],
+    lastNames: ["Smith", "Brown", "Tremblay", "Martin", "Roy", "Gagnon", "Lee", "Wilson"],
+    ipRanges: ["24.80.", "70.24.", "99.224.", "142.150."],
+    emailDomains: ["gmail.com", "yahoo.ca", "rogers.com", "bell.net"],
+  },
+  AU: {
+    phonePrefix: "61",
+    phoneFormat: () => {
+      const num = Math.floor(400000000 + Math.random() * 99999999);
+      return `61${num}`;
+    },
+    states: ["nsw", "vic", "qld", "wa"],
+    cities: [
+      { city: "Sydney", state: "nsw", zip: "2000" },
+      { city: "Melbourne", state: "vic", zip: "3000" },
+      { city: "Brisbane", state: "qld", zip: "4000" },
+      { city: "Perth", state: "wa", zip: "6000" },
+    ],
+    firstNamesFemale: ["Charlotte", "Amelia", "Isla", "Olivia", "Mia", "Ava", "Grace"],
+    firstNamesMale: ["Oliver", "Noah", "Leo", "William", "Henry", "Jack", "Theodore"],
+    lastNames: ["Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Johnson", "White"],
+    ipRanges: ["1.128.", "49.176.", "101.160.", "139.130."],
+    emailDomains: ["gmail.com", "yahoo.com.au", "bigpond.com", "optusnet.com.au"],
+  },
+  AR: {
+    phonePrefix: "54",
+    phoneFormat: () => {
+      const num = Math.floor(91100000000 + Math.random() * 899999999);
+      return `54${num}`;
+    },
+    states: ["caba", "buenos-aires", "cordoba", "santa-fe", "mendoza"],
+    cities: [
+      { city: "Buenos Aires", state: "caba", zip: "C1002" },
+      { city: "Córdoba", state: "cordoba", zip: "X5000" },
+      { city: "Rosario", state: "santa-fe", zip: "S2000" },
+      { city: "Mendoza", state: "mendoza", zip: "M5500" },
+    ],
+    firstNamesFemale: ["Emma", "Olivia", "Catalina", "Martina", "Sofia", "Delfina", "Valentina"],
+    firstNamesMale: ["Mateo", "Felipe", "Benicio", "Bautista", "Joaquin", "Valentin", "Santino"],
+    lastNames: ["Gonzalez", "Rodriguez", "Gomez", "Fernandez", "Lopez", "Diaz", "Martinez", "Perez"],
+    ipRanges: ["181.16.", "186.136.", "190.188.", "200.45."],
+    emailDomains: ["gmail.com", "hotmail.com", "yahoo.com.ar"],
+  },
+  CL: {
+    phonePrefix: "56",
+    phoneFormat: () => {
+      const num = Math.floor(900000000 + Math.random() * 99999999);
+      return `56${num}`;
+    },
+    states: ["santiago", "valparaiso", "biobio"],
+    cities: [
+      { city: "Santiago", state: "santiago", zip: "8320000" },
+      { city: "Valparaíso", state: "valparaiso", zip: "2340000" },
+      { city: "Concepción", state: "biobio", zip: "4030000" },
+    ],
+    firstNamesFemale: ["Emma", "Isabella", "Sofia", "Emilia", "Julieta", "Trinidad", "Florencia"],
+    firstNamesMale: ["Mateo", "Gaspar", "Santiago", "Lucas", "Benjamin", "Vicente", "Agustin"],
+    lastNames: ["Gonzalez", "Muñoz", "Rojas", "Diaz", "Perez", "Soto", "Contreras", "Silva"],
+    ipRanges: ["186.104.", "190.160.", "200.28."],
+    emailDomains: ["gmail.com", "hotmail.com", "yahoo.cl"],
+  },
+  CO: {
+    phonePrefix: "57",
+    phoneFormat: () => {
+      const num = Math.floor(3000000000 + Math.random() * 999999999);
+      return `57${num}`;
+    },
+    states: ["bogota", "antioquia", "valle-del-cauca"],
+    cities: [
+      { city: "Bogotá", state: "bogota", zip: "110111" },
+      { city: "Medellín", state: "antioquia", zip: "050001" },
+      { city: "Cali", state: "valle-del-cauca", zip: "760001" },
+    ],
+    firstNamesFemale: ["Luciana", "Salome", "Isabella", "Mariana", "Gabriela", "Valentina"],
+    firstNamesMale: ["Emiliano", "Santiago", "Mateo", "Samuel", "Jeromino", "Alejandro"],
+    lastNames: ["Rodriguez", "Gomez", "Gonzalez", "Martinez", "Garcia", "Lopez", "Hernandez"],
+    ipRanges: ["181.128.", "186.28.", "190.24."],
+    emailDomains: ["gmail.com", "hotmail.com", "yahoo.com.co"],
+  },
 };
 
 const USER_AGENTS = [
-  // iPhone Safari
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1",
   "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
-  // Android Chrome
   "Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.113 Mobile Safari/537.36",
   "Mozilla/5.0 (Linux; Android 13; Pixel 7 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.118 Mobile Safari/537.36",
-  // Windows Chrome
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
-  // macOS Safari
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15",
 ];
 
@@ -290,7 +421,6 @@ export function generateCustomer(
 ): GeneratedCustomer {
   const data = COUNTRY_DATA[countryCode] || COUNTRY_DATA.BR;
 
-  // Decide gender
   let gender: "f" | "m" = "f";
   if (genderFilter === "female") {
     gender = "f";
@@ -304,24 +434,16 @@ export function generateCustomer(
   const firstName = firstList[Math.floor(Math.random() * firstList.length)];
   const lastName = data.lastNames[Math.floor(Math.random() * data.lastNames.length)];
 
-  // Email format
   const domain = data.emailDomains[Math.floor(Math.random() * data.emailDomains.length)];
   const randSuffix = Math.floor(10 + Math.random() * 899);
   const cleanFirst = normalizeName(firstName);
   const cleanLast = normalizeName(lastName);
   const email = `${cleanFirst}.${cleanLast}${randSuffix}@${domain}`;
 
-  // Phone
   const phone = data.phoneFormat();
-
-  // Location
   const loc = data.cities[Math.floor(Math.random() * data.cities.length)];
-
-  // IP
   const ipPrefix = data.ipRanges[Math.floor(Math.random() * data.ipRanges.length)];
   const ip = `${ipPrefix}${Math.floor(1 + Math.random() * 250)}.${Math.floor(1 + Math.random() * 250)}`;
-
-  // User Agent
   const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
 
   return {
@@ -386,12 +508,11 @@ export function buildEventPayload(
     event_name: eventName,
     event_time: now,
     event_id: eventId,
-    event_source_url: window.location.origin + "/checkout",
+    event_source_url: typeof window !== "undefined" ? window.location.origin + "/checkout" : "https://nebulamembers.com/checkout",
     action_source: "website",
     user_data: hashedUser,
   };
 
-  // Add custom data depending on event
   if (
     eventName === "Purchase" ||
     eventName === "InitiateCheckout" ||

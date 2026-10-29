@@ -34,16 +34,7 @@ import {
   hashCustomerData,
 } from "@/lib/pixel-feeder/generator";
 import { sendMetaEvent } from "@/lib/pixel-feeder/sender";
-
-const ALL_COUNTRIES: { code: SupportedCountry; label: string; flag: string; defaultCurrency: SupportedCurrency }[] = [
-  { code: "BR", label: "Brasil", flag: "🇧🇷", defaultCurrency: "BRL" },
-  { code: "US", label: "Estados Unidos", flag: "🇺🇸", defaultCurrency: "USD" },
-  { code: "PT", label: "Portugal", flag: "🇵🇹", defaultCurrency: "EUR" },
-  { code: "ES", label: "Espanha", flag: "🇪🇸", defaultCurrency: "EUR" },
-  { code: "GB", label: "Reino Unido", flag: "🇬🇧", defaultCurrency: "GBP" },
-  { code: "FR", label: "França", flag: "🇫🇷", defaultCurrency: "EUR" },
-  { code: "MX", label: "México", flag: "🇲🇽", defaultCurrency: "MXN" },
-];
+import { CountrySelectDropdown } from "./CountrySelectDropdown";
 
 const ALL_EVENTS: { name: PixelEventName; label: string }[] = [
   { name: "PageView", label: "PageView" },
@@ -121,20 +112,6 @@ export function PixelFeederView() {
       toast.success("Credenciais salvas.");
     } catch {
       toast.error("Erro ao salvar.");
-    }
-  };
-
-  const toggleCountry = (code: SupportedCountry) => {
-    if (selectedCountries.includes(code)) {
-      if (selectedCountries.length === 1) return;
-      setSelectedCountries(selectedCountries.filter((c) => c !== code));
-    } else {
-      const next = [...selectedCountries, code];
-      setSelectedCountries(next);
-      if (next.length === 1) {
-        const match = ALL_COUNTRIES.find((c) => c.code === code);
-        if (match) setCurrency(match.defaultCurrency);
-      }
     }
   };
 
@@ -434,27 +411,11 @@ export function PixelFeederView() {
 
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">País de destino</Label>
-              <div className="flex flex-wrap gap-1.5">
-                {ALL_COUNTRIES.map((c) => {
-                  const active = selectedCountries.includes(c.code);
-                  return (
-                    <button
-                      key={c.code}
-                      type="button"
-                      onClick={() => toggleCountry(c.code)}
-                      disabled={isRunning}
-                      className={`text-xs px-2.5 py-1 rounded-md border transition-colors flex items-center gap-1.5 ${
-                        active
-                          ? "bg-primary/10 border-primary/50 text-foreground font-medium"
-                          : "border-border bg-background/40 text-muted-foreground hover:text-foreground hover:bg-muted/30"
-                      }`}
-                    >
-                      <span>{c.flag}</span>
-                      <span>{c.code}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <CountrySelectDropdown
+                selectedCountries={selectedCountries}
+                onChange={setSelectedCountries}
+                disabled={isRunning}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 pt-1">
@@ -472,6 +433,11 @@ export function PixelFeederView() {
                   <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
                   <option value="MXN">MXN ($)</option>
+                  <option value="CAD">CAD (C$)</option>
+                  <option value="AUD">AUD (A$)</option>
+                  <option value="ARS">ARS ($)</option>
+                  <option value="CLP">CLP ($)</option>
+                  <option value="COP">COP ($)</option>
                 </select>
               </div>
 
