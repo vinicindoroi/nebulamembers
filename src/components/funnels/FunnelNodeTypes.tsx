@@ -649,14 +649,14 @@ function PageNode({ data, selected }: { data: FunnelNodeData; selected: boolean 
       style={{ width, height }}
     >
       {/* Browser top bar */}
-      <div className="h-6 bg-gradient-to-b from-[#26262c] to-[#22222a] flex items-center px-2 gap-1.5 border-b border-white/[0.04]">
+      <div className="funnel-page-chrome h-6 flex items-center px-2 gap-1.5">
         <div className="flex gap-1">
           <Circle className="w-2.5 h-2.5 fill-[#ff5f57] text-[#ff5f57]" />
           <Circle className="w-2.5 h-2.5 fill-[#ffbd2e] text-[#ffbd2e]" />
           <Circle className="w-2.5 h-2.5 fill-[#28ca41] text-[#28ca41]" />
         </div>
         <div className="flex-1 mx-2">
-          <div className="h-3 bg-[#0f0f12] rounded-sm border border-white/[0.04]" />
+          <div className="funnel-page-address h-3 rounded-sm" />
         </div>
       </div>
       
@@ -675,8 +675,8 @@ function PageNode({ data, selected }: { data: FunnelNodeData; selected: boolean 
             )}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#1a1a1f] to-[#252530] flex items-center justify-center">
-            <Icon className="w-12 h-12 text-muted-foreground/50" />
+          <div className="funnel-page-placeholder w-full h-full flex items-center justify-center">
+            <Icon className="funnel-page-glyph w-12 h-12" />
           </div>
         )}
       </div>

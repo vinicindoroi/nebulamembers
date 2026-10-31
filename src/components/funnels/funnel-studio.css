@@ -270,22 +270,51 @@
   box-shadow: 0 3px 10px oklch(0 0 0 / 0.14);
   border: 1px solid oklch(1 0 0 / 0.12);
 }
-.funnel-studio .funnel-page-node {
-  border: 1px solid var(--border);
-  box-shadow: 0 6px 20px oklch(0 0 0 / 0.12);
+.funnel-studio .react-flow__node .funnel-page-node {
+  border: 1px solid color-mix(in oklab, var(--foreground) 30%, var(--card)) !important;
+  background: color-mix(in oklab, var(--foreground) 12%, var(--card));
+  box-shadow:
+    0 4px 16px oklch(0 0 0 / 0.22),
+    inset 0 1px 0 color-mix(in oklab, var(--foreground) 8%, transparent);
 }
-.funnel-studio .funnel-page-node > div:first-child {
-  background: var(--card);
+.funnel-studio .funnel-page-node .funnel-page-chrome {
+  background: color-mix(in oklab, var(--foreground) 15%, var(--card));
+  border-bottom: 1px solid color-mix(in oklab, var(--foreground) 18%, var(--card));
 }
-.funnel-studio .funnel-page-node > div:first-child svg {
+.funnel-studio .funnel-page-chrome svg {
   width: 6px;
   height: 6px;
-  fill: var(--muted-foreground);
-  color: var(--muted-foreground);
-  opacity: 0.4;
+  fill: var(--foreground);
+  color: var(--foreground);
+  opacity: 0.55;
+}
+.funnel-studio .funnel-page-address {
+  background: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+.funnel-studio .funnel-page-placeholder {
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklab, var(--primary) 11%, var(--card)),
+    color-mix(in oklab, var(--foreground) 10%, var(--card))
+  );
+}
+.funnel-studio .funnel-page-glyph {
+  color: var(--primary);
+  opacity: 1;
+  stroke-width: 1.8;
+  filter: drop-shadow(0 2px 8px color-mix(in oklab, var(--primary) 12%, transparent));
+}
+.funnel-studio .funnel-node-label {
+  color: var(--foreground);
+  font-weight: 600;
+  text-shadow: 0 1px 3px var(--background);
+}
+.funnel-studio .react-flow__node:hover .funnel-page-node {
+  border-color: color-mix(in oklab, var(--primary) 65%, var(--foreground)) !important;
 }
 .funnel-studio .react-flow__node.selected .funnel-page-node {
-  border-color: var(--primary);
+  border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 12%, transparent);
 }
 .funnel-studio .react-flow__node.selected .funnel-node-wrapper {
