@@ -271,7 +271,7 @@ export function FunnelsSidebar({
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:bg-white/10 transition-opacity shrink-0 mr-2"
+              aria-label={`Ações de ${funnel.name}`} className="h-7 w-7 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-white/10 transition-opacity shrink-0 mr-2"
               onClick={(e) => e.stopPropagation()}
             >
               <MoreHorizontal className="h-3.5 w-3.5" />
@@ -348,10 +348,10 @@ export function FunnelsSidebar({
 
   if (collapsed) {
     return (
-      <div className="funnel-panel w-14 border-r border-border flex flex-col items-center py-4 gap-2 shrink-0 h-full">
+      <div className="funnel-panel funnel-list-rail w-12 border-r border-border flex flex-col items-center py-4 gap-2 shrink-0 h-full">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="hover:bg-muted/50">
+            <Button variant="ghost" size="icon" onClick={onToggleCollapse} aria-label="Expandir projetos" className="hover:bg-muted/50">
               <ChevronRight className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -393,7 +393,7 @@ export function FunnelsSidebar({
 
   return (
     <>
-      <div className="funnel-panel funnel-list-panel w-full sm:w-64 shrink-0 border-r border-border flex flex-col h-full z-10">
+      <div className="funnel-panel funnel-list-panel w-full sm:w-56 shrink-0 border-r border-border flex flex-col h-full z-10">
         {/* Header */}
         <div className="px-4 py-4 border-b border-border/70 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -401,7 +401,7 @@ export function FunnelsSidebar({
               <GitFork className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold text-sm font-display">Funis</h2>
+              <h2 className="font-semibold text-sm font-display">Meus projetos</h2>
               <p className="text-[10px] text-muted-foreground">
                 {funnels.length} {funnels.length === 1 ? 'funil' : 'funis'}
               </p>
@@ -473,7 +473,7 @@ export function FunnelsSidebar({
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
             <Input
-              placeholder="Buscar funis ou pastas..."
+              aria-label="Buscar funis" placeholder="Buscar funis..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="funnel-search pl-8 h-9 bg-card/60 border-border/70 focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 text-sm"

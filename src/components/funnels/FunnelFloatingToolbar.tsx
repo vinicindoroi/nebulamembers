@@ -1,19 +1,37 @@
-import { useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Download, Radio, Hand, MousePointer2, Check, Loader2, Group, GraduationCap, Upload, Ungroup, Code, Pencil, StickyNote, Type, Image as ImageIcon } from 'lucide-react';
+import { useRef, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Download,
+  Radio,
+  Hand,
+  MousePointer2,
+  Loader2,
+  Group,
+  GraduationCap,
+  Upload,
+  Ungroup,
+  Code,
+  Pencil,
+  StickyNote,
+  Type,
+  Image as ImageIcon,
+  MoreHorizontal,
+  Presentation,
+  GitBranch,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
-export type InteractionMode = 'select' | 'pan' | 'draw' | 'sticky-note' | 'free-text';
-
+export type InteractionMode = "select" | "pan" | "draw" | "sticky-note" | "free-text";
 interface FunnelFloatingToolbarProps {
-  onExport: (format: 'png' | 'svg') => void;
+  onExport: (format: "png" | "svg") => void;
   onExportJson?: () => void;
   onImportJson?: (file: File) => void;
   isSaving?: boolean;
@@ -32,10 +50,11 @@ interface FunnelFloatingToolbarProps {
   onAddStickyNote?: () => void;
   onAddFreeText?: () => void;
   onAddImage?: (base64: string, width: number, height: number) => void;
-  liveMenu?: React.ReactNode;
+  liveMenu?: ReactNode;
+  funnelName?: string;
+  nodeCount?: number;
+  onPresent?: () => void;
 }
-
-
 export function FunnelFloatingToolbar({
   onExport,
   onExportJson,
@@ -48,321 +67,249 @@ export function FunnelFloatingToolbar({
   selectedNodesCount = 0,
   onGroupNodes,
   onUngroupNodes,
-  hasGroupedSelection = false,
-  educationalMode = false,
+  hasGroupedSelection,
+  educationalMode,
   onEducationalModeChange,
   onOpenTracking,
-  hasTrackingToken = false,
+  hasTrackingToken,
   onAddStickyNote,
   onAddFreeText,
   onAddImage,
   liveMenu,
+  funnelName,
+  nodeCount,
+  onPresent,
 }: FunnelFloatingToolbarProps) {
-
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onImportJson) {
-      onImportJson(file);
-      e.target.value = '';
-    }
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const imageInput = useRef<HTMLInputElement>(null);
+  const importInput = useRef<HTMLInputElement>(null);
+  function handleImage(file?: File) {
     if (!file || !onAddImage) return;
-
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
+    reader.onload = () => {
+      const src = reader.result as string;
       const img = new Image();
-      img.onload = () => {
-        onAddImage(base64, img.width, img.height);
-      };
-      img.src = base64;
+      img.onload = () => onAddImage(src, img.width, img.height);
+      img.src = src;
     };
     reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
+  }
+  const tools = [
+    { mode: "select" as const, icon: MousePointer2, label: "Selecionar (V)" },
+    { mode: "pan" as const, icon: Hand, label: "Mover (H)" },
+    { mode: "draw" as const, icon: Pencil, label: "Desenho livre (D)" },
+  ];
   return (
-    <div className="funnel-toolbar absolute right-3 top-2 z-20 flex max-w-[calc(100%-14rem)] items-center gap-1 overflow-x-auto border border-border bg-card px-1.5 py-1">
-      {/* Interaction Mode Toggle */}
-      <div className="flex shrink-0 items-center bg-background/70 rounded-full p-0.5 border border-border/70">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onInteractionModeChange('select')}
-          className={cn(
-            "h-7 w-7 p-0 rounded-full transition-all",
-            interactionMode === 'select'
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-              : "hover:bg-muted/50 text-muted-foreground"
-          )}
-          title="Selecionar (V)"
-        >
-          <MousePointer2 className="w-3.5 h-3.5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onInteractionModeChange('pan')}
-          className={cn(
-            "h-7 w-7 p-0 rounded-full transition-all",
-            interactionMode === 'pan'
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-              : "hover:bg-muted/50 text-muted-foreground"
-          )}
-          title="Mover (H)"
-        >
-          <Hand className="w-3.5 h-3.5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onInteractionModeChange('draw')}
-          className={cn(
-            "h-7 w-7 p-0 rounded-full transition-all",
-            interactionMode === 'draw'
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-              : "hover:bg-muted/50 text-muted-foreground"
-          )}
-          title="Desenho Livre (D)"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-        </Button>
-      </div>
-
-      {/* Annotations Tools next to Freehand Drawing */}
-      {(onAddStickyNote || onAddFreeText || onAddImage) && (
-        <>
-          <div className="w-px h-5 bg-white/10" />
-          <div className="flex shrink-0 items-center bg-background/70 rounded-full p-0.5 border border-border/70">
-            {onAddImage && (
-              <>
-                <input 
-                  type="file" 
-                  ref={imageInputRef} 
-                  className="hidden" 
-                  accept="image/*" 
-                  onChange={handleImageUpload} 
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => imageInputRef.current?.click()}
-                  className="h-7 w-7 p-0 rounded-full transition-all hover:bg-muted/50 text-muted-foreground"
-                  title="Adicionar Imagem"
-                >
-                  <ImageIcon className="w-3.5 h-3.5" />
-                </Button>
-              </>
-            )}
-            {onAddStickyNote && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onAddStickyNote}
-                className={cn(
-                  "h-7 w-7 p-0 rounded-full transition-all",
-                  interactionMode === 'sticky-note'
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-                    : "hover:bg-muted/50 text-muted-foreground"
-                )}
-                title="Nota Livre (N)"
-              >
-                <StickyNote className="w-3.5 h-3.5" />
-              </Button>
-            )}
-            {onAddFreeText && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onAddFreeText}
-                className={cn(
-                  "h-7 w-7 p-0 rounded-full transition-all",
-                  interactionMode === 'free-text'
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/30"
-                    : "hover:bg-muted/50 text-muted-foreground"
-                )}
-                title="Texto Livre (T)"
-              >
-                <Type className="w-3.5 h-3.5" />
-              </Button>
-            )}
+    <>
+      <header className="funnel-editor-header">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="funnel-editor-mark">
+            <GitBranch className="h-4 w-4" />
           </div>
-        </>
-      )}
-
-      {/* Group Button - only show when multiple nodes selected */}
-      {selectedNodesCount >= 2 && onGroupNodes && (
-        <>
-          <div className="w-px h-5 bg-white/10" />
+          <div className="min-w-0">
+            <p className="funnel-editor-eyebrow">ESTÚDIO DE FUNIS</p>
+            <h1 className="truncate text-sm font-semibold" title={funnelName}>
+              {funnelName || "Editor visual"}
+            </h1>
+          </div>
+          <span className="funnel-block-count">{nodeCount ?? 0} blocos</span>
+        </div>
+        <div className="funnel-header-actions">
+          <span className="funnel-save-hint" title="As alterações são salvas automaticamente">
+            {isSaving ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />
+            )}
+            {isSaving ? "Salvando..." : "Autosave"}
+          </span>
+          {onOpenTracking && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onOpenTracking}
+              className="funnel-header-button"
+              aria-label="Configurar tracking"
+            >
+              <Code className="h-3.5 w-3.5" />
+              <span className="funnel-header-label">Tracking</span>
+              {hasTrackingToken && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+            </Button>
+          )}
+          {liveMenu ?? (
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-pressed={liveMode}
+              onClick={() => onLiveModeChange(!liveMode)}
+            >
+              <Radio className="h-3.5 w-3.5" />
+              Live
+            </Button>
+          )}
+          <div className="funnel-header-divider" />
+          {onPresent && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="funnel-header-button"
+              onClick={onPresent}
+              aria-label="Apresentar funil"
+            >
+              <Presentation className="h-3.5 w-3.5" />
+              <span className="funnel-header-label">Apresentar</span>
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                aria-label="Mais ações do funil"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onSelect={() => onExport("png")}>
+                <Download className="h-4 w-4" />
+                Exportar imagem PNG
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onExport("svg")}>
+                <Download className="h-4 w-4" />
+                Exportar imagem SVG
+              </DropdownMenuItem>
+              {onExportJson && (
+                <DropdownMenuItem onSelect={onExportJson}>
+                  <Download className="h-4 w-4" />
+                  Exportar backup JSON
+                </DropdownMenuItem>
+              )}
+              {onImportJson && (
+                <DropdownMenuItem onSelect={() => importInput.current?.click()}>
+                  <Upload className="h-4 w-4" />
+                  Importar JSON
+                </DropdownMenuItem>
+              )}
+              {onEducationalModeChange && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={educationalMode}
+                    onCheckedChange={onEducationalModeChange}
+                  >
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                    Modo educacional
+                  </DropdownMenuCheckboxItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+      <div className="funnel-tools-dock" role="toolbar" aria-label="Ferramentas do canvas">
+        {tools.map((tool) => (
+          <Button
+            key={tool.mode}
+            variant="ghost"
+            size="icon"
+            title={tool.label}
+            aria-label={tool.label}
+            aria-pressed={interactionMode === tool.mode}
+            onClick={() => onInteractionModeChange(tool.mode)}
+            className={cn("funnel-tool-button", interactionMode === tool.mode && "is-active")}
+          >
+            <tool.icon className="h-4 w-4" />
+          </Button>
+        ))}
+        <div className="funnel-dock-divider" />
+        {onAddStickyNote && (
           <Button
             variant="ghost"
-            size="sm"
-            onClick={onGroupNodes}
-            className="h-8 px-3 text-xs hover:bg-muted/50 text-primary rounded-full"
-            title="Agrupar selecionados"
+            size="icon"
+            className={cn("funnel-tool-button", interactionMode === "sticky-note" && "is-active")}
+            title="Nota livre (N)"
+            aria-label="Nota livre (N)"
+            aria-pressed={interactionMode === "sticky-note"}
+            onClick={onAddStickyNote}
           >
-            <Group className="w-3.5 h-3.5 mr-1.5" />
-            Agrupar ({selectedNodesCount})
+            <StickyNote className="h-4 w-4" />
           </Button>
-        </>
-      )}
-
-      {/* Ungroup Button - only show when grouped nodes are selected */}
-      {hasGroupedSelection && onUngroupNodes && (
-        <>
-          <div className="w-px h-5 bg-white/10" />
+        )}
+        {onAddFreeText && (
           <Button
             variant="ghost"
-            size="sm"
-            onClick={onUngroupNodes}
-            className="h-8 px-3 text-xs hover:bg-muted/50 text-orange-400 rounded-full"
-            title="Desagrupar selecionados"
+            size="icon"
+            className={cn("funnel-tool-button", interactionMode === "free-text" && "is-active")}
+            title="Texto livre (T)"
+            aria-label="Texto livre (T)"
+            aria-pressed={interactionMode === "free-text"}
+            onClick={onAddFreeText}
           >
-            <Ungroup className="w-3.5 h-3.5 mr-1.5" />
-            Desagrupar
+            <Type className="h-4 w-4" />
           </Button>
-        </>
-      )}
-
-      <div className="w-px h-5 bg-white/10" />
-
-      {/* Auto-save status indicator */}
-      <div className={cn(
-        "flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors",
-        isSaving ? "bg-card" : "bg-emerald-500/10 border border-emerald-500/20"
-      )}>
-        {isSaving ? (
+        )}
+        {onAddImage && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="funnel-tool-button"
+            title="Adicionar imagem"
+            aria-label="Adicionar imagem"
+            onClick={() => imageInput.current?.click()}
+          >
+            <ImageIcon className="h-4 w-4" />
+          </Button>
+        )}
+        {selectedNodesCount >= 2 && onGroupNodes && (
           <>
-            <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
-            <span className="funnel-toolbar-label text-muted-foreground">Salvando...</span>
-          </>
-        ) : (
-          <>
-            <Check className="w-3 h-3 text-emerald-400" />
-            <span className="funnel-toolbar-label text-emerald-400 font-medium">Salvo</span>
+            <div className="funnel-dock-divider" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="funnel-tool-button"
+              title={`Agrupar ${selectedNodesCount} blocos`}
+              aria-label="Agrupar blocos selecionados"
+              onClick={onGroupNodes}
+            >
+              <Group className="h-4 w-4" />
+            </Button>
           </>
         )}
-      </div>
-
-      <div className="w-px h-5 bg-white/10" />
-
-      {/* Export/Import Dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50 rounded-full text-foreground/80 hover:text-foreground">
-            <Download className="w-3.5 h-3.5 mr-1.5" />
-            <span className="funnel-toolbar-label">Exportar</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" className="bg-popover border-border shadow-2xl">
-          <DropdownMenuItem onClick={() => onExport('png')} className="text-xs cursor-pointer">
-            Exportar como PNG
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onExport('svg')} className="text-xs cursor-pointer">
-            Exportar como SVG
-          </DropdownMenuItem>
-          {onExportJson && (
-            <DropdownMenuItem onClick={onExportJson} className="text-xs cursor-pointer">
-              Exportar como JSON (backup)
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      {/* Import Button */}
-      {onImportJson && (
-        <label className="cursor-pointer">
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <Button variant="ghost" size="sm" className="h-8 px-3 text-xs hover:bg-muted/50 rounded-full text-foreground/80 hover:text-foreground" asChild>
-            <span>
-              <Upload className="w-3.5 h-3.5 mr-1.5" />
-              <span className="funnel-toolbar-label">Importar</span>
-            </span>
-          </Button>
-        </label>
-      )}
-
-      <div className="w-px h-5 bg-white/10" />
-
-      {/* Tracking Script Button */}
-      {onOpenTracking && (
-        <>
+        {hasGroupedSelection && onUngroupNodes && (
           <Button
             variant="ghost"
-            size="sm"
-            onClick={onOpenTracking}
-            className={cn(
-              "h-8 px-3 text-xs rounded-full transition-all",
-              hasTrackingToken
-                ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/15"
-                : "hover:bg-muted/50 text-foreground/80 hover:text-foreground"
-            )}
-            title="Gerar script de tracking"
+            size="icon"
+            className="funnel-tool-button"
+            title="Desagrupar"
+            aria-label="Desagrupar"
+            onClick={onUngroupNodes}
           >
-            <Code className="w-3.5 h-3.5 mr-1.5" />
-            <span className="funnel-toolbar-label">Tracking</span>
-            {hasTrackingToken && (
-              <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            )}
+            <Ungroup className="h-4 w-4" />
           </Button>
-          <div className="w-px h-5 bg-white/10" />
-        </>
-      )}
-
-      {/* Educational Mode Toggle */}
-      {onEducationalModeChange && (
-        <>
-          <button
-            onClick={() => onEducationalModeChange(!educationalMode)}
-            className={cn(
-              'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
-              educationalMode
-                ? 'bg-primary/15 border border-primary/30 text-primary'
-                : 'hover:bg-muted/50 text-muted-foreground border border-transparent'
-            )}
-          >
-            <GraduationCap className={cn('w-3.5 h-3.5', educationalMode && 'animate-pulse')} />
-            <span className="funnel-toolbar-label font-medium">Educacional</span>
-            <Switch
-              checked={educationalMode}
-              onCheckedChange={onEducationalModeChange}
-              className="scale-75 -mr-1 pointer-events-none"
-            />
-          </button>
-          <div className="w-px h-5 bg-white/10" />
-        </>
-      )}
-
-      {/* Live Mode Menu */}
-      {liveMenu ?? (
-        <button
-          onClick={() => onLiveModeChange(!liveMode)}
-          className={cn(
-            'flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-full text-xs transition-all',
-            liveMode
-              ? 'bg-primary/15 border border-primary/30 text-primary'
-              : 'hover:bg-muted/50 text-muted-foreground border border-transparent'
-          )}
-        >
-          <Radio className={cn('w-3 h-3', liveMode && 'animate-pulse')} />
-          <span className="funnel-toolbar-label font-medium">Live</span>
-          <Switch
-            checked={liveMode}
-            onCheckedChange={onLiveModeChange}
-            className="scale-75 -mr-1 pointer-events-none"
-          />
-        </button>
-      )}
-
-    </div>
+        )}
+      </div>
+      <input
+        type="file"
+        ref={imageInput}
+        hidden
+        accept="image/*"
+        onChange={(e) => {
+          handleImage(e.target.files?.[0]);
+          e.target.value = "";
+        }}
+      />
+      <input
+        type="file"
+        ref={importInput}
+        hidden
+        accept=".json"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onImportJson?.(file);
+          e.target.value = "";
+        }}
+      />
+    </>
   );
 }

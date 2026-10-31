@@ -32,7 +32,7 @@ import { FunnelLiveMenu } from './FunnelLiveMenu';
 
 import { FunnelAnalyticsPanel } from './FunnelAnalyticsPanel';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Eraser, Trash2, Paintbrush, Circle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Eraser, Trash2, Paintbrush, Circle } from 'lucide-react';
 import { Funnel } from '@/hooks/useFunnels';
 import { useFunnelAnalytics } from '@/hooks/useFunnelAnalytics';
 
@@ -41,18 +41,33 @@ interface FunnelCanvasProps {
   onSave: (funnelId: string, nodes: Node[], edges: Edge[], viewport: Viewport) => void;
   isSaving?: boolean;
   onRegisterFlush?: (flush: () => void) => void;
+  presentationMode?: boolean;
+  onPresentationModeChange?: (enabled: boolean) => void;
 }
 
 // Magnetic snapping threshold in pixels
 const SNAP_THRESHOLD = 10;
 
-export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: FunnelCanvasProps) {
+export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presentationMode = false, onPresentationModeChange }: FunnelCanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance<Node, Edge> | null>(null);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const presentationViewport = useRef<Viewport | null>(null);
+  useEffect(() => {
+    if (!reactFlowInstance) return;
+    if (presentationMode) {
+      presentationViewport.current = reactFlowInstance.getViewport();
+      const frame = requestAnimationFrame(() => reactFlowInstance.fitView({ padding: 0.25, duration: 200 }));
+      return () => cancelAnimationFrame(frame);
+    }
+    if (presentationViewport.current) {
+      reactFlowInstance.setViewport(presentationViewport.current, { duration: 150 });
+      presentationViewport.current = null;
+    }
+  }, [presentationMode, reactFlowInstance]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1100);
   const [liveMode, setLiveMode] = useState(false);
   const [educationalMode, setEducationalMode] = useState(false);
   const [interactionMode, setInteractionMode] = useState<InteractionMode>('select');
@@ -954,6 +969,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
+      if (presentationMode) return;
       // Don't intercept if user is typing in an input/textarea
       const activeElement = document.activeElement as HTMLElement;
       if (
@@ -1002,7 +1018,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
-  }, [reactFlowInstance, setNodes]);
+  }, [presentationMode, reactFlowInstance, setNodes]);
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -1320,6 +1336,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (presentationMode) return;
       // Check if user is typing in an input field
       const target = event.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
@@ -1385,7 +1402,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleCopy, handlePaste, handleUndo, handleRedo, setInteractionMode]);
+  }, [presentationMode, handleCopy, handlePaste, handleUndo, handleRedo, setInteractionMode]);
 
   // Count selected nodes
   const selectedNodesCount = nodes.filter((node) => node.selected).length;
@@ -1530,7 +1547,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     
     setNodes((nds) => [...nds, newNode as any]);
     toast.success('Imagem adicionada ao canvas!');
-  }, [reactFlowInstance, setNodes]);
+  }, [presentationMode, reactFlowInstance, setNodes]);
 
   const handleExport = async (format: 'png' | 'svg') => {
     if (!reactFlowWrapper.current) return;
@@ -1556,24 +1573,21 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
     }
   };
 
-  const isRestrictedMode = interactionMode === 'draw' || interactionMode === 'sticky-note' || interactionMode === 'free-text';
+  const isRestrictedMode = presentationMode || interactionMode === 'draw' || interactionMode === 'sticky-note' || interactionMode === 'free-text';
 
   return (
     <div className="flex h-full min-w-0 bg-background">
-      <FunnelElementsSidebar collapsed={sidebarCollapsed} />
+      <FunnelElementsSidebar collapsed={sidebarCollapsed || presentationMode} onClose={() => setSidebarCollapsed(true)} />
 
-      <div className="funnel-canvas flex-1 relative min-w-0 overflow-hidden">
-        <div className="funnel-canvas-header absolute inset-x-0 top-0 z-10 flex h-14 items-center border-b border-border px-4">
-          <div className="min-w-0 pr-3">
-            <p className="truncate text-sm font-semibold text-foreground">{funnel.name}</p>
-            <p className="text-[10px] text-muted-foreground">Editor visual</p>
-          </div>
-        </div>
+      <div className={cn("funnel-canvas flex-1 relative min-w-0 overflow-hidden", selectedNode && !presentationMode && "has-inspector")}>
+        {presentationMode && <div className="funnel-presentation-bar"><div><span className="funnel-editor-eyebrow">APRESENTAÇÃO</span><p className="text-sm font-medium">{funnel.name}</p></div><Button variant="outline" size="sm" onClick={() => onPresentationModeChange?.(false)} aria-label="Sair da apresentação"><X className="h-4 w-4" />Sair <kbd>Esc</kbd></Button></div>}
 
         {/* Toggle sidebar button */}
-        <Button
+        {!presentationMode && <Button
           variant="ghost"
           size="icon"
+          aria-label={sidebarCollapsed ? "Abrir biblioteca de blocos" : "Recolher biblioteca de blocos"}
+          title="Biblioteca de blocos"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="funnel-panel-toggle absolute bottom-4 left-4 z-10 border border-border bg-card hover:bg-accent"
         >
@@ -1582,10 +1596,13 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
           ) : (
             <ChevronLeft className="w-4 h-4" />
           )}
-        </Button>
+        </Button>}
 
         {/* Floating Toolbar */}
-        <FunnelFloatingToolbar
+        {!presentationMode && <FunnelFloatingToolbar
+          funnelName={funnel.name}
+          nodeCount={nodes.length}
+          onPresent={() => { setSelectedNode(null); setInteractionMode("pan"); onPresentationModeChange?.(true); }}
           onExport={handleExport}
           onExportJson={handleExportJson}
           onImportJson={handleImportJson}
@@ -1620,10 +1637,10 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
           onAddStickyNote={() => setInteractionMode(interactionMode === 'sticky-note' ? 'select' : 'sticky-note')}
           onAddFreeText={() => setInteractionMode(interactionMode === 'free-text' ? 'select' : 'free-text')}
           onAddImage={handleAddImage}
-        />
+        />}
 
         {/* Draw Mode sub-toolbar with Miro-style colors and tools */}
-        {interactionMode === 'draw' && (
+        {!presentationMode && interactionMode === 'draw' && (
           <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 px-4 py-2 rounded-full bg-[#16161c]/95 border border-border shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-in fade-in slide-in-from-top-3 duration-200">
             {/* Tool Selector: Brush vs Eraser */}
             <div className="flex items-center bg-card rounded-full p-0.5 border border-border shrink-0">
@@ -1746,12 +1763,13 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
         <FunnelEducationalContext.Provider value={{ educationalMode }}>
           <div 
             ref={reactFlowWrapper} 
-            className="h-full"
+            className="funnel-canvas-viewport"
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
           >
             <ReactFlow
+              colorMode="dark"
               nodes={nodes.map((n) => multiConnectSources.includes(n.id) ? { ...n, className: `${n.className || ''} multi-connect-source`.trim() } : n)}
               edges={edges}
               onNodesChange={onNodesChange}
@@ -1767,10 +1785,10 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               onMove={onViewportMove}
               onMoveEnd={onMoveEnd}
               onInit={(instance) => setReactFlowInstance(instance as ReactFlowInstance<Node, Edge>)}
-              onDrop={onDrop}
+              onDrop={presentationMode ? undefined : onDrop}
               onDragOver={onDragOver}
-              onNodeDoubleClick={onNodeDoubleClick}
-              onNodeClick={onNodeClick}
+              onNodeDoubleClick={presentationMode ? undefined : onNodeDoubleClick}
+              onNodeClick={presentationMode ? undefined : onNodeClick}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               defaultEdgeOptions={{ type: 'funnel' }}
@@ -1785,10 +1803,10 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               edgesReconnectable={!isRestrictedMode}
               edgesFocusable={!isRestrictedMode}
               elementsSelectable={!isRestrictedMode}
-              deleteKeyCode={['Delete', 'Backspace']}
+              deleteKeyCode={presentationMode ? null : ['Delete', 'Backspace']}
               snapToGrid
               snapGrid={[4, 4]}
-              className="funnel-flow-canvas bg-background pt-14"
+              className={cn("funnel-flow-canvas bg-background", interactionMode === "pan" && "is-panning")}
               proOptions={{ hideAttribution: true }}
             >
               <Controls 
@@ -1798,7 +1816,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
               <Background
                 variant={BackgroundVariant.Dots}
                 gap={28}
-                size={1.25}
+                size={1}
                 color="var(--funnel-grid-dot)"
               />
             </ReactFlow>
@@ -1856,7 +1874,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
         </FunnelEducationalContext.Provider>
 
         {/* Analytics Panel - shown when liveMode is active */}
-        {liveMode && (
+        {!presentationMode && liveMode && (
           <FunnelAnalyticsPanel
             totalVisitors={getTotalVisitors()}
             totalPageviews={getTotalPageviews()}
@@ -1869,7 +1887,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Funn
 
         {/* Node Config Sheet */}
         <FunnelNodeConfigSheet
-          node={selectedNode}
+          node={presentationMode ? null : selectedNode}
           onClose={() => setSelectedNode(null)}
           funnelId={funnel.id}
           liveMode={liveMode}

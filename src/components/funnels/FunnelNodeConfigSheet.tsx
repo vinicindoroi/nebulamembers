@@ -1,12 +1,5 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { Node, useReactFlow } from '@xyflow/react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -456,16 +449,21 @@ export function FunnelNodeConfigSheet({ node, onClose, funnelId, liveMode, analy
     );
   };
 
-  return (
-    <Sheet open={!!node} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-96 bg-[#0f0f12] border-[#2a2a30] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="text-foreground">Configurar Elemento</SheetTitle>
-          <SheetDescription className="text-muted-foreground">
-            As alterações são salvas automaticamente
-          </SheetDescription>
-        </SheetHeader>
+  useEffect(() => {
+    if (!node) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [node?.id, onClose]);
 
+  if (!node) return null;
+  return (
+    <aside className="funnel-inspector" aria-label="Propriedades do bloco">
+      <div className="funnel-inspector-header">
+        <div><p className="funnel-editor-eyebrow">PROPRIEDADES</p><h2 className="truncate text-sm font-semibold">{label || 'Configurar bloco'}</h2><p className="mt-1 text-xs text-muted-foreground">Alterações salvas automaticamente</p></div>
+        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={onClose} aria-label="Fechar propriedades"><X className="h-4 w-4" /></Button>
+      </div>
+      <div className="funnel-inspector-body">
         <div className="mt-6 space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
@@ -1660,7 +1658,7 @@ export function FunnelNodeConfigSheet({ node, onClose, funnelId, liveMode, analy
             </Button>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </aside>
   );
 }
