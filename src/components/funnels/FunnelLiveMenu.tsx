@@ -107,6 +107,8 @@ export function FunnelLiveMenu({
     <Popover>
       <PopoverTrigger asChild>
         <button
+          aria-label="Dados ao vivo do funil"
+          title="Dados ao vivo"
           className={cn(
             'flex items-center gap-2 pl-2.5 pr-2.5 py-1 rounded-full text-xs transition-all',
             liveMode

@@ -1,3 +1,4 @@
+import "@/components/funnels/funnel-studio.css";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Node, Edge, Viewport, ReactFlowProvider } from '@xyflow/react';
@@ -10,9 +11,7 @@ import { MindMapCanvas } from '@/components/mindmap/MindMapCanvas';
 import { CanvasWhiteboard } from '@/components/canvas/CanvasWhiteboard';
 import { useFunnels, Funnel } from '@/hooks/useFunnels';
 import { useFunnelFolders, FunnelFolder } from '@/hooks/useFunnelFolders';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useOrganizationContext } from '@/contexts/OrganizationContext';
-import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
 
@@ -31,9 +30,15 @@ export const Route = createFileRoute("/_app/funnels")({
 function FunnelsPage() {
   const [selectedFunnel, setSelectedFunnel] = useState<Funnel | null>(null);
   const [isNewFunnelDialogOpen, setIsNewFunnelDialogOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(window.innerWidth < 768);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1100);
 
-  const isMobile = useIsMobile();
+  const [presentationMode, setPresentationMode] = useState(false);
+  useEffect(() => {
+    if (!presentationMode) return;
+    const exit = (event: KeyboardEvent) => { if (event.key === 'Escape') setPresentationMode(false); };
+    window.addEventListener('keydown', exit);
+    return () => window.removeEventListener('keydown', exit);
+  }, [presentationMode]);
   const queryClient = useQueryClient();
   const { organization } = useOrganizationContext();
   const { funnels, isLoading: isLoadingFunnels, createFunnel, importFunnel, updateFunnel, deleteFunnel, duplicateFunnel } = useFunnels();
@@ -112,9 +117,9 @@ function FunnelsPage() {
   }, [queryClient, organization?.id]);
 
   return (
-    <div className={cn("funnel-studio flex flex-col bg-background overflow-hidden", isMobile ? "h-[calc(100dvh-4rem)]" : "h-[100dvh]")}>
+    <div data-presentation={presentationMode || undefined} className="funnel-studio flex h-[100dvh] flex-col bg-background overflow-hidden">
       <main className="flex-1 flex overflow-hidden h-full">
-        <FunnelsSidebar 
+        {!presentationMode && <FunnelsSidebar
           funnels={funnels} 
           folders={folders}
           selectedFunnel={selectedFunnel} 
@@ -131,7 +136,7 @@ function FunnelsPage() {
           isLoading={isLoading} 
           collapsed={sidebarCollapsed} 
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
-        />
+        />}
         <div className="flex-1 h-full overflow-hidden">
           {selectedFunnel ? (
             selectedFunnel.funnel_type === 'mind' ? (
@@ -144,7 +149,7 @@ function FunnelsPage() {
               </ReactFlowProvider>
             ) : (
               <ReactFlowProvider key={`funnel-${selectedFunnel.id}`}>
-                <FunnelCanvas funnel={selectedFunnel} onSave={handleSaveFunnel} isSaving={false} onRegisterFlush={(fn) => { flushCanvasRef.current = fn; }} />
+                <FunnelCanvas presentationMode={presentationMode} onPresentationModeChange={setPresentationMode} funnel={selectedFunnel} onSave={handleSaveFunnel} isSaving={false} onRegisterFlush={(fn) => { flushCanvasRef.current = fn; }} />
               </ReactFlowProvider>
             )
           ) : (

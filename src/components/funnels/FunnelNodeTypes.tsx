@@ -755,7 +755,7 @@ function IconNode({ data, selected }: { data: FunnelNodeData; selected: boolean 
     <div className="relative">
       <div
         className={cn(
-          'w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 overflow-hidden',
+          'funnel-icon-face w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 overflow-hidden',
           !hasCustomIcon && !hasAdMedia && !isAiTool && colors.bg,
           colors.shadow,
           'hover:scale-[1.04]',
@@ -1278,7 +1278,7 @@ function FunnelNode({ data, selected, id }: NodeProps) {
         
         {/* Label below (not for sticky notes or free text) */}
         {!isStickyNote && !isFreeText && (
-          <span className="text-xs font-medium text-center text-muted-foreground max-w-[120px] truncate">
+          <span className="funnel-node-label text-xs font-medium text-center text-foreground/85 max-w-[160px] truncate" title={nodeData.label}>
             {nodeData.label}
           </span>
         )}

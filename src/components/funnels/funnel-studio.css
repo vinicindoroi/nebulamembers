@@ -1,0 +1,474 @@
+/* The editor inherits Nebula's colors and typography; rules stay in its scope. */
+.funnel-studio {
+  --funnel-grid-dot: color-mix(in oklab, var(--foreground) 11%, transparent);
+  --funnel-surface: color-mix(in oklab, var(--card) 94%, var(--background));
+  --funnel-panel-border: color-mix(in oklab, var(--border) 75%, transparent);
+  --funnel-header-height: 68px;
+  --funnel-inspector-width: 336px;
+}
+.funnel-studio .funnel-panel {
+  background: var(--funnel-surface);
+  border-color: var(--funnel-panel-border);
+}
+.funnel-studio .funnel-list-panel {
+  width: 220px;
+  min-width: 220px;
+}
+.funnel-studio .funnel-list-panel > div:first-child {
+  padding: 20px 14px;
+  border-bottom: 0;
+}
+.funnel-studio .funnel-list-panel > div:first-child > div:first-child > div:first-child {
+  display: none;
+}
+.funnel-studio .funnel-list-panel > div:first-child > div:first-child {
+  gap: 0;
+}
+.funnel-studio .funnel-list-panel > div:first-child h2 {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.funnel-studio .funnel-list-panel > div:first-child p {
+  margin-top: 4px;
+}
+.funnel-studio .funnel-list-panel > div:first-child button {
+  width: 25px;
+  height: 28px;
+}
+.funnel-studio .funnel-list-rail {
+  width: 48px;
+}
+.funnel-studio .funnel-list-item {
+  margin-bottom: 5px;
+  padding: 11px 10px;
+  border-radius: 10px;
+}
+.funnel-studio .funnel-list-item.is-active {
+  box-shadow: none;
+  background: color-mix(in oklab, var(--primary) 8%, var(--card));
+  border-color: color-mix(in oklab, var(--primary) 24%, transparent);
+}
+.funnel-studio .funnel-list-item > .absolute {
+  display: none;
+}
+.funnel-studio .funnel-list-item p {
+  max-width: 132px;
+}
+.funnel-studio .funnel-search {
+  background: var(--background);
+  box-shadow: none;
+}
+.funnel-studio .funnel-elements-panel {
+  width: 224px;
+  min-width: 224px;
+  z-index: 22;
+}
+.funnel-studio .funnel-library-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--funnel-panel-border);
+}
+.funnel-studio .funnel-library-sections {
+  padding: 12px;
+}
+.funnel-studio .funnel-library-sections h4 {
+  font-size: 10px;
+  letter-spacing: 0.09em;
+}
+.funnel-studio .funnel-element-item {
+  min-height: 42px;
+  padding: 7px 9px;
+  border-radius: 8px;
+}
+.funnel-studio .funnel-element-item span {
+  font-size: 12px;
+}
+.funnel-studio .funnel-element-item > div:first-child {
+  box-shadow: none;
+}
+.funnel-studio .funnel-element-item:hover {
+  border-color: color-mix(in oklab, var(--primary) 22%, transparent);
+  background: color-mix(in oklab, var(--primary) 6%, var(--card));
+}
+.funnel-studio .funnel-library-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid var(--funnel-panel-border);
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.funnel-studio kbd {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font: inherit;
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.funnel-studio .funnel-editor-header {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--funnel-header-height);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 20px;
+  background: var(--funnel-surface);
+  border-bottom: 1px solid var(--funnel-panel-border);
+}
+.funnel-studio .funnel-editor-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, var(--primary) 22%, transparent);
+  background: color-mix(in oklab, var(--primary) 7%, transparent);
+  color: var(--primary);
+}
+.funnel-studio .funnel-editor-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted-foreground);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+.funnel-studio .funnel-block-count {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
+}
+.funnel-studio .funnel-header-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+}
+.funnel-studio .funnel-header-button {
+  height: 32px;
+  gap: 7px;
+  border-radius: 7px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+.funnel-studio .funnel-header-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.funnel-studio .funnel-save-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.funnel-studio .funnel-canvas-viewport {
+  position: absolute;
+  inset: var(--funnel-header-height) 0 0;
+  transition: right 0.18s ease;
+}
+.funnel-studio .has-inspector .funnel-canvas-viewport {
+  right: var(--funnel-inspector-width);
+}
+.funnel-studio .funnel-flow-canvas .react-flow__pane {
+  cursor: default;
+}
+.funnel-studio .funnel-flow-canvas.is-panning .react-flow__pane {
+  cursor: grab;
+}
+.funnel-studio .funnel-flow-canvas.is-panning .react-flow__pane:active {
+  cursor: grabbing;
+}
+.funnel-studio .funnel-tools-dock {
+  position: absolute;
+  z-index: 21;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--card) 96%, transparent);
+  box-shadow: 0 8px 28px oklch(0 0 0 / 0.18);
+  backdrop-filter: blur(12px);
+}
+.funnel-studio .has-inspector .funnel-tools-dock {
+  bottom: 76px;
+  left: calc((100% - var(--funnel-inspector-width)) / 2);
+}
+.funnel-studio .funnel-tool-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  color: var(--muted-foreground);
+}
+.funnel-studio .funnel-tool-button.is-active {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+.funnel-studio .funnel-tool-button:not(.is-active):hover {
+  color: var(--foreground);
+  background: var(--accent);
+}
+.funnel-studio .funnel-dock-divider {
+  width: 1px;
+  height: 22px;
+  margin: 0 4px;
+  background: var(--border);
+}
+.funnel-studio .funnel-panel-toggle {
+  bottom: 28px;
+  left: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  box-shadow: none;
+}
+.funnel-studio .funnel-flow-controls.react-flow__panel {
+  left: auto !important;
+  width: max-content;
+  flex-direction: row;
+  right: 16px;
+  bottom: 28px;
+  margin: 0;
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 9px !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+.funnel-studio .funnel-flow-controls button {
+  width: 30px;
+  height: 32px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 9px;
+}
+.funnel-studio .funnel-flow-controls button:last-child {
+  border-right: 0;
+}
+.funnel-studio .funnel-node-label {
+  margin-top: 3px;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
+.funnel-studio .funnel-icon-face {
+  border-radius: 16px;
+  box-shadow: 0 3px 10px oklch(0 0 0 / 0.14);
+  border: 1px solid oklch(1 0 0 / 0.12);
+}
+.funnel-studio .funnel-page-node {
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px oklch(0 0 0 / 0.12);
+}
+.funnel-studio .funnel-page-node > div:first-child {
+  background: var(--card);
+}
+.funnel-studio .funnel-page-node > div:first-child svg {
+  width: 6px;
+  height: 6px;
+  fill: var(--muted-foreground);
+  color: var(--muted-foreground);
+  opacity: 0.4;
+}
+.funnel-studio .react-flow__node.selected .funnel-page-node {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 12%, transparent);
+}
+.funnel-studio .react-flow__node.selected .funnel-node-wrapper {
+  filter: none;
+}
+.funnel-studio .funnel-inspector {
+  position: absolute;
+  top: var(--funnel-header-height);
+  right: 0;
+  bottom: 0;
+  width: var(--funnel-inspector-width);
+  z-index: 23;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  background: var(--funnel-surface);
+}
+.funnel-studio .funnel-inspector-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.funnel-studio .funnel-inspector-header > div {
+  min-width: 0;
+}
+.funnel-studio .funnel-inspector-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 20px 24px;
+  scrollbar-width: thin;
+}
+.funnel-studio .funnel-inspector-body input:not([type="checkbox"]):not([type="color"]),
+.funnel-studio .funnel-inspector-body textarea,
+.funnel-studio .funnel-inspector-body button[role="combobox"] {
+  background: var(--background);
+  border-color: var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.funnel-studio .funnel-presentation-bar {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  right: 24px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  pointer-events: none;
+}
+.funnel-studio .funnel-presentation-bar button {
+  pointer-events: auto;
+  background: var(--card);
+}
+.funnel-studio[data-presentation] {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  height: 100dvh;
+}
+.funnel-studio[data-presentation] .funnel-canvas-viewport {
+  inset: 0;
+}
+.funnel-studio[data-presentation] .react-flow__controls,
+.funnel-studio[data-presentation] .react-flow__handle {
+  display: none;
+}
+@media (max-width: 1500px) {
+  .funnel-studio .funnel-save-hint,
+  .funnel-studio .funnel-block-count {
+    display: none;
+  }
+  .funnel-studio .funnel-header-label {
+    display: none;
+  }
+  .funnel-studio .funnel-header-button {
+    width: 32px;
+    padding: 0;
+  }
+}
+@media (max-width: 1099px) {
+  .funnel-studio .funnel-elements-panel {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 244px;
+    min-width: 244px;
+    z-index: 30;
+    box-shadow: 12px 0 30px oklch(0 0 0 / 0.2);
+  }
+  .funnel-studio .funnel-list-panel {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 240px;
+    min-width: 240px;
+    z-index: 35;
+    box-shadow: 12px 0 30px oklch(0 0 0 / 0.2);
+  }
+  .funnel-studio .has-inspector .funnel-canvas-viewport {
+    right: 0;
+  }
+  .funnel-studio .funnel-inspector {
+    width: min(336px, 100%);
+  }
+  .funnel-studio .has-inspector .funnel-tools-dock {
+    visibility: hidden;
+  }
+}
+@media (max-width: 639px) {
+  .funnel-studio {
+    --funnel-header-height: 100px;
+  }
+  .funnel-studio .funnel-editor-header {
+    padding: 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .funnel-studio .funnel-editor-header > div:first-child {
+    width: 100%;
+  }
+  .funnel-studio .funnel-editor-mark {
+    display: none;
+  }
+  .funnel-studio .funnel-editor-eyebrow {
+    font-size: 7px;
+  }
+  .funnel-studio .funnel-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .funnel-studio .funnel-header-button {
+    height: 28px;
+    width: 28px;
+  }
+  .funnel-studio .funnel-tools-dock {
+    bottom: 64px;
+    max-width: calc(100% - 20px);
+    gap: 1px;
+    padding: 4px;
+  }
+  .funnel-studio .funnel-tool-button {
+    width: 30px;
+    height: 32px;
+  }
+  .funnel-studio .funnel-panel-toggle {
+    bottom: 16px;
+    left: 12px;
+  }
+  .funnel-studio .funnel-flow-controls {
+    bottom: 16px;
+    right: 12px;
+  }
+  .funnel-studio .funnel-inspector {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .funnel-studio *,
+  .funnel-studio *::before,
+  .funnel-studio *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}
+
+.funnel-studio[data-presentation] .react-flow__node {
+  pointer-events: none !important;
+}
+.funnel-studio[data-presentation] .react-flow__node button,
+.funnel-studio[data-presentation] .react-flow__resize-control,
+.funnel-studio[data-presentation] .react-flow__edgelabel-renderer button {
+  display: none !important;
+}
+.funnel-studio[data-presentation] .react-flow__edgelabel-renderer * {
+  pointer-events: none !important;
+}
+.funnel-studio[data-presentation] .react-flow__node.selected .funnel-page-node,
+.funnel-studio[data-presentation] .react-flow__node.selected .funnel-icon-face {
+  box-shadow: none;
+  outline: none;
+}

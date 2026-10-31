@@ -3,10 +3,12 @@ import { funnelElements, iconMap } from './FunnelNodeTypes';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, Facebook, MoveRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronRight, Layers, Search, X } from 'lucide-react';
 
 interface FunnelElementsSidebarProps {
   collapsed?: boolean;
+  onClose?: () => void;
 }
 
 // Color mappings for each element type
@@ -138,6 +140,7 @@ interface SectionProps {
   showFacebookSubcategories?: boolean;
   facebookExpanded?: boolean;
   onToggleFacebookExpanded?: () => void;
+  query?: string;
 }
 
 function Section({ 
@@ -149,11 +152,15 @@ function Section({
   showFacebookSubcategories,
   facebookExpanded,
   onToggleFacebookExpanded,
+  query = "",
 }: SectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  const matches = (label: string) => label.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'));
+  const visible = elements.filter(element => matches(element.label) || (element.hasSubcategories && funnelElements.facebookSubcategories.some(child => matches(child.label))));
+  if (!visible.length) return null;
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <Collapsible open={query ? true : isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-2 hover:bg-card/60 rounded-md transition-colors group/section">
         <h4 className="text-[9px] font-semibold text-muted-foreground/80 uppercase tracking-[0.12em] group-hover/section:text-foreground/80 transition-colors">
           {title}
@@ -166,7 +173,7 @@ function Section({
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="space-y-0.5 mt-1">
-          {elements.map((element) => (
+          {visible.map((element) => (
             <div key={element.type}>
               <ElementItem
                 element={element}
@@ -176,9 +183,9 @@ function Section({
                 isFacebookExpanded={facebookExpanded}
               />
               {/* Facebook subcategories */}
-              {element.hasSubcategories && facebookExpanded && showFacebookSubcategories && (
+              {element.hasSubcategories && (facebookExpanded || !!query) && showFacebookSubcategories && (
                 <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-[#1877F2]/30 pl-2">
-                  {funnelElements.facebookSubcategories.map((subElement) => (
+                  {funnelElements.facebookSubcategories.filter(child => !query || matches(child.label) || matches(element.label)).map((subElement) => (
                     <ElementItem
                       key={subElement.type}
                       element={subElement}
@@ -195,8 +202,9 @@ function Section({
   );
 }
 
-export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps) {
+export function FunnelElementsSidebar({ collapsed, onClose }: FunnelElementsSidebarProps) {
   const [facebookExpanded, setFacebookExpanded] = useState(false);
+  const [query, setQuery] = useState("");
 
   const onDragStart = (event: React.DragEvent, nodeType: string, label: string) => {
     event.dataTransfer.setData('application/reactflow/type', nodeType);
@@ -218,36 +226,16 @@ export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps)
 
   return (
     <div className="funnel-panel funnel-elements-panel w-60 border-r border-border flex flex-col">
-      <div className="px-4 py-4 border-b border-border/70">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <MoveRight className="w-3 h-3 text-primary" />
-          </div>
-          <h3 className="font-semibold text-sm text-foreground font-display">Elementos</h3>
-        </div>
-        <p className="text-[10px] text-muted-foreground/70 ml-8">
-          Arraste para o canvas
-        </p>
-        {/* Search for elements */}
-        <div className="relative mt-3">
-          <input
-            type="text"
-            placeholder="Filtrar elementos..."
-            className="funnel-search w-full text-[11px] bg-card/60 border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors"
-            onChange={(e) => {
-              const val = e.target.value.toLowerCase();
-              document.querySelectorAll('[data-element-item]').forEach((el) => {
-                const label = el.getAttribute('data-element-label')?.toLowerCase() || '';
-                (el as HTMLElement).style.display = label.includes(val) ? '' : 'none';
-              });
-            }}
-          />
-        </div>
+      <div className="funnel-library-header">
+        <div className="flex items-center justify-between"><div className="flex items-center gap-2"><Layers className="h-4 w-4 text-primary" /><h2 className="text-sm font-semibold">Biblioteca de blocos</h2></div><Button size="icon" variant="ghost" className="h-7 w-7" onClick={onClose} aria-label="Fechar biblioteca de blocos"><X className="h-3.5 w-3.5" /></Button></div>
+        <p className="mt-1 text-xs text-muted-foreground">Arraste uma ideia para o canvas.</p>
+        <div className="relative mt-4"><Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" /><input type="search" aria-label="Buscar blocos" placeholder="Buscar blocos..." value={query} onChange={e => setQuery(e.target.value)} className="funnel-search w-full rounded-lg border border-border py-2 pl-9 pr-3 text-xs outline-none focus:border-primary/60" /></div>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-3 space-y-3">
-          <Section 
+        <div className="funnel-library-sections p-3 space-y-3">
+          {query && !Object.values(funnelElements).some(group => Array.isArray(group) && group.some(element => element.label.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR")))) && <p className="px-2 py-6 text-center text-xs text-muted-foreground">Nenhum bloco encontrado.</p>}
+          <Section query={query}
             title="Tráfego" 
             elements={funnelElements.traffic} 
             onDragStart={onDragStart}
@@ -256,44 +244,44 @@ export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps)
             onToggleFacebookExpanded={() => setFacebookExpanded(!facebookExpanded)}
           />
           
-          <Section 
+          <Section query={query}
             title="Páginas" 
             elements={funnelElements.pages} 
             isPageType
             onDragStart={onDragStart}
           />
           
-          <Section 
+          <Section query={query}
             title="Pagamento" 
             elements={funnelElements.payment} 
             onDragStart={onDragStart}
           />
 
-          <Section 
+          <Section query={query}
             title="IA" 
             elements={funnelElements.ai} 
             onDragStart={onDragStart}
           />
           
-          <Section 
+          <Section query={query}
             title="Automação" 
             elements={funnelElements.automation} 
             onDragStart={onDragStart}
           />
           
-          <Section 
+          <Section query={query}
             title="Ações" 
             elements={funnelElements.actions} 
             onDragStart={onDragStart}
           />
           
-          <Section 
+          <Section query={query}
             title="Condições" 
             elements={funnelElements.conditions} 
             onDragStart={onDragStart}
           />
           
-          <Section 
+          <Section query={query}
             title="Conectores" 
             elements={funnelElements.connectors || []} 
             onDragStart={onDragStart}
@@ -301,6 +289,7 @@ export function FunnelElementsSidebar({ collapsed }: FunnelElementsSidebarProps)
           />
         </div>
       </ScrollArea>
+      <div className="funnel-library-footer"><span>Selecionar <kbd>V</kbd></span><span>Mover <kbd>H</kbd></span></div>
     </div>
   );
 }
