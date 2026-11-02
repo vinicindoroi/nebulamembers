@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 import { usePlans, isPendingPlan, PENDING_PLAN } from "@/hooks/use-plans";
 import { Button } from "@/components/ui/button";
-import { MemberTagsModal, useMemberTags } from "@/components/admin/MemberTags";
+import { MemberTagsModal, MemberTagsPicker, useMemberTags } from "@/components/admin/MemberTags";
 import { matchesMemberTag } from "@/lib/member-tags";
 import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberSort, type MemberSortKey } from "@/lib/member-search";
 
@@ -314,7 +314,7 @@ function Page() {
             <button onClick={() => setSelectedIds([])} className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer">Limpar seleção</button>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <Button variant="outline" size="sm" onClick={() => setTagTarget({ memberIds: [...selectedIds], title: `Tags · ${selectedIds.length} alunos` })}><Tag />Aplicar tags</Button>
+            <MemberTagsPicker {...memberTags} memberIds={[...selectedIds]} align="end" trigger={<Button variant="outline" size="sm"><Tag />Aplicar tags</Button>} />
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-muted-foreground">Plano:</span>
               <select
@@ -473,16 +473,37 @@ function Page() {
                   </td>
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex max-w-56 flex-wrap items-center gap-1.5">
-                      {rowTags.map((tag) => <span key={tag.id} className="max-w-full break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary">{tag.name}</span>)}
-                      <button
-                        type="button"
-                        onClick={() => setTagTarget({ memberIds: [r.id], title: `Tags · ${r.full_name ?? "Sem nome"}` })}
-                        aria-label={`Tags de ${r.full_name ?? "Sem nome"}`}
-                        title="Editar tags"
-                        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition hover:bg-muted/60 ${rowTags.length ? "text-muted-foreground" : "border border-dashed border-border text-muted-foreground"}`}
-                      >
-                        {rowTags.length ? <Tag className="h-3.5 w-3.5" /> : <><Plus className="h-3 w-3" />Tag</>}
-                      </button>
+                      {rowTags.map((tag) => (
+                        <button
+                          key={tag.id}
+                          type="button"
+                          title={`Remover ${tag.name}`}
+                          aria-label={`Remover tag ${tag.name} de ${r.full_name ?? "Sem nome"}`}
+                          onClick={async () => {
+                            const { error } = await supabase.from("member_tag_assignments").delete().eq("member_id", r.id).eq("tag_id", tag.id);
+                            if (error) toast.error("Não foi possível remover a tag.");
+                            else { await memberTags.reload(); toast.success("Tag removida"); }
+                          }}
+                          className="group/tag inline-flex max-w-full items-center gap-1 break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary transition hover:border-destructive/40 hover:bg-destructive/10"
+                        >
+                          {tag.name}
+                          <X className="size-3 shrink-0 opacity-40 transition group-hover/tag:opacity-100" />
+                        </button>
+                      ))}
+                      <MemberTagsPicker
+                        {...memberTags}
+                        memberIds={[r.id]}
+                        trigger={
+                          <button
+                            type="button"
+                            aria-label={`Tags de ${r.full_name ?? "Sem nome"}`}
+                            title="Editar tags"
+                            className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition hover:bg-muted/60 ${rowTags.length ? "text-muted-foreground" : "border border-dashed border-border text-muted-foreground"}`}
+                          >
+                            {rowTags.length ? <Tag className="h-3.5 w-3.5" /> : <><Plus className="h-3 w-3" />Tag</>}
+                          </button>
+                        }
+                      />
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3"><StatusPill status={r.status} /></td>
