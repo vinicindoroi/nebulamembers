@@ -8,7 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal, dateFromYmd,
+  fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
 
@@ -146,7 +146,7 @@ function SchedulePage() {
               <p className="text-sm text-muted-foreground">Selecione um dia disponível no calendário.</p>
             ) : (
               <>
-                <h3 className="font-semibold capitalize">{fmtDate(dateFromYmd(ymdFromLocal(day)).toISOString(), Intl.DateTimeFormat().resolvedOptions().timeZone)}</h3>
+                <h3 className="font-semibold capitalize">{day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h3>
                 {daySlots.length > 0 && takenWeeks.has(weekKey(daySlots[0], tz)) ? (
                   <p className="text-sm text-muted-foreground">Você já tem uma call nesta semana. Escolha um dia de outra semana.</p>
                 ) : daySlots.length === 0 ? (

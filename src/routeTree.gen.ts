@@ -28,6 +28,7 @@ import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
 import { Route as AppPixelFeederRouteImport } from './routes/_app.pixel-feeder'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppSavedRouteImport } from './routes/_app.saved'
+import { Route as AppScheduleRouteImport } from './routes/_app.schedule'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppTranscriptRouteImport } from './routes/_app.transcript'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -141,6 +142,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
 const AppSavedRoute = AppSavedRouteImport.update({
   id: '/saved',
   path: '/saved',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppScheduleRoute = AppScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/pixel-feeder': typeof AppPixelFeederRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
+  '/schedule': typeof AppScheduleRoute
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByTo {
   '/pixel-feeder': typeof AppPixelFeederRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
+  '/schedule': typeof AppScheduleRoute
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -345,6 +353,7 @@ export interface FileRoutesById {
   '/_app/pixel-feeder': typeof AppPixelFeederRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/saved': typeof AppSavedRoute
+  '/_app/schedule': typeof AppScheduleRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/transcript': typeof AppTranscriptRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/pixel-feeder'
     | '/profile'
     | '/saved'
+    | '/schedule'
     | '/settings'
     | '/transcript'
     | '/admin/categories'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/pixel-feeder'
     | '/profile'
     | '/saved'
+    | '/schedule'
     | '/settings'
     | '/transcript'
     | '/admin/categories'
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/_app/pixel-feeder'
     | '/_app/profile'
     | '/_app/saved'
+    | '/_app/schedule'
     | '/_app/settings'
     | '/_app/transcript'
     | '/admin/categories'
@@ -634,6 +646,13 @@ declare module '@tanstack/react-router' {
       path: '/saved'
       fullPath: '/saved'
       preLoaderRoute: typeof AppSavedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/schedule': {
+      id: '/_app/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof AppScheduleRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings': {
@@ -803,6 +822,7 @@ interface AppRouteChildren {
   AppPixelFeederRoute: typeof AppPixelFeederRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSavedRoute: typeof AppSavedRoute
+  AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTranscriptRoute: typeof AppTranscriptRoute
 }
@@ -819,6 +839,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPixelFeederRoute: AppPixelFeederRoute,
   AppProfileRoute: AppProfileRoute,
   AppSavedRoute: AppSavedRoute,
+  AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTranscriptRoute: AppTranscriptRoute,
 }
