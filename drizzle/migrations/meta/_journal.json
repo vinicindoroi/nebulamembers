@@ -78,6 +78,13 @@
       "when": 1793648334879,
       "tag": "0010_member_groups",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793653694960,
+      "tag": "0011_mentor_group_weekly_limit",
+      "breakpoints": true
     }
   ]
 }
