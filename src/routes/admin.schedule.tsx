@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, type PlanOption } from "@/hooks/use-plans";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useMemberTags } from "@/components/admin/MemberTags";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -519,6 +520,49 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
     .filter((p) => `${p.full_name ?? ""} ${p.email ?? ""}`.toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => (a.full_name ?? a.email ?? "").localeCompare(b.full_name ?? b.email ?? ""));
 
+  const { tags, assignments: tagAssign } = useMemberTags();
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
+  const [groupOf, setGroupOf] = useState<Record<string, string>>({});
+  const [tagF, setTagF] = useState("");
+  const [groupF, setGroupF] = useState("");
+  const [grouped, setGrouped] = useState(true);
+  const [newGroup, setNewGroup] = useState("");
+  const db = supabase as any;
+  async function loadGroups() {
+    const [g, m] = await Promise.all([
+      db.from("member_groups").select("id,name").order("name"),
+      db.from("member_group_members").select("member_id,group_id"),
+    ]);
+    setGroups(g.data ?? []);
+    setGroupOf(Object.fromEntries((m.data ?? []).map((r: any) => [r.member_id, r.group_id])));
+  }
+  useEffect(() => { void loadGroups(); }, []);
+  async function createGroup() {
+    const { error } = await db.from("member_groups").insert({ name: newGroup.trim() });
+    if (error) return toast.error(error.code === "23505" ? "Esse grupo já existe." : error.message);
+    setNewGroup(""); toast.success("Grupo criado."); loadGroups();
+  }
+  async function deleteGroup(name: string) {
+    const g = groups.find((x) => x.name === name);
+    if (!g || !confirm(`Excluir o grupo "${name}"? Os alunos ficam sem grupo.`)) return;
+    await db.from("member_groups").delete().eq("id", g.id); loadGroups();
+  }
+  async function setGroup(memberId: string, groupId: string) {
+    setGroupOf((s) => { const n = { ...s }; if (groupId) n[memberId] = groupId; else delete n[memberId]; return n; });
+    const { error } = groupId
+      ? await db.from("member_group_members").upsert({ member_id: memberId, group_id: groupId })
+      : await db.from("member_group_members").delete().eq("member_id", memberId);
+    if (error) { toast.error(error.message); loadGroups(); }
+  }
+  const shown = members
+    .filter((p) => !tagF || tagAssign.some((a) => a.member_id === p.id && a.tag_id === tagF))
+    .filter((p) => !groupF || (groupF === "none" ? !groupOf[p.id] : groupOf[p.id] === groupF));
+  const sections: [string, Profile[]][] = grouped
+    ? [...groups.map((g) => [g.name, shown.filter((p) => groupOf[p.id] === g.id)] as [string, Profile[]]),
+       ["Sem grupo", shown.filter((p) => !groupOf[p.id])] as [string, Profile[]]].filter(([, l]) => l.length > 0)
+    : [["", shown]];
+
+
   async function save() {
     setSaving(true);
     const { error } = await supabase.from("mentor_schedule_settings").update({ allowed_plans: selected }).eq("id", 1);
@@ -550,14 +594,49 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
       </section>
       <section className="space-y-3 rounded-xl border border-border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-semibold">Alunos com acesso ({members.length})</p>
+          <p className="font-semibold">Alunos com acesso ({shown.length})</p>
           <Input placeholder="Buscar aluno..." value={q} onChange={(e) => setQ(e.target.value)} className="h-9 max-w-xs" />
         </div>
-        <div className="max-h-[480px] divide-y divide-border overflow-y-auto">
-          {members.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : members.map((p) => (
-            <div key={p.id} className="flex items-center justify-between py-2.5 text-sm">
-              <div><p className="font-medium">{p.full_name || "Sem nome"}</p><p className="text-xs text-muted-foreground">{p.email}</p></div>
-              <span className="text-xs text-muted-foreground">{p.plan}</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <select value={tagF} onChange={(e) => setTagF(e.target.value)} className="h-9 rounded-md border border-border bg-background px-2 text-sm">
+            <option value="">Todas as tags</option>
+            {tags.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </select>
+          <select value={groupF} onChange={(e) => setGroupF(e.target.value)} className="h-9 rounded-md border border-border bg-background px-2 text-sm">
+            <option value="">Todos os grupos</option>
+            <option value="none">Sem grupo</option>
+            {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+          <label className="flex cursor-pointer items-center gap-2 text-sm"><Checkbox checked={grouped} onCheckedChange={(v) => setGrouped(!!v)} /> Agrupar</label>
+          <form className="ml-auto flex gap-2" onSubmit={(e) => { e.preventDefault(); void createGroup(); }}>
+            <Input placeholder="Novo grupo (ex: Sócios X)" value={newGroup} onChange={(e) => setNewGroup(e.target.value)} className="h-9 w-48" />
+            <Button type="submit" size="sm" variant="outline" disabled={!newGroup.trim()}><Plus className="h-4 w-4" /> Grupo</Button>
+          </form>
+        </div>
+        <div className="max-h-[520px] overflow-y-auto">
+          {shown.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : sections.map(([label, list]) => (
+            <div key={label} className="mb-3">
+              {grouped && <div className="flex items-center justify-between border-b border-border py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span>{label} ({list.length})</span>
+                {label !== "Sem grupo" && <button onClick={() => deleteGroup(label)} className="hover:text-destructive" aria-label="Excluir grupo"><Trash2 className="h-3.5 w-3.5" /></button>}
+              </div>}
+              <div className="divide-y divide-border">
+                {list.map((p) => {
+                  const myTags = tagAssign.filter((a) => a.member_id === p.id).map((a) => tags.find((t) => t.id === a.tag_id)?.name).filter(Boolean);
+                  return (
+                    <div key={p.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                      <div className="min-w-0">
+                        <p className="font-medium">{p.full_name || "Sem nome"}</p>
+                        <p className="truncate text-xs text-muted-foreground">{p.email}{myTags.length ? ` · ${myTags.join(", ")}` : ""}</p>
+                      </div>
+                      <select value={groupOf[p.id] ?? ""} onChange={(e) => setGroup(p.id, e.target.value)} className="h-8 shrink-0 rounded-md border border-border bg-background px-2 text-xs">
+                        <option value="">Sem grupo</option>
+                        {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
