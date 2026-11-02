@@ -1,9 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Users, PlayCircle, UserPlus, TrendingUp } from "lucide-react";
+import { Users, PlayCircle, UserPlus, TrendingUp, CalendarClock, ArrowRight, Video, MessageCircle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
+import { Button } from "@/components/ui/button";
+import {
+  fmtTime, ymdOf, zonedToDate,
+  type Booking, type ScheduleSettings,
+} from "@/lib/mentor-schedule";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [
