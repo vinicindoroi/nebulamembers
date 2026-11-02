@@ -60,7 +60,6 @@ function CoursesList() {
     });
   }, [courses, filter, tag, deferredSearch]);
 
-  const featured = visible[0];
 
   const scrollCatalog = (direction: -1 | 1) => {
     const catalog = catalogRef.current;
@@ -175,31 +174,10 @@ function CoursesList() {
             {search ? "Tente ajustar os filtros ou a busca." : "Nenhum curso corresponde a estes filtros."}
           </div>
         </div>
-      ) : featured && (
+      ) : (
         <div className="space-y-8">
-          {banners.length === 0 && <Link
-            to="/courses/$courseId"
-            params={{ courseId: featured.id }}
-            className="group relative block min-h-72 overflow-hidden rounded-md border border-border bg-card sm:min-h-96 lg:min-h-[28rem]"
-          >
-            {featured.cover_url && (
-              <>
-                <img src={featured.cover_url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-xl" />
-                <img src={featured.cover_url} alt={featured.title} className="absolute inset-0 h-full w-full object-cover object-center" />
-              </>
-            )}
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--background)_0%,color-mix(in_oklab,var(--background)_88%,transparent)_32%,color-mix(in_oklab,var(--background)_28%,transparent)_72%,transparent_100%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(0deg,var(--background)_0%,transparent_55%)]" />
-            <div className="relative flex min-h-72 max-w-xl flex-col justify-end p-6 sm:min-h-96 sm:p-10 lg:min-h-[28rem] lg:p-12">
-              <span className="mb-3 text-xs font-bold uppercase text-primary">Em destaque</span>
-              {(featured as any).title_visible !== false && <h2 className="font-course-display text-3xl font-bold sm:text-5xl">{featured.title}</h2>}
-              {featured.description && <p className="mt-3 line-clamp-2 max-w-lg text-sm text-foreground/75 sm:text-base">{featured.description}</p>}
-              <div className="mt-6 flex items-center gap-3">
-                <Button className="h-11 px-5"><Play className="h-4 w-4" fill="currentColor" />{featured.progress > 0 ? "Continuar" : "Assistir agora"}</Button>
-                <span className="text-xs font-semibold text-muted-foreground">{featured.progress > 0 ? `${featured.progress}% concluído` : "Comece agora"}</span>
-              </div>
-            </div>
-          </Link>}
+
+
 
           <section className="space-y-4">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
