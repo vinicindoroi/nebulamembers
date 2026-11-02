@@ -1,0 +1,1 @@
+ALTER TABLE public.mentor_bookings ADD COLUMN IF NOT EXISTS google_event_id text;

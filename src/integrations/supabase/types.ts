@@ -1149,6 +1149,7 @@ export type Database = {
         Row: {
           created_at: string
           ends_at: string
+          google_event_id: string | null
           id: string
           notes: string | null
           starts_at: string
@@ -1158,6 +1159,7 @@ export type Database = {
         Insert: {
           created_at?: string
           ends_at: string
+          google_event_id?: string | null
           id?: string
           notes?: string | null
           starts_at: string
@@ -1167,6 +1169,7 @@ export type Database = {
         Update: {
           created_at?: string
           ends_at?: string
+          google_event_id?: string | null
           id?: string
           notes?: string | null
           starts_at?: string
