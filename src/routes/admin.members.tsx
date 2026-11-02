@@ -166,9 +166,10 @@ function Page() {
   };
 
   const toggleSelect = (id: string, index: number, shiftKey: boolean) => {
+    const anchor = lastClickedIndex.current;
     setSelectedIds((prev) => {
-      if (shiftKey && lastClickedIndex.current !== null) {
-        const [from, to] = [lastClickedIndex.current, index].sort((a, b) => a - b);
+      if (shiftKey && anchor !== null) {
+        const [from, to] = [anchor, index].sort((a, b) => a - b);
         const range = sorted.slice(from, to + 1).map((m) => m.id);
         return Array.from(new Set([...prev, ...range]));
       }
