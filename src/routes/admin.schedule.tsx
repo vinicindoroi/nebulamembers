@@ -59,7 +59,17 @@ function AdminSchedule() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel(`admin-bookings-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "mentor_bookings" }, () => load())
+      .subscribe();
+    const iv = setInterval(load, 30000);
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => { supabase.removeChannel(ch); clearInterval(iv); window.removeEventListener("focus", onFocus); };
+  }, []);
 
   if (loading || !settings) return <p className="text-sm text-muted-foreground">Carregando...</p>;
 
