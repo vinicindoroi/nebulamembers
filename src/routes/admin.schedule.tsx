@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CalendarClock, Check, Loader2, MessageCircle, Plus, Trash2, Video, X } from "lucide-react";
 import { ptBR } from "date-fns/locale";
+import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, type PlanOption } from "@/hooks/use-plans";
@@ -107,6 +108,7 @@ function Agenda({ settings, bookings, profiles, reload }: {
     setRSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Call remarcada. O aluno foi notificado.");
+    syncBookingToGoogle({ data: { bookingId: resched.id } }).catch(() => {});
     setResched(null);
     reload();
   }
@@ -126,6 +128,7 @@ function Agenda({ settings, bookings, profiles, reload }: {
       : await supabase.from("mentor_bookings").update({ status }).eq("id", b.id);
     if (error) return toast.error(error.message);
     toast.success(status === "done" ? "Marcada como realizada." : "Call cancelada.");
+    syncBookingToGoogle({ data: { bookingId: b.id } }).catch(() => {});
     reload();
   }
 

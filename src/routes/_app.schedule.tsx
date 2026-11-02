@@ -9,6 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
+import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
   fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
@@ -108,10 +109,11 @@ function SchedulePage() {
   async function book() {
     if (!slot) return;
     setSaving(true);
-    const { error } = await supabase.rpc("book_mentor_call", { _starts_at: slot.toISOString(), _notes: notes || undefined });
+    const { data: newId, error } = await supabase.rpc("book_mentor_call", { _starts_at: slot.toISOString(), _notes: notes || undefined });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Call agendada!");
+    if (newId) syncBookingToGoogle({ data: { bookingId: newId as string } }).catch(() => {});
     setSlot(null); setNotes(""); setDay(undefined);
     load(); notifyOthers();
   }
@@ -120,6 +122,7 @@ function SchedulePage() {
     const { error } = await supabase.rpc("cancel_mentor_booking", { _id: id });
     if (error) return toast.error(error.message);
     toast.success("Call cancelada.");
+    syncBookingToGoogle({ data: { bookingId: id } }).catch(() => {});
     load(); notifyOthers();
   }
 
