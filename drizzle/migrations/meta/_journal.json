@@ -57,6 +57,13 @@
       "when": 1793644580568,
       "tag": "0007_mentor_bookings_realtime",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793645490333,
+      "tag": "0008_mentor_one_booking_at_a_time",
+      "breakpoints": true
     }
   ]
 }

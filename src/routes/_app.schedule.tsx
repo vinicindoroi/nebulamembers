@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
-  fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
+  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
 
@@ -96,10 +96,6 @@ function SchedulePage() {
   const notifyOthers = () => channelRef.current?.send({ type: "broadcast", event: "changed", payload: {} });
 
   const tz = settings?.timezone ?? "America/Sao_Paulo";
-  const takenWeeks = useMemo(
-    () => new Set(mine.filter((b) => b.status !== "cancelled").map((b) => weekKey(new Date(b.starts_at), tz))),
-    [mine, tz],
-  );
   const freeSlots = (ymd: string) =>
     settings ? slotsForDay(ymd, settings, availability).filter((d) => !busy.has(d.getTime())) : [];
   const daySlots = day ? freeSlots(ymdFromLocal(day)) : [];
@@ -136,7 +132,7 @@ function SchedulePage() {
       <header>
         <h1 className="text-3xl font-bold tracking-tight">Agendamento</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Escolha o dia e o horário da sua call com o mentor. Limite de uma call por semana.
+          Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez.
         </p>
       </header>
 
@@ -211,9 +207,7 @@ function SchedulePage() {
                     <h3 className="text-lg font-semibold capitalize">{day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h3>
                     {daySlots.length > 0 && <span className="shrink-0 text-xs text-muted-foreground">{daySlots.length} {daySlots.length === 1 ? "horário" : "horários"}</span>}
                   </div>
-                  {daySlots.length > 0 && takenWeeks.has(weekKey(daySlots[0], tz)) ? (
-                    <p className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">Você já tem uma call nesta semana. Escolha um dia de outra semana.</p>
-                  ) : daySlots.length === 0 ? (
+                  {daySlots.length === 0 ? (
                     <p className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">Sem horários livres neste dia.</p>
                   ) : (
                     periodGroups(daySlots, tz).map(([label, items]) => (

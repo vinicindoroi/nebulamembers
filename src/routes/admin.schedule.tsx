@@ -432,7 +432,7 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
             </div>
             <div className="space-y-1.5"><Label>Link da call (Meet, Zoom...)</Label><Input placeholder="https://meet.google.com/..." value={form.meeting_link ?? ""} onChange={(e) => setForm({ ...form, meeting_link: e.target.value })} /></div>
             <div className="space-y-1.5"><Label>Recado para o aluno <span className="font-normal text-muted-foreground">(opcional)</span></Label><Textarea rows={3} value={form.instructions ?? ""} onChange={(e) => setForm({ ...form, instructions: e.target.value })} /></div>
-            <p className="text-xs text-muted-foreground">Limite fixo: 1 call por semana por aluno.</p>
+            <p className="text-xs text-muted-foreground">Limite fixo: cada aluno pode ter 1 call marcada por vez.</p>
           </Step>
 
           <Step n={3} title="Dias de folga" desc="Clique nos dias em que você não vai atender. Salva na hora.">
