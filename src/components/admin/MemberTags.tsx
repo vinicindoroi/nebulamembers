@@ -117,6 +117,7 @@ export function MemberTagsPicker({ tags, assignments, loading, reload, memberIds
             value={name}
             maxLength={60}
             onChange={(event) => setName(event.target.value)}
+            placeholder="Nova tag + Enter"
             onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void createAndApply(); } }}
             className={`${inputClass} h-8 flex-1 text-xs`}
           />
