@@ -259,7 +259,7 @@ function Page() {
           <table className="w-full text-sm">
             <thead className="text-xs text-muted-foreground bg-card sticky top-0">
               <tr>
-                <th className="px-4 py-3 w-10 text-center">
+                <th className="px-4 py-3 w-14 text-center">
                   <input
                     type="checkbox"
                     checked={filtered.length > 0 && selectedIds.length === filtered.length}
@@ -270,7 +270,7 @@ function Page() {
                         setSelectedIds([]);
                       }
                     }}
-                    className="accent-primary rounded cursor-pointer scale-105"
+                    className="size-6 shrink-0 accent-primary rounded-md cursor-pointer"
                   />
                 </th>
                 <th className="text-left font-medium px-4 py-3">Membro</th>
@@ -287,7 +287,7 @@ function Page() {
               {!loading && filtered.length === 0 && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-xs">Nenhum membro encontrado</td></tr>}
               {filtered.map((r) => (
                 <tr key={r.id} className={`hover:bg-card transition cursor-pointer select-none group ${selectedIds.includes(r.id) ? "bg-primary/[0.02]" : ""}`}>
-                  <td className="px-4 py-3 w-10 text-center" onClick={(e) => e.stopPropagation()}>
+                  <td className="px-4 py-3 w-14 text-center" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(r.id)}
@@ -298,7 +298,7 @@ function Page() {
                           setSelectedIds(selectedIds.filter(id => id !== r.id));
                         }
                       }}
-                      className="accent-primary rounded cursor-pointer scale-105"
+                      className="size-6 shrink-0 accent-primary rounded-md cursor-pointer"
                     />
                   </td>
                   <td className="px-4 py-3" onClick={() => setViewing(r)}>
