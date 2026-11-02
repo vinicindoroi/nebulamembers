@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Trash2, Edit3, Download, Plus, MoreVertical, Shield, Pause, Play, UserPlus, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag } from "lucide-react";
+import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
@@ -8,6 +8,7 @@ import { usePlans, isPendingPlan, PENDING_PLAN } from "@/hooks/use-plans";
 import { Button } from "@/components/ui/button";
 import { MemberTagsModal, useMemberTags } from "@/components/admin/MemberTags";
 import { matchesMemberTag } from "@/lib/member-tags";
+import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberSort, type MemberSortKey } from "@/lib/member-search";
 
 function PlanOptions({ includePending = true }: { includePending?: boolean }) {
   const { plans } = usePlans();
