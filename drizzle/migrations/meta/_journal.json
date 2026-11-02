@@ -36,6 +36,13 @@
       "when": 1793643528984,
       "tag": "0004_mentor_schedule_allowed_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793644122173,
+      "tag": "0005_mentor_booking_notifications_reschedule",
+      "breakpoints": true
     }
   ]
 }
