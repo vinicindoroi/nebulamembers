@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -80,13 +80,27 @@ function Page() {
   const [adding, setAdding] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewing, setViewing] = useState<Member | null>(null);
+  const [sort, setSort] = useState<MemberSort>({ key: "created_at", dir: "desc" });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const lastClickedIndex = useRef<number | null>(null);
   const memberTags = useMemberTags();
+  const { plans } = usePlans();
   const [tagFilter, setTagFilter] = useState("all");
   const [tagTarget, setTagTarget] = useState<{ memberIds: string[]; title: string } | null>(null);
   const tagsFor = (id: string) => memberTags.tags.filter((tag) => memberTags.assignments.some((item) => item.member_id === id && item.tag_id === tag.id));
   useEffect(() => {
     if (!memberTags.loading && tagFilter !== "all" && tagFilter !== "untagged" && !memberTags.tags.some((tag) => tag.id === tagFilter)) setTagFilter("all");
   }, [memberTags.tags, memberTags.loading, tagFilter]);
+
+  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all";
+
+  const clearFilters = () => {
+    setQ("");
+    setStatusFilter("all");
+    setPlanFilter("all");
+    setTagFilter("all");
+    setSelectedIds([]);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -102,9 +116,45 @@ function Page() {
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
     else if (planFilter !== "all" && (r.plan ?? "") !== planFilter) return false;
-    if (q && !(r.full_name ?? "").toLowerCase().includes(q.toLowerCase())) return false;
+    if (!memberMatchesQuery(r, q)) return false;
     return true;
   });
+
+  const sorted = useMemo(
+    () => sortMembers(filtered, sort, plans.map((p) => p.name)),
+    [filtered, sort, plans],
+  );
+
+  const changeSort = (key: MemberSortKey) => {
+    setSort((prev) => (prev.key === key
+      ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+      : { key, dir: key === "created_at" || key === "last_seen_at" ? "desc" : "asc" }));
+  };
+
+  const toggleSelect = (id: string, index: number, shiftKey: boolean) => {
+    setSelectedIds((prev) => {
+      if (shiftKey && lastClickedIndex.current !== null) {
+        const [from, to] = [lastClickedIndex.current, index].sort((a, b) => a - b);
+        const range = sorted.slice(from, to + 1).map((m) => m.id);
+        return Array.from(new Set([...prev, ...range]));
+      }
+      return prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+    });
+    lastClickedIndex.current = index;
+  };
+
+  const copyEmail = async (member: Member) => {
+    const email = member.email?.trim();
+    if (!email) return;
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedId(member.id);
+      setTimeout(() => setCopiedId((current) => (current === member.id ? null : current)), 1600);
+      toast.success("Email copiado");
+    } catch {
+      toast.error("Não foi possível copiar o email");
+    }
+  };
 
   const setStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
