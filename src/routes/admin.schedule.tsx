@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Check, Loader2, MessageCircle, Plus, Trash2, X } from "lucide-react";
+import { CalendarClock, Check, Loader2, MessageCircle, Plus, Trash2, Video, X } from "lucide-react";
+import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, type PlanOption } from "@/hooks/use-plans";
@@ -110,62 +111,125 @@ function Agenda({ settings, bookings, profiles, reload }: {
     reload();
   }
 
-  const Row = ({ b }: { b: Booking }) => {
+  const now = Date.now();
+  const todayYmd = ymdOf(new Date(), tz);
+  const weekEnd = now + 7 * 86400_000;
+  const stats = [
+    { label: "Hoje", value: upcoming.filter((b) => ymdOf(new Date(b.starts_at), tz) === todayYmd).length },
+    { label: "Próximos 7 dias", value: upcoming.filter((b) => new Date(b.starts_at).getTime() < weekEnd).length },
+    { label: "Total agendadas", value: upcoming.length },
+    { label: "Realizadas", value: bookings.filter((b) => b.status === "done").length },
+  ];
+  const next = upcoming[0];
+
+  const waLink = (phone: string) => {
+    const d = phone.replace(/\D/g, "");
+    return `https://wa.me/${d.length <= 11 ? `55${d}` : d}`;
+  };
+
+  const Row = ({ b, showDate }: { b: Booking; showDate?: boolean }) => {
     const p = profiles[b.user_id];
+    const name = p?.full_name || p?.email || "Aluno";
+    const isPast = new Date(b.ends_at).getTime() < now;
     return (
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-card p-4">
-        <div className="min-w-0 space-y-1">
-          <p className="font-semibold">{p?.full_name || p?.email || "Aluno"}</p>
-          <p className="text-xs text-muted-foreground">{p?.email}</p>
-          {p?.phone ? (
-            <a
-              href={`https://wa.me/${(() => { const d = p.phone.replace(/\D/g, ""); return d.length <= 11 ? `55${d}` : d; })()}`}
-              target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-            >
-              <MessageCircle className="h-3.5 w-3.5" /> {p.phone}
-            </a>
-          ) : (
-            <p className="text-xs text-muted-foreground/70">Sem WhatsApp cadastrado</p>
-          )}
-          <p className="text-sm capitalize">{fmtDate(b.starts_at, tz)} · {fmtTime(b.starts_at, tz)}–{fmtTime(b.ends_at, tz)}</p>
-          {b.notes && <p className="whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center">
+        <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-2 text-center sm:w-24">
+          {showDate && <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(b.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: tz })}</span>}
+          <span className="text-lg font-bold tabular-nums">{fmtTime(b.starts_at, tz)}</span>
+          <span className="text-[11px] text-muted-foreground">até {fmtTime(b.ends_at, tz)}</span>
         </div>
-        {b.status === "booked" ? (
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /> Realizada</Button>
-            <Button size="sm" variant="outline" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /> Cancelar</Button>
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold uppercase text-primary">
+            {name.slice(0, 2)}
           </div>
-        ) : (
-          <span className="text-xs text-muted-foreground">Realizada</span>
-        )}
+          <div className="min-w-0 space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="truncate font-semibold">{name}</p>
+              {b.status === "done" && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+            </div>
+            <p className="truncate text-xs text-muted-foreground">{p?.email}</p>
+            {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          {p?.phone ? (
+            <Button asChild size="sm" variant="outline">
+              <a href={waLink(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+            </Button>
+          ) : (
+            <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
+          )}
+          {b.status === "booked" && (
+            <>
+              {settings.meeting_link && !isPast && (
+                <Button asChild size="sm"><a href={settings.meeting_link} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
+              )}
+              <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
+              <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
+            </>
+          )}
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
-      <div className="rounded-xl border border-border bg-card p-4 h-fit">
-        <Calendar
-          mode="single"
-          selected={day}
-          onSelect={setDay}
-          modifiers={{ booked: bookedDays }}
-          modifiersClassNames={{ booked: "font-bold text-primary underline underline-offset-4" }}
-          className="p-0 pointer-events-auto"
-        />
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-xl border border-border bg-card p-4">
+            <p className="text-xs text-muted-foreground">{s.label}</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p>
+          </div>
+        ))}
       </div>
-      <div className="space-y-6">
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {day ? day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : "Selecione um dia"}
-          </h2>
-          {selected.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma call neste dia.</p> : selected.map((b) => <Row key={b.id} b={b} />)}
-        </section>
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Próximas calls ({upcoming.length})</h2>
-          {upcoming.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma call marcada.</p> : upcoming.map((b) => <Row key={b.id} b={b} />)}
-        </section>
+
+      {next && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <div className="flex items-center gap-3">
+            <CalendarClock className="h-5 w-5 text-primary" />
+            <p className="text-sm">
+              <span className="text-muted-foreground">Próxima call: </span>
+              <span className="font-semibold">{profiles[next.user_id]?.full_name || "Aluno"}</span>
+              <span className="capitalize text-muted-foreground"> · {fmtDate(next.starts_at, tz)} às {fmtTime(next.starts_at, tz)}</span>
+            </p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => setDay(dateFromYmd(ymdOf(new Date(next.starts_at), tz)))}>Ver no calendário</Button>
+        </div>
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-[auto_minmax(0,1fr)]">
+        <div className="h-fit rounded-xl border border-border bg-card p-5">
+          <Calendar
+            mode="single"
+            locale={ptBR}
+            selected={day}
+            onSelect={setDay}
+            modifiers={{ booked: bookedDays }}
+            modifiersClassNames={{ booked: "[&_button]:after:absolute [&_button]:after:bottom-1.5 [&_button]:after:h-1 [&_button]:after:w-1 [&_button]:after:rounded-full [&_button]:after:bg-primary [&_button]:relative [&_button]:font-bold" }}
+            className="bg-transparent p-0 pointer-events-auto [--cell-size:2.75rem] sm:[--cell-size:3.25rem] [&_.rdp-caption_label]:capitalize"
+          />
+          <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-primary" /> Dias com call marcada</p>
+        </div>
+        <div className="space-y-8">
+          <section className="space-y-3">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 className="text-lg font-semibold capitalize">
+                {day ? day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : "Selecione um dia"}
+              </h2>
+              <span className="text-xs text-muted-foreground">{selected.length} {selected.length === 1 ? "call" : "calls"}</span>
+            </div>
+            {selected.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nenhuma call neste dia.</div>
+            ) : selected.map((b) => <Row key={b.id} b={b} />)}
+          </section>
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Todas as próximas calls</h2>
+            {upcoming.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma call marcada.</p>
+            ) : upcoming.map((b) => <Row key={b.id} b={b} showDate />)}
+          </section>
+        </div>
       </div>
     </div>
   );
