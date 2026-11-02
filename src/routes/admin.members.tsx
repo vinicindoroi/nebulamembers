@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
+import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
@@ -12,6 +12,37 @@ import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberS
 
 const filterSelectClass =
   "h-9 shrink-0 cursor-pointer rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50";
+
+function StatusPill({ status }: { status: string }) {
+  const tone = status === "active"
+    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+    : status === "suspended"
+      ? "border-red-500/20 bg-red-500/10 text-red-400"
+      : "border-amber-500/20 bg-amber-500/10 text-amber-400";
+  return (
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium ${tone}`}>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
+      {statusLabel(status)}
+    </span>
+  );
+}
+
+function SortHeader({ label, sortKey, sort, onSort }: { label: string; sortKey: MemberSortKey; sort: MemberSort; onSort: (key: MemberSortKey) => void }) {
+  const active = sort.key === sortKey;
+  return (
+    <th scope="col" className="px-4 py-3 text-left font-medium">
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        aria-label={`Ordenar por ${label.toLowerCase()}`}
+        className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs uppercase tracking-wide transition hover:text-foreground ${active ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        {label}
+        {active ? (sort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ChevronsUpDown className="h-3 w-3 opacity-40" />}
+      </button>
+    </th>
+  );
+}
 
 function PlanOptions({ includePending = true }: { includePending?: boolean }) {
   const { plans } = usePlans();
