@@ -27,10 +27,10 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
-function SortHeader({ label, sortKey, sort, onSort }: { label: string; sortKey: MemberSortKey; sort: MemberSort; onSort: (key: MemberSortKey) => void }) {
+function SortHeader({ label, sortKey, sort, onSort, className }: { label: string; sortKey: MemberSortKey; sort: MemberSort; onSort: (key: MemberSortKey) => void; className?: string }) {
   const active = sort.key === sortKey;
   return (
-    <th scope="col" className="px-4 py-3 text-left font-medium">
+    <th scope="col" className={`px-4 py-3 text-left font-medium ${className ?? ""}`}>
       <button
         type="button"
         onClick={() => onSort(sortKey)}
@@ -378,13 +378,13 @@ function Page() {
                     className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
                   />
                 </th>
-                <SortHeader label="Membro" sortKey="name" sort={sort} onSort={changeSort} />
+                <SortHeader label="Membro" sortKey="name" sort={sort} onSort={changeSort} className="w-[320px]" />
                 <SortHeader label="Plano" sortKey="plan" sort={sort} onSort={changeSort} />
-                <th scope="col" className="px-4 py-3 text-left font-medium">Tags</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">Tags</th>
                 <SortHeader label="Status" sortKey="status" sort={sort} onSort={changeSort} />
                 <SortHeader label="Cadastro" sortKey="created_at" sort={sort} onSort={changeSort} />
                 <SortHeader label="Último acesso" sortKey="last_seen_at" sort={sort} onSort={changeSort} />
-                <th scope="col" className="px-4 py-3 text-right font-medium">Ações</th>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -442,7 +442,7 @@ function Page() {
                       className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
                     />
                   </td>
-                  <td className="max-w-0 px-4 py-3">
+                  <td className="w-[320px] px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 shrink-0 rounded-full gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground">
                         {(r.full_name ?? "U").slice(0, 2).toUpperCase()}
