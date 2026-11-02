@@ -117,6 +117,7 @@ function Page() {
   const [sort, setSort] = useState<MemberSort>({ key: "created_at", dir: "desc" });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const lastClickedIndex = useRef<number | null>(null);
+  const lastShift = useRef(false);
   const memberTags = useMemberTags();
   const { plans } = usePlans();
   const [tagFilter, setTagFilter] = useState("all");
@@ -435,8 +436,8 @@ function Page() {
                       type="checkbox"
                       aria-label={`Selecionar ${r.full_name ?? "Sem nome"}`}
                       checked={selectedIds.includes(r.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => toggleSelect(r.id, index, e.shiftKey)}
+                      onClick={(e) => { e.stopPropagation(); lastShift.current = e.nativeEvent.shiftKey; }}
+                      onChange={(e) => toggleSelect(r.id, index, lastShift.current)}
                       className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
                     />
                   </td>
