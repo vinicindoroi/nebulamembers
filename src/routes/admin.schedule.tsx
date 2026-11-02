@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, type PlanOption } from "@/hooks/use-plans";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMemberTags } from "@/components/admin/MemberTags";
+import { useMemberGroups } from "@/hooks/use-member-groups";
+import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
+import { MemberGroupSelect } from "@/components/admin/MemberGroups";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -521,46 +524,27 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
     .sort((a, b) => (a.full_name ?? a.email ?? "").localeCompare(b.full_name ?? b.email ?? ""));
 
   const { tags, assignments: tagAssign } = useMemberTags();
-  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
-  const [groupOf, setGroupOf] = useState<Record<string, string>>({});
+  const memberGroups = useMemberGroups();
+  const { groups, groupOf } = memberGroups;
   const [tagF, setTagF] = useState("");
   const [groupF, setGroupF] = useState("");
   const [grouped, setGrouped] = useState(true);
   const [newGroup, setNewGroup] = useState("");
-  const db = supabase as any;
-  async function loadGroups() {
-    const [g, m] = await Promise.all([
-      db.from("member_groups").select("id,name").order("name"),
-      db.from("member_group_members").select("member_id,group_id"),
-    ]);
-    setGroups(g.data ?? []);
-    setGroupOf(Object.fromEntries((m.data ?? []).map((r: any) => [r.member_id, r.group_id])));
-  }
-  useEffect(() => { void loadGroups(); }, []);
   async function createGroup() {
-    const { error } = await db.from("member_groups").insert({ name: newGroup.trim() });
-    if (error) return toast.error(error.code === "23505" ? "Esse grupo já existe." : error.message);
-    setNewGroup(""); toast.success("Grupo criado."); loadGroups();
+    if (await memberGroups.createGroup(newGroup)) setNewGroup("");
   }
   async function deleteGroup(name: string) {
     const g = groups.find((x) => x.name === name);
     if (!g || !confirm(`Excluir o grupo "${name}"? Os alunos ficam sem grupo.`)) return;
-    await db.from("member_groups").delete().eq("id", g.id); loadGroups();
-  }
-  async function setGroup(memberId: string, groupId: string) {
-    setGroupOf((s) => { const n = { ...s }; if (groupId) n[memberId] = groupId; else delete n[memberId]; return n; });
-    const { error } = groupId
-      ? await db.from("member_group_members").upsert({ member_id: memberId, group_id: groupId })
-      : await db.from("member_group_members").delete().eq("member_id", memberId);
-    if (error) { toast.error(error.message); loadGroups(); }
+    await memberGroups.deleteGroup(g.id);
   }
   const shown = members
     .filter((p) => !tagF || tagAssign.some((a) => a.member_id === p.id && a.tag_id === tagF))
-    .filter((p) => !groupF || (groupF === "none" ? !groupOf[p.id] : groupOf[p.id] === groupF));
-  const sections: [string, Profile[]][] = grouped
-    ? [...groups.map((g) => [g.name, shown.filter((p) => groupOf[p.id] === g.id)] as [string, Profile[]]),
-       ["Sem grupo", shown.filter((p) => !groupOf[p.id])] as [string, Profile[]]].filter(([, l]) => l.length > 0)
-    : [["", shown]];
+    .filter((p) => matchesMemberGroup(p.id, groupF, groupOf));
+  const sections = groupMembers(shown, groups, groupOf, grouped);
+  useEffect(() => {
+    if (!memberGroups.loading && groupF && groupF !== "none" && !groups.some((g) => g.id === groupF)) setGroupF("");
+  }, [groups, memberGroups.loading, groupF]);
 
 
   async function save() {
@@ -614,11 +598,11 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
           </form>
         </div>
         <div className="max-h-[520px] overflow-y-auto">
-          {shown.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : sections.map(([label, list]) => (
-            <div key={label} className="mb-3">
+          {shown.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : sections.map(({ id, name: label, members: list }) => (
+            <div key={id} className="mb-3">
               {grouped && <div className="flex items-center justify-between border-b border-border py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <span>{label} ({list.length})</span>
-                {label !== "Sem grupo" && <button onClick={() => deleteGroup(label)} className="hover:text-destructive" aria-label="Excluir grupo"><Trash2 className="h-3.5 w-3.5" /></button>}
+                {id !== "none" && <Button variant="ghost" size="icon" onClick={() => deleteGroup(label)} aria-label="Excluir grupo"><Trash2 className="h-3.5 w-3.5" /></Button>}
               </div>}
               <div className="divide-y divide-border">
                 {list.map((p) => {
@@ -629,10 +613,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
                         <p className="font-medium">{p.full_name || "Sem nome"}</p>
                         <p className="truncate text-xs text-muted-foreground">{p.email}{myTags.length ? ` · ${myTags.join(", ")}` : ""}</p>
                       </div>
-                      <select value={groupOf[p.id] ?? ""} onChange={(e) => setGroup(p.id, e.target.value)} className="h-8 shrink-0 rounded-md border border-border bg-background px-2 text-xs">
-                        <option value="">Sem grupo</option>
-                        {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-                      </select>
+                      <MemberGroupSelect state={memberGroups} memberIds={[p.id]} label={`Grupo de ${p.full_name || "Sem nome"}`} />
                     </div>
                   );
                 })}

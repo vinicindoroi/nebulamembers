@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,6 +9,10 @@ import { Button } from "@/components/ui/button";
 import { MemberTagsModal, MemberTagsPicker, useMemberTags } from "@/components/admin/MemberTags";
 import { matchesMemberTag } from "@/lib/member-tags";
 import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberSort, type MemberSortKey } from "@/lib/member-search";
+import { useMemberGroups } from "@/hooks/use-member-groups";
+import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
+import { MemberGroupSelect, MemberGroupsDialog } from "@/components/admin/MemberGroups";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const filterSelectClass =
   "h-9 shrink-0 cursor-pointer rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50";
@@ -118,6 +122,10 @@ function Page() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const lastClickedIndex = useRef<number | null>(null);
   const memberTags = useMemberTags();
+  const memberGroups = useMemberGroups();
+  const [groupFilter, setGroupFilter] = useState("all");
+  const [grouped, setGrouped] = useState(false);
+  const [groupsOpen, setGroupsOpen] = useState(false);
   const { plans } = usePlans();
   const [tagFilter, setTagFilter] = useState("all");
   const [tagTarget, setTagTarget] = useState<{ memberIds: string[]; title: string } | null>(null);
@@ -126,13 +134,17 @@ function Page() {
     if (!memberTags.loading && tagFilter !== "all" && tagFilter !== "untagged" && !memberTags.tags.some((tag) => tag.id === tagFilter)) setTagFilter("all");
   }, [memberTags.tags, memberTags.loading, tagFilter]);
 
-  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all";
+  useEffect(() => {
+    if (!memberGroups.loading && groupFilter !== "all" && groupFilter !== "none" && !memberGroups.groups.some((g) => g.id === groupFilter)) setGroupFilter("all");
+  }, [memberGroups.groups, memberGroups.loading, groupFilter]);
+  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all" || groupFilter !== "all";
 
   const clearFilters = () => {
     setQ("");
     setStatusFilter("all");
     setPlanFilter("all");
     setTagFilter("all");
+    setGroupFilter("all");
     setSelectedIds([]);
   };
 
@@ -146,6 +158,7 @@ function Page() {
   useEffect(() => { load(); }, []);
 
   const filtered = rows.filter((r) => {
+    if (!matchesMemberGroup(r.id, groupFilter, memberGroups.groupOf)) return false;
     if (!matchesMemberTag(r.id, tagFilter, memberTags.assignments)) return false;
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
@@ -165,12 +178,15 @@ function Page() {
       : { key, dir: key === "created_at" || key === "last_seen_at" ? "desc" : "asc" }));
   };
 
+  const sections = groupMembers(sorted, memberGroups.groups, memberGroups.groupOf, grouped);
+  const displayed = sections.flatMap((section) => section.members);
+
   const toggleSelect = (id: string, index: number, shiftKey: boolean) => {
     const anchor = lastClickedIndex.current;
     let next: string[];
     if (shiftKey && anchor !== null) {
       const [from, to] = [anchor, index].sort((a, b) => a - b);
-      const range = sorted.slice(from, to + 1).map((m) => m.id);
+      const range = displayed.slice(from, to + 1).map((m) => m.id);
       next = Array.from(new Set([...selectedIds, ...range]));
     } else {
       next = selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id];
@@ -271,6 +287,7 @@ function Page() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setGroupsOpen(true)}><User />Grupos</Button>
           <Button variant="outline" onClick={() => setTagTarget({ memberIds: [], title: "Gerenciar tags" })}><Tag />Tags</Button>
           <button type="button" onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-muted/60"><Download className="h-4 w-4" />CSV</button>
           <button type="button" onClick={() => setAdding(true)} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Adicionar</button>
@@ -305,6 +322,11 @@ function Page() {
           <option value="untagged">Sem tags</option>
           {memberTags.tags.map((tag) => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
         </select>
+        <select aria-label="Filtrar por grupo" value={groupFilter} disabled={memberGroups.loading} onChange={(e) => { setGroupFilter(e.target.value); setSelectedIds([]); lastClickedIndex.current = null; }} className={filterSelectClass}>
+          <option value="all">Todos os grupos</option><option value="none">Sem grupo</option>
+          {memberGroups.groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+        </select>
+        <label className="flex cursor-pointer items-center gap-2 px-2 text-sm"><Checkbox checked={grouped} onCheckedChange={(v) => { setGrouped(v === true); lastClickedIndex.current = null; }} />Agrupar</label>
       </div>
 
       {selectedIds.length > 0 && (
@@ -315,6 +337,7 @@ function Page() {
           </div>
           <div className="flex items-center gap-3 flex-wrap">
             <MemberTagsPicker {...memberTags} memberIds={[...selectedIds]} align="end" trigger={<Button variant="outline" size="sm"><Tag />Aplicar tags</Button>} />
+            <MemberGroupSelect state={memberGroups} memberIds={selectedIds} label="Grupo dos membros selecionados" />
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-muted-foreground">Plano:</span>
               <select
@@ -381,6 +404,7 @@ function Page() {
                 <SortHeader label="Membro" sortKey="name" sort={sort} onSort={changeSort} className="w-[320px]" />
                 <SortHeader label="Plano" sortKey="plan" sort={sort} onSort={changeSort} />
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">Tags</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">Grupo</th>
                 <SortHeader label="Status" sortKey="status" sort={sort} onSort={changeSort} />
                 <SortHeader label="Cadastro" sortKey="created_at" sort={sort} onSort={changeSort} />
                 <SortHeader label="Último acesso" sortKey="last_seen_at" sort={sort} onSort={changeSort} />
@@ -390,7 +414,7 @@ function Page() {
             <tbody className="divide-y divide-border">
               {loading && Array.from({ length: 6 }).map((_, i) => (
                 <tr key={`skeleton-${i}`}>
-                  <td colSpan={8} className="px-4 py-4">
+                  <td colSpan={9} className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-muted/60" />
                       <div className="flex-1 space-y-2">
@@ -403,7 +427,7 @@ function Page() {
               ))}
               {!loading && sorted.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-14 text-center">
+                  <td colSpan={9} className="px-4 py-14 text-center">
                     <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
                       <div className="rounded-full border border-border bg-muted/30 p-3">
                         {rows.length === 0 ? <UserPlus className="h-5 w-5 text-muted-foreground" /> : <Search className="h-5 w-5 text-muted-foreground" />}
@@ -422,7 +446,10 @@ function Page() {
                   </td>
                 </tr>
               )}
-              {sorted.map((r, index) => {
+              {sections.map((section) => <Fragment key={section.id}>
+              {grouped && <tr className="bg-muted/30"><td colSpan={9} className="px-4 py-3 text-sm font-semibold">{section.name} <span className="ml-2 text-xs font-normal text-muted-foreground">{section.members.length}</span></td></tr>}
+              {section.members.map((r) => {
+                const index = displayed.findIndex((member) => member.id === r.id);
                 const rowTags = tagsFor(r.id);
                 return (
                 <tr
@@ -506,6 +533,7 @@ function Page() {
                       />
                     </div>
                   </td>
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><MemberGroupSelect state={memberGroups} memberIds={[r.id]} label={`Grupo de ${r.full_name ?? "Sem nome"}`} /></td>
                   <td className="whitespace-nowrap px-4 py-3"><StatusPill status={r.status} /></td>
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
                   <td
@@ -526,7 +554,7 @@ function Page() {
                   </td>
                 </tr>
                 );
-              })}
+              })}</Fragment>)}
             </tbody>
           </table>
         </div>
@@ -536,6 +564,7 @@ function Page() {
       {editing && <EditModal member={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
       {adding && <AddMemberModal onClose={() => setAdding(false)} onSaved={() => { setAdding(false); load(); }} />}
       {tagTarget && <MemberTagsModal {...memberTags} {...tagTarget} onClose={() => setTagTarget(null)} />}
+      <MemberGroupsDialog state={memberGroups} open={groupsOpen} onOpenChange={setGroupsOpen} />
     </div>
   );
 }

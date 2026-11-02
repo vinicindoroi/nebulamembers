@@ -13,3 +13,4 @@
 - Route funnel connections between perpendicular anchors with corner-aware cubic curves so branches bend concavely toward their destination.
 - Keep existing funnel connection anchors fixed when nodes move; users reposition anchors manually.
 - Store member classification tags and assignments in separate admin-only RLS tables; tags must never grant access or become editable through student profiles.
+- Use the shared member-groups hook and grouping helpers in administrative screens; one persisted group catalog and membership mapping prevents divergent assignments between Members and Scheduling.
