@@ -15,7 +15,8 @@ import { WhatsappPrompt } from "@/components/members/WhatsappPrompt";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } from "@/hooks/use-plans";
-import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
+import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
+import brandMark from "@/assets/nebula-mark-n.png.asset.json";
 
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; badge?: string };
@@ -312,14 +313,8 @@ export function AppShell() {
         </Tooltip>
         {/* Collapsed content */}
         <div className={`absolute inset-0 flex flex-col items-center py-4 gap-1 transition-opacity duration-200 ${collapsed ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-          <Link to="/dashboard" className="mb-3">
-            {siteSettings.logoUrl ? (
-              <img src={siteSettings.logoUrl} alt={siteSettings.name} className="h-8 w-8 rounded-lg object-cover" />
-            ) : (
-              <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
-                <Orbit className="h-4 w-4 text-primary-foreground" />
-              </div>
-            )}
+          <Link to="/dashboard" className="mb-3 grid h-7 w-11 shrink-0 place-items-center" aria-label={siteSettings.name}>
+            <img src={brandMark.url} alt={siteSettings.name} className="h-7 w-11 object-contain" />
           </Link>
           <div className="w-6 h-px bg-muted/40 mb-2" />
           {allNav.map((item) => {
