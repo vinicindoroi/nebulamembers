@@ -1010,6 +1010,45 @@ export function PixelFeederView() {
                 })
               )}
             </div>
+          {/* Primary action pinned to feed panel */}
+            {isRunning && (
+              <div className="h-1 w-full rounded-full bg-muted overflow-hidden"><div className="h-full bg-primary transition-all" style={{ width: `${progressPercent}%` }} /></div>
+            )}
+          <div className="space-y-2 pt-3 border-t border-border/50 shrink-0">
+            {isRunning ? (
+              <Button
+                size="lg"
+                variant="destructive"
+                onClick={handlePause}
+                className="w-full gap-2 text-sm font-semibold shadow-md h-11"
+              >
+                <Pause className="h-4 w-4" /> Pausar Aquecimento ({progressPercent}%)
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                onClick={handleStart}
+                className="w-full gap-2 bg-primary text-primary-foreground hover:opacity-90 font-semibold shadow-md shadow-primary/20 h-11"
+              >
+                <Play className="h-4 w-4 fill-current" />
+                <span>Iniciar Aquecimento ({totalCalculatedEvents} eventos)</span>
+              </Button>
+            )}
+
+            <div className="flex items-center justify-between gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleTestSingle}
+                disabled={isRunning || isTestingSingle}
+                className="flex-1 text-xs text-muted-foreground hover:text-foreground h-8 gap-1.5 border-border/80"
+              >
+                <Send className="h-3 w-3" />
+                {isTestingSingle ? "Enviando teste..." : "Disparar 1 Teste Rápido"}
+              </Button>
+            </div>
+          </div>
           </div>
         </div>
       </div>
