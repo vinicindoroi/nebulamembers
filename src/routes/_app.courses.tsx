@@ -4,6 +4,7 @@ import { Play, Search, BookOpen, CheckCircle2, Clock, X, ChevronLeft, ChevronRig
 import { useCourses } from "@/hooks/use-courses";
 import { Button } from "@/components/ui/button";
 import { useCourseBanners } from "@/hooks/use-course-banners";
+import { useUsableBanners } from "@/hooks/use-usable-banners";
 import { CourseBannerCarousel } from "@/components/members/CourseBannerCarousel";
 
 export const Route = createFileRoute("/_app/courses")({
@@ -40,8 +41,9 @@ function CoursesList() {
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const { data: courses = [], isLoading } = useCourses();
-  const { data: bannerData } = useCourseBanners();
-  const banners = (bannerData?.config.banners ?? []).filter((b) => b.active && bannerData?.urls[b.path]);
+  const { data: bannerData, isError: bannersError } = useCourseBanners();
+  const { usable: banners, ready: bannersReady, markBroken } = useUsableBanners(bannerData?.config.banners ?? [], bannerData?.urls);
+  const bannersResolved = Boolean(bannerData) || bannersError;
 
   const tags = useMemo(() => {
     const set = new Set<string>();
