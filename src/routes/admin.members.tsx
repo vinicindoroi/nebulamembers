@@ -117,7 +117,6 @@ function Page() {
   const [sort, setSort] = useState<MemberSort>({ key: "created_at", dir: "desc" });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const lastClickedIndex = useRef<number | null>(null);
-  const lastShift = useRef(false);
   const memberTags = useMemberTags();
   const { plans } = usePlans();
   const [tagFilter, setTagFilter] = useState("all");
