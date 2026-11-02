@@ -1,0 +1,10 @@
+CREATE TABLE public.member_groups (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text NOT NULL UNIQUE, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE public.member_group_members (member_id uuid PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE, group_id uuid NOT NULL REFERENCES public.member_groups(id) ON DELETE CASCADE, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.member_groups TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.member_group_members TO authenticated;
+GRANT ALL ON public.member_groups TO service_role;
+GRANT ALL ON public.member_group_members TO service_role;
+ALTER TABLE public.member_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.member_group_members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "admin all groups" ON public.member_groups FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));
+CREATE POLICY "admin all group members" ON public.member_group_members FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));

@@ -1059,6 +1059,64 @@ export type Database = {
           },
         ]
       }
+      member_group_members: {
+        Row: {
+          created_at: string
+          group_id: string
+          member_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          member_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "member_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_group_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_group_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_groups: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       member_offer_files: {
         Row: {
           created_at: string
