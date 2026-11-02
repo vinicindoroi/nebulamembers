@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Trash2, Edit3, Download, Plus, MoreVertical, Shield, Pause, Play, UserPlus, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock } from "lucide-react";
+import { Search, Trash2, Edit3, Download, Plus, MoreVertical, Shield, Pause, Play, UserPlus, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 import { usePlans, isPendingPlan, PENDING_PLAN } from "@/hooks/use-plans";
+import { Button } from "@/components/ui/button";
+import { MemberTagsModal, useMemberTags } from "@/components/admin/MemberTags";
+import { matchesMemberTag } from "@/lib/member-tags";
 
 function PlanOptions({ includePending = true }: { includePending?: boolean }) {
   const { plans } = usePlans();
@@ -76,6 +79,13 @@ function Page() {
   const [adding, setAdding] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewing, setViewing] = useState<Member | null>(null);
+  const memberTags = useMemberTags();
+  const [tagFilter, setTagFilter] = useState("all");
+  const [tagTarget, setTagTarget] = useState<{ memberIds: string[]; title: string } | null>(null);
+  const tagsFor = (id: string) => memberTags.tags.filter((tag) => memberTags.assignments.some((item) => item.member_id === id && item.tag_id === tag.id));
+  useEffect(() => {
+    if (!memberTags.loading && tagFilter !== "all" && tagFilter !== "untagged" && !memberTags.tags.some((tag) => tag.id === tagFilter)) setTagFilter("all");
+  }, [memberTags.tags, memberTags.loading, tagFilter]);
 
   const load = async () => {
     setLoading(true);
@@ -87,6 +97,7 @@ function Page() {
   useEffect(() => { load(); }, []);
 
   const filtered = rows.filter((r) => {
+    if (!matchesMemberTag(r.id, tagFilter, memberTags.assignments)) return false;
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
     else if (planFilter !== "all" && (r.plan ?? "") !== planFilter) return false;
@@ -165,6 +176,7 @@ function Page() {
           <p className="text-sm text-muted-foreground">{filtered.length} de {rows.length} membros</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setTagTarget({ memberIds: [], title: "Gerenciar tags" })}><Tag />Tags</Button>
           <button onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-white/10"><Download className="h-4 w-4" />CSV</button>
           <button onClick={() => setAdding(true)} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Adicionar</button>
         </div>
@@ -181,6 +193,11 @@ function Page() {
         <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
           <option value="all">Todos planos</option><option value="pending">Pendente (sem acesso)</option><PlanOptions includePending={false} />
         </select>
+        <select aria-label="Filtrar por tag" value={tagFilter} disabled={memberTags.loading} onChange={(event) => { setTagFilter(event.target.value); setSelectedIds([]); }} className="h-9 max-w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground">
+          <option value="all">Todas as tags</option>
+          <option value="untagged">Sem tags</option>
+          {memberTags.tags.map((tag) => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
+        </select>
       </div>
 
       {selectedIds.length > 0 && (
@@ -190,6 +207,7 @@ function Page() {
             <button onClick={() => setSelectedIds([])} className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer">Limpar seleção</button>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
+            <Button variant="outline" size="sm" onClick={() => setTagTarget({ memberIds: [...selectedIds], title: `Tags · ${selectedIds.length} alunos` })}><Tag />Aplicar tags</Button>
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-muted-foreground">Plano:</span>
               <select
@@ -257,6 +275,7 @@ function Page() {
                 </th>
                 <th className="text-left font-medium px-4 py-3">Membro</th>
                 <th className="text-left font-medium px-4 py-3">Plano</th>
+                <th className="text-left font-medium px-4 py-3">Tags</th>
                 <th className="text-left font-medium px-4 py-3">Status</th>
                 <th className="text-left font-medium px-4 py-3">Cadastro</th>
                 <th className="text-left font-medium px-4 py-3">Último acesso</th>
@@ -264,8 +283,8 @@ function Page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {loading && <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-xs">Carregando...</td></tr>}
-              {!loading && filtered.length === 0 && <tr><td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-xs">Nenhum membro encontrado</td></tr>}
+              {loading && <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-xs">Carregando...</td></tr>}
+              {!loading && filtered.length === 0 && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-xs">Nenhum membro encontrado</td></tr>}
               {filtered.map((r) => (
                 <tr key={r.id} className={`hover:bg-card transition cursor-pointer select-none group ${selectedIds.includes(r.id) ? "bg-primary/[0.02]" : ""}`}>
                   <td className="px-4 py-3 w-10 text-center" onClick={(e) => e.stopPropagation()}>
@@ -291,6 +310,12 @@ function Page() {
                     </div>
                   </td>
                   <td className="px-4 py-3" onClick={() => setViewing(r)}><span className={`text-xs px-2 py-1 rounded-md ${isPendingPlan(r.plan) ? "bg-amber-500/10 text-amber-400" : "bg-muted/40"}`}>{isPendingPlan(r.plan) ? "Pendente" : r.plan}</span></td>
+                  <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
+                    <div className="flex max-w-64 flex-wrap items-center gap-1.5">
+                      {tagsFor(r.id).map((tag) => <span key={tag.id} className="max-w-full break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary">{tag.name}</span>)}
+                      <Button variant="ghost" size="icon" aria-label={`Tags de ${r.full_name ?? "Sem nome"}`} title="Editar tags" onClick={() => setTagTarget({ memberIds: [r.id], title: `Tags · ${r.full_name ?? "Sem nome"}` })}><Tag /></Button>
+                    </div>
+                  </td>
                   <td className="px-4 py-3" onClick={() => setViewing(r)}>
                     <span className={`text-xs px-2 py-1 rounded-md ${r.status === "active" ? "bg-emerald-500/10 text-emerald-400" : r.status === "suspended" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>{r.status}</span>
                   </td>
@@ -316,6 +341,7 @@ function Page() {
       {viewing && <MemberDetailsModal member={viewing} onClose={() => setViewing(null)} onEdit={() => setEditing(viewing)} />}
       {editing && <EditModal member={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
       {adding && <AddMemberModal onClose={() => setAdding(false)} onSaved={() => { setAdding(false); load(); }} />}
+      {tagTarget && <MemberTagsModal {...memberTags} {...tagTarget} onClose={() => setTagTarget(null)} />}
     </div>
   );
 }
