@@ -5,4 +5,4 @@
 - [x] Adicionar tags personalizadas aos alunos e filtros administrativos
 - [x] Compartilhar grupos entre Membros e Agendamento, com atribuição e filtro em Membros
 - [x] Impedir mais de uma call por semana para integrantes do mesmo grupo
-- [ ] Adicionar banners de Cursos configuráveis no admin e alternância suave
+- [x] Adicionar banners de Cursos configuráveis no admin e alternância suave
