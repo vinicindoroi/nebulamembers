@@ -1911,6 +1911,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_reschedule_booking: {
+        Args: { _id: string; _starts_at: string }
+        Returns: undefined
+      }
       book_mentor_call: {
         Args: { _notes?: string; _starts_at: string }
         Returns: string
