@@ -139,12 +139,17 @@ function Page() {
     })();
   }, []);
 
+  const { settings: schedSettings, calls, loading: callsLoading } = useTodayCalls();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Visão geral em tempo real</p>
       </div>
+
+      <TodayCalls settings={schedSettings} calls={calls} loading={callsLoading} />
+
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Membros ativos" value={stats.members.toLocaleString("pt-BR")} icon={Users} />
