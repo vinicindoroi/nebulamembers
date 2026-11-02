@@ -112,14 +112,14 @@ function SchedulePage() {
     if (error) return toast.error(error.message);
     toast.success("Call agendada!");
     setSlot(null); setNotes(""); setDay(undefined);
-    load();
+    load(); notifyOthers();
   }
   async function cancel(id: string) {
     if (!confirm("Cancelar esta call?")) return;
     const { error } = await supabase.rpc("cancel_mentor_booking", { _id: id });
     if (error) return toast.error(error.message);
     toast.success("Call cancelada.");
-    load();
+    load(); notifyOthers();
   }
 
   if (loading) return <p role="status" className="text-sm text-muted-foreground">Carregando agenda...</p>;
