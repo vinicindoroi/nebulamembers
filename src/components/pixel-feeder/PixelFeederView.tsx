@@ -1011,9 +1011,6 @@ export function PixelFeederView() {
               )}
             </div>
           {/* Primary action pinned to feed panel */}
-            {isRunning && (
-              <div className="h-1 w-full rounded-full bg-muted overflow-hidden"><div className="h-full bg-primary transition-all" style={{ width: `${progressPercent}%` }} /></div>
-            )}
           <div className="space-y-2 pt-3 border-t border-border/50 shrink-0">
             {isRunning ? (
               <Button
