@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -191,7 +191,7 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
     save(n, n.enabled ? "Agendamentos abertos para os alunos." : "Agendamentos fechados.");
   };
 
-  const Step = ({ n, title, desc, children }: { n: number; title: string; desc: string; children: React.ReactNode }) => (
+  const Step = ({ n, title, desc, children }: { n: number; title: string; desc: string; children: ReactNode }) => (
     <section className="space-y-4 rounded-xl border border-border bg-card p-5">
       <div className="flex gap-3">
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">{n}</span>
