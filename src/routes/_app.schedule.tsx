@@ -8,6 +8,7 @@ import { useAdmin } from "@/hooks/use-admin";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ptBR } from "date-fns/locale";
 import {
   fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
@@ -262,4 +263,22 @@ function SchedulePage() {
       )}
     </div>
   );
+}
+
+function StepLabel({ n, label, done }: { n: number; label: string; done: boolean }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${done ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{n}</span>
+      <span className="text-sm font-semibold">{label}</span>
+    </div>
+  );
+}
+
+function periodGroups(slots: Date[], tz: string): [string, Date[]][] {
+  const groups: Record<string, Date[]> = { Manhã: [], Tarde: [], Noite: [] };
+  for (const d of slots) {
+    const h = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: tz }).format(d));
+    groups[h < 12 ? "Manhã" : h < 18 ? "Tarde" : "Noite"].push(d);
+  }
+  return Object.entries(groups).filter(([, v]) => v.length > 0);
 }
