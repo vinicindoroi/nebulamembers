@@ -43,6 +43,13 @@
       "when": 1793644122173,
       "tag": "0005_mentor_booking_notifications_reschedule",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793644289508,
+      "tag": "0006_mentor_bookings_google_event",
+      "breakpoints": true
     }
   ]
 }
