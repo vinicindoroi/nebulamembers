@@ -373,7 +373,7 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
         </Button>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_480px]">
         <Step n={1} title="Seus horários na semana" desc="Faixas em que você atende. Elas são divididas automaticamente pela duração da call.">
           <div className="divide-y divide-border">
             {WEEKDAYS.map((name, wd) => {
@@ -436,18 +436,51 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
           </Step>
 
           <Step n={3} title="Dias de folga" desc="Clique nos dias em que você não vai atender. Salva na hora.">
-            <div className="flex justify-center">
-              <Calendar mode="multiple" locale={ptBR} selected={blocked} onSelect={setBlocked} className="bg-transparent p-0 pointer-events-auto [&_.rdp-caption_label]:capitalize" />
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={() => setBlocked(mergeDays(blocked, weekendsAhead(365)))}>+ Todos os fins de semana</Button>
+              <Button size="sm" variant="outline" onClick={() => setBlocked(mergeDays(blocked, brHolidays()))}>+ Feriados nacionais</Button>
+              {blocked.length > 0 && (
+                <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => confirm("Remover todos os dias de folga?") && setBlocked([])}>Limpar tudo</Button>
+              )}
             </div>
-            {form.blocked_dates.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {form.blocked_dates.map((d) => (
-                  <span key={d} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs">
-                    {dateFromYmd(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
-                    <button aria-label="Remover folga" onClick={() => setBlocked(blocked.filter((x) => ymdFromLocal(x) !== d))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
-                  </span>
-                ))}
-              </div>
+            <div className="flex justify-center rounded-lg border border-border p-3">
+              <Calendar
+                mode="multiple"
+                locale={ptBR}
+                selected={blocked}
+                onSelect={setBlocked}
+                className="bg-transparent p-0 pointer-events-auto [--cell-size:2.75rem] sm:[--cell-size:3rem] [&_.rdp-caption_label]:text-base [&_.rdp-caption_label]:capitalize [&_.rdp-day]:text-base"
+              />
+            </div>
+            {blocked.length > 0 && (
+              <details className="group rounded-lg border border-border">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2.5 text-sm">
+                  <span><span className="font-semibold">{form.blocked_dates.filter((d) => d >= ymdFromLocal(new Date())).length}</span> dias de folga marcados</span>
+                  <span className="text-xs text-muted-foreground group-open:hidden">Ver lista</span>
+                  <span className="hidden text-xs text-muted-foreground group-open:inline">Esconder</span>
+                </summary>
+                <div className="max-h-56 space-y-3 overflow-y-auto border-t border-border p-3">
+                  {Object.entries(
+                    form.blocked_dates.filter((d) => d >= ymdFromLocal(new Date())).reduce<Record<string, string[]>>((m, d) => {
+                      const k = dateFromYmd(d).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+                      (m[k] ??= []).push(d);
+                      return m;
+                    }, {}),
+                  ).map(([month, days]) => (
+                    <div key={month} className="space-y-1.5">
+                      <p className="text-xs font-medium capitalize text-muted-foreground">{month}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {days.map((d) => (
+                          <span key={d} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs tabular-nums">
+                            {d.slice(8)}
+                            <button aria-label="Remover folga" onClick={() => setBlocked(blocked.filter((x) => ymdFromLocal(x) !== d))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
             )}
           </Step>
         </div>
@@ -531,4 +564,37 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
       </section>
     </div>
   );
+}
+
+function mergeDays(a: Date[], b: Date[]) {
+  const m = new Map<string, Date>();
+  for (const d of [...a, ...b]) m.set(ymdFromLocal(d), d);
+  return [...m.values()];
+}
+
+function weekendsAhead(days: number) {
+  const out: Date[] = [];
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  for (let i = 0; i < days; i++) {
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + i);
+    if (x.getDay() === 0 || x.getDay() === 6) out.push(x);
+  }
+  return out;
+}
+
+/** Feriados nacionais do Brasil (ano atual e próximo), incluindo Carnaval, Sexta-feira Santa e Corpus Christi. */
+function brHolidays() {
+  const out: Date[] = [];
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (const y of [today.getFullYear(), today.getFullYear() + 1]) {
+    const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4;
+    const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31) - 1, day = ((h + l - 7 * m + 114) % 31) + 1;
+    const easter = new Date(y, month, day);
+    const rel = (n: number) => new Date(y, easter.getMonth(), easter.getDate() + n);
+    const fixed = [[0, 1], [3, 21], [4, 1], [8, 7], [9, 12], [10, 2], [10, 15], [10, 20], [11, 25]].map(([mo, da]) => new Date(y, mo, da));
+    out.push(...fixed, rel(-48), rel(-47), rel(-2), rel(60));
+  }
+  return out.filter((d) => d >= today);
 }
