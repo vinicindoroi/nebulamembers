@@ -73,8 +73,10 @@ export function AppShell() {
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   useEffect(() => {
     if (!user) return;
-    supabase.from("mentor_schedule_settings").select("enabled").eq("id", 1).maybeSingle()
-      .then(({ data }) => setScheduleEnabled(!!data?.enabled));
+    Promise.all([
+      supabase.from("mentor_schedule_settings").select("enabled").eq("id", 1).maybeSingle(),
+      supabase.rpc("can_access_mentor_schedule", {}),
+    ]).then(([s, a]) => setScheduleEnabled(!!s.data?.enabled && !!a.data));
   }, [user?.id]);
 
   useEffect(() => {

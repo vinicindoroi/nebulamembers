@@ -35,6 +35,7 @@ function SchedulePage() {
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const [mine, setMine] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allowed, setAllowed] = useState(true);
   const [day, setDay] = useState<Date | undefined>();
   const [slot, setSlot] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
@@ -44,6 +45,8 @@ function SchedulePage() {
     if (!user) return;
     try {
       const cfg = await fetchScheduleConfig();
+      const acc = await supabase.rpc("can_access_mentor_schedule", {});
+      setAllowed(!!acc.data);
       setSettings(cfg.settings);
       setAvailability(cfg.availability);
       const from = new Date();
@@ -128,7 +131,11 @@ function SchedulePage() {
         </section>
       )}
 
-      {!settings?.enabled ? (
+      {!allowed ? (
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          O agendamento de calls é exclusivo da mentoria individual.
+        </div>
+      ) : !settings?.enabled ? (
         <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           Os agendamentos estão fechados no momento. Volte mais tarde.
           {isAdmin && <span className="mt-2 block text-primary">Você é admin: abra em Admin → Agendamentos → Disponibilidade → "Abrir agendamentos".</span>}
