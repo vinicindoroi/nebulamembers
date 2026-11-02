@@ -473,7 +473,23 @@ function Page() {
                   </td>
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex max-w-56 flex-wrap items-center gap-1.5">
-                      {rowTags.map((tag) => <span key={tag.id} className="max-w-full break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary">{tag.name}</span>)}
+                      {rowTags.map((tag) => (
+                        <button
+                          key={tag.id}
+                          type="button"
+                          title={`Remover ${tag.name}`}
+                          aria-label={`Remover tag ${tag.name} de ${r.full_name ?? "Sem nome"}`}
+                          onClick={async () => {
+                            const { error } = await supabase.from("member_tag_assignments").delete().eq("member_id", r.id).eq("tag_id", tag.id);
+                            if (error) toast.error("Não foi possível remover a tag.");
+                            else { await memberTags.reload(); toast.success("Tag removida"); }
+                          }}
+                          className="group/tag inline-flex max-w-full items-center gap-1 break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary transition hover:border-destructive/40 hover:bg-destructive/10"
+                        >
+                          {tag.name}
+                          <X className="size-3 shrink-0 opacity-40 transition group-hover/tag:opacity-100" />
+                        </button>
+                      ))}
                       <MemberTagsPicker
                         {...memberTags}
                         memberIds={[r.id]}
