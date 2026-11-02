@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Search, Trash2, Edit3, Download, Plus, MoreVertical, Shield, Pause, Play, UserPlus, Mail, User, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
@@ -8,6 +8,41 @@ import { usePlans, isPendingPlan, PENDING_PLAN } from "@/hooks/use-plans";
 import { Button } from "@/components/ui/button";
 import { MemberTagsModal, useMemberTags } from "@/components/admin/MemberTags";
 import { matchesMemberTag } from "@/lib/member-tags";
+import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberSort, type MemberSortKey } from "@/lib/member-search";
+
+const filterSelectClass =
+  "h-9 shrink-0 cursor-pointer rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50";
+
+function StatusPill({ status }: { status: string }) {
+  const tone = status === "active"
+    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+    : status === "suspended"
+      ? "border-red-500/20 bg-red-500/10 text-red-400"
+      : "border-amber-500/20 bg-amber-500/10 text-amber-400";
+  return (
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium ${tone}`}>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
+      {statusLabel(status)}
+    </span>
+  );
+}
+
+function SortHeader({ label, sortKey, sort, onSort, className }: { label: string; sortKey: MemberSortKey; sort: MemberSort; onSort: (key: MemberSortKey) => void; className?: string }) {
+  const active = sort.key === sortKey;
+  return (
+    <th scope="col" className={`px-4 py-3 text-left font-medium ${className ?? ""}`}>
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        aria-label={`Ordenar por ${label.toLowerCase()}`}
+        className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs uppercase tracking-wide transition hover:text-foreground ${active ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        {label}
+        {active ? (sort.dir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ChevronsUpDown className="h-3 w-3 opacity-40" />}
+      </button>
+    </th>
+  );
+}
 
 function PlanOptions({ includePending = true }: { includePending?: boolean }) {
   const { plans } = usePlans();
@@ -79,13 +114,27 @@ function Page() {
   const [adding, setAdding] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewing, setViewing] = useState<Member | null>(null);
+  const [sort, setSort] = useState<MemberSort>({ key: "created_at", dir: "desc" });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const lastClickedIndex = useRef<number | null>(null);
   const memberTags = useMemberTags();
+  const { plans } = usePlans();
   const [tagFilter, setTagFilter] = useState("all");
   const [tagTarget, setTagTarget] = useState<{ memberIds: string[]; title: string } | null>(null);
   const tagsFor = (id: string) => memberTags.tags.filter((tag) => memberTags.assignments.some((item) => item.member_id === id && item.tag_id === tag.id));
   useEffect(() => {
     if (!memberTags.loading && tagFilter !== "all" && tagFilter !== "untagged" && !memberTags.tags.some((tag) => tag.id === tagFilter)) setTagFilter("all");
   }, [memberTags.tags, memberTags.loading, tagFilter]);
+
+  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all";
+
+  const clearFilters = () => {
+    setQ("");
+    setStatusFilter("all");
+    setPlanFilter("all");
+    setTagFilter("all");
+    setSelectedIds([]);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -101,9 +150,47 @@ function Page() {
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
     else if (planFilter !== "all" && (r.plan ?? "") !== planFilter) return false;
-    if (q && !(r.full_name ?? "").toLowerCase().includes(q.toLowerCase())) return false;
+    if (!memberMatchesQuery(r, q)) return false;
     return true;
   });
+
+  const sorted = useMemo(
+    () => sortMembers(filtered, sort, plans.map((p) => p.name)),
+    [filtered, sort, plans],
+  );
+
+  const changeSort = (key: MemberSortKey) => {
+    setSort((prev) => (prev.key === key
+      ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+      : { key, dir: key === "created_at" || key === "last_seen_at" ? "desc" : "asc" }));
+  };
+
+  const toggleSelect = (id: string, index: number, shiftKey: boolean) => {
+    const anchor = lastClickedIndex.current;
+    let next: string[];
+    if (shiftKey && anchor !== null) {
+      const [from, to] = [anchor, index].sort((a, b) => a - b);
+      const range = sorted.slice(from, to + 1).map((m) => m.id);
+      next = Array.from(new Set([...selectedIds, ...range]));
+    } else {
+      next = selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id];
+    }
+    setSelectedIds(next);
+    lastClickedIndex.current = index;
+  };
+
+  const copyEmail = async (member: Member) => {
+    const email = member.email?.trim();
+    if (!email) return;
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedId(member.id);
+      setTimeout(() => setCopiedId((current) => (current === member.id ? null : current)), 1600);
+      toast.success("Email copiado");
+    } catch {
+      toast.error("Não foi possível copiar o email");
+    }
+  };
 
   const setStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
@@ -161,11 +248,12 @@ function Page() {
   };
 
   const exportCsv = () => {
-    const head = "Nome,Plano,Status,Cadastro\n";
-    const body = filtered.map((r) => `"${r.full_name ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${r.status}","${r.created_at}"`).join("\n");
-    const blob = new Blob([head + body], { type: "text/csv" });
+    const head = "Nome,Email,Plano,Status,Cadastro\n";
+    const body = sorted.map((r) => `"${r.full_name ?? ""}","${r.email ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${statusLabel(r.status)}","${r.created_at}"`).join("\n");
+    const blob = new Blob(["\uFEFF" + head + body], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "membros.csv"; a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -173,27 +261,46 @@ function Page() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Membros</h1>
-          <p className="text-sm text-muted-foreground">{filtered.length} de {rows.length} membros</p>
+          <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <span>{filtered.length} de {rows.length} membros</span>
+            {filtersActive && (
+              <button type="button" onClick={clearFilters} className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-xs text-foreground transition hover:bg-muted/60">
+                <X className="h-3 w-3" /> Limpar filtros
+              </button>
+            )}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setTagTarget({ memberIds: [], title: "Gerenciar tags" })}><Tag />Tags</Button>
-          <button onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-white/10"><Download className="h-4 w-4" />CSV</button>
-          <button onClick={() => setAdding(true)} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Adicionar</button>
+          <button type="button" onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-muted/60"><Download className="h-4 w-4" />CSV</button>
+          <button type="button" onClick={() => setAdding(true)} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Adicionar</button>
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-4 flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome..." className="w-full bg-muted/40 border border-border rounded-xl pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+      <div className="glass rounded-2xl p-3 flex items-center gap-2 flex-wrap">
+        <div className="relative min-w-[220px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            type="search"
+            aria-label="Buscar membros por nome, email ou telefone"
+            placeholder="Buscar por nome, email ou telefone..."
+            className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-9 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary/40"
+          />
+          {q && (
+            <button type="button" onClick={() => setQ("")} aria-label="Limpar busca" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
+        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setSelectedIds([]); }} aria-label="Filtrar por status" className={filterSelectClass} style={{ colorScheme: "dark" }}>
           <option value="all">Todos status</option><option value="active">Ativo</option><option value="suspended">Suspenso</option><option value="pending">Pendente</option>
         </select>
-        <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
+        <select value={planFilter} onChange={(e) => { setPlanFilter(e.target.value); setSelectedIds([]); }} aria-label="Filtrar por plano" className={filterSelectClass} style={{ colorScheme: "dark" }}>
           <option value="all">Todos planos</option><option value="pending">Pendente (sem acesso)</option><PlanOptions includePending={false} />
         </select>
-        <select aria-label="Filtrar por tag" value={tagFilter} disabled={memberTags.loading} onChange={(event) => { setTagFilter(event.target.value); setSelectedIds([]); }} className="h-9 max-w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground">
+        <select aria-label="Filtrar por tag" value={tagFilter} disabled={memberTags.loading} onChange={(event) => { setTagFilter(event.target.value); setSelectedIds([]); }} className={filterSelectClass} style={{ colorScheme: "dark" }}>
           <option value="all">Todas as tags</option>
           <option value="untagged">Sem tags</option>
           {memberTags.tags.map((tag) => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
@@ -256,83 +363,149 @@ function Page() {
 
       <div className="glass rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground bg-card sticky top-0">
-              <tr>
-                <th className="px-4 py-3 w-14 text-center">
+          <table className="w-full min-w-[920px] text-sm">
+            <thead className="sticky top-0 z-10 bg-card text-xs text-muted-foreground">
+              <tr className="border-b border-border">
+                <th scope="col" className="w-14 px-4 py-3 text-center">
                   <input
                     type="checkbox"
-                    checked={filtered.length > 0 && selectedIds.length === filtered.length}
+                    aria-label="Selecionar todos os membros listados"
+                    checked={sorted.length > 0 && selectedIds.length === sorted.length}
                     onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedIds(filtered.map(r => r.id));
-                      } else {
-                        setSelectedIds([]);
-                      }
+                      setSelectedIds(e.target.checked ? sorted.map((r) => r.id) : []);
+                      lastClickedIndex.current = null;
                     }}
-                    className="size-6 shrink-0 accent-primary rounded-md cursor-pointer"
+                    className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
                   />
                 </th>
-                <th className="text-left font-medium px-4 py-3">Membro</th>
-                <th className="text-left font-medium px-4 py-3">Plano</th>
-                <th className="text-left font-medium px-4 py-3">Tags</th>
-                <th className="text-left font-medium px-4 py-3">Status</th>
-                <th className="text-left font-medium px-4 py-3">Cadastro</th>
-                <th className="text-left font-medium px-4 py-3">Último acesso</th>
-                <th className="px-4 py-3"></th>
+                <SortHeader label="Membro" sortKey="name" sort={sort} onSort={changeSort} className="w-[320px]" />
+                <SortHeader label="Plano" sortKey="plan" sort={sort} onSort={changeSort} />
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">Tags</th>
+                <SortHeader label="Status" sortKey="status" sort={sort} onSort={changeSort} />
+                <SortHeader label="Cadastro" sortKey="created_at" sort={sort} onSort={changeSort} />
+                <SortHeader label="Último acesso" sortKey="last_seen_at" sort={sort} onSort={changeSort} />
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {loading && <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-xs">Carregando...</td></tr>}
-              {!loading && filtered.length === 0 && <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-xs">Nenhum membro encontrado</td></tr>}
-              {filtered.map((r) => (
-                <tr key={r.id} className={`hover:bg-card transition cursor-pointer select-none group ${selectedIds.includes(r.id) ? "bg-primary/[0.02]" : ""}`}>
-                  <td className="px-4 py-3 w-14 text-center" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(r.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedIds([...selectedIds, r.id]);
-                        } else {
-                          setSelectedIds(selectedIds.filter(id => id !== r.id));
-                        }
-                      }}
-                      className="size-6 shrink-0 accent-primary rounded-md cursor-pointer"
-                    />
-                  </td>
-                  <td className="px-4 py-3" onClick={() => setViewing(r)}>
+            <tbody className="divide-y divide-border">
+              {loading && Array.from({ length: 6 }).map((_, i) => (
+                <tr key={`skeleton-${i}`}>
+                  <td colSpan={8} className="px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground group-hover:scale-105 transition duration-200">
-                        {(r.full_name ?? "U").slice(0, 2).toUpperCase()}
+                      <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-muted/60" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-40 animate-pulse rounded bg-muted/60" />
+                        <div className="h-3 w-60 animate-pulse rounded bg-muted/40" />
                       </div>
-                      <div className="font-medium group-hover:text-primary transition duration-200">{r.full_name ?? "Sem nome"}</div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3" onClick={() => setViewing(r)}><span className={`text-xs px-2 py-1 rounded-md ${isPendingPlan(r.plan) ? "bg-amber-500/10 text-amber-400" : "bg-muted/40"}`}>{isPendingPlan(r.plan) ? "Pendente" : r.plan}</span></td>
-                  <td className="px-4 py-3" onClick={(event) => event.stopPropagation()}>
-                    <div className="flex max-w-64 flex-wrap items-center gap-1.5">
-                      {tagsFor(r.id).map((tag) => <span key={tag.id} className="max-w-full break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary">{tag.name}</span>)}
-                      <Button variant="ghost" size="icon" aria-label={`Tags de ${r.full_name ?? "Sem nome"}`} title="Editar tags" onClick={() => setTagTarget({ memberIds: [r.id], title: `Tags · ${r.full_name ?? "Sem nome"}` })}><Tag /></Button>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3" onClick={() => setViewing(r)}>
-                    <span className={`text-xs px-2 py-1 rounded-md ${r.status === "active" ? "bg-emerald-500/10 text-emerald-400" : r.status === "suspended" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>{r.status}</span>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground" onClick={() => setViewing(r)}>{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
-                  <td className="px-4 py-3 text-muted-foreground" onClick={() => setViewing(r)}>{r.last_seen_at ? new Date(r.last_seen_at).toLocaleDateString("pt-BR") : "—"}</td>
-                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                    <div className="inline-flex gap-1">
-                      <button onClick={() => setViewing(r)} className="p-1.5 rounded-lg hover:bg-white/10" title="Visualizar Detalhes"><Eye className="h-3.5 w-3.5" /></button>
-                      <button onClick={() => setEditing(r)} className="p-1.5 rounded-lg hover:bg-white/10" title="Editar"><Edit3 className="h-3.5 w-3.5" /></button>
-                      <button onClick={() => setStatus(r.id, r.status === "active" ? "suspended" : "active")} className="p-1.5 rounded-lg hover:bg-white/10" title="Suspender/Reativar">
-                        {r.status === "active" ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-                      </button>
-                      <button onClick={() => remove(r.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400" title="Excluir"><Trash2 className="h-3.5 w-3.5" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
+              {!loading && sorted.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-4 py-14 text-center">
+                    <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
+                      <div className="rounded-full border border-border bg-muted/30 p-3">
+                        {rows.length === 0 ? <UserPlus className="h-5 w-5 text-muted-foreground" /> : <Search className="h-5 w-5 text-muted-foreground" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{rows.length === 0 ? "Nenhum membro ainda" : "Nenhum membro encontrado"}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {rows.length === 0 ? "Adicione o primeiro membro para começar." : "Nenhum resultado com os filtros aplicados."}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        {rows.length > 0 && <Button variant="outline" size="sm" onClick={clearFilters}><X />Limpar filtros</Button>}
+                        <Button size="sm" onClick={() => setAdding(true)}><Plus />Adicionar membro</Button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {sorted.map((r, index) => {
+                const rowTags = tagsFor(r.id);
+                return (
+                <tr
+                  key={r.id}
+                  tabIndex={0}
+                  onClick={() => setViewing(r)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); setViewing(r); } }}
+                  className={`group cursor-pointer select-none outline-none transition hover:bg-card focus-visible:bg-card focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary/40 ${selectedIds.includes(r.id) ? "bg-primary/[0.04]" : ""}`}
+                >
+                  <td className="w-14 px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Selecionar ${r.full_name ?? "Sem nome"}`}
+                      checked={selectedIds.includes(r.id)}
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(r.id, index, e.nativeEvent.shiftKey); }}
+                      onChange={() => {}}
+                      className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
+                    />
+                  </td>
+                  <td className="w-[320px] px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 shrink-0 rounded-full gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground">
+                        {(r.full_name ?? "U").slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate font-medium transition duration-200 group-hover:text-primary">{r.full_name ?? "Sem nome"}</div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="truncate text-xs text-muted-foreground">{r.email?.trim() || "sem email"}</span>
+                          {r.email?.trim() && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); copyEmail(r); }}
+                              aria-label={`Copiar email de ${r.full_name ?? "Sem nome"}`}
+                              title="Copiar email"
+                              className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition hover:bg-muted/60 hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
+                            >
+                              {copiedId === r.id ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    <span className={`rounded-md px-2 py-1 text-xs ${isPendingPlan(r.plan) ? "bg-amber-500/10 text-amber-400" : "bg-muted/40 text-foreground"}`}>
+                      {isPendingPlan(r.plan) ? "Pendente" : r.plan}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex max-w-56 flex-wrap items-center gap-1.5">
+                      {rowTags.map((tag) => <span key={tag.id} className="max-w-full break-words rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs text-primary">{tag.name}</span>)}
+                      <button
+                        type="button"
+                        onClick={() => setTagTarget({ memberIds: [r.id], title: `Tags · ${r.full_name ?? "Sem nome"}` })}
+                        aria-label={`Tags de ${r.full_name ?? "Sem nome"}`}
+                        title="Editar tags"
+                        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition hover:bg-muted/60 ${rowTags.length ? "text-muted-foreground" : "border border-dashed border-border text-muted-foreground"}`}
+                      >
+                        {rowTags.length ? <Tag className="h-3.5 w-3.5" /> : <><Plus className="h-3 w-3" />Tag</>}
+                      </button>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3"><StatusPill status={r.status} /></td>
+                  <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
+                  <td
+                    className="whitespace-nowrap px-4 py-3 text-muted-foreground"
+                    title={r.last_seen_at ? new Date(r.last_seen_at).toLocaleString("pt-BR") : undefined}
+                  >
+                    {r.last_seen_at ? relativeDay(r.last_seen_at) : "—"}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="inline-flex gap-1">
+                      <button type="button" onClick={() => setViewing(r)} aria-label="Visualizar detalhes" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Eye className="h-3.5 w-3.5" /></button>
+                      <button type="button" onClick={() => setEditing(r)} aria-label="Editar membro" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Edit3 className="h-3.5 w-3.5" /></button>
+                      <button type="button" onClick={() => setStatus(r.id, r.status === "active" ? "suspended" : "active")} aria-label={r.status === "active" ? "Suspender membro" : "Reativar membro"} className="p-1.5 rounded-lg transition hover:bg-muted/60">
+                        {r.status === "active" ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                      </button>
+                      <button type="button" onClick={() => remove(r.id)} aria-label="Excluir membro" className="p-1.5 rounded-lg text-red-400 transition hover:bg-red-500/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                    </div>
+                  </td>
+                </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
