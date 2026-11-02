@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { nextBannerIndex } from "@/lib/course-banners";
 import type { CourseBanner } from "@/lib/course-banners";
 
-export function CourseBannerCarousel({ banners, urls, intervalSeconds }: { banners: CourseBanner[]; urls: Record<string, string>; intervalSeconds: number }) {
+export function CourseBannerCarousel({ banners, urls, intervalSeconds, onImageError }: { banners: CourseBanner[]; urls: Record<string, string>; intervalSeconds: number; onImageError?: (path: string) => void }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [hovered, setHovered] = useState(false);

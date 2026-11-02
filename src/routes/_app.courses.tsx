@@ -155,7 +155,7 @@ function CoursesList() {
         )}
       </div>
 
-      {banners.length > 0 && bannerData && <CourseBannerCarousel banners={banners} urls={bannerData.urls} intervalSeconds={bannerData.config.intervalSeconds} />}
+      {bannersResolved && banners.length > 0 && bannerData && <CourseBannerCarousel banners={banners} urls={bannerData.urls} intervalSeconds={bannerData.config.intervalSeconds} onImageError={markBroken} />}
 
       {isLoading ? (
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-6 sm:mx-0 sm:px-0">
@@ -179,7 +179,7 @@ function CoursesList() {
         </div>
       ) : featured && (
         <div className="space-y-8">
-          {bannerData && banners.length === 0 && <Link
+          {bannersResolved && bannersReady && banners.length === 0 && <Link
             to="/courses/$courseId"
             params={{ courseId: featured.id }}
             className="group relative block min-h-72 overflow-hidden rounded-md border border-border bg-card sm:min-h-96 lg:min-h-[28rem]"
