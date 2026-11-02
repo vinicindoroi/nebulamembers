@@ -2065,6 +2065,12 @@ export type Database = {
           starts_at: string
         }[]
       }
+      mentor_group_booked_weeks: {
+        Args: never
+        Returns: {
+          week_start: string
+        }[]
+      }
       plan_level: { Args: { _plan: string }; Returns: number }
       plan_slug: { Args: { _plan: string }; Returns: string }
       set_content_password: {
