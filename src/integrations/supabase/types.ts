@@ -1121,6 +1121,64 @@ export type Database = {
         }
         Relationships: []
       }
+      member_tag_assignments: {
+        Row: {
+          created_at: string
+          member_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          member_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          member_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_tag_assignments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_tag_assignments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "member_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       mentor_availability: {
         Row: {
           created_at: string

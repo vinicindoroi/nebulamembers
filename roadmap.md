@@ -2,3 +2,4 @@
 - [x] Aplicar nova logo em toda a plataforma e favicon
 - [x] Corrigir o enquadramento do banner e a navegação horizontal do catálogo
 - [x] Redesenhar o criador de funis com painéis fixos, canvas amplo e o mesmo tema grafite/ciano da plataforma
+- [x] Adicionar tags personalizadas aos alunos e filtros administrativos
