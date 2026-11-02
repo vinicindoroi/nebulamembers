@@ -71,6 +71,13 @@
       "when": 1793646066527,
       "tag": "0009_member_custom_tags",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793648334879,
+      "tag": "0010_member_groups",
+      "breakpoints": true
     }
   ]
 }
