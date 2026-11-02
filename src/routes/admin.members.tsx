@@ -167,14 +167,16 @@ function Page() {
 
   const toggleSelect = (id: string, index: number, shiftKey: boolean) => {
     const anchor = lastClickedIndex.current;
-    setSelectedIds((prev) => {
-      if (shiftKey && anchor !== null) {
-        const [from, to] = [anchor, index].sort((a, b) => a - b);
-        const range = sorted.slice(from, to + 1).map((m) => m.id);
-        return Array.from(new Set([...prev, ...range]));
-      }
-      return prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-    });
+    let next: string[];
+    if (shiftKey && anchor !== null) {
+      const [from, to] = [anchor, index].sort((a, b) => a - b);
+      const range = sorted.slice(from, to + 1).map((m) => m.id);
+      next = Array.from(new Set([...selectedIds, ...range]));
+    } else {
+      next = selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id];
+    }
+    console.log("[select]", JSON.stringify({ index, shiftKey, anchor, sortedLen: sorted.length, prevLen: selectedIds.length, nextLen: next.length }));
+    setSelectedIds(next);
     lastClickedIndex.current = index;
   };
 
