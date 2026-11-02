@@ -4,6 +4,7 @@ import { Orbit, Mail, Lock, ArrowRight, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
 
 type LoginSearch = {
   mode?: "signin" | "signup";
@@ -111,9 +112,7 @@ function LoginPage() {
       <div className="w-full max-w-md animate-fade-up">
         <div className="glass-strong rounded-2xl p-8 md:p-10">
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center glow mb-4">
-              <Orbit className="h-6 w-6 text-primary-foreground" />
-            </div>
+            <img src={brandLogo.url} alt="Nebula Members" className="mb-5 h-12 w-full max-w-xs object-contain" />
             <h1 className="text-2xl font-semibold">
               {mode === "signin" ? "Bem-vindo de volta" : "Crie sua conta"}
             </h1>
