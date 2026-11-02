@@ -175,7 +175,6 @@ function Page() {
     } else {
       next = selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id];
     }
-    console.log("[select]", JSON.stringify({ index, shiftKey, anchor, sortedLen: sorted.length, prevLen: selectedIds.length, nextLen: next.length }));
     setSelectedIds(next);
     lastClickedIndex.current = index;
   };
