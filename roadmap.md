@@ -3,3 +3,4 @@
 - [x] Corrigir o enquadramento do banner e a navegação horizontal do catálogo
 - [x] Redesenhar o criador de funis com painéis fixos, canvas amplo e o mesmo tema grafite/ciano da plataforma
 - [x] Adicionar tags personalizadas aos alunos e filtros administrativos
+- [ ] Compartilhar grupos entre Membros e Agendamento, com atribuição e filtro em Membros
