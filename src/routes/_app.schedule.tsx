@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
-  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal,
+  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal, weekKey, zonedToDate,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
 
@@ -36,6 +36,7 @@ function SchedulePage() {
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const [mine, setMine] = useState<Booking[]>([]);
+  const [groupWeeks, setGroupWeeks] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(true);
   const [day, setDay] = useState<Date | undefined>();
@@ -54,12 +55,15 @@ function SchedulePage() {
       setAvailability(cfg.availability);
       const from = new Date();
       const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
-      const [b, m] = await Promise.all([
+      const [b, m, g] = await Promise.all([
         supabase.rpc("mentor_busy_slots", { _from: from.toISOString(), _to: to.toISOString() }),
         supabase.from("mentor_bookings").select("*").eq("user_id", user.id).order("starts_at", { ascending: false }),
+        supabase.rpc("mentor_group_booked_weeks"),
       ]);
+      if (b.error || m.error || g.error) throw b.error || m.error || g.error;
       setBusy(new Set((b.data ?? []).map((x) => new Date(x.starts_at).getTime())));
       setMine((m.data ?? []) as Booking[]);
+      setGroupWeeks(new Set((g.data ?? []).map((row) => row.week_start)));
     } catch {
       toast.error("Não foi possível carregar a agenda.");
     } finally {
@@ -97,17 +101,23 @@ function SchedulePage() {
 
   const tz = settings?.timezone ?? "America/Sao_Paulo";
   const freeSlots = (ymd: string) =>
-    settings ? slotsForDay(ymd, settings, availability).filter((d) => !busy.has(d.getTime())) : [];
+    settings && !groupWeeks.has(weekKey(zonedToDate(ymd, 720, tz), tz)) ? slotsForDay(ymd, settings, availability).filter((d) => !busy.has(d.getTime())) : [];
   const daySlots = day ? freeSlots(ymdFromLocal(day)) : [];
   const upcoming = mine.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date());
   const past = mine.filter((b) => !upcoming.includes(b));
+  useEffect(() => {
+    if (day && groupWeeks.has(weekKey(zonedToDate(ymdFromLocal(day), 720, tz), tz))) {
+      setDay(undefined); setSlot(null);
+      toast.info("Seu grupo já tem uma call nesta semana. Escolha outra semana.");
+    }
+  }, [groupWeeks, day, tz]);
 
   async function book() {
     if (!slot) return;
     setSaving(true);
     const { data: newId, error } = await supabase.rpc("book_mentor_call", { _starts_at: slot.toISOString(), _notes: notes || undefined });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { void load(); return toast.error(error.message); }
     toast.success("Call agendada!");
     if (newId) syncBookingToGoogle({ data: { bookingId: newId as string } }).catch(() => {});
     setSlot(null); setNotes(""); setDay(undefined);
@@ -135,6 +145,7 @@ function SchedulePage() {
           Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez.
         </p>
       </header>
+      {groupWeeks.size > 0 && upcoming.length === 0 && <p className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">Seu grupo já tem uma call em uma das semanas. Os dias dessa semana ficam indisponíveis; você pode escolher outra semana.</p>}
 
       {upcoming.length > 0 && (
         <section className="space-y-3">
