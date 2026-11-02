@@ -92,6 +92,23 @@ function Agenda({ settings, bookings, profiles, reload }: {
 }) {
   const tz = settings.timezone;
   const [day, setDay] = useState<Date | undefined>(new Date());
+  const [resched, setResched] = useState<Booking | null>(null);
+  const [rDate, setRDate] = useState("");
+  const [rTime, setRTime] = useState("");
+  const [rSaving, setRSaving] = useState(false);
+
+  async function doReschedule() {
+    if (!resched || !rDate || !/^\d{2}:\d{2}$/.test(rTime)) return toast.error("Informe data e horário.");
+    const [h, m] = rTime.split(":").map(Number);
+    const startsAt = zonedToDate(rDate, h * 60 + m, tz);
+    setRSaving(true);
+    const { error } = await (supabase as any).rpc("admin_reschedule_booking", { _id: resched.id, _starts_at: startsAt.toISOString() });
+    setRSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Call remarcada. O aluno foi notificado.");
+    setResched(null);
+    reload();
+  }
   const active = bookings.filter((b) => b.status !== "cancelled");
   const byDay = useMemo(() => {
     const m: Record<string, Booking[]> = {};
@@ -164,6 +181,7 @@ function Agenda({ settings, bookings, profiles, reload }: {
               {settings.meeting_link && !isPast && (
                 <Button asChild size="sm"><a href={settings.meeting_link} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
               )}
+              <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
               <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
               <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
             </>
