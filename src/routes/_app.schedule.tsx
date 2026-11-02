@@ -8,6 +8,7 @@ import { useAdmin } from "@/hooks/use-admin";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ptBR } from "date-fns/locale";
 import {
   fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
@@ -169,47 +170,82 @@ function SchedulePage() {
           {isAdmin && <span className="mt-2 block text-primary">Você é admin: abra em Admin → Agendamentos → Disponibilidade → "Abrir agendamentos".</span>}
         </div>
       ) : (
-        <section className="grid gap-6 rounded-xl border border-border bg-card p-5 md:grid-cols-[auto_1fr]">
-          <Calendar
-            mode="single"
-            selected={day}
-            onSelect={(d) => { setDay(d); setSlot(null); }}
-            fromDate={today}
-            toDate={lastDay}
-            disabled={(d) => d < today || d > lastDay || freeSlots(ymdFromLocal(d)).length === 0}
-            className="p-0 pointer-events-auto"
-          />
-          <div className="space-y-4">
-            {!day ? (
-              <p className="text-sm text-muted-foreground">Selecione um dia disponível no calendário.</p>
-            ) : (
-              <>
-                <h3 className="font-semibold capitalize">{day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h3>
-                {daySlots.length > 0 && takenWeeks.has(weekKey(daySlots[0], tz)) ? (
-                  <p className="text-sm text-muted-foreground">Você já tem uma call nesta semana. Escolha um dia de outra semana.</p>
-                ) : daySlots.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Sem horários livres neste dia.</p>
-                ) : (
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {daySlots.map((d) => (
-                      <Button key={d.getTime()} variant={slot?.getTime() === d.getTime() ? "default" : "outline"} size="sm" onClick={() => setSlot(d)}>
-                        <Clock className="h-3.5 w-3.5" /> {fmtTime(d, tz)}
-                      </Button>
-                    ))}
+        <section className="grid overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-[auto_minmax(0,1fr)]">
+          <div className="border-b border-border p-5 sm:p-7 lg:border-b-0 lg:border-r">
+            <StepLabel n={1} label="Escolha o dia" done={!!day} />
+            <div className="mt-5 flex justify-center">
+              <Calendar
+                mode="single"
+                locale={ptBR}
+                selected={day}
+                onSelect={(d) => { setDay(d); setSlot(null); }}
+                startMonth={today}
+                endMonth={lastDay}
+                disabled={(d) => d < today || d > lastDay || freeSlots(ymdFromLocal(d)).length === 0}
+                modifiers={{ mine: (d) => upcoming.some((b) => ymdFromLocal(new Date(b.starts_at)) === ymdFromLocal(d)) }}
+                modifiersClassNames={{ mine: "[&_button]:ring-2 [&_button]:ring-primary" }}
+                className="bg-transparent p-0 pointer-events-auto [--cell-size:2.75rem] sm:[--cell-size:3.5rem] xl:[--cell-size:4rem] [&_.rdp-caption_label]:text-base [&_.rdp-caption_label]:capitalize [&_.rdp-day]:text-base"
+              />
+            </div>
+            <div className="mt-5 flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-foreground" /> Disponível</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" /> Indisponível</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-primary" /> Selecionado</span>
+            </div>
+          </div>
+
+          <div className="flex min-w-0 flex-col p-5 sm:p-7">
+            <StepLabel n={2} label="Escolha o horário" done={!!slot} />
+            <div className="mt-5 flex-1 space-y-5">
+              {!day ? (
+                <div className="flex h-full min-h-48 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border p-8 text-center">
+                  <CalendarClock className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Selecione um dia no calendário para ver os horários livres.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="text-lg font-semibold capitalize">{day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h3>
+                    {daySlots.length > 0 && <span className="shrink-0 text-xs text-muted-foreground">{daySlots.length} {daySlots.length === 1 ? "horário" : "horários"}</span>}
                   </div>
-                )}
-                {slot && (
-                  <div className="space-y-3 border-t border-border pt-4">
-                    <Textarea placeholder="Sobre o que você quer falar? (opcional)" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={1000} />
-                    <Button onClick={book} disabled={saving} className="w-full sm:w-auto">
-                      {saving && <Loader2 className="h-4 w-4 animate-spin" />} Confirmar {fmtTime(slot, tz)}
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
-            {settings.instructions && <p className="whitespace-pre-line text-xs text-muted-foreground">{settings.instructions}</p>}
-            <p className="text-xs text-muted-foreground">Horários no fuso de Brasília.</p>
+                  {daySlots.length > 0 && takenWeeks.has(weekKey(daySlots[0], tz)) ? (
+                    <p className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">Você já tem uma call nesta semana. Escolha um dia de outra semana.</p>
+                  ) : daySlots.length === 0 ? (
+                    <p className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">Sem horários livres neste dia.</p>
+                  ) : (
+                    periodGroups(daySlots, tz).map(([label, items]) => (
+                      <div key={label} className="space-y-2">
+                        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 xl:grid-cols-5">
+                          {items.map((d) => (
+                            <Button key={d.getTime()} variant={slot?.getTime() === d.getTime() ? "default" : "outline"} className="h-11 text-sm" onClick={() => setSlot(d)}>
+                              {fmtTime(d, tz)}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
+
+              {slot && (
+                <div className="space-y-3 rounded-xl border border-primary/40 bg-primary/5 p-4">
+                  <StepLabel n={3} label="Confirme" done={false} />
+                  <p className="text-sm">
+                    <span className="font-semibold capitalize">{fmtDate(slot, tz)}</span> · {fmtTime(slot, tz)} – {fmtTime(new Date(slot.getTime() + settings.slot_minutes * 60000), tz)}
+                  </p>
+                  <Textarea placeholder="Sobre o que você quer falar? (opcional)" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={1000} />
+                  <Button onClick={book} disabled={saving} className="h-11 w-full">
+                    {saving && <Loader2 className="h-4 w-4 animate-spin" />} Confirmar agendamento
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="mt-6 space-y-1 border-t border-border pt-4">
+              {settings.instructions && <p className="whitespace-pre-line text-xs text-muted-foreground">{settings.instructions}</p>}
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> Horários no fuso de Brasília · {settings.slot_minutes} min por call</p>
+            </div>
           </div>
         </section>
       )}
@@ -227,4 +263,22 @@ function SchedulePage() {
       )}
     </div>
   );
+}
+
+function StepLabel({ n, label, done }: { n: number; label: string; done: boolean }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${done ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{n}</span>
+      <span className="text-sm font-semibold">{label}</span>
+    </div>
+  );
+}
+
+function periodGroups(slots: Date[], tz: string): [string, Date[]][] {
+  const groups: Record<string, Date[]> = { Manhã: [], Tarde: [], Noite: [] };
+  for (const d of slots) {
+    const h = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: tz }).format(d));
+    groups[h < 12 ? "Manhã" : h < 18 ? "Tarde" : "Noite"].push(d);
+  }
+  return Object.entries(groups).filter(([, v]) => v.length > 0);
 }
