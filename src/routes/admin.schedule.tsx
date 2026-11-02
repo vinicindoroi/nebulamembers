@@ -154,6 +154,17 @@ function Agenda({ settings, bookings, profiles, reload }: {
   );
 }
 
+const Step = ({ n, title, desc, children }: { n: number; title: string; desc: string; children: ReactNode }) => (
+    <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+      <div className="flex gap-3">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">{n}</span>
+        <div><p className="font-semibold">{title}</p><p className="text-xs text-muted-foreground">{desc}</p></div>
+      </div>
+      {children}
+    </section>
+  );
+
+
 function Config({ settings, availability, reload }: { settings: ScheduleSettings; availability: Availability[]; reload: () => void }) {
   const [form, setForm] = useState(settings);
   const [saving, setSaving] = useState(false);
@@ -190,16 +201,6 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
     setForm(n);
     save(n, n.enabled ? "Agendamentos abertos para os alunos." : "Agendamentos fechados.");
   };
-
-  const Step = ({ n, title, desc, children }: { n: number; title: string; desc: string; children: ReactNode }) => (
-    <section className="space-y-4 rounded-xl border border-border bg-card p-5">
-      <div className="flex gap-3">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">{n}</span>
-        <div><p className="font-semibold">{title}</p><p className="text-xs text-muted-foreground">{desc}</p></div>
-      </div>
-      {children}
-    </section>
-  );
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
