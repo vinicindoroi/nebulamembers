@@ -4,4 +4,4 @@
 - [x] Redesenhar o criador de funis com painéis fixos, canvas amplo e o mesmo tema grafite/ciano da plataforma
 - [x] Adicionar tags personalizadas aos alunos e filtros administrativos
 - [x] Compartilhar grupos entre Membros e Agendamento, com atribuição e filtro em Membros
-- [ ] Impedir mais de uma call por semana para integrantes do mesmo grupo
+- [x] Impedir mais de uma call por semana para integrantes do mesmo grupo
