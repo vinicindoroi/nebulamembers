@@ -331,68 +331,137 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
     setForm(n);
     save(n, n.enabled ? "Agendamentos abertos para os alunos." : "Agendamentos fechados.");
   };
+  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  const slotsOf = (wins: Availability[]) =>
+    wins.reduce((n, w) => n + Math.max(0, Math.floor((toMin(w.end_time) - toMin(w.start_time)) / (form.slot_minutes || 60))), 0);
+  const weekSlots = WEEKDAYS.reduce((n, _, wd) => n + slotsOf(availability.filter((a) => a.weekday === wd)), 0);
+  const dirty = ["slot_minutes", "min_notice_hours", "max_days_ahead", "meeting_link", "instructions"]
+    .some((k) => ((form as any)[k] ?? "") !== ((settings as any)[k] ?? ""));
+
+  async function copyTo(fromWd: number, targets: number[]) {
+    const src = availability.filter((a) => a.weekday === fromWd);
+    if (!src.length) return;
+    const tg = targets.filter((t) => t !== fromWd);
+    const ids = availability.filter((a) => tg.includes(a.weekday)).map((a) => a.id);
+    if (ids.length) await supabase.from("mentor_availability").delete().in("id", ids);
+    const rows = tg.flatMap((weekday) => src.map((w) => ({ weekday, start_time: w.start_time, end_time: w.end_time })));
+    const { error } = await supabase.from("mentor_availability").insert(rows);
+    if (error) return toast.error(error.message);
+    toast.success("Horários copiados.");
+    reload();
+  }
+  function setBlocked(ds: Date[] | undefined) {
+    const n = { ...form, blocked_dates: (ds ?? []).map(ymdFromLocal).sort() };
+    setForm(n);
+    save({ ...settings, blocked_dates: n.blocked_dates }, "Dias de folga atualizados.");
+  }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
+    <div className="space-y-5 pb-24">
       <div className={`flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5 ${form.enabled ? "border-primary/40 bg-primary/10" : "border-border bg-card"}`}>
-        <div>
-          <p className="font-semibold">{form.enabled ? "🟢 Agendamentos abertos" : "⚪ Agendamentos fechados"}</p>
-          <p className="text-sm text-muted-foreground">
-            {form.enabled ? "Os alunos já podem marcar calls nos horários abaixo." : "Os alunos não veem a aba. Cadastre seus horários e clique em abrir."}
-          </p>
+        <div className="flex items-center gap-3">
+          <span className={`h-2.5 w-2.5 rounded-full ${form.enabled ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
+          <div>
+            <p className="font-semibold">{form.enabled ? "Agendamentos abertos" : "Agendamentos fechados"}</p>
+            <p className="text-sm text-muted-foreground">
+              {form.enabled ? `Os alunos podem marcar · ${weekSlots} horários por semana` : "Os alunos não conseguem marcar no momento."}
+            </p>
+          </div>
         </div>
         <Button onClick={toggle} disabled={saving} variant={form.enabled ? "outline" : "default"}>
           {form.enabled ? "Fechar agendamentos" : "Abrir agendamentos"}
         </Button>
       </div>
 
-      <Step n={1} title="Seus horários na semana" desc="Em quais dias e faixas de horário você atende. As calls são divididas automaticamente pela duração.">
-        <div className="divide-y divide-border">
-          {WEEKDAYS.map((name, wd) => {
-            const wins = availability.filter((a) => a.weekday === wd);
-            return (
-              <div key={wd} className="flex flex-wrap items-center gap-2 py-2.5 text-sm">
-                <span className="w-24 font-medium">{name}</span>
-                {wins.length === 0 && adding !== wd && <span className="text-xs text-muted-foreground">Não atendo</span>}
-                {wins.map((w) => (
-                  <span key={w.id} className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1 text-xs">
-                    {w.start_time.slice(0, 5)} às {w.end_time.slice(0, 5)}
-                    <button aria-label="Remover horário" onClick={() => removeWindow(w.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <Step n={1} title="Seus horários na semana" desc="Faixas em que você atende. Elas são divididas automaticamente pela duração da call.">
+          <div className="divide-y divide-border">
+            {WEEKDAYS.map((name, wd) => {
+              const wins = availability.filter((a) => a.weekday === wd);
+              const n = slotsOf(wins);
+              return (
+                <div key={wd} className="group flex flex-wrap items-center gap-2 py-3 text-sm">
+                  <div className="w-28">
+                    <p className={`font-medium ${wins.length ? "" : "text-muted-foreground"}`}>{name}</p>
+                    <p className="text-[11px] text-muted-foreground">{wins.length ? `${n} ${n === 1 ? "call" : "calls"}` : "Folga"}</p>
+                  </div>
+                  {wins.map((w) => (
+                    <span key={w.id} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted px-2.5 py-1.5 text-xs font-medium tabular-nums">
+                      {w.start_time.slice(0, 5)} – {w.end_time.slice(0, 5)}
+                      <button aria-label="Remover horário" onClick={() => removeWindow(w.id)} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                  {adding === wd ? (
+                    <span className="flex items-center gap-1.5">
+                      <Input type="time" className="h-8 w-28" value={newWin.start_time} onChange={(e) => setNewWin({ ...newWin, start_time: e.target.value })} />
+                      <span className="text-xs text-muted-foreground">às</span>
+                      <Input type="time" className="h-8 w-28" value={newWin.end_time} onChange={(e) => setNewWin({ ...newWin, end_time: e.target.value })} />
+                      <Button size="sm" className="h-8" onClick={() => addWindow(wd)}><Check className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" className="h-8" onClick={() => setAdding(null)}><X className="h-4 w-4" /></Button>
+                    </span>
+                  ) : (
+                    <div className="ml-auto flex items-center gap-1">
+                      {wins.length > 0 && (
+                        <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" onClick={() => confirm(`Copiar os horários de ${name} para segunda a sexta?`) && copyTo(wd, [1, 2, 3, 4, 5])}>
+                          Copiar p/ dias úteis
+                        </Button>
+                      )}
+                      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setAdding(wd)}><Plus className="h-3.5 w-3.5" /> Horário</Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </Step>
+
+        <div className="space-y-5">
+          <Step n={2} title="Regras da call" desc="Como os alunos podem marcar.">
+            <div className="space-y-1.5">
+              <Label>Duração de cada call</Label>
+              <div className="flex flex-wrap gap-2">
+                {[30, 45, 60, 90].map((m) => (
+                  <Button key={m} size="sm" type="button" variant={form.slot_minutes === m ? "default" : "outline"} onClick={() => setForm({ ...form, slot_minutes: m })}>{m} min</Button>
+                ))}
+                <div className="flex items-center gap-1.5"><Input type="number" min={10} max={240} className="h-9 w-20" value={form.slot_minutes} onChange={(e) => setForm({ ...form, slot_minutes: Number(e.target.value) })} /><span className="text-xs text-muted-foreground">min</span></div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5"><Label>Antecedência mínima</Label><div className="flex items-center gap-2"><Input type="number" min={0} value={form.min_notice_hours} onChange={(e) => setForm({ ...form, min_notice_hours: Number(e.target.value) })} /><span className="text-xs text-muted-foreground">h</span></div></div>
+              <div className="space-y-1.5"><Label>Agenda aberta por</Label><div className="flex items-center gap-2"><Input type="number" min={1} max={365} value={form.max_days_ahead} onChange={(e) => setForm({ ...form, max_days_ahead: Number(e.target.value) })} /><span className="text-xs text-muted-foreground">dias</span></div></div>
+            </div>
+            <div className="space-y-1.5"><Label>Link da call (Meet, Zoom...)</Label><Input placeholder="https://meet.google.com/..." value={form.meeting_link ?? ""} onChange={(e) => setForm({ ...form, meeting_link: e.target.value })} /></div>
+            <div className="space-y-1.5"><Label>Recado para o aluno <span className="font-normal text-muted-foreground">(opcional)</span></Label><Textarea rows={3} value={form.instructions ?? ""} onChange={(e) => setForm({ ...form, instructions: e.target.value })} /></div>
+            <p className="text-xs text-muted-foreground">Limite fixo: 1 call por semana por aluno.</p>
+          </Step>
+
+          <Step n={3} title="Dias de folga" desc="Clique nos dias em que você não vai atender. Salva na hora.">
+            <div className="flex justify-center">
+              <Calendar mode="multiple" locale={ptBR} selected={blocked} onSelect={setBlocked} className="bg-transparent p-0 pointer-events-auto [&_.rdp-caption_label]:capitalize" />
+            </div>
+            {form.blocked_dates.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {form.blocked_dates.map((d) => (
+                  <span key={d} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs">
+                    {dateFromYmd(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+                    <button aria-label="Remover folga" onClick={() => setBlocked(blocked.filter((x) => ymdFromLocal(x) !== d))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
                   </span>
                 ))}
-                {adding === wd ? (
-                  <span className="flex items-center gap-1.5">
-                    <Input type="time" className="h-8 w-28" value={newWin.start_time} onChange={(e) => setNewWin({ ...newWin, start_time: e.target.value })} />
-                    <span className="text-xs text-muted-foreground">às</span>
-                    <Input type="time" className="h-8 w-28" value={newWin.end_time} onChange={(e) => setNewWin({ ...newWin, end_time: e.target.value })} />
-                    <Button size="sm" className="h-8" onClick={() => addWindow(wd)}><Check className="h-4 w-4" /></Button>
-                    <Button size="sm" variant="ghost" className="h-8" onClick={() => setAdding(null)}><X className="h-4 w-4" /></Button>
-                  </span>
-                ) : (
-                  <Button size="sm" variant="ghost" className="ml-auto h-7 text-xs" onClick={() => setAdding(wd)}><Plus className="h-3.5 w-3.5" /> Horário</Button>
-                )}
               </div>
-            );
-          })}
+            )}
+          </Step>
         </div>
-      </Step>
+      </div>
 
-      <Step n={2} title="Regras da call" desc="Como os alunos podem marcar. Lembre de salvar.">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5"><Label>Duração de cada call</Label><div className="flex items-center gap-2"><Input type="number" min={10} max={240} value={form.slot_minutes} onChange={(e) => setForm({ ...form, slot_minutes: Number(e.target.value) })} /><span className="text-xs text-muted-foreground">min</span></div></div>
-          <div className="space-y-1.5"><Label>Marcar com antecedência de</Label><div className="flex items-center gap-2"><Input type="number" min={0} value={form.min_notice_hours} onChange={(e) => setForm({ ...form, min_notice_hours: Number(e.target.value) })} /><span className="text-xs text-muted-foreground">horas</span></div></div>
-          <div className="space-y-1.5"><Label>Mostrar agenda dos próximos</Label><div className="flex items-center gap-2"><Input type="number" min={1} max={365} value={form.max_days_ahead} onChange={(e) => setForm({ ...form, max_days_ahead: Number(e.target.value) })} /><span className="text-xs text-muted-foreground">dias</span></div></div>
+      {dirty && (
+        <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-lg">
+            <span className="text-sm text-muted-foreground">Você tem alterações não salvas</span>
+            <Button size="sm" variant="ghost" onClick={() => setForm({ ...settings, blocked_dates: form.blocked_dates })}>Descartar</Button>
+            <Button size="sm" onClick={() => save()} disabled={saving}>{saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar</Button>
+          </div>
         </div>
-        <div className="space-y-1.5"><Label>Link da call (Meet, Zoom...)</Label><Input placeholder="https://meet.google.com/..." value={form.meeting_link ?? ""} onChange={(e) => setForm({ ...form, meeting_link: e.target.value })} /></div>
-        <div className="space-y-1.5"><Label>Recado para o aluno (opcional)</Label><Textarea value={form.instructions ?? ""} onChange={(e) => setForm({ ...form, instructions: e.target.value })} /></div>
-        <p className="text-xs text-muted-foreground">Limite fixo: 1 call por semana por aluno.</p>
-        <Button onClick={() => save()} disabled={saving}>{saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar regras</Button>
-      </Step>
-
-      <Step n={3} title="Dias de folga (opcional)" desc="Clique nos dias em que você não vai atender, como feriados ou viagens.">
-        <Calendar mode="multiple" selected={blocked} onSelect={(ds) => setForm({ ...form, blocked_dates: (ds ?? []).map(ymdFromLocal).sort() })} className="p-0 pointer-events-auto" />
-        <Button size="sm" variant="outline" onClick={() => save(form, "Dias de folga salvos.")} disabled={saving}>Salvar dias de folga</Button>
-      </Step>
+      )}
     </div>
   );
 }
