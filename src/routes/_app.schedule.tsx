@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarClock, Clock, Loader2, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +40,7 @@ function SchedulePage() {
   const [slot, setSlot] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   async function load() {
     if (!user) return;
@@ -64,6 +65,33 @@ function SchedulePage() {
     }
   }
   useEffect(() => { load(); }, [user?.id]);
+
+  // Atualização ao vivo: aviso compartilhado + checagem periódica/ao voltar à aba
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase.channel("mentor-schedule-room")
+      .on("broadcast", { event: "changed" }, () => load())
+      .subscribe();
+    channelRef.current = ch;
+    const iv = setInterval(load, 20000);
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      supabase.removeChannel(ch);
+      channelRef.current = null;
+      clearInterval(iv);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (slot && busy.has(slot.getTime())) {
+      toast.warning("Esse horário acabou de ser reservado por outro aluno. Escolha outro.");
+      setSlot(null);
+    }
+  }, [busy]);
+
+  const notifyOthers = () => channelRef.current?.send({ type: "broadcast", event: "changed", payload: {} });
 
   const tz = settings?.timezone ?? "America/Sao_Paulo";
   const takenWeeks = useMemo(
