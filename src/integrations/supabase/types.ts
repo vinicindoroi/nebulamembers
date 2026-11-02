@@ -1121,6 +1121,99 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_availability: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          start_time: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
+      mentor_bookings: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          notes: string | null
+          starts_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          notes?: string | null
+          starts_at: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          starts_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mentor_schedule_settings: {
+        Row: {
+          blocked_dates: string[]
+          enabled: boolean
+          id: number
+          instructions: string | null
+          max_days_ahead: number
+          meeting_link: string | null
+          min_notice_hours: number
+          slot_minutes: number
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          blocked_dates?: string[]
+          enabled?: boolean
+          id?: number
+          instructions?: string | null
+          max_days_ahead?: number
+          meeting_link?: string | null
+          min_notice_hours?: number
+          slot_minutes?: number
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          blocked_dates?: string[]
+          enabled?: boolean
+          id?: number
+          instructions?: string | null
+          max_days_ahead?: number
+          meeting_link?: string | null
+          min_notice_hours?: number
+          slot_minutes?: number
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       modules: {
         Row: {
           access_level: string
@@ -1815,11 +1908,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      book_mentor_call: {
+        Args: { _notes?: string; _starts_at: string }
+        Returns: string
+      }
       can_access_lesson: { Args: { _lesson_id: string }; Returns: boolean }
       can_read_lesson_content: {
         Args: { _lesson_id: string }
         Returns: boolean
       }
+      cancel_mentor_booking: { Args: { _id: string }; Returns: undefined }
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
       content_unlocked: { Args: { _lesson_id: string }; Returns: boolean }
       generate_tracking_token: { Args: never; Returns: string }
@@ -1829,6 +1927,13 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      mentor_busy_slots: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          ends_at: string
+          starts_at: string
+        }[]
       }
       plan_level: { Args: { _plan: string }; Returns: number }
       plan_slug: { Args: { _plan: string }; Returns: string }
