@@ -47,6 +47,7 @@ import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminPlansRouteImport } from './routes/admin.plans'
 import { Route as AdminPlayerRouteImport } from './routes/admin.player'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
+import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 
@@ -239,6 +240,11 @@ const AdminSalesRoute = AdminSalesRouteImport.update({
   path: '/sales',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminScheduleRoute = AdminScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -288,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/admin/plans': typeof AdminPlansRoute
   '/admin/player': typeof AdminPlayerRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
@@ -329,6 +336,7 @@ export interface FileRoutesByTo {
   '/admin/plans': typeof AdminPlansRoute
   '/admin/player': typeof AdminPlayerRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
@@ -372,6 +380,7 @@ export interface FileRoutesById {
   '/admin/plans': typeof AdminPlansRoute
   '/admin/player': typeof AdminPlayerRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
@@ -415,6 +424,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/player'
     | '/admin/sales'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/player'
     | '/admin/sales'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/courses/$courseId'
   id:
@@ -498,6 +509,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/player'
     | '/admin/sales'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/_app/courses/$courseId'
   fileRoutesById: FileRoutesById
@@ -781,6 +793,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/schedule': {
+      id: '/admin/schedule'
+      path: '/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof AdminScheduleRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -863,6 +882,7 @@ interface AdminRouteChildren {
   AdminPlansRoute: typeof AdminPlansRoute
   AdminPlayerRoute: typeof AdminPlayerRoute
   AdminSalesRoute: typeof AdminSalesRoute
+  AdminScheduleRoute: typeof AdminScheduleRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
 }
 
@@ -883,6 +903,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPlansRoute: AdminPlansRoute,
   AdminPlayerRoute: AdminPlayerRoute,
   AdminSalesRoute: AdminSalesRoute,
+  AdminScheduleRoute: AdminScheduleRoute,
   AdminSettingsRoute: AdminSettingsRoute,
 }
 
