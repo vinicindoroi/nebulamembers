@@ -26,7 +26,7 @@ export function CourseBannerCarousel({ banners, urls, intervalSeconds, onImageEr
   if (!banners.length) return null;
   return <section aria-label="Banners de Cursos" aria-roledescription="carrossel" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocusCapture={() => setFocused(true)} onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false); }} className="relative aspect-[16/7] overflow-hidden rounded-md bg-card sm:aspect-[32/9]">
     {banners.map((b, i) => <div key={b.id} aria-hidden={i !== index} inert={i !== index} className={`absolute inset-0 transition-opacity duration-700 ease-in-out motion-reduce:transition-none ${i === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
-      {b.courseId ? <Link to="/courses/$courseId" params={{ courseId: b.courseId }} className="block h-full w-full"><img src={urls[b.path]} alt={b.label} className="h-full w-full object-cover object-center" /></Link> : <img src={urls[b.path]} alt={b.label} className="h-full w-full object-cover object-center" />}
+      {b.courseId ? <Link to="/courses/$courseId" params={{ courseId: b.courseId }} className="block h-full w-full"><img src={urls[b.path]} alt={b.label} onError={() => onImageError?.(b.path)} className="h-full w-full object-cover object-center" /></Link> : <img src={urls[b.path]} alt={b.label} onError={() => onImageError?.(b.path)} className="h-full w-full object-cover object-center" />}
     </div>)}
     {banners.length > 1 && <div className="absolute inset-x-3 bottom-3 z-20 flex items-center justify-between gap-3">
       <div className="flex gap-1 rounded-md border border-border bg-background/85 p-1">
