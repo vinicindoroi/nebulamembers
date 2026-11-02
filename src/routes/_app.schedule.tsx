@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarClock, Clock, Loader2, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -167,6 +167,10 @@ function SchedulePage() {
         <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           Os agendamentos estão fechados no momento. Volte mais tarde.
           {isAdmin && <span className="mt-2 block text-primary">Você é admin: abra em Admin → Agendamentos → Disponibilidade → "Abrir agendamentos".</span>}
+        </div>
+      ) : upcoming.length > 0 ? (
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          Você só pode ter uma call marcada por vez. Cancele a call acima para escolher outro horário.
         </div>
       ) : (
         <section className="grid overflow-hidden rounded-2xl border border-border bg-card lg:grid-cols-[auto_minmax(0,1fr)]">
