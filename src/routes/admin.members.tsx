@@ -10,6 +10,9 @@ import { MemberTagsModal, useMemberTags } from "@/components/admin/MemberTags";
 import { matchesMemberTag } from "@/lib/member-tags";
 import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberSort, type MemberSortKey } from "@/lib/member-search";
 
+const filterSelectClass =
+  "h-9 shrink-0 cursor-pointer rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50";
+
 function PlanOptions({ includePending = true }: { includePending?: boolean }) {
   const { plans } = usePlans();
   return (
@@ -212,11 +215,12 @@ function Page() {
   };
 
   const exportCsv = () => {
-    const head = "Nome,Plano,Status,Cadastro\n";
-    const body = filtered.map((r) => `"${r.full_name ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${r.status}","${r.created_at}"`).join("\n");
-    const blob = new Blob([head + body], { type: "text/csv" });
+    const head = "Nome,Email,Plano,Status,Cadastro\n";
+    const body = sorted.map((r) => `"${r.full_name ?? ""}","${r.email ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${statusLabel(r.status)}","${r.created_at}"`).join("\n");
+    const blob = new Blob(["\uFEFF" + head + body], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "membros.csv"; a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -224,27 +228,46 @@ function Page() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Membros</h1>
-          <p className="text-sm text-muted-foreground">{filtered.length} de {rows.length} membros</p>
+          <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <span>{filtered.length} de {rows.length} membros</span>
+            {filtersActive && (
+              <button type="button" onClick={clearFilters} className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-xs text-foreground transition hover:bg-muted/60">
+                <X className="h-3 w-3" /> Limpar filtros
+              </button>
+            )}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setTagTarget({ memberIds: [], title: "Gerenciar tags" })}><Tag />Tags</Button>
-          <button onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-white/10"><Download className="h-4 w-4" />CSV</button>
-          <button onClick={() => setAdding(true)} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Adicionar</button>
+          <button type="button" onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-muted/60"><Download className="h-4 w-4" />CSV</button>
+          <button type="button" onClick={() => setAdding(true)} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Adicionar</button>
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-4 flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nome..." className="w-full bg-muted/40 border border-border rounded-xl pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+      <div className="glass rounded-2xl p-3 flex items-center gap-2 flex-wrap">
+        <div className="relative min-w-[220px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            type="search"
+            aria-label="Buscar membros por nome, email ou telefone"
+            placeholder="Buscar por nome, email ou telefone..."
+            className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-9 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary/40"
+          />
+          {q && (
+            <button type="button" onClick={() => setQ("")} aria-label="Limpar busca" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
+        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setSelectedIds([]); }} aria-label="Filtrar por status" className={filterSelectClass} style={{ colorScheme: "dark" }}>
           <option value="all">Todos status</option><option value="active">Ativo</option><option value="suspended">Suspenso</option><option value="pending">Pendente</option>
         </select>
-        <select value={planFilter} onChange={(e) => setPlanFilter(e.target.value)} className="bg-muted/40 border border-border rounded-xl px-3 py-2 text-sm cursor-pointer hover:bg-white/10 outline-none [&>option]:bg-[#121214] [&>option]:text-white" style={{ colorScheme: "dark" }}>
+        <select value={planFilter} onChange={(e) => { setPlanFilter(e.target.value); setSelectedIds([]); }} aria-label="Filtrar por plano" className={filterSelectClass} style={{ colorScheme: "dark" }}>
           <option value="all">Todos planos</option><option value="pending">Pendente (sem acesso)</option><PlanOptions includePending={false} />
         </select>
-        <select aria-label="Filtrar por tag" value={tagFilter} disabled={memberTags.loading} onChange={(event) => { setTagFilter(event.target.value); setSelectedIds([]); }} className="h-9 max-w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground">
+        <select aria-label="Filtrar por tag" value={tagFilter} disabled={memberTags.loading} onChange={(event) => { setTagFilter(event.target.value); setSelectedIds([]); }} className={filterSelectClass} style={{ colorScheme: "dark" }}>
           <option value="all">Todas as tags</option>
           <option value="untagged">Sem tags</option>
           {memberTags.tags.map((tag) => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
