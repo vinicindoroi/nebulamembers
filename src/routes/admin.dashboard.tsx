@@ -1,9 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Users, PlayCircle, UserPlus, TrendingUp } from "lucide-react";
+import { Users, PlayCircle, UserPlus, TrendingUp, CalendarClock, ArrowRight, Video, MessageCircle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
+import { Button } from "@/components/ui/button";
+import {
+  fmtTime, ymdOf, zonedToDate,
+  type Booking, type ScheduleSettings,
+} from "@/lib/mentor-schedule";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [
@@ -134,12 +139,17 @@ function Page() {
     })();
   }, []);
 
+  const { settings: schedSettings, calls, loading: callsLoading } = useTodayCalls();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Visão geral em tempo real</p>
       </div>
+
+      <TodayCalls settings={schedSettings} calls={calls} loading={callsLoading} />
+
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Membros ativos" value={stats.members.toLocaleString("pt-BR")} icon={Users} />
@@ -239,3 +249,134 @@ function Page() {
     </div>
   );
 }
+
+type CallProfile = { id: string; full_name: string | null; email: string | null; phone: string | null };
+type TodayCall = Booking & { profile?: CallProfile };
+
+const waLink = (phone: string) => {
+  const d = phone.replace(/\D/g, "");
+  return `https://wa.me/${d.length <= 11 ? `55${d}` : d}`;
+};
+
+/** Calls booked for the current day in the mentor's timezone. */
+function useTodayCalls() {
+  const [settings, setSettings] = useState<ScheduleSettings | null>(null);
+  const [calls, setCalls] = useState<TodayCall[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function load() {
+    const { data: s } = await supabase.from("mentor_schedule_settings").select("*").eq("id", 1).maybeSingle();
+    const st = (s ?? null) as ScheduleSettings | null;
+    const tz = st?.timezone || "America/Sao_Paulo";
+    const dayStart = zonedToDate(ymdOf(new Date(), tz), 0, tz);
+    const dayEnd = new Date(dayStart.getTime() + 86400000);
+    const { data } = await supabase
+      .from("mentor_bookings")
+      .select("*")
+      .gte("starts_at", dayStart.toISOString())
+      .lt("starts_at", dayEnd.toISOString())
+      .neq("status", "cancelled")
+      .order("starts_at");
+    const rows = (data ?? []) as Booking[];
+    const ids = Array.from(new Set(rows.map((r) => r.user_id)));
+    const profiles: Record<string, CallProfile> = {};
+    if (ids.length) {
+      const p = await supabase.from("profiles").select("id,full_name,email,phone").in("id", ids);
+      ((p.data ?? []) as CallProfile[]).forEach((x) => { profiles[x.id] = x; });
+    }
+    setSettings(st);
+    setCalls(rows.map((r) => ({ ...r, profile: profiles[r.user_id] })));
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    load();
+    const iv = setInterval(load, 60000);
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => { clearInterval(iv); window.removeEventListener("focus", onFocus); };
+  }, []);
+
+  return { settings, calls, loading };
+}
+
+function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings | null; calls: TodayCall[]; loading: boolean }) {
+  const tz = settings?.timezone || "America/Sao_Paulo";
+  const now = Date.now();
+  const nextId = calls.find((c) => new Date(c.ends_at).getTime() >= now)?.id;
+
+  return (
+    <section className="glass rounded-2xl p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary"><CalendarClock className="h-4 w-4" /></div>
+          <div>
+            <h3 className="text-sm font-medium">Agendamentos de hoje</h3>
+            <p className="text-xs capitalize text-muted-foreground">
+              {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", timeZone: tz })}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-muted px-3 py-1 text-xs tabular-nums text-muted-foreground">
+            {loading ? "—" : `${calls.length} ${calls.length === 1 ? "call" : "calls"}`}
+          </span>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/admin/schedule">Ver agenda<ArrowRight className="h-3.5 w-3.5" /></Link>
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <p className="text-xs text-muted-foreground">Carregando...</p>
+      ) : calls.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Nenhuma call marcada para hoje.</p>
+      ) : (
+        <div className="space-y-2">
+          {calls.map((c) => {
+            const name = c.profile?.full_name || c.profile?.email || "Aluno";
+            const isNext = c.id === nextId;
+            const isDone = c.status === "done";
+            return (
+              <div key={c.id} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center">
+                <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-1.5 text-center sm:w-24">
+                  <span className="text-lg font-bold tabular-nums">{fmtTime(c.starts_at, tz)}</span>
+                  <span className="text-[11px] text-muted-foreground">até {fmtTime(c.ends_at, tz)}</span>
+                </div>
+                <div className="flex min-w-0 flex-1 items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
+                    {name.slice(0, 2)}
+                  </div>
+                  <div className="min-w-0 space-y-0.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate font-semibold">{name}</p>
+                      {isDone && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+                      {isNext && !isDone && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] text-primary">Próxima</span>}
+                    </div>
+                    <p className="truncate text-xs text-muted-foreground">{c.profile?.email}</p>
+                    {c.notes && <p className="line-clamp-2 whitespace-pre-line text-xs text-muted-foreground">“{c.notes}”</p>}
+                  </div>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  {c.profile?.phone ? (
+                    <Button asChild size="sm" variant="outline">
+                      <a href={waLink(c.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                    </Button>
+                  ) : (
+                    <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
+                  )}
+                  {settings?.meeting_link && !isDone && (
+                    <Button asChild size="sm">
+                      <a href={settings.meeting_link} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
