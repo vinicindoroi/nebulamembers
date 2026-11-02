@@ -6,7 +6,7 @@ import {
 import { NotificationBell } from "@/components/members/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
+import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 type NavGroup = { label: string; items: NavItem[] };
@@ -72,9 +72,9 @@ export function AdminShell() {
         }`}
       >
         <div className="h-full flex flex-col p-5">
-          <Link to="/admin/dashboard" className="flex items-center gap-3 px-2 py-2 mb-8">
-            <img src={brandLogo.url} alt="Nebula Members" className="h-16 w-60 max-w-full object-contain object-left" />
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/20">ADMIN</span>
+          <Link to="/admin/dashboard" className="flex min-w-0 items-center gap-3 px-2 py-2 mb-8">
+            <img src={brandLogo.url} alt="Nebula Members" className="h-10 w-full object-contain object-left" />
+            <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/20">ADMIN</span>
           </Link>
 
           <nav className="flex-1 overflow-y-auto -mx-1 px-1 space-y-5">
