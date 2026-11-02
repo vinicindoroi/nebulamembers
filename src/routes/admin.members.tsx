@@ -436,8 +436,8 @@ function Page() {
                       type="checkbox"
                       aria-label={`Selecionar ${r.full_name ?? "Sem nome"}`}
                       checked={selectedIds.includes(r.id)}
-                      onClick={(e) => { e.stopPropagation(); lastShift.current = e.nativeEvent.shiftKey; }}
-                      onChange={(e) => toggleSelect(r.id, index, lastShift.current)}
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(r.id, index, e.nativeEvent.shiftKey); }}
+                      onChange={() => {}}
                       className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
                     />
                   </td>
