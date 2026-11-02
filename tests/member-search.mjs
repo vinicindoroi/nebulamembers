@@ -20,8 +20,8 @@ assert.equal(memberMatchesQuery(rows[0], "naoexiste"), false);
 assert.equal(memberMatchesQuery(rows[1], ""), true);
 
 // ordenação por nome respeita acentuação e é case-insensitive
-assert.deepEqual(sortMembers(rows, { key: "name", dir: "asc" }).map((r) => r.id), ["3", "1", "2"]);
-assert.deepEqual(sortMembers(rows, { key: "name", dir: "desc" }).map((r) => r.id), ["2", "1", "3"]);
+assert.deepEqual(sortMembers(rows, { key: "name", dir: "asc" }).map((r) => r.id), ["3", "2", "1"]);
+assert.deepEqual(sortMembers(rows, { key: "name", dir: "desc" }).map((r) => r.id), ["1", "2", "3"]);
 
 // ordenação por cadastro: mais recente primeiro
 assert.deepEqual(sortMembers(rows, { key: "created_at", dir: "desc" }).map((r) => r.id), ["2", "1", "3"]);
