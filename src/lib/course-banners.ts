@@ -10,3 +10,6 @@ export function normalizeBannerConfig(value: unknown): CourseBannerConfig {
   };
 }
 export function nextBannerIndex(current: number, count: number) { return count > 0 ? (current + 1) % count : 0; }
+export function usableBanners(banners: CourseBanner[], urls: Record<string, string>, broken: string[] = []): CourseBanner[] {
+  return banners.filter((b) => b.active && Boolean(urls[b.path]) && !broken.includes(b.path));
+}
