@@ -13,9 +13,9 @@ const rows = [
   { id:'b', path:'b.png', label:'B', courseId:'', active:true },
   { id:'c', path:'c.png', label:'C', courseId:'', active:false },
 ];
-assert.deepEqual(usableBanners(rows, { a:'https://cdn/a.png', b:'https://cdn/b.png' }, ['b']).map((b)=>b.id), ['a']);
-assert.deepEqual(usableBanners(rows, { a:'https://cdn/a.png' }, []).map((b)=>b.id), ['a']);
-assert.deepEqual(usableBanners(rows, { a:'https://cdn/a.png', b:'https://cdn/b.png' }, ['a','b']), []);
+assert.deepEqual(usableBanners(rows, { 'a.png':'https://cdn/a.png', 'b.png':'https://cdn/b.png' }, ['b.png']).map((b)=>b.id), ['a']);
+assert.deepEqual(usableBanners(rows, { 'a.png':'https://cdn/a.png' }, []).map((b)=>b.id), ['a']);
+assert.deepEqual(usableBanners(rows, { 'a.png':'https://cdn/a.png', 'b.png':'https://cdn/b.png' }, ['a.png','b.png']), []);
 assert.deepEqual(usableBanners([], {}, []), []);
 
 console.log('Course banners: chosen interval, visibility, looping and broken-image fallback passed.');
