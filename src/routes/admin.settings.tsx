@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Settings as SettingsIcon, CreditCard, Mail, Plug, ShieldCheck, Save, Type, Palette, Link as LinkIcon, Key, Hash, CloudLightning, Play, AlertCircle } from "lucide-react";
 import { Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
 import { supabase } from "@/integrations/supabase/client";
-import brandLogo from "@/assets/nebula-members-wordmark.png.asset.json";
+import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
 
 export const Route = createFileRoute("/admin/settings")({
   head: () => ({ meta: [
