@@ -633,8 +633,7 @@ export function AppShell() {
         <main ref={mainRef} className={`flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
           <div className={isFunnelsPage ? 'h-full' : 'admin-route-slot w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
-              <Outlet />
-              <WhatsappPrompt />
+              <><Outlet /><WhatsappPrompt /></>
             ) : (
               <PlanLockScreen pending={planPending} />
             )}
