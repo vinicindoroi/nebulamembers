@@ -3,6 +3,8 @@ import { useMemo, useState, useDeferredValue, useRef } from "react";
 import { Play, Search, BookOpen, CheckCircle2, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCourses } from "@/hooks/use-courses";
 import { Button } from "@/components/ui/button";
+import { useCourseBanners } from "@/hooks/use-course-banners";
+import { CourseBannerCarousel } from "@/components/members/CourseBannerCarousel";
 
 export const Route = createFileRoute("/_app/courses")({
   component: CoursesPage,
@@ -38,6 +40,8 @@ function CoursesList() {
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const { data: courses = [], isLoading } = useCourses();
+  const { data: bannerData } = useCourseBanners();
+  const banners = (bannerData?.config.banners ?? []).filter((b) => b.active && bannerData?.urls[b.path]);
 
   const tags = useMemo(() => {
     const set = new Set<string>();
@@ -149,6 +153,8 @@ function CoursesList() {
         )}
       </div>
 
+      {banners.length > 0 && bannerData && <CourseBannerCarousel banners={banners} urls={bannerData.urls} intervalSeconds={bannerData.config.intervalSeconds} />}
+
       {isLoading ? (
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-6 sm:mx-0 sm:px-0">
           {[0, 1, 2, 3].map((i) => (
@@ -171,7 +177,7 @@ function CoursesList() {
         </div>
       ) : featured && (
         <div className="space-y-8">
-          <Link
+          {banners.length === 0 && <Link
             to="/courses/$courseId"
             params={{ courseId: featured.id }}
             className="group relative block min-h-72 overflow-hidden rounded-md border border-border bg-card sm:min-h-96 lg:min-h-[28rem]"
@@ -193,7 +199,7 @@ function CoursesList() {
                 <span className="text-xs font-semibold text-muted-foreground">{featured.progress > 0 ? `${featured.progress}% concluído` : "Comece agora"}</span>
               </div>
             </div>
-          </Link>
+          </Link>}
 
           <section className="space-y-4">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
