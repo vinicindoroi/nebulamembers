@@ -85,6 +85,13 @@
       "when": 1793653694960,
       "tag": "0011_mentor_group_weekly_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793654028584,
+      "tag": "0012_course_banner_storage_policies",
+      "breakpoints": true
     }
   ]
 }

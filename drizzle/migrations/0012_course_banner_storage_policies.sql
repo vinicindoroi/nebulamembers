@@ -1,0 +1,3 @@
+CREATE POLICY "course banners member read" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'course-banners');
+CREATE POLICY "course banners admin insert" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'course-banners' AND public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "course banners admin delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'course-banners' AND public.has_role(auth.uid(), 'admin'));

@@ -15,3 +15,4 @@
 - Store member classification tags and assignments in separate admin-only RLS tables; tags must never grant access or become editable through student profiles.
 - Use the shared member-groups hook and grouping helpers in administrative screens; one persisted group catalog and membership mapping prevents divergent assignments between Members and Scheduling.
 - Enforce group weekly booking limits through a database trigger shared by reservations and admin rescheduling; expose only occupied week dates to students so group classification and peer details remain admin-only.
+- Persist course banner order and timing in app_settings, store images in the private course-banners bucket with signed URLs, and share the query between admin and catalog so changes remain synchronized.

@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePlans } from "@/hooks/use-plans";
+import { CourseBanners } from "@/components/admin/CourseBanners";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/courses")({
   component: Page,
@@ -29,6 +31,7 @@ function Page() {
   const [cats, setCats] = useState<Cat[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [editing, setEditing] = useState<Partial<Course> | null>(null);
+  const [bannersOpen, setBannersOpen] = useState(false);
 
   const load = async () => {
     const [{ data: c }, { data: ct }, { data: of }] = await Promise.all([
@@ -53,7 +56,7 @@ function Page() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div><h1 className="text-2xl font-semibold tracking-tight">Cursos</h1><p className="text-sm text-muted-foreground">{rows.length} cursos</p></div>
-        <button onClick={() => setEditing({})} className="gradient-primary text-primary-foreground px-3.5 py-2 rounded-xl text-sm flex items-center gap-2"><Plus className="h-4 w-4" />Novo curso</button>
+        <div className="flex gap-2"><Button variant="outline" onClick={() => setBannersOpen(true)}><ImageIcon />Banners</Button><Button onClick={() => setEditing({})}><Plus />Novo curso</Button></div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -95,6 +98,7 @@ function Page() {
       </div>
 
       {editing && <CourseModal initial={editing} cats={cats} offers={offers} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); queryClient.invalidateQueries({ queryKey: ["courses"] }); load(); }} />}
+      {bannersOpen && <CourseBanners open={bannersOpen} onOpenChange={setBannersOpen} courses={rows} />}
     </div>
   );
 }
