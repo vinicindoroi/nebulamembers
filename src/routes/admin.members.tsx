@@ -172,8 +172,10 @@ function Page() {
       if (shiftKey && lastClickedIndex.current !== null) {
         const [from, to] = [lastClickedIndex.current, index].sort((a, b) => a - b);
         const range = sorted.slice(from, to + 1).map((m) => m.id);
+        console.log("[updater] prev", prev.length, "sorted", sorted.length, "from", from, "to", to, "range", range.length);
         return Array.from(new Set([...prev, ...range]));
       }
+      console.log("[updater] plain", prev.length);
       return prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
     });
     lastClickedIndex.current = index;
