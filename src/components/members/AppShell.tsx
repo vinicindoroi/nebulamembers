@@ -2,7 +2,7 @@ import { Link, useRouterState, Outlet, useNavigate } from "@tanstack/react-route
 import {
   LayoutDashboard, GraduationCap, Users, User, Settings, Search, Bell,
   Menu, X, Orbit, LogOut, Shield, MessageSquare, Bookmark, GitBranch,
-  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock, Package, Flame,
+  PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock, Package, Flame, CalendarClock,
 } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -33,6 +33,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: "/courses", label: "Cursos", icon: GraduationCap },
       { to: "/offers", label: "Ofertas", icon: Package },
+      { to: "/schedule", label: "Agendamento", icon: CalendarClock },
       { to: "/community", label: "Comunidade", icon: Users },
       { to: "/forum", label: "Fórum", icon: MessageSquare },
       { to: "/saved", label: "Salvos", icon: Bookmark },
@@ -69,6 +70,12 @@ export function AppShell() {
   const [planPending, setPlanPending] = useState(false);
 
   const fallbackFeatures = NO_ACCESS_FEATURES;
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("mentor_schedule_settings").select("enabled").eq("id", 1).maybeSingle()
+      .then(({ data }) => setScheduleEnabled(!!data?.enabled));
+  }, [user?.id]);
 
   useEffect(() => {
     if (!user) return;
@@ -132,9 +139,9 @@ export function AppShell() {
   const filteredNavGroups = useMemo(
     () => navGroups.map((group) => ({
       ...group,
-      items: group.items.map((item) => ({ ...item, locked: isLocked(item.to) })),
+      items: group.items.filter((item) => item.to !== "/schedule" || isAdmin || scheduleEnabled).map((item) => ({ ...item, locked: isLocked(item.to) })),
     })),
-    [isLocked],
+    [isLocked, scheduleEnabled, isAdmin],
   );
 
   const allNav = useMemo(() => {

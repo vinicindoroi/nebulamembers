@@ -28,6 +28,7 @@ import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
 import { Route as AppPixelFeederRouteImport } from './routes/_app.pixel-feeder'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppSavedRouteImport } from './routes/_app.saved'
+import { Route as AppScheduleRouteImport } from './routes/_app.schedule'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppTranscriptRouteImport } from './routes/_app.transcript'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -46,6 +47,7 @@ import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminPlansRouteImport } from './routes/admin.plans'
 import { Route as AdminPlayerRouteImport } from './routes/admin.player'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
+import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 
@@ -143,6 +145,11 @@ const AppSavedRoute = AppSavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => AppRoute,
 } as any)
+const AppScheduleRoute = AppScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -233,6 +240,11 @@ const AdminSalesRoute = AdminSalesRouteImport.update({
   path: '/sales',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminScheduleRoute = AdminScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -263,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/pixel-feeder': typeof AppPixelFeederRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
+  '/schedule': typeof AppScheduleRoute
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -281,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/admin/plans': typeof AdminPlansRoute
   '/admin/player': typeof AdminPlayerRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
@@ -303,6 +317,7 @@ export interface FileRoutesByTo {
   '/pixel-feeder': typeof AppPixelFeederRoute
   '/profile': typeof AppProfileRoute
   '/saved': typeof AppSavedRoute
+  '/schedule': typeof AppScheduleRoute
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -321,6 +336,7 @@ export interface FileRoutesByTo {
   '/admin/plans': typeof AdminPlansRoute
   '/admin/player': typeof AdminPlayerRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
@@ -345,6 +361,7 @@ export interface FileRoutesById {
   '/_app/pixel-feeder': typeof AppPixelFeederRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/saved': typeof AppSavedRoute
+  '/_app/schedule': typeof AppScheduleRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/transcript': typeof AppTranscriptRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -363,6 +380,7 @@ export interface FileRoutesById {
   '/admin/plans': typeof AdminPlansRoute
   '/admin/player': typeof AdminPlayerRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
 }
@@ -387,6 +405,7 @@ export interface FileRouteTypes {
     | '/pixel-feeder'
     | '/profile'
     | '/saved'
+    | '/schedule'
     | '/settings'
     | '/transcript'
     | '/admin/categories'
@@ -405,6 +424,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/player'
     | '/admin/sales'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
@@ -427,6 +447,7 @@ export interface FileRouteTypes {
     | '/pixel-feeder'
     | '/profile'
     | '/saved'
+    | '/schedule'
     | '/settings'
     | '/transcript'
     | '/admin/categories'
@@ -445,6 +466,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/player'
     | '/admin/sales'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/courses/$courseId'
   id:
@@ -468,6 +490,7 @@ export interface FileRouteTypes {
     | '/_app/pixel-feeder'
     | '/_app/profile'
     | '/_app/saved'
+    | '/_app/schedule'
     | '/_app/settings'
     | '/_app/transcript'
     | '/admin/categories'
@@ -486,6 +509,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/player'
     | '/admin/sales'
+    | '/admin/schedule'
     | '/admin/settings'
     | '/_app/courses/$courseId'
   fileRoutesById: FileRoutesById
@@ -636,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSavedRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/schedule': {
+      id: '/_app/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof AppScheduleRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings': {
       id: '/_app/settings'
       path: '/settings'
@@ -762,6 +793,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/schedule': {
+      id: '/admin/schedule'
+      path: '/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof AdminScheduleRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -803,6 +841,7 @@ interface AppRouteChildren {
   AppPixelFeederRoute: typeof AppPixelFeederRoute
   AppProfileRoute: typeof AppProfileRoute
   AppSavedRoute: typeof AppSavedRoute
+  AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTranscriptRoute: typeof AppTranscriptRoute
 }
@@ -819,6 +858,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPixelFeederRoute: AppPixelFeederRoute,
   AppProfileRoute: AppProfileRoute,
   AppSavedRoute: AppSavedRoute,
+  AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTranscriptRoute: AppTranscriptRoute,
 }
@@ -842,6 +882,7 @@ interface AdminRouteChildren {
   AdminPlansRoute: typeof AdminPlansRoute
   AdminPlayerRoute: typeof AdminPlayerRoute
   AdminSalesRoute: typeof AdminSalesRoute
+  AdminScheduleRoute: typeof AdminScheduleRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
 }
 
@@ -862,6 +903,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPlansRoute: AdminPlansRoute,
   AdminPlayerRoute: AdminPlayerRoute,
   AdminSalesRoute: AdminSalesRoute,
+  AdminScheduleRoute: AdminScheduleRoute,
   AdminSettingsRoute: AdminSettingsRoute,
 }
 
