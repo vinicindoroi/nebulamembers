@@ -1177,6 +1177,7 @@ export type Database = {
       }
       mentor_schedule_settings: {
         Row: {
+          allowed_plans: string[]
           blocked_dates: string[]
           enabled: boolean
           id: number
@@ -1189,6 +1190,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allowed_plans?: string[]
           blocked_dates?: string[]
           enabled?: boolean
           id?: number
@@ -1201,6 +1203,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allowed_plans?: string[]
           blocked_dates?: string[]
           enabled?: boolean
           id?: number
@@ -1913,6 +1916,10 @@ export type Database = {
         Returns: string
       }
       can_access_lesson: { Args: { _lesson_id: string }; Returns: boolean }
+      can_access_mentor_schedule: {
+        Args: { _user_id?: string }
+        Returns: boolean
+      }
       can_read_lesson_content: {
         Args: { _lesson_id: string }
         Returns: boolean

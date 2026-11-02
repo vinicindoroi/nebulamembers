@@ -29,6 +29,13 @@
       "when": 1793642814358,
       "tag": "0003_mentor_scheduling",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793643528984,
+      "tag": "0004_mentor_schedule_allowed_plans",
+      "breakpoints": true
     }
   ]
 }

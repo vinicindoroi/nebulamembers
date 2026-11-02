@@ -10,6 +10,7 @@ export type ScheduleSettings = {
   instructions: string | null;
   timezone: string;
   blocked_dates: string[];
+  allowed_plans: string[];
 };
 export type Availability = { id: string; weekday: number; start_time: string; end_time: string };
 export type Booking = {

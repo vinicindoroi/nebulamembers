@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchPlans, type PlanOption } from "@/hooks/use-plans";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +30,7 @@ export const Route = createFileRoute("/admin/schedule")({
   component: AdminSchedule,
 });
 
-type Profile = { id: string; full_name: string | null; email: string | null; phone: string | null };
+type Profile = { id: string; full_name: string | null; email: string | null; phone: string | null; plan: string | null };
 
 function AdminSchedule() {
   const [settings, setSettings] = useState<ScheduleSettings | null>(null);
@@ -68,9 +70,13 @@ function AdminSchedule() {
         <TabsList>
           <TabsTrigger value="agenda">Agenda</TabsTrigger>
           <TabsTrigger value="config">Disponibilidade</TabsTrigger>
+          <TabsTrigger value="access">Quem tem acesso</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda">
           <Agenda settings={settings} bookings={bookings} profiles={profiles} reload={load} />
+        </TabsContent>
+        <TabsContent value="access">
+          <Access settings={settings} profiles={profiles} reload={load} />
         </TabsContent>
         <TabsContent value="config">
           <Config settings={settings} availability={availability} reload={load} />
@@ -263,6 +269,73 @@ function Config({ settings, availability, reload }: { settings: ScheduleSettings
         <Calendar mode="multiple" selected={blocked} onSelect={(ds) => setForm({ ...form, blocked_dates: (ds ?? []).map(ymdFromLocal).sort() })} className="p-0 pointer-events-auto" />
         <Button size="sm" variant="outline" onClick={() => save(form, "Dias de folga salvos.")} disabled={saving}>Salvar dias de folga</Button>
       </Step>
+    </div>
+  );
+}
+
+const norm = (v: string | null | undefined) =>
+  (v ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-");
+
+function Access({ settings, profiles, reload }: { settings: ScheduleSettings; profiles: Record<string, Profile>; reload: () => void }) {
+  const [plans, setPlans] = useState<PlanOption[]>([]);
+  const [selected, setSelected] = useState<string[]>(settings.allowed_plans ?? []);
+  const [saving, setSaving] = useState(false);
+  const [q, setQ] = useState("");
+  useEffect(() => { fetchPlans().then(setPlans).catch(() => {}); }, []);
+
+  const slugOf = (plan: string | null) => {
+    const n = norm(plan);
+    const p = plans.find((x) => norm(x.slug) === n || norm(x.name) === n);
+    return p ? norm(p.slug) : n;
+  };
+  const members = Object.values(profiles)
+    .filter((p) => selected.includes(slugOf(p.plan)))
+    .filter((p) => `${p.full_name ?? ""} ${p.email ?? ""}`.toLowerCase().includes(q.toLowerCase()))
+    .sort((a, b) => (a.full_name ?? a.email ?? "").localeCompare(b.full_name ?? b.email ?? ""));
+
+  async function save() {
+    setSaving(true);
+    const { error } = await supabase.from("mentor_schedule_settings").update({ allowed_plans: selected }).eq("id", 1);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Acesso atualizado.");
+    reload();
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-5">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
+        <div>
+          <p className="font-semibold">Planos com acesso</p>
+          <p className="text-xs text-muted-foreground">Só alunos desses planos veem a aba e conseguem marcar call.</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {plans.map((p) => {
+            const slug = norm(p.slug);
+            return (
+              <label key={p.id} className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm">
+                <Checkbox checked={selected.includes(slug)} onCheckedChange={(v) => setSelected(v ? [...selected, slug] : selected.filter((x) => x !== slug))} />
+                {p.name}
+              </label>
+            );
+          })}
+        </div>
+        <Button onClick={save} disabled={saving}>{saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar acesso</Button>
+      </section>
+      <section className="space-y-3 rounded-xl border border-border bg-card p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="font-semibold">Alunos com acesso ({members.length})</p>
+          <Input placeholder="Buscar aluno..." value={q} onChange={(e) => setQ(e.target.value)} className="h-9 max-w-xs" />
+        </div>
+        <div className="max-h-[480px] divide-y divide-border overflow-y-auto">
+          {members.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : members.map((p) => (
+            <div key={p.id} className="flex items-center justify-between py-2.5 text-sm">
+              <div><p className="font-medium">{p.full_name || "Sem nome"}</p><p className="text-xs text-muted-foreground">{p.email}</p></div>
+              <span className="text-xs text-muted-foreground">{p.plan}</span>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
