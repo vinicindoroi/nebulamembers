@@ -436,7 +436,7 @@ function Page() {
                       aria-label={`Selecionar ${r.full_name ?? "Sem nome"}`}
                       checked={selectedIds.includes(r.id)}
                       onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => toggleSelect(r.id, index, e.nativeEvent.shiftKey)}
+                      onChange={(e) => toggleSelect(r.id, index, e.shiftKey)}
                       className="size-6 shrink-0 cursor-pointer rounded-md accent-primary"
                     />
                   </td>
