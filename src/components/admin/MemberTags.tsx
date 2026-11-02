@@ -3,6 +3,7 @@ import { Tag, Plus, Trash2, Pencil, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Modal, inputClass } from "@/components/admin/Modal";
 import type { MemberTag, TagAssignment } from "@/lib/member-tags";
 
@@ -23,7 +24,110 @@ export function useMemberTags() {
   return { tags, assignments, loading, reload };
 }
 
-type Props = ReturnType<typeof useMemberTags> & { memberIds: string[]; title: string; onClose: () => void };
+type TagsState = ReturnType<typeof useMemberTags>;
+
+async function applyTag(tagId: string, memberIds: string[]) {
+  return supabase.from("member_tag_assignments").upsert(
+    memberIds.map((member_id) => ({ member_id, tag_id: tagId })),
+    { onConflict: "member_id,tag_id", ignoreDuplicates: true },
+  );
+}
+
+type PickerProps = TagsState & {
+  memberIds: string[];
+  trigger: React.ReactNode;
+  align?: "start" | "center" | "end";
+};
+
+export function MemberTagsPicker({ tags, assignments, loading, reload, memberIds, trigger, align = "start" }: PickerProps) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const assignedCount = (tagId: string) => memberIds.filter((id) => assignments.some((item) => item.member_id === id && item.tag_id === tagId)).length;
+
+  const toggle = async (tagId: string) => {
+    if (busy || memberIds.length === 0) return;
+    const on = assignedCount(tagId) === memberIds.length;
+    setBusy(true);
+    const { error } = on
+      ? await supabase.from("member_tag_assignments").delete().eq("tag_id", tagId).in("member_id", memberIds)
+      : await applyTag(tagId, memberIds);
+    if (error) toast.error("Não foi possível atualizar as tags.");
+    else await reload();
+    setBusy(false);
+  };
+
+  const createAndApply = async () => {
+    const value = name.trim();
+    if (!value || busy) return;
+    setBusy(true);
+    let tagId = tags.find((tag) => tag.name.toLowerCase() === value.toLowerCase())?.id ?? null;
+    if (!tagId) {
+      const { data, error } = await supabase.from("member_tags").insert({ name: value }).select("id").single();
+      if (data?.id) tagId = data.id;
+      else if (error?.code === "23505") {
+        const { data: existing } = await supabase.from("member_tags").select("id").eq("name", value).maybeSingle();
+        tagId = existing?.id ?? null;
+      }
+      if (!tagId) { toast.error("Não foi possível criar a tag."); setBusy(false); return; }
+    }
+    if (memberIds.length) {
+      const { error } = await applyTag(tagId, memberIds);
+      if (error) toast.error("Não foi possível aplicar a tag.");
+    }
+    setName("");
+    await reload();
+    setBusy(false);
+    toast.success("Tag aplicada");
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent align={align} className="w-60 p-2">
+        <div className="max-h-56 overflow-y-auto">
+          {loading ? (
+            <p className="px-2 py-3 text-xs text-muted-foreground">Carregando tags...</p>
+          ) : tags.length === 0 ? (
+            <p className="px-2 py-3 text-xs text-muted-foreground">Nenhuma tag ainda. Crie a primeira abaixo.</p>
+          ) : (
+            tags.map((tag) => {
+              const on = assignedCount(tag.id) === memberIds.length;
+              return (
+                <button
+                  key={tag.id}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void toggle(tag.id)}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition hover:bg-muted/60"
+                >
+                  <span className={`flex size-4 shrink-0 items-center justify-center rounded border ${on ? "border-primary bg-primary/15 text-primary" : "border-border text-transparent"}`}>
+                    <Check className="size-3" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{tag.name}</span>
+                </button>
+              );
+            })
+          )}
+        </div>
+        <form className="mt-2 flex items-center gap-1.5 border-t border-border pt-2" onSubmit={(event) => { event.preventDefault(); void createAndApply(); }}>
+          <input
+            aria-label="Criar e aplicar tag"
+            value={name}
+            maxLength={60}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Nova tag + Enter"
+            className={`${inputClass} h-8 flex-1 text-xs`}
+          />
+          <Button type="submit" size="icon" className="size-8 shrink-0" disabled={busy || !name.trim()} aria-label="Criar e aplicar tag"><Plus /></Button>
+        </form>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+type Props = TagsState & { memberIds: string[]; title: string; onClose: () => void };
 
 export function MemberTagsModal({ tags, assignments, loading, reload, memberIds, title, onClose }: Props) {
   const [name, setName] = useState("");
@@ -41,7 +145,7 @@ export function MemberTagsModal({ tags, assignments, loading, reload, memberIds,
   const toggle = async (tagId: string, add: boolean) => {
     setBusy(true);
     const { error } = add
-      ? await supabase.from("member_tag_assignments").upsert(memberIds.map((member_id) => ({ member_id, tag_id: tagId })), { onConflict: "member_id,tag_id", ignoreDuplicates: true })
+      ? await applyTag(tagId, memberIds)
       : await supabase.from("member_tag_assignments").delete().eq("tag_id", tagId).in("member_id", memberIds);
     if (error) toast.error("Não foi possível atualizar as tags.");
     else await reload();
