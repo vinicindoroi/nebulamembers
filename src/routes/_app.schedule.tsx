@@ -4,6 +4,7 @@ import { CalendarClock, Clock, Loader2, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdmin } from "@/hooks/use-admin";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/_app/schedule")({
 
 function SchedulePage() {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const [settings, setSettings] = useState<ScheduleSettings | null>(null);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [busy, setBusy] = useState<Set<number>>(new Set());
@@ -129,6 +131,7 @@ function SchedulePage() {
       {!settings?.enabled ? (
         <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           Os agendamentos estão fechados no momento. Volte mais tarde.
+          {isAdmin && <span className="mt-2 block text-primary">Você é admin: abra em Admin → Agendamentos → Disponibilidade → "Abrir agendamentos".</span>}
         </div>
       ) : (
         <section className="grid gap-6 rounded-xl border border-border bg-card p-5 md:grid-cols-[auto_1fr]">
