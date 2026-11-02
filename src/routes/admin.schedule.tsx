@@ -12,8 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  fetchScheduleConfig, fmtDate, fmtTime, ymdOf, ymdFromLocal, dateFromYmd, WEEKDAYS,
+  fetchScheduleConfig, fmtDate, fmtTime, ymdOf, zonedToDate, ymdFromLocal, dateFromYmd, WEEKDAYS,
   type Availability, type Booking, type ScheduleSettings,
 } from "@/lib/mentor-schedule";
 
@@ -193,6 +194,23 @@ function Agenda({ settings, bookings, profiles, reload }: {
 
   return (
     <div className="space-y-6">
+      <Dialog open={!!resched} onOpenChange={(o) => !o && setResched(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Remarcar call</DialogTitle>
+            <DialogDescription>{resched ? (profiles[resched.user_id]?.full_name || "Aluno") : ""} será avisado da nova data.</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5"><Label>Data</Label><Input type="date" value={rDate} onChange={(e) => setRDate(e.target.value)} /></div>
+            <div className="space-y-1.5"><Label>Horário</Label><Input type="time" value={rTime} onChange={(e) => setRTime(e.target.value)} /></div>
+          </div>
+          <p className="text-xs text-muted-foreground">Duração: {settings.slot_minutes} min · fuso de Brasília</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setResched(null)}>Voltar</Button>
+            <Button onClick={doReschedule} disabled={rSaving}>{rSaving && <Loader2 className="h-4 w-4 animate-spin" />} Remarcar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="rounded-xl border border-border bg-card p-4">
