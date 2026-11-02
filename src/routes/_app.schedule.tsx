@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarClock, Clock, Loader2, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +40,7 @@ function SchedulePage() {
   const [slot, setSlot] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   async function load() {
     if (!user) return;
@@ -65,6 +66,33 @@ function SchedulePage() {
   }
   useEffect(() => { load(); }, [user?.id]);
 
+  // Atualização ao vivo: aviso compartilhado + checagem periódica/ao voltar à aba
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase.channel("mentor-schedule-room")
+      .on("broadcast", { event: "changed" }, () => load())
+      .subscribe();
+    channelRef.current = ch;
+    const iv = setInterval(load, 20000);
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      supabase.removeChannel(ch);
+      channelRef.current = null;
+      clearInterval(iv);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (slot && busy.has(slot.getTime())) {
+      toast.warning("Esse horário acabou de ser reservado por outro aluno. Escolha outro.");
+      setSlot(null);
+    }
+  }, [busy]);
+
+  const notifyOthers = () => channelRef.current?.send({ type: "broadcast", event: "changed", payload: {} });
+
   const tz = settings?.timezone ?? "America/Sao_Paulo";
   const takenWeeks = useMemo(
     () => new Set(mine.filter((b) => b.status !== "cancelled").map((b) => weekKey(new Date(b.starts_at), tz))),
@@ -84,14 +112,14 @@ function SchedulePage() {
     if (error) return toast.error(error.message);
     toast.success("Call agendada!");
     setSlot(null); setNotes(""); setDay(undefined);
-    load();
+    load(); notifyOthers();
   }
   async function cancel(id: string) {
     if (!confirm("Cancelar esta call?")) return;
     const { error } = await supabase.rpc("cancel_mentor_booking", { _id: id });
     if (error) return toast.error(error.message);
     toast.success("Call cancelada.");
-    load();
+    load(); notifyOthers();
   }
 
   if (loading) return <p role="status" className="text-sm text-muted-foreground">Carregando agenda...</p>;
