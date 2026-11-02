@@ -280,7 +280,7 @@ function ProfilePage() {
                 className={`${inputClass} opacity-60 cursor-not-allowed`}
               />
             </Field>
-            <Field label="Telefone" icon={Phone}>
+            <Field label="WhatsApp" icon={Phone}>
               <input
                 value={form.phone}
                 onChange={(e) => update({ phone: e.target.value })}

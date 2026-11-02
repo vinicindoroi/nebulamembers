@@ -11,6 +11,7 @@ import { usePresence } from "@/hooks/use-presence";
 import { useScrollRestore } from "@/hooks/use-scroll-restore";
 import { NotificationBell } from "@/components/members/NotificationBell";
 import { TutorialWizard } from "@/components/tutorial/TutorialWizard";
+import { WhatsappPrompt } from "@/components/members/WhatsappPrompt";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } from "@/hooks/use-plans";
@@ -632,7 +633,7 @@ export function AppShell() {
         <main ref={mainRef} className={`flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
           <div className={isFunnelsPage ? 'h-full' : 'admin-route-slot w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
-              <Outlet />
+              <><Outlet /><WhatsappPrompt /></>
             ) : (
               <PlanLockScreen pending={planPending} />
             )}

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
+import { Check, Loader2, MessageCircle, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, type PlanOption } from "@/hooks/use-plans";
@@ -116,7 +116,18 @@ function Agenda({ settings, bookings, profiles, reload }: {
       <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-card p-4">
         <div className="min-w-0 space-y-1">
           <p className="font-semibold">{p?.full_name || p?.email || "Aluno"}</p>
-          <p className="text-xs text-muted-foreground">{p?.email}{p?.phone ? ` · ${p.phone}` : ""}</p>
+          <p className="text-xs text-muted-foreground">{p?.email}</p>
+          {p?.phone ? (
+            <a
+              href={`https://wa.me/${(() => { const d = p.phone.replace(/\D/g, ""); return d.length <= 11 ? `55${d}` : d; })()}`}
+              target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+            >
+              <MessageCircle className="h-3.5 w-3.5" /> {p.phone}
+            </a>
+          ) : (
+            <p className="text-xs text-muted-foreground/70">Sem WhatsApp cadastrado</p>
+          )}
           <p className="text-sm capitalize">{fmtDate(b.starts_at, tz)} · {fmtTime(b.starts_at, tz)}–{fmtTime(b.ends_at, tz)}</p>
           {b.notes && <p className="whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
         </div>
