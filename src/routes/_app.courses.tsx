@@ -60,7 +60,6 @@ function CoursesList() {
     });
   }, [courses, filter, tag, deferredSearch]);
 
-  const featured = visible[0];
 
   const scrollCatalog = (direction: -1 | 1) => {
     const catalog = catalogRef.current;
@@ -177,6 +176,7 @@ function CoursesList() {
         </div>
       ) : (
         <div className="space-y-8">
+
 
 
           <section className="space-y-4">
