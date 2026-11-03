@@ -47,28 +47,40 @@ export const syncBookingToGoogle = createServerFn({ method: "POST" })
         }
         return { ok: true };
       }
-      const [{ data: p }, { data: s }] = await Promise.all([
+      const [{ data: p }, { data: s }, { data: link }] = await Promise.all([
         supabaseAdmin.from("profiles").select("full_name,email,phone").eq("id", b.user_id).maybeSingle(),
-        supabaseAdmin.from("mentor_schedule_settings").select("meeting_link,timezone").eq("id", 1).maybeSingle(),
+        supabaseAdmin.from("mentor_schedule_settings").select("timezone").eq("id", 1).maybeSingle(),
+        supabaseAdmin.from("mentor_booking_links").select("url").eq("booking_id", b.id).maybeSingle(),
       ]);
       const name = p?.full_name || p?.email || "Aluno";
-      const event = {
+      const needsMeet = !link?.url;
+      const event: Record<string, unknown> = {
         summary: `Call Nebula — ${name}${b.status === "done" ? " (realizada)" : ""}`,
         description: [
           p?.email && `E-mail: ${p.email}`,
           p?.phone && `WhatsApp: ${p.phone}`,
           b.notes && `Assunto: ${b.notes}`,
-          s?.meeting_link && `Link: ${s.meeting_link}`,
         ].filter(Boolean).join("\n"),
-        location: s?.meeting_link ?? undefined,
         start: { dateTime: b.starts_at, timeZone: s?.timezone ?? "America/Sao_Paulo" },
         end: { dateTime: b.ends_at, timeZone: s?.timezone ?? "America/Sao_Paulo" },
+        ...(p?.email ? { attendees: [{ email: p.email }] } : {}),
       };
-      if (b.google_event_id) {
-        await gcal("PATCH", `/${encodeURIComponent(b.google_event_id)}`, event);
-      } else {
-        const created = await gcal("POST", "", event);
-        await supabaseAdmin.from("mentor_bookings").update({ google_event_id: created.id }).eq("id", b.id);
+      if (needsMeet) {
+        event.conferenceData = {
+          createRequest: { requestId: `nebula-${b.id}-${Date.now()}`, conferenceSolutionKey: { type: "hangoutsMeet" } },
+        };
+      }
+      const qs = "?conferenceDataVersion=1&sendUpdates=all";
+      const ev = b.google_event_id
+        ? await gcal("PATCH", `/${encodeURIComponent(b.google_event_id)}${qs}`, event)
+        : await gcal("POST", qs, event);
+      if (!b.google_event_id) {
+        await supabaseAdmin.from("mentor_bookings").update({ google_event_id: ev.id }).eq("id", b.id);
+      }
+      const meet: string | undefined = ev?.hangoutLink
+        ?? ev?.conferenceData?.entryPoints?.find((x: { entryPointType?: string; uri?: string }) => x.entryPointType === "video")?.uri;
+      if (needsMeet && meet) {
+        await supabaseAdmin.from("mentor_booking_links").upsert({ booking_id: b.id, url: meet, updated_at: new Date().toISOString() });
       }
       return { ok: true };
     } catch (e) {
