@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { callsQueue } from "../src/lib/mentor-schedule.ts";
+import { callsQueue } from "../src/lib/call-queue.ts";
 
 const rows = [
   { id: "allam", status: "done", starts_at: "2026-11-03T20:00:00Z" },

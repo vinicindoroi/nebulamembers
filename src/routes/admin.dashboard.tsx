@@ -7,9 +7,10 @@ import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
 import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
 import {
-  fmtTime, ymdOf, zonedToDate, callsQueue,
+  fmtTime, ymdOf, zonedToDate,
   type Booking, type ScheduleSettings,
 } from "@/lib/mentor-schedule";
+import { callsQueue } from "@/lib/call-queue";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [
