@@ -45,6 +45,7 @@ function AdminSchedule() {
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [links, setLinks] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -58,6 +59,7 @@ function AdminSchedule() {
       ]);
       setBookings((b.data ?? []) as Booking[]);
       setProfiles(Object.fromEntries(((p.data ?? []) as Profile[]).map((x) => [x.id, x])));
+      setLinks(await fetchBookingLinks((b.data ?? []).map((x) => x.id)));
     } catch {
       toast.error("Erro ao carregar agendamentos.");
     } finally {
@@ -91,7 +93,7 @@ function AdminSchedule() {
           <TabsTrigger value="access">Quem tem acesso</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda">
-          <Agenda settings={settings} bookings={bookings} profiles={profiles} reload={load} />
+          <Agenda settings={settings} bookings={bookings} profiles={profiles} links={links} reload={load} />
         </TabsContent>
         <TabsContent value="access">
           <Access settings={settings} profiles={profiles} reload={load} />
@@ -104,8 +106,8 @@ function AdminSchedule() {
   );
 }
 
-function Agenda({ settings, bookings, profiles, reload }: {
-  settings: ScheduleSettings; bookings: Booking[]; profiles: Record<string, Profile>; reload: () => void;
+function Agenda({ settings, bookings, profiles, links, reload }: {
+  settings: ScheduleSettings; bookings: Booking[]; profiles: Record<string, Profile>; links: Record<string, string>; reload: () => void;
 }) {
   const tz = settings.timezone;
   const [day, setDay] = useState<Date | undefined>(new Date());
