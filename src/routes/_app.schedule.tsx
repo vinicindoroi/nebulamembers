@@ -293,3 +293,22 @@ function periodGroups(slots: Date[], tz: string): [string, Date[]][] {
   }
   return Object.entries(groups).filter(([, v]) => v.length > 0);
 }
+
+/** Shows the call link only from 10 min before start until the end (enforced server-side). */
+function CallLinkButton({ bookingId, startsAt, endsAt }: { bookingId: string; startsAt: string; endsAt: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [now, setNow] = useState(Date.now());
+  const opens = new Date(startsAt).getTime() - 10 * 60000;
+  const open = now >= opens && now <= new Date(endsAt).getTime();
+  useEffect(() => { const iv = setInterval(() => setNow(Date.now()), 30000); return () => clearInterval(iv); }, []);
+  useEffect(() => {
+    if (!open) { setUrl(null); return; }
+    supabase.rpc("my_call_link", { _booking_id: bookingId }).then(({ data }) => setUrl((data as string | null) ?? null));
+  }, [open, bookingId, now]);
+  if (url) return <Button asChild size="sm"><a href={url} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar na call</a></Button>;
+  return (
+    <span className="self-center text-xs text-muted-foreground">
+      {open ? "Aguardando link do mentor" : "Link liberado 10 min antes"}
+    </span>
+  );
+}
