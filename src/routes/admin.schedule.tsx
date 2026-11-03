@@ -24,6 +24,8 @@ import {
   type Availability, type Booking, type ScheduleSettings,
 } from "@/lib/mentor-schedule";
 import { callsQueue } from "@/lib/call-queue";
+import { waLink } from "@/lib/whatsapp";
+import { RealizedCalls } from "@/components/admin/RealizedCalls";
 
 export const Route = createFileRoute("/admin/schedule")({
   head: () => ({
@@ -138,14 +140,16 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
   }, [active, tz]);
   const bookedDays = Object.keys(byDay).map(dateFromYmd);
   const selected = day ? callsQueue(byDay[ymdFromLocal(day)] ?? []) : [];
+  const pending = selected.filter((b) => b.status !== "done");
+  const realized = selected.filter((b) => b.status === "done");
   const upcoming = callsQueue(bookings.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date()));
 
-  async function setStatus(b: Booking, status: "done" | "cancelled") {
+  async function setStatus(b: Booking, status: "done" | "cancelled" | "booked") {
     const { error } = status === "cancelled"
       ? await supabase.rpc("cancel_mentor_booking", { _id: b.id })
       : await supabase.from("mentor_bookings").update({ status }).eq("id", b.id);
     if (error) return toast.error(error.message);
-    toast.success(status === "done" ? "Marcada como realizada." : "Call cancelada.");
+    toast.success(status === "done" ? "Marcada como realizada." : status === "booked" ? "Call devolvida para a fila." : "Call cancelada.");
     syncBookingToGoogle({ data: { bookingId: b.id } }).catch(() => {});
     reload();
   }
@@ -160,11 +164,10 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
     { label: "Realizadas", value: bookings.filter((b) => b.status === "done").length },
   ];
   const next = upcoming[0];
+  const dayLabel = realized.length > 0 && pending.length > 0
+    ? `${pending.length} ${pending.length === 1 ? "pendente" : "pendentes"} · ${realized.length} ${realized.length === 1 ? "realizada" : "realizadas"}`
+    : `${selected.length} ${selected.length === 1 ? "call" : "calls"}`;
 
-  const waLink = (phone: string) => {
-    const d = phone.replace(/\D/g, "");
-    return `https://wa.me/${d.length <= 11 ? `55${d}` : d}`;
-  };
 
   const Row = ({ b, showDate }: { b: Booking; showDate?: boolean }) => {
     const p = profiles[b.user_id];
@@ -280,11 +283,28 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               <h2 className="text-lg font-semibold capitalize">
                 {day ? day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : "Selecione um dia"}
               </h2>
-              <span className="text-xs text-muted-foreground">{selected.length} {selected.length === 1 ? "call" : "calls"}</span>
+              <span className="text-xs text-muted-foreground">{dayLabel}</span>
             </div>
             {selected.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nenhuma call neste dia.</div>
-            ) : selected.map((b) => <Row key={b.id} b={b} />)}
+            ) : (
+              <>
+                {pending.map((b) => <Row key={b.id} b={b} />)}
+                {realized.length > 0 && (
+                  <RealizedCalls
+                    tz={tz}
+                    calls={realized.map((b) => {
+                      const p = profiles[b.user_id];
+                      return { id: b.id, starts_at: b.starts_at, ends_at: b.ends_at, name: p?.full_name || p?.email || "Aluno", email: p?.email, phone: p?.phone };
+                    })}
+                    onUndo={(id) => {
+                      const b = realized.find((x) => x.id === id);
+                      if (b) setStatus(b, "booked");
+                    }}
+                  />
+                )}
+              </>
+            )}
           </section>
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Todas as próximas calls</h2>
