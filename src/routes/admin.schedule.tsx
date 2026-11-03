@@ -172,13 +172,13 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
     const canLink = b.status === "booked" && !isPast;
     return (
       <div className="rounded-xl border border-border bg-card p-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-2 text-center sm:w-24">
             {showDate && <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(b.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: tz })}</span>}
             <span className="text-lg font-bold tabular-nums">{fmtTime(b.starts_at, tz)}</span>
             <span className="text-[11px] text-muted-foreground">até {fmtTime(b.ends_at, tz)}</span>
           </div>
-          <div className="flex min-w-0 flex-1 items-start gap-3">
+          <div className="flex min-w-[220px] flex-1 items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold uppercase text-primary">
               {name.slice(0, 2)}
             </div>
@@ -191,7 +191,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
             </div>
           </div>
-          <div className="flex shrink-0 flex-wrap gap-2">
+          <div className="flex shrink-0 flex-wrap gap-2 sm:ml-auto">
             {p?.phone ? (
               <Button asChild size="sm" variant="outline">
                 <a href={waLink(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>

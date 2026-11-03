@@ -342,12 +342,12 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
             const isDone = c.status === "done";
             return (
               <div key={c.id} className="rounded-xl border border-border bg-card p-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                   <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-1.5 text-center sm:w-24">
                     <span className="text-lg font-bold tabular-nums">{fmtTime(c.starts_at, tz)}</span>
                     <span className="text-[11px] text-muted-foreground">até {fmtTime(c.ends_at, tz)}</span>
                   </div>
-                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                  <div className="flex min-w-[220px] flex-1 items-start gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
                       {name.slice(0, 2)}
                     </div>
@@ -361,7 +361,7 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
                       {c.notes && <p className="line-clamp-2 whitespace-pre-line text-xs text-muted-foreground">“{c.notes}”</p>}
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-wrap gap-2">
+                  <div className="flex shrink-0 flex-wrap gap-2 sm:ml-auto">
                     {c.profile?.phone ? (
                       <Button asChild size="sm" variant="outline">
                         <a href={waLink(c.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
