@@ -160,9 +160,8 @@ function SchedulePage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                {settings?.meeting_link && (
-                  <Button asChild size="sm"><a href={settings.meeting_link} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar na call</a></Button>
-                )}
+                <CallLinkButton bookingId={b.id} startsAt={b.starts_at} endsAt={b.ends_at} />
+
                 <Button size="sm" variant="outline" onClick={() => cancel(b.id)}><X className="h-4 w-4" /> Cancelar</Button>
               </div>
             </div>

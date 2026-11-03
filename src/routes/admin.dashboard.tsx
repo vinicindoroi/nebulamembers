@@ -5,6 +5,8 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tool
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   fmtTime, ymdOf, zonedToDate,
   type Booking, type ScheduleSettings,
