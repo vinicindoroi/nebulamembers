@@ -5,6 +5,8 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tool
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   fmtTime, ymdOf, zonedToDate,
   type Booking, type ScheduleSettings,
@@ -251,7 +253,39 @@ function Page() {
 }
 
 type CallProfile = { id: string; full_name: string | null; email: string | null; phone: string | null };
-type TodayCall = Booking & { profile?: CallProfile };
+type TodayCall = Booking & { profile?: CallProfile; link?: string };
+
+function CallLinkEditor({ bookingId, initial }: { bookingId: string; initial?: string }) {
+  const [val, setVal] = useState(initial ?? "");
+  const [saved, setSaved] = useState(initial ?? "");
+  useEffect(() => { setVal(initial ?? ""); setSaved(initial ?? ""); }, [initial]);
+  async function save() {
+    const url = val.trim();
+    if (url === saved) return;
+    if (url && !/^https?:\/\//i.test(url)) { toast.error("Link inválido. Use https://..."); return; }
+    const { error } = url
+      ? await supabase.from("mentor_booking_links").upsert({ booking_id: bookingId, url, updated_at: new Date().toISOString() })
+      : await supabase.from("mentor_booking_links").delete().eq("booking_id", bookingId);
+    if (error) { toast.error(error.message); return; }
+    setSaved(url);
+    toast.success(url ? "Link salvo. O aluno verá 10 min antes da call." : "Link removido.");
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <Input
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+        placeholder="Link do Google Meet"
+        className="h-8 w-56 text-xs"
+      />
+      {saved && (
+        <Button asChild size="sm"><a href={saved} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
+      )}
+    </div>
+  );
+}
 
 const waLink = (phone: string) => {
   const d = phone.replace(/\D/g, "");
@@ -284,8 +318,13 @@ function useTodayCalls() {
       const p = await supabase.from("profiles").select("id,full_name,email,phone").in("id", ids);
       ((p.data ?? []) as CallProfile[]).forEach((x) => { profiles[x.id] = x; });
     }
+    const links: Record<string, string> = {};
+    if (rows.length) {
+      const l = await supabase.from("mentor_booking_links").select("booking_id,url").in("booking_id", rows.map((r) => r.id));
+      (l.data ?? []).forEach((x) => { links[x.booking_id] = x.url; });
+    }
     setSettings(st);
-    setCalls(rows.map((r) => ({ ...r, profile: profiles[r.user_id] })));
+    setCalls(rows.map((r) => ({ ...r, profile: profiles[r.user_id], link: links[r.id] })));
     setLoading(false);
   }
 
@@ -365,11 +404,7 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
                   ) : (
                     <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
                   )}
-                  {settings?.meeting_link && !isDone && (
-                    <Button asChild size="sm">
-                      <a href={settings.meeting_link} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a>
-                    </Button>
-                  )}
+                  {!isDone && <CallLinkEditor bookingId={c.id} initial={c.link} />}
                 </div>
               </div>
             );
