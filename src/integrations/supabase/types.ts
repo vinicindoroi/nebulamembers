@@ -1261,6 +1261,32 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_booking_links: {
+        Row: {
+          booking_id: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          booking_id: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          booking_id?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_booking_links_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_bookings: {
         Row: {
           created_at: string
@@ -2071,6 +2097,7 @@ export type Database = {
           week_start: string
         }[]
       }
+      my_call_link: { Args: { _booking_id: string }; Returns: string }
       plan_level: { Args: { _plan: string }; Returns: number }
       plan_slug: { Args: { _plan: string }; Returns: string }
       set_content_password: {
