@@ -27,5 +27,6 @@ export function lessonsOfGroup(memberIds: string[], counts: LessonCounts) {
 }
 
 export function formatLessons(count: number) {
-  return count === 1 ? "1 aula" : `${count} ${count.toLocaleString("pt-BR")} aulas`;
+  const label = count.toLocaleString("pt-BR");
+  return count === 1 ? "1 aula" : `${label} aulas`;
 }
