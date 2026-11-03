@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
-  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal,
+  fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
 
@@ -36,6 +36,7 @@ function SchedulePage() {
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const [mine, setMine] = useState<Booking[]>([]);
+  const [usedWeeks, setUsedWeeks] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(true);
   const [day, setDay] = useState<Date | undefined>();
@@ -54,10 +55,12 @@ function SchedulePage() {
       setAvailability(cfg.availability);
       const from = new Date();
       const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
-      const [b, m] = await Promise.all([
+      const [b, m, w] = await Promise.all([
         supabase.rpc("mentor_busy_slots", { _from: from.toISOString(), _to: to.toISOString() }),
         supabase.from("mentor_bookings").select("*").eq("user_id", user.id).order("starts_at", { ascending: false }),
+        supabase.rpc("mentor_my_booked_weeks"),
       ]);
+      setUsedWeeks(new Set(((w.data ?? []) as { week_start: string }[]).map((x) => String(x.week_start).slice(0, 10))));
       if (b.error || m.error) throw b.error || m.error;
       setBusy(new Set((b.data ?? []).map((x) => new Date(x.starts_at).getTime())));
       setMine((m.data ?? []) as Booking[]);
@@ -98,7 +101,7 @@ function SchedulePage() {
 
   const tz = settings?.timezone ?? "America/Sao_Paulo";
   const freeSlots = (ymd: string) =>
-    settings ? slotsForDay(ymd, settings, availability).filter((d) => !busy.has(d.getTime())) : [];
+    settings ? slotsForDay(ymd, settings, availability).filter((d) => !busy.has(d.getTime()) && !usedWeeks.has(weekKey(d, settings.timezone ?? "America/Sao_Paulo"))) : [];
   const daySlots = day ? freeSlots(ymdFromLocal(day)) : [];
   const upcoming = mine.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date());
   const past = mine.filter((b) => !upcoming.includes(b));
@@ -133,7 +136,7 @@ function SchedulePage() {
       <header>
         <h1 className="text-3xl font-bold tracking-tight">Agendamento</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez — assim que ela terminar, já pode agendar a próxima.
+          Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez — assim que ela terminar, já pode agendar a próxima a partir da semana seguinte.
         </p>
       </header>
 
