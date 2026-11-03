@@ -11,6 +11,9 @@ import {
   type Booking, type ScheduleSettings,
 } from "@/lib/mentor-schedule";
 import { callsQueue } from "@/lib/call-queue";
+import { waLink } from "@/lib/whatsapp";
+import { RealizedCalls } from "@/components/admin/RealizedCalls";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [
@@ -141,7 +144,7 @@ function Page() {
     })();
   }, []);
 
-  const { settings: schedSettings, calls, loading: callsLoading } = useTodayCalls();
+  const { settings: schedSettings, calls, loading: callsLoading, reload: reloadCalls } = useTodayCalls();
 
   return (
     <div className="space-y-6">
@@ -150,7 +153,7 @@ function Page() {
         <p className="text-sm text-muted-foreground">Visão geral em tempo real</p>
       </div>
 
-      <TodayCalls settings={schedSettings} calls={calls} loading={callsLoading} />
+      <TodayCalls settings={schedSettings} calls={calls} loading={callsLoading} reload={reloadCalls} />
 
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -256,10 +259,6 @@ type CallProfile = { id: string; full_name: string | null; email: string | null;
 type TodayCall = Booking & { profile?: CallProfile; link?: string };
 
 
-const waLink = (phone: string) => {
-  const d = phone.replace(/\D/g, "");
-  return `https://wa.me/${d.length <= 11 ? `55${d}` : d}`;
-};
 
 /** Calls booked for the current day in the mentor's timezone. */
 function useTodayCalls() {
@@ -301,13 +300,15 @@ function useTodayCalls() {
     return () => { clearInterval(iv); window.removeEventListener("focus", onFocus); };
   }, []);
 
-  return { settings, calls, loading };
+  return { settings, calls, loading, reload: load };
 }
 
-function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings | null; calls: TodayCall[]; loading: boolean }) {
+function TodayCalls({ settings, calls, loading, reload }: { settings: ScheduleSettings | null; calls: TodayCall[]; loading: boolean; reload: () => void }) {
   const tz = settings?.timezone || "America/Sao_Paulo";
   const now = Date.now();
-  const nextId = calls.find((c) => c.status !== "done" && new Date(c.ends_at).getTime() >= now)?.id;
+  const pending = callsQueue(calls.filter((c) => c.status !== "done"));
+  const realized = calls.filter((c) => c.status === "done");
+  const nextId = pending.find((c) => new Date(c.ends_at).getTime() >= now)?.id;
 
   return (
     <section className="glass rounded-2xl p-5">
@@ -337,7 +338,7 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
         <p className="text-xs text-muted-foreground">Nenhuma call marcada para hoje.</p>
       ) : (
         <div className="space-y-2">
-          {calls.map((c) => {
+          {pending.map((c) => {
             const name = c.profile?.full_name || c.profile?.email || "Aluno";
             const isNext = c.id === nextId;
             const isDone = c.status === "done";
@@ -381,6 +382,27 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
               </div>
             );
           })}
+        </div>
+      )}
+      {realized.length > 0 && (
+        <div className="mt-2">
+          <RealizedCalls
+            tz={tz}
+            calls={realized.map((c) => ({
+              id: c.id,
+              starts_at: c.starts_at,
+              ends_at: c.ends_at,
+              name: c.profile?.full_name || c.profile?.email || "Aluno",
+              email: c.profile?.email,
+              phone: c.profile?.phone,
+            }))}
+            onUndo={async (id) => {
+              const { error } = await supabase.from("mentor_bookings").update({ status: "booked" }).eq("id", id);
+              if (error) return toast.error(error.message);
+              toast.success("Call devolvida para a fila.");
+              reload();
+            }}
+          />
         </div>
       )}
     </section>
