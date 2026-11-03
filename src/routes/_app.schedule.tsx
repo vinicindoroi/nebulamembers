@@ -287,11 +287,11 @@ function periodGroups(slots: Date[], tz: string): [string, Date[]][] {
   return Object.entries(groups).filter(([, v]) => v.length > 0);
 }
 
-/** Shows the call link only from 10 min before start until the end (enforced server-side). */
+/** Shows the call link only from 5 min before start until the end (enforced server-side). */
 function CallLinkButton({ bookingId, startsAt, endsAt }: { bookingId: string; startsAt: string; endsAt: string }) {
   const [url, setUrl] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
-  const opens = new Date(startsAt).getTime() - 10 * 60000;
+  const opens = new Date(startsAt).getTime() - 5 * 60000;
   const open = now >= opens && now <= new Date(endsAt).getTime();
   useEffect(() => { const iv = setInterval(() => setNow(Date.now()), 30000); return () => clearInterval(iv); }, []);
   useEffect(() => {
@@ -301,7 +301,7 @@ function CallLinkButton({ bookingId, startsAt, endsAt }: { bookingId: string; st
   if (url) return <Button asChild size="sm"><a href={url} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar na call</a></Button>;
   return (
     <span className="self-center text-xs text-muted-foreground">
-      {open ? "Aguardando link do mentor" : "Link liberado 10 min antes"}
+      {open ? "Aguardando link do mentor" : "Link liberado 5 min antes"}
     </span>
   );
 }
