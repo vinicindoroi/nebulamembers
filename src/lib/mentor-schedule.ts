@@ -113,12 +113,4 @@ export function ymdFromLocal(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-/** Pending calls keep their chronological order; finished ones drop to the end of the queue. */
-export function callsQueue<T extends { status: string; starts_at: string }>(rows: T[]) {
-  return [...rows].sort(
-    (a, b) =>
-      (a.status === "done" ? 1 : 0) - (b.status === "done" ? 1 : 0) ||
-      new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-  );
-}
 
