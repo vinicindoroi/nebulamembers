@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
 import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
-import { toast } from "sonner";
 import {
   fmtTime, ymdOf, zonedToDate,
   type Booking, type ScheduleSettings,
