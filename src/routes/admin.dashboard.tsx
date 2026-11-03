@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Users, PlayCircle, UserPlus, TrendingUp, CalendarClock, ArrowRight, Video, MessageCircle } from "lucide-react";
+import { Users, PlayCircle, UserPlus, TrendingUp, CalendarClock, ArrowRight, MessageCircle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
 import {
   fmtTime, ymdOf, zonedToDate,
   type Booking, type ScheduleSettings,
@@ -255,37 +254,6 @@ function Page() {
 type CallProfile = { id: string; full_name: string | null; email: string | null; phone: string | null };
 type TodayCall = Booking & { profile?: CallProfile; link?: string };
 
-function CallLinkEditor({ bookingId, initial }: { bookingId: string; initial?: string }) {
-  const [val, setVal] = useState(initial ?? "");
-  const [saved, setSaved] = useState(initial ?? "");
-  useEffect(() => { setVal(initial ?? ""); setSaved(initial ?? ""); }, [initial]);
-  async function save() {
-    const url = val.trim();
-    if (url === saved) return;
-    if (url && !/^https?:\/\//i.test(url)) { toast.error("Link inválido. Use https://..."); return; }
-    const { error } = url
-      ? await supabase.from("mentor_booking_links").upsert({ booking_id: bookingId, url, updated_at: new Date().toISOString() })
-      : await supabase.from("mentor_booking_links").delete().eq("booking_id", bookingId);
-    if (error) { toast.error(error.message); return; }
-    setSaved(url);
-    toast.success(url ? "Link salvo. O aluno verá 10 min antes da call." : "Link removido.");
-  }
-  return (
-    <div className="flex items-center gap-2">
-      <Input
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        onBlur={save}
-        onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
-        placeholder="Link do Google Meet"
-        className="h-8 w-56 text-xs"
-      />
-      {saved && (
-        <Button asChild size="sm"><a href={saved} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
-      )}
-    </div>
-  );
-}
 
 const waLink = (phone: string) => {
   const d = phone.replace(/\D/g, "");
@@ -318,11 +286,7 @@ function useTodayCalls() {
       const p = await supabase.from("profiles").select("id,full_name,email,phone").in("id", ids);
       ((p.data ?? []) as CallProfile[]).forEach((x) => { profiles[x.id] = x; });
     }
-    const links: Record<string, string> = {};
-    if (rows.length) {
-      const l = await supabase.from("mentor_booking_links").select("booking_id,url").in("booking_id", rows.map((r) => r.id));
-      (l.data ?? []).forEach((x) => { links[x.booking_id] = x.url; });
-    }
+    const links = await fetchBookingLinks(rows.map((r) => r.id));
     setSettings(st);
     setCalls(rows.map((r) => ({ ...r, profile: profiles[r.user_id], link: links[r.id] })));
     setLoading(false);
@@ -377,35 +341,42 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
             const isNext = c.id === nextId;
             const isDone = c.status === "done";
             return (
-              <div key={c.id} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center">
-                <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-1.5 text-center sm:w-24">
-                  <span className="text-lg font-bold tabular-nums">{fmtTime(c.starts_at, tz)}</span>
-                  <span className="text-[11px] text-muted-foreground">até {fmtTime(c.ends_at, tz)}</span>
-                </div>
-                <div className="flex min-w-0 flex-1 items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
-                    {name.slice(0, 2)}
+              <div key={c.id} className="rounded-xl border border-border bg-card p-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                  <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-1.5 text-center sm:w-24">
+                    <span className="text-lg font-bold tabular-nums">{fmtTime(c.starts_at, tz)}</span>
+                    <span className="text-[11px] text-muted-foreground">até {fmtTime(c.ends_at, tz)}</span>
                   </div>
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate font-semibold">{name}</p>
-                      {isDone && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
-                      {isNext && !isDone && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] text-primary">Próxima</span>}
+                  <div className="flex min-w-[220px] flex-1 items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
+                      {name.slice(0, 2)}
                     </div>
-                    <p className="truncate text-xs text-muted-foreground">{c.profile?.email}</p>
-                    {c.notes && <p className="line-clamp-2 whitespace-pre-line text-xs text-muted-foreground">“{c.notes}”</p>}
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate font-semibold">{name}</p>
+                        {isDone && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+                        {isNext && !isDone && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] text-primary">Próxima</span>}
+                      </div>
+                      <p className="truncate text-xs text-muted-foreground">{c.profile?.email}</p>
+                      {c.notes && <p className="line-clamp-2 whitespace-pre-line text-xs text-muted-foreground">“{c.notes}”</p>}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2 sm:ml-auto">
+                    {c.profile?.phone ? (
+                      <Button asChild size="sm" variant="outline">
+                        <a href={waLink(c.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                      </Button>
+                    ) : (
+                      <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
+                    )}
                   </div>
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  {c.profile?.phone ? (
-                    <Button asChild size="sm" variant="outline">
-                      <a href={waLink(c.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
-                    </Button>
-                  ) : (
-                    <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
-                  )}
-                  {!isDone && <CallLinkEditor bookingId={c.id} initial={c.link} />}
-                </div>
+                {!isDone && (
+                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+                    <span className="text-xs font-medium text-muted-foreground">Link da call</span>
+                    <CallLinkEditor bookingId={c.id} initial={c.link} />
+                  </div>
+                )}
               </div>
             );
           })}

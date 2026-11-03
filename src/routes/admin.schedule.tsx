@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { CalendarClock, Check, Loader2, MessageCircle, Plus, Trash2, Video, X } from "lucide-react";
+import { CalendarClock, Check, Loader2, MessageCircle, Plus, Trash2, X } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { useMemberTags } from "@/components/admin/MemberTags";
 import { useMemberGroups } from "@/hooks/use-member-groups";
 import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
 import { MemberGroupSelect } from "@/components/admin/MemberGroups";
+import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +45,7 @@ function AdminSchedule() {
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [links, setLinks] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -57,6 +59,7 @@ function AdminSchedule() {
       ]);
       setBookings((b.data ?? []) as Booking[]);
       setProfiles(Object.fromEntries(((p.data ?? []) as Profile[]).map((x) => [x.id, x])));
+      setLinks(await fetchBookingLinks((b.data ?? []).map((x) => x.id)));
     } catch {
       toast.error("Erro ao carregar agendamentos.");
     } finally {
@@ -90,7 +93,7 @@ function AdminSchedule() {
           <TabsTrigger value="access">Quem tem acesso</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda">
-          <Agenda settings={settings} bookings={bookings} profiles={profiles} reload={load} />
+          <Agenda settings={settings} bookings={bookings} profiles={profiles} links={links} reload={load} />
         </TabsContent>
         <TabsContent value="access">
           <Access settings={settings} profiles={profiles} reload={load} />
@@ -103,8 +106,8 @@ function AdminSchedule() {
   );
 }
 
-function Agenda({ settings, bookings, profiles, reload }: {
-  settings: ScheduleSettings; bookings: Booking[]; profiles: Record<string, Profile>; reload: () => void;
+function Agenda({ settings, bookings, profiles, links, reload }: {
+  settings: ScheduleSettings; bookings: Booking[]; profiles: Record<string, Profile>; links: Record<string, string>; reload: () => void;
 }) {
   const tz = settings.timezone;
   const [day, setDay] = useState<Date | undefined>(new Date());
@@ -166,45 +169,51 @@ function Agenda({ settings, bookings, profiles, reload }: {
     const p = profiles[b.user_id];
     const name = p?.full_name || p?.email || "Aluno";
     const isPast = new Date(b.ends_at).getTime() < now;
+    const canLink = b.status === "booked" && !isPast;
     return (
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center">
-        <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-2 text-center sm:w-24">
-          {showDate && <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(b.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: tz })}</span>}
-          <span className="text-lg font-bold tabular-nums">{fmtTime(b.starts_at, tz)}</span>
-          <span className="text-[11px] text-muted-foreground">até {fmtTime(b.ends_at, tz)}</span>
-        </div>
-        <div className="flex min-w-0 flex-1 items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold uppercase text-primary">
-            {name.slice(0, 2)}
+      <div className="rounded-xl border border-border bg-card p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-2 text-center sm:w-24">
+            {showDate && <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(b.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: tz })}</span>}
+            <span className="text-lg font-bold tabular-nums">{fmtTime(b.starts_at, tz)}</span>
+            <span className="text-[11px] text-muted-foreground">até {fmtTime(b.ends_at, tz)}</span>
           </div>
-          <div className="min-w-0 space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="truncate font-semibold">{name}</p>
-              {b.status === "done" && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+          <div className="flex min-w-[220px] flex-1 items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold uppercase text-primary">
+              {name.slice(0, 2)}
             </div>
-            <p className="truncate text-xs text-muted-foreground">{p?.email}</p>
-            {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
+            <div className="min-w-0 space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="truncate font-semibold">{name}</p>
+                {b.status === "done" && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+              </div>
+              <p className="truncate text-xs text-muted-foreground">{p?.email}</p>
+              {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2 sm:ml-auto">
+            {p?.phone ? (
+              <Button asChild size="sm" variant="outline">
+                <a href={waLink(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+              </Button>
+            ) : (
+              <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
+            )}
+            {b.status === "booked" && (
+              <>
+                <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
+                <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
+              </>
+            )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {p?.phone ? (
-            <Button asChild size="sm" variant="outline">
-              <a href={waLink(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
-            </Button>
-          ) : (
-            <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
-          )}
-          {b.status === "booked" && (
-            <>
-              {settings.meeting_link && !isPast && (
-                <Button asChild size="sm"><a href={settings.meeting_link} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
-              )}
-              <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
-              <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
-              <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
-            </>
-          )}
-        </div>
+        {canLink && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+            <span className="text-xs font-medium text-muted-foreground">Link da call</span>
+            <CallLinkEditor bookingId={b.id} initial={links[b.id]} fallback={settings.meeting_link} />
+          </div>
+        )}
       </div>
     );
   };
