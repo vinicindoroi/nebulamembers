@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
-  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal,
+  fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
 
