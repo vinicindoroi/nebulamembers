@@ -47,4 +47,14 @@ assert.equal(relativeDay("2026-10-30T10:00:00", now), "Há 3 dias");
 assert.equal(relativeDay("2026-10-01T10:00:00", now), "01/10/2026");
 assert.equal(relativeDay(null, now), "—");
 
+// ordenação por aulas concluídas (quem não tem aula fica em qualquer ponta conforme a direção)
+const lessonRows = [
+  { id: "1", full_name: "Pedro", email: "", plan: "Free", status: "active", created_at: "2026-10-01T12:00:00Z", last_seen_at: null },
+  { id: "2", full_name: "Lucas", email: "", plan: "Free", status: "active", created_at: "2026-10-02T12:00:00Z", last_seen_at: null },
+  { id: "3", full_name: "Allam", email: "", plan: "Free", status: "active", created_at: "2026-10-03T12:00:00Z", last_seen_at: null },
+];
+const lessonCounts = { 1: 2, 3: 5 };
+assert.deepEqual(sortMembers(lessonRows, { key: "lessons", dir: "desc" }, [], lessonCounts).map((r) => r.id), ["3", "1", "2"]);
+assert.deepEqual(sortMembers(lessonRows, { key: "lessons", dir: "asc" }, [], lessonCounts).map((r) => r.id), ["2", "1", "3"]);
+
 console.log("member-search: all assertions passed");
