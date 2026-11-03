@@ -10,6 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useMemberTags } from "@/components/admin/MemberTags";
 import { useMemberGroups } from "@/hooks/use-member-groups";
 import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
+import { useMemberLessons } from "@/hooks/use-member-lessons";
+import { formatLessons, lessonsOf, lessonsOfGroup } from "@/lib/member-lessons";
 import { MemberGroupSelect } from "@/components/admin/MemberGroups";
 import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
 import { Calendar } from "@/components/ui/calendar";
@@ -555,6 +557,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
 
   const { tags, assignments: tagAssign } = useMemberTags();
   const memberGroups = useMemberGroups();
+  const lessons = useMemberLessons();
   const { groups, groupOf } = memberGroups;
   const [tagF, setTagF] = useState("");
   const [groupF, setGroupF] = useState("");
@@ -608,7 +611,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
       </section>
       <section className="space-y-3 rounded-xl border border-border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-semibold">Alunos com acesso ({shown.length})</p>
+          <p className="font-semibold">Alunos com acesso ({shown.length}) <span className="ml-1 text-xs font-normal text-muted-foreground">· {formatLessons(lessonsOfGroup(shown.map((p) => p.id), lessons.counts))} até agora</span></p>
           <Input placeholder="Buscar aluno..." value={q} onChange={(e) => setQ(e.target.value)} className="h-9 max-w-xs" />
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -631,7 +634,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
           {shown.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : sections.map(({ id, name: label, members: list }) => (
             <div key={id} className="mb-3">
               {grouped && <div className="flex items-center justify-between border-b border-border py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <span>{label} ({list.length})</span>
+                <span>{label} ({list.length}) <span className="font-normal normal-case tracking-normal">· {formatLessons(lessonsOfGroup(list.map((p) => p.id), lessons.counts))} até agora</span></span>
                 {id !== "none" && <Button variant="ghost" size="icon" onClick={() => deleteGroup(label)} aria-label="Excluir grupo"><Trash2 className="h-3.5 w-3.5" /></Button>}
               </div>}
               <div className="divide-y divide-border">
@@ -643,6 +646,9 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
                         <p className="font-medium">{p.full_name || "Sem nome"}</p>
                         <p className="truncate text-xs text-muted-foreground">{p.email}{myTags.length ? ` · ${myTags.join(", ")}` : ""}</p>
                       </div>
+                      <span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground" title="Aulas concluídas até agora">
+                        {formatLessons(lessonsOf(p.id, lessons.counts))}
+                      </span>
                       <MemberGroupSelect state={memberGroups} memberIds={[p.id]} label={`Grupo de ${p.full_name || "Sem nome"}`} />
                     </div>
                   );
