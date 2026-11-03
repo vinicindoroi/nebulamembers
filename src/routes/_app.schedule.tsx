@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
-  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal, weekKey, zonedToDate,
+  fetchScheduleConfig, slotsForDay, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
 
@@ -36,7 +36,6 @@ function SchedulePage() {
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const [mine, setMine] = useState<Booking[]>([]);
-  const [groupWeeks, setGroupWeeks] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(true);
   const [day, setDay] = useState<Date | undefined>();
