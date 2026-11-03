@@ -133,7 +133,7 @@ function SchedulePage() {
       <header>
         <h1 className="text-3xl font-bold tracking-tight">Agendamento</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez.
+          Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez — assim que ela terminar, já pode agendar a próxima.
         </p>
       </header>
 
