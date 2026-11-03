@@ -23,6 +23,7 @@ import {
   fetchScheduleConfig, fmtDate, fmtTime, ymdOf, zonedToDate, ymdFromLocal, dateFromYmd, WEEKDAYS,
   type Availability, type Booking, type ScheduleSettings,
 } from "@/lib/mentor-schedule";
+import { callsQueue } from "@/lib/call-queue";
 
 export const Route = createFileRoute("/admin/schedule")({
   head: () => ({
@@ -136,8 +137,8 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
     return m;
   }, [active, tz]);
   const bookedDays = Object.keys(byDay).map(dateFromYmd);
-  const selected = day ? byDay[ymdFromLocal(day)] ?? [] : [];
-  const upcoming = bookings.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date());
+  const selected = day ? callsQueue(byDay[ymdFromLocal(day)] ?? []) : [];
+  const upcoming = callsQueue(bookings.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date()));
 
   async function setStatus(b: Booking, status: "done" | "cancelled") {
     const { error } = status === "cancelled"
