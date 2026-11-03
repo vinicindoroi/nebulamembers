@@ -169,43 +169,51 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
     const p = profiles[b.user_id];
     const name = p?.full_name || p?.email || "Aluno";
     const isPast = new Date(b.ends_at).getTime() < now;
+    const canLink = b.status === "booked" && !isPast;
     return (
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center">
-        <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-2 text-center sm:w-24">
-          {showDate && <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(b.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: tz })}</span>}
-          <span className="text-lg font-bold tabular-nums">{fmtTime(b.starts_at, tz)}</span>
-          <span className="text-[11px] text-muted-foreground">até {fmtTime(b.ends_at, tz)}</span>
-        </div>
-        <div className="flex min-w-0 flex-1 items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold uppercase text-primary">
-            {name.slice(0, 2)}
+      <div className="rounded-xl border border-border bg-card p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-2 text-center sm:w-24">
+            {showDate && <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{new Date(b.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: tz })}</span>}
+            <span className="text-lg font-bold tabular-nums">{fmtTime(b.starts_at, tz)}</span>
+            <span className="text-[11px] text-muted-foreground">até {fmtTime(b.ends_at, tz)}</span>
           </div>
-          <div className="min-w-0 space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="truncate font-semibold">{name}</p>
-              {b.status === "done" && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+          <div className="flex min-w-0 flex-1 items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold uppercase text-primary">
+              {name.slice(0, 2)}
             </div>
-            <p className="truncate text-xs text-muted-foreground">{p?.email}</p>
-            {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
+            <div className="min-w-0 space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="truncate font-semibold">{name}</p>
+                {b.status === "done" && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+              </div>
+              <p className="truncate text-xs text-muted-foreground">{p?.email}</p>
+              {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            {p?.phone ? (
+              <Button asChild size="sm" variant="outline">
+                <a href={waLink(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+              </Button>
+            ) : (
+              <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
+            )}
+            {b.status === "booked" && (
+              <>
+                <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
+                <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
+              </>
+            )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {p?.phone ? (
-            <Button asChild size="sm" variant="outline">
-              <a href={waLink(p.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
-            </Button>
-          ) : (
-            <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
-          )}
-          {b.status === "booked" && (
-            <>
-              {!isPast && <CallLinkEditor bookingId={b.id} initial={links[b.id]} fallback={settings.meeting_link} />}
-              <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
-              <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
-              <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
-            </>
-          )}
-        </div>
+        {canLink && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+            <span className="text-xs font-medium text-muted-foreground">Link da call</span>
+            <CallLinkEditor bookingId={b.id} initial={links[b.id]} fallback={settings.meeting_link} />
+          </div>
+        )}
       </div>
     );
   };

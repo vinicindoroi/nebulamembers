@@ -341,35 +341,42 @@ function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings |
             const isNext = c.id === nextId;
             const isDone = c.status === "done";
             return (
-              <div key={c.id} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 sm:flex-row sm:items-center">
-                <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-1.5 text-center sm:w-24">
-                  <span className="text-lg font-bold tabular-nums">{fmtTime(c.starts_at, tz)}</span>
-                  <span className="text-[11px] text-muted-foreground">até {fmtTime(c.ends_at, tz)}</span>
-                </div>
-                <div className="flex min-w-0 flex-1 items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
-                    {name.slice(0, 2)}
+              <div key={c.id} className="rounded-xl border border-border bg-card p-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted px-4 py-1.5 text-center sm:w-24">
+                    <span className="text-lg font-bold tabular-nums">{fmtTime(c.starts_at, tz)}</span>
+                    <span className="text-[11px] text-muted-foreground">até {fmtTime(c.ends_at, tz)}</span>
                   </div>
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate font-semibold">{name}</p>
-                      {isDone && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
-                      {isNext && !isDone && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] text-primary">Próxima</span>}
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase text-primary">
+                      {name.slice(0, 2)}
                     </div>
-                    <p className="truncate text-xs text-muted-foreground">{c.profile?.email}</p>
-                    {c.notes && <p className="line-clamp-2 whitespace-pre-line text-xs text-muted-foreground">“{c.notes}”</p>}
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate font-semibold">{name}</p>
+                        {isDone && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+                        {isNext && !isDone && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] text-primary">Próxima</span>}
+                      </div>
+                      <p className="truncate text-xs text-muted-foreground">{c.profile?.email}</p>
+                      {c.notes && <p className="line-clamp-2 whitespace-pre-line text-xs text-muted-foreground">“{c.notes}”</p>}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    {c.profile?.phone ? (
+                      <Button asChild size="sm" variant="outline">
+                        <a href={waLink(c.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                      </Button>
+                    ) : (
+                      <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
+                    )}
                   </div>
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  {c.profile?.phone ? (
-                    <Button asChild size="sm" variant="outline">
-                      <a href={waLink(c.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
-                    </Button>
-                  ) : (
-                    <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
-                  )}
-                  {!isDone && <CallLinkEditor bookingId={c.id} initial={c.link} />}
-                </div>
+                {!isDone && (
+                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+                    <span className="text-xs font-medium text-muted-foreground">Link da call</span>
+                    <CallLinkEditor bookingId={c.id} initial={c.link} />
+                  </div>
+                )}
               </div>
             );
           })}

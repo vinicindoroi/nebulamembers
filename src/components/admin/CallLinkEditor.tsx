@@ -46,17 +46,17 @@ export function CallLinkEditor({ bookingId, initial, fallback }: {
   const open = saved || fallback;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 flex-1 items-center gap-2">
       <Input
         value={val}
         onChange={(e) => setVal(e.target.value)}
         onBlur={save}
         onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
         placeholder="Link do Google Meet"
-        className="h-8 w-56 text-xs"
+        className="h-8 w-full min-w-0 text-xs"
       />
       {open && (
-        <Button asChild size="sm"><a href={open} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
+        <Button asChild size="sm" className="shrink-0"><a href={open} target="_blank" rel="noreferrer"><Video className="h-4 w-4" /> Entrar</a></Button>
       )}
     </div>
   );
