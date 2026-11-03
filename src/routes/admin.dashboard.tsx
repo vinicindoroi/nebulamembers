@@ -7,7 +7,7 @@ import { StatCard } from "@/components/admin/StatCard";
 import { Button } from "@/components/ui/button";
 import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
 import {
-  fmtTime, ymdOf, zonedToDate,
+  fmtTime, ymdOf, zonedToDate, callsQueue,
   type Booking, type ScheduleSettings,
 } from "@/lib/mentor-schedule";
 
@@ -288,7 +288,7 @@ function useTodayCalls() {
     }
     const links = await fetchBookingLinks(rows.map((r) => r.id));
     setSettings(st);
-    setCalls(rows.map((r) => ({ ...r, profile: profiles[r.user_id], link: links[r.id] })));
+    setCalls(callsQueue(rows).map((r) => ({ ...r, profile: profiles[r.user_id], link: links[r.id] })));
     setLoading(false);
   }
 
@@ -306,7 +306,7 @@ function useTodayCalls() {
 function TodayCalls({ settings, calls, loading }: { settings: ScheduleSettings | null; calls: TodayCall[]; loading: boolean }) {
   const tz = settings?.timezone || "America/Sao_Paulo";
   const now = Date.now();
-  const nextId = calls.find((c) => new Date(c.ends_at).getTime() >= now)?.id;
+  const nextId = calls.find((c) => c.status !== "done" && new Date(c.ends_at).getTime() >= now)?.id;
 
   return (
     <section className="glass rounded-2xl p-5">
