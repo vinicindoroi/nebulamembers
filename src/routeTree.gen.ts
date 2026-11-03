@@ -50,6 +50,7 @@ import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
+import { Route as ApiPublicJobsClosePastCallsRouteImport } from './routes/api/public/jobs/close-past-calls'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -255,6 +256,12 @@ const AppCoursesCourseIdRoute = AppCoursesCourseIdRouteImport.update({
   path: '/$courseId',
   getParentRoute: () => AppCoursesRoute,
 } as any)
+const ApiPublicJobsClosePastCallsRoute =
+  ApiPublicJobsClosePastCallsRouteImport.update({
+    id: '/api/public/jobs/close-past-calls',
+    path: '/api/public/jobs/close-past-calls',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -297,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
+  '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -339,6 +347,7 @@ export interface FileRoutesByTo {
   '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
+  '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -383,6 +392,7 @@ export interface FileRoutesById {
   '/admin/schedule': typeof AdminScheduleRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
+  '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/settings'
     | '/courses/$courseId'
+    | '/api/public/jobs/close-past-calls'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -469,6 +480,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/settings'
     | '/courses/$courseId'
+    | '/api/public/jobs/close-past-calls'
   id:
     | '__root__'
     | '/'
@@ -512,6 +524,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/settings'
     | '/_app/courses/$courseId'
+    | '/api/public/jobs/close-past-calls'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -523,6 +536,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RespostasRoute: typeof RespostasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -814,6 +828,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCoursesCourseIdRouteImport
       parentRoute: typeof AppCoursesRoute
     }
+    '/api/public/jobs/close-past-calls': {
+      id: '/api/public/jobs/close-past-calls'
+      path: '/api/public/jobs/close-past-calls'
+      fullPath: '/api/public/jobs/close-past-calls'
+      preLoaderRoute: typeof ApiPublicJobsClosePastCallsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -918,6 +939,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RespostasRoute: RespostasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
