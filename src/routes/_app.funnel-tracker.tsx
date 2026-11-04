@@ -219,6 +219,9 @@ function FunnelsPage() {
           <div>
             <h1 className="flex items-center gap-2 font-display text-2xl font-semibold tracking-tight">
               <GitBranch className="h-5 w-5 text-primary" /> Funnel Tracker
+              <span className="rounded-md border border-cyan-500/30 bg-cyan-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                Beta
+              </span>
             </h1>
             <p className="text-sm text-muted-foreground">Cada passagem do funil, o gargalo e quem paga — por criativo e origem.</p>
           </div>
