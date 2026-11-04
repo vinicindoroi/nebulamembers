@@ -87,9 +87,18 @@ function AdminSchedule() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight">Agendamentos</h1>
-        <p className="text-sm text-muted-foreground">Calls marcadas pelos alunos e seus horários disponíveis.</p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Agendamentos</h1>
+          <p className="text-sm text-muted-foreground">Calls marcadas pelos alunos e seus horários disponíveis.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => {
+            navigator.clipboard.writeText(`${window.location.origin}/agenda`);
+            toast.success("Link público da agenda copiado.");
+          }}>Copiar link público</Button>
+          <Button variant="ghost" size="sm" asChild><a href="/agenda" target="_blank" rel="noreferrer">Abrir</a></Button>
+        </div>
       </header>
       <Tabs defaultValue="agenda" className="space-y-6">
         <TabsList>
