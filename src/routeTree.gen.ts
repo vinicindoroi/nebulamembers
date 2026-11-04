@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as FormsRouteImport } from './routes/forms'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
@@ -64,6 +65,11 @@ const AppRoute = AppRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgendaRoute = AgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FormsRoute = FormsRouteImport.update({
@@ -266,6 +272,7 @@ const ApiPublicJobsClosePastCallsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/agenda': typeof AgendaRoute
   '/forms': typeof FormsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
@@ -309,6 +316,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/agenda': typeof AgendaRoute
   '/forms': typeof FormsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
@@ -354,6 +362,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/agenda': typeof AgendaRoute
   '/forms': typeof FormsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
@@ -399,6 +408,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/agenda'
     | '/forms'
     | '/landing'
     | '/login'
@@ -442,6 +452,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/agenda'
     | '/forms'
     | '/landing'
     | '/login'
@@ -486,6 +497,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/admin'
+    | '/agenda'
     | '/forms'
     | '/landing'
     | '/login'
@@ -531,6 +543,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
+  AgendaRoute: typeof AgendaRoute
   FormsRoute: typeof FormsRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
@@ -560,6 +573,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agenda': {
+      id: '/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AgendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forms': {
@@ -934,6 +954,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
+  AgendaRoute: AgendaRoute,
   FormsRoute: FormsRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
