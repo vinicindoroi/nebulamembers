@@ -1756,6 +1756,142 @@ export type Database = {
         }
         Relationships: []
       }
+      tracker_funnel_events: {
+        Row: {
+          amount: number | null
+          click_id: string | null
+          created_at: string
+          currency: string | null
+          funnel_id: string
+          id: string
+          ip: string | null
+          is_bot: boolean
+          metadata: Json | null
+          referrer: string | null
+          session_id: string
+          step: string
+          transaction_id: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          workspace_id: string
+        }
+        Insert: {
+          amount?: number | null
+          click_id?: string | null
+          created_at?: string
+          currency?: string | null
+          funnel_id: string
+          id?: string
+          ip?: string | null
+          is_bot?: boolean
+          metadata?: Json | null
+          referrer?: string | null
+          session_id: string
+          step: string
+          transaction_id?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          workspace_id: string
+        }
+        Update: {
+          amount?: number | null
+          click_id?: string | null
+          created_at?: string
+          currency?: string | null
+          funnel_id?: string
+          id?: string
+          ip?: string | null
+          is_bot?: boolean
+          metadata?: Json | null
+          referrer?: string | null
+          session_id?: string
+          step?: string
+          transaction_id?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracker_funnel_events_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "tracker_funnels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tracker_funnel_steps: {
+        Row: {
+          created_at: string
+          funnel_id: string
+          id: string
+          key: string
+          label: string
+          position: number
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          funnel_id: string
+          id?: string
+          key: string
+          label: string
+          position?: number
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          funnel_id?: string
+          id?: string
+          key?: string
+          label?: string
+          position?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracker_funnel_steps_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "tracker_funnels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tracker_funnels: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
