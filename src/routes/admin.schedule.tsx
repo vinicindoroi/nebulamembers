@@ -129,13 +129,16 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
   const [rDate, setRDate] = useState("");
   const [rTime, setRTime] = useState("");
   const [rSaving, setRSaving] = useState(false);
+  const [rReason, setRReason] = useState("");
+  const [cancelB, setCancelB] = useState<Booking | null>(null);
+  const [cReason, setCReason] = useState("");
 
   async function doReschedule() {
     if (!resched || !rDate || !/^\d{2}:\d{2}$/.test(rTime)) return toast.error("Informe data e horário.");
     const [h, m] = rTime.split(":").map(Number);
     const startsAt = zonedToDate(rDate, h * 60 + m, tz);
     setRSaving(true);
-    const { error } = await (supabase as any).rpc("admin_reschedule_booking", { _id: resched.id, _starts_at: startsAt.toISOString() });
+    const { error } = await (supabase as any).rpc("admin_reschedule_booking", { _id: resched.id, _starts_at: startsAt.toISOString(), _reason: rReason.trim() || null });
     setRSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Call remarcada. O aluno foi notificado.");
@@ -155,9 +158,9 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
   const realized = selected.filter((b) => b.status === "done");
   const upcoming = callsQueue(bookings.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date()));
 
-  async function setStatus(b: Booking, status: "done" | "cancelled" | "booked") {
+  async function setStatus(b: Booking, status: "done" | "cancelled" | "booked", reason?: string) {
     const { error } = status === "cancelled"
-      ? await supabase.rpc("cancel_mentor_booking", { _id: b.id })
+      ? await supabase.rpc("cancel_mentor_booking", { _id: b.id, _reason: reason?.trim() || undefined })
       : await supabase.from("mentor_bookings").update({ status }).eq("id", b.id);
     if (error) return toast.error(error.message);
     toast.success(status === "done" ? "Marcada como realizada." : status === "booked" ? "Call devolvida para a fila." : "Call cancelada.");
@@ -216,9 +219,9 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
             )}
             {b.status === "booked" && (
               <>
-                <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
+                <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); setRReason(""); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
                 <Button size="icon" variant="ghost" className="h-9 w-9" title="Marcar como realizada" onClick={() => setStatus(b, "done")}><Check className="h-4 w-4" /></Button>
-                <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => confirm("Cancelar esta call?") && setStatus(b, "cancelled")}><X className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" title="Cancelar call" onClick={() => { setCancelB(b); setCReason(""); }}><X className="h-4 w-4" /></Button>
               </>
             )}
           </div>
@@ -245,10 +248,24 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
             <div className="space-y-1.5"><Label>Data</Label><Input type="date" value={rDate} onChange={(e) => setRDate(e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Horário</Label><Input type="time" value={rTime} onChange={(e) => setRTime(e.target.value)} /></div>
           </div>
+          <div className="space-y-1.5"><Label>Motivo (opcional)</Label><Textarea rows={2} maxLength={500} value={rReason} onChange={(e) => setRReason(e.target.value)} placeholder="Ex.: imprevisto na agenda" /></div>
           <p className="text-xs text-muted-foreground">Duração: {settings.slot_minutes} min · fuso de Brasília</p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setResched(null)}>Voltar</Button>
             <Button onClick={doReschedule} disabled={rSaving}>{rSaving && <Loader2 className="h-4 w-4 animate-spin" />} Remarcar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!cancelB} onOpenChange={(o) => !o && setCancelB(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Cancelar call</DialogTitle>
+            <DialogDescription>{cancelB ? (profiles[cancelB.user_id]?.full_name || "Aluno") : ""} será avisado do cancelamento.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1.5"><Label>Motivo (opcional)</Label><Textarea rows={2} maxLength={500} value={cReason} onChange={(e) => setCReason(e.target.value)} placeholder="Ex.: precisei desmarcar" /></div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setCancelB(null)}>Voltar</Button>
+            <Button variant="destructive" onClick={() => { const b = cancelB!; setCancelB(null); setStatus(b, "cancelled", cReason); }}>Cancelar call</Button>
           </div>
         </DialogContent>
       </Dialog>
