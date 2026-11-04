@@ -17,3 +17,4 @@
 - Enforce group weekly booking limits through a database trigger shared by reservations and admin rescheduling; expose only occupied week dates to students so group classification and peer details remain admin-only.
 - Persist course banner order and timing in app_settings, store images in the private course-banners bucket with signed URLs, and share the query between admin and catalog so changes remain synchronized.
 - Derive per-member and per-group lesson counts from lesson_progress through one shared hook and pure helper, so every admin screen reports identical numbers and duplicate progress rows never double-count.
+- Funnel Tracker (ported from TRACKLY) uses tracker_* tables scoped by workspace_id = owner user id; public ingestion via /api/public/tracker-event/$userId and /funnel-tracker.js, kept separate from the funnel-builder 'funnels' tables.
