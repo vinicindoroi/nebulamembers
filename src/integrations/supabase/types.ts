@@ -1289,6 +1289,7 @@ export type Database = {
       }
       mentor_bookings: {
         Row: {
+          change_reason: string | null
           created_at: string
           ends_at: string
           google_event_id: string | null
@@ -1299,6 +1300,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          change_reason?: string | null
           created_at?: string
           ends_at: string
           google_event_id?: string | null
@@ -1309,6 +1311,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          change_reason?: string | null
           created_at?: string
           ends_at?: string
           google_event_id?: string | null
@@ -2057,7 +2060,7 @@ export type Database = {
         }
       }
       admin_reschedule_booking: {
-        Args: { _id: string; _starts_at: string }
+        Args: { _id: string; _reason?: string; _starts_at: string }
         Returns: undefined
       }
       book_mentor_call: {
@@ -2073,7 +2076,10 @@ export type Database = {
         Args: { _lesson_id: string }
         Returns: boolean
       }
-      cancel_mentor_booking: { Args: { _id: string }; Returns: undefined }
+      cancel_mentor_booking: {
+        Args: { _id: string; _reason?: string }
+        Returns: undefined
+      }
       check_email_in_leads: { Args: { check_email: string }; Returns: boolean }
       content_unlocked: { Args: { _lesson_id: string }; Returns: boolean }
       generate_tracking_token: { Args: never; Returns: string }
