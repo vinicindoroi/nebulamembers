@@ -689,10 +689,10 @@ function PromptBox({ value }: { value: string }) {
 function SetupTab({ workspaceId, funnelId }: { workspaceId: string; funnelId: string }) {
   // Snippets precisam de uma origem pública: o preview exige login e não carrega no site do cliente.
   const origin = FUNNEL_PUBLIC_ORIGIN;
-  const eventUrl = `${origin}/api/public/funnel-event/${workspaceId}`;
+  const eventUrl = `${origin}/api/public/tracker-event/${workspaceId}`;
   const payUrl = `${origin}/api/public/funnel-payment/${workspaceId}`;
-  const autoScript = `<script src="${origin}/funnel.js?w=${workspaceId}&f=${funnelId}" data-auto="true" defer></script>`;
-  const manualScript = `<script src="${origin}/funnel.js?w=${workspaceId}&f=${funnelId}" data-step="chegou" defer></script>`;
+  const autoScript = `<script src="${origin}/funnel-tracker.js?w=${workspaceId}&f=${funnelId}" data-auto="true" defer></script>`;
+  const manualScript = `<script src="${origin}/funnel-tracker.js?w=${workspaceId}&f=${funnelId}" data-step="chegou" defer></script>`;
   const listFn = useServerFn(listRecentFunnelEvents);
   const stepsFn = useServerFn(getFunnelSteps);
   const { data: recent, refetch: refetchRecent } = useQuery({
