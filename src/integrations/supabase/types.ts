@@ -1428,6 +1428,51 @@ export type Database = {
           },
         ]
       }
+      monitored_sites: {
+        Row: {
+          active: boolean
+          check_interval_seconds: number
+          created_at: string
+          id: string
+          label: string | null
+          last_checked_at: string | null
+          last_ok: boolean | null
+          notify_email: boolean
+          notify_push: boolean
+          updated_at: string
+          url: string
+          workspace_id: string
+        }
+        Insert: {
+          active?: boolean
+          check_interval_seconds?: number
+          created_at?: string
+          id?: string
+          label?: string | null
+          last_checked_at?: string | null
+          last_ok?: boolean | null
+          notify_email?: boolean
+          notify_push?: boolean
+          updated_at?: string
+          url: string
+          workspace_id: string
+        }
+        Update: {
+          active?: boolean
+          check_interval_seconds?: number
+          created_at?: string
+          id?: string
+          label?: string | null
+          last_checked_at?: string | null
+          last_ok?: boolean | null
+          notify_email?: boolean
+          notify_push?: boolean
+          updated_at?: string
+          url?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       notification_reads: {
         Row: {
           notification_id: string
@@ -1921,6 +1966,47 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      uptime_checks: {
+        Row: {
+          checked_at: string
+          error: string | null
+          id: string
+          ok: boolean
+          response_ms: number | null
+          site_id: string
+          status_code: number | null
+          workspace_id: string
+        }
+        Insert: {
+          checked_at?: string
+          error?: string | null
+          id?: string
+          ok?: boolean
+          response_ms?: number | null
+          site_id: string
+          status_code?: number | null
+          workspace_id: string
+        }
+        Update: {
+          checked_at?: string
+          error?: string | null
+          id?: string
+          ok?: boolean
+          response_ms?: number | null
+          site_id?: string
+          status_code?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uptime_checks_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "monitored_sites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_notes: {
         Row: {
