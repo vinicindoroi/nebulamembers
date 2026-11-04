@@ -41,7 +41,7 @@ const navGroups: NavGroup[] = [
       { to: "/saved", label: "Salvos", icon: Bookmark },
       { to: "/notes", label: "Notas", icon: StickyNote },
       { to: "/funnels", label: "Funis", icon: GitBranch },
-      { to: "/funnel-tracker", label: "Funnel Tracker", icon: Activity },
+      { to: "/funnel-tracker", label: "Funnel Tracker", icon: Activity, badge: "BETA" },
       { to: "/pixel-feeder", label: "Pixel Feeder", icon: Flame, badge: "BETA" },
       { to: "/transcript", label: "Transcrição", icon: Mic },
     ],
