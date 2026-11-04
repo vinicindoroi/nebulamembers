@@ -7,7 +7,7 @@ export async function resolveFunnelId(
 ): Promise<string | null> {
   if (requested && /^[0-9a-f-]{36}$/i.test(requested)) {
     const { data } = await supabaseAdmin
-      .from("funnels")
+      .from("tracker_funnels")
       .select("id")
       .eq("id", requested)
       .eq("workspace_id", workspaceId)
@@ -16,7 +16,7 @@ export async function resolveFunnelId(
   }
 
   const { data: first } = await supabaseAdmin
-    .from("funnels")
+    .from("tracker_funnels")
     .select("id")
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: true })
@@ -25,7 +25,7 @@ export async function resolveFunnelId(
   if (first?.id) return first.id as string;
 
   const { data: created } = await supabaseAdmin
-    .from("funnels")
+    .from("tracker_funnels")
     .insert({ workspace_id: workspaceId, name: "Funil principal" })
     .select("id")
     .single();

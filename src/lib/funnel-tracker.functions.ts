@@ -14,7 +14,7 @@ export const listFunnels = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ workspaceId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
-      .from("funnels" as never)
+      .from("tracker_funnels" as never)
       .select("id, name, created_at")
       .eq("workspace_id", data.workspaceId)
       .order("created_at", { ascending: true });
@@ -22,7 +22,7 @@ export const listFunnels = createServerFn({ method: "POST" })
     let list = (rows ?? []) as unknown as FunnelListItem[];
     if (!list.length) {
       const { data: created, error: createError } = await context.supabase
-        .from("funnels" as never)
+        .from("tracker_funnels" as never)
         .insert({ workspace_id: data.workspaceId, name: "Funil principal" } as never)
         .select("id, name, created_at")
         .single();
@@ -45,7 +45,7 @@ export const createFunnel = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { data: created, error } = await context.supabase
-      .from("funnels" as never)
+      .from("tracker_funnels" as never)
       .insert({ workspace_id: data.workspaceId, name: data.name } as never)
       .select("id, name, created_at")
       .single();
@@ -55,7 +55,7 @@ export const createFunnel = createServerFn({ method: "POST" })
     let steps: { key: string; label: string; position: number }[] = [];
     if (data.copyStepsFromFunnelId) {
       const { data: src } = await context.supabase
-        .from("funnel_steps" as never)
+        .from("tracker_funnel_steps" as never)
         .select("key, label, position")
         .eq("funnel_id", data.copyStepsFromFunnelId)
         .order("position", { ascending: true });
@@ -70,7 +70,7 @@ export const createFunnel = createServerFn({ method: "POST" })
         { key: "pagamento_aprovado", label: "Pagamento aprovado", position: 5 },
       ];
     }
-    await context.supabase.from("funnel_steps" as never).insert(
+    await context.supabase.from("tracker_funnel_steps" as never).insert(
       steps.map((s, i) => ({
         workspace_id: data.workspaceId,
         funnel_id: funnel.id,
@@ -87,7 +87,7 @@ export const renameFunnel = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ funnelId: z.string().uuid(), name: z.string().min(1).max(80) }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
-      .from("funnels" as never)
+      .from("tracker_funnels" as never)
       .update({ name: data.name } as never)
       .eq("id", data.funnelId);
     if (error) throw new Error(error.message);
@@ -98,7 +98,7 @@ export const deleteFunnel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ funnelId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("funnels" as never).delete().eq("id", data.funnelId);
+    const { error } = await context.supabase.from("tracker_funnels" as never).delete().eq("id", data.funnelId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -120,7 +120,7 @@ export const getFunnelReport = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { computeFunnelReport } = await import("./funnel/compute.server");
+    const { computeFunnelReport } = await import("./funnel-tracker/compute.server");
     const { data: ws } = await context.supabase
       .from("workspaces")
       .select("display_currency")
@@ -144,7 +144,7 @@ export const getFunnelSteps = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ funnelId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
-      .from("funnel_steps" as never)
+      .from("tracker_funnel_steps" as never)
       .select("id, key, label, position")
       .eq("funnel_id", data.funnelId)
       .order("position", { ascending: true });
@@ -176,13 +176,13 @@ export const saveFunnelSteps = createServerFn({ method: "POST" })
     if (new Set(keys).size !== keys.length) throw new Error("chaves_duplicadas");
 
     await context.supabase
-      .from("funnel_steps" as never)
+      .from("tracker_funnel_steps" as never)
       .delete()
       .eq("funnel_id", data.funnelId)
       .not("key", "in", `(${keys.join(",")})`);
 
     const { error } = await context.supabase
-      .from("funnel_steps" as never)
+      .from("tracker_funnel_steps" as never)
       .upsert(
         data.steps.map((s, i) => ({
           workspace_id: data.workspaceId,
@@ -202,7 +202,7 @@ export const listRecentFunnelEvents = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ funnelId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
-      .from("funnel_events" as never)
+      .from("tracker_funnel_events" as never)
       .select("id, session_id, step, amount, utm_content, utm_campaign, utm_source, created_at")
       .eq("funnel_id", data.funnelId)
       .order("created_at", { ascending: false })
@@ -234,7 +234,7 @@ export const getFunnelLive = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { computeFunnelLive } = await import("./funnel/live.server");
+    const { computeFunnelLive } = await import("./funnel-tracker/live.server");
     return computeFunnelLive({
       supabase: context.supabase,
       funnelId: data.funnelId,
@@ -259,7 +259,7 @@ export const getFunnelTrafficQuality = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { computeTrafficQuality } = await import("./funnel/traffic.server");
+    const { computeTrafficQuality } = await import("./funnel-tracker/traffic.server");
     return computeTrafficQuality({
       supabase: context.supabase,
       funnelId: data.funnelId,

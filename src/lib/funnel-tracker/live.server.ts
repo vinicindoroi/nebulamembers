@@ -12,7 +12,7 @@ export async function computeFunnelLive(args: {
   const since = new Date(Date.now() - args.windowMinutes * 60_000).toISOString();
 
   const { data, error } = await args.supabase
-    .from("funnel_events")
+    .from("tracker_funnel_events")
     .select("session_id, step, created_at, utm_campaign, utm_source")
     .eq("funnel_id", args.funnelId)
     .eq("is_bot", false)

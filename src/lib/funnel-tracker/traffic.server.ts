@@ -43,7 +43,7 @@ export async function computeTrafficQuality(args: {
   const rows: any[] = [];
   for (let page = 0; page < 20; page++) {
     const { data, error } = await args.supabase
-      .from("funnel_events")
+      .from("tracker_funnel_events")
       .select("session_id, is_bot, utm_source, utm_campaign, referrer, user_agent, created_at")
       .eq("funnel_id", args.funnelId)
       .gte("created_at", args.from)

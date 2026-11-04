@@ -1,6 +1,6 @@
 import { creativeKey, parseCreative } from "./creative";
 import { scopeJourney, type OfferScope } from "./offer-scope";
-import { offerOf } from "../offer-classification";
+import { offerOf } from "./offer-classification";
 import type { FunnelBreakdownRow, FunnelReport, FunnelStepRow, FunnelSummary } from "./types";
 
 interface EventRow {
@@ -41,7 +41,7 @@ interface Ctx {
 
 async function loadSteps(ctx: Ctx): Promise<StepDef[]> {
   const { data } = await ctx.supabase
-    .from("funnel_steps")
+    .from("tracker_funnel_steps")
     .select("key, label, position")
     .eq("funnel_id", ctx.funnelId)
     .order("position", { ascending: true });
@@ -54,7 +54,7 @@ async function loadEvents(ctx: Ctx): Promise<EventRow[]> {
   const pageSize = 1000;
   for (let page = 0; page < 20; page++) {
     const { data, error } = await ctx.supabase
-      .from("funnel_events")
+      .from("tracker_funnel_events")
       .select("session_id, step, amount, click_id, utm_source, utm_campaign, utm_content, metadata, created_at, is_bot")
       .eq("funnel_id", ctx.funnelId)
       .gte("created_at", ctx.from)

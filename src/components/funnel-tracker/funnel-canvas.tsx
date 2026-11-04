@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { num } from "@/lib/utils-format";
-import type { FunnelStepRow } from "@/lib/funnel/types";
+import { num } from "@/lib/funnel-tracker/utils-format";
+import type { FunnelStepRow } from "@/lib/funnel-tracker/types";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Maximize2, Code2 } from "lucide-react";
-import { StepSnippetDialog } from "@/components/funnel/step-snippet-dialog";
+import { StepSnippetDialog } from "@/components/funnel-tracker/step-snippet-dialog";
 
 const NODE_W = 260;
 const NODE_H = 140;

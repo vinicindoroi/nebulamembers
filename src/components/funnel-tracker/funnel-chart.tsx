@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { num } from "@/lib/utils-format";
-import type { FunnelStepRow } from "@/lib/funnel/types";
+import { num } from "@/lib/funnel-tracker/utils-format";
+import type { FunnelStepRow } from "@/lib/funnel-tracker/types";
 
 const BAND = 64;
 const GAP = 6;

@@ -1,4 +1,4 @@
-import { offerOf, type Offer } from "../offer-classification";
+import { offerOf, type Offer } from "./offer-classification";
 
 export type OfferScope = "all" | Offer;
 type AttributedRow = { utm_campaign?: string | null; utm_source?: string | null };
