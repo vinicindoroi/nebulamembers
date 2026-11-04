@@ -51,7 +51,7 @@ export function StepSnippetDialog({
   stepLabel: string;
 }) {
   const origin = FUNNEL_PUBLIC_ORIGIN;
-  const eventUrl = `${origin}/api/public/funnel-event/${workspaceId}`;
+  const eventUrl = `${origin}/api/public/tracker-event/${workspaceId}`;
   const base = `<script src="${origin}/funnel-tracker.js?w=${workspaceId}&f=${funnelId}" data-auto="true" defer></script>`;
 
   return (

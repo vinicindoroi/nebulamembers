@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as FormsRouteImport } from './routes/forms'
+import { Route as FunnelTrackerDotjsRouteImport } from './routes/funnel-tracker[.]js'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RespostasRouteImport } from './routes/respostas'
@@ -52,6 +53,7 @@ import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 import { Route as ApiPublicJobsClosePastCallsRouteImport } from './routes/api/public/jobs/close-past-calls'
+import { Route as ApiPublicTrackerEventWorkspaceIdRouteImport } from './routes/api/public/tracker-event.$workspaceId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -75,6 +77,11 @@ const AgendaRoute = AgendaRouteImport.update({
 const FormsRoute = FormsRouteImport.update({
   id: '/forms',
   path: '/forms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FunnelTrackerDotjsRoute = FunnelTrackerDotjsRouteImport.update({
+  id: '/funnel-tracker.js',
+  path: '/funnel-tracker.js',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -268,12 +275,19 @@ const ApiPublicJobsClosePastCallsRoute =
     path: '/api/public/jobs/close-past-calls',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTrackerEventWorkspaceIdRoute =
+  ApiPublicTrackerEventWorkspaceIdRouteImport.update({
+    id: '/api/public/tracker-event/$workspaceId',
+    path: '/api/public/tracker-event/$workspaceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/agenda': typeof AgendaRoute
   '/forms': typeof FormsRoute
+  '/funnel-tracker.js': typeof FunnelTrackerDotjsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/respostas': typeof RespostasRoute
@@ -312,12 +326,14 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/agenda': typeof AgendaRoute
   '/forms': typeof FormsRoute
+  '/funnel-tracker.js': typeof FunnelTrackerDotjsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/respostas': typeof RespostasRoute
@@ -356,6 +372,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -364,6 +381,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/agenda': typeof AgendaRoute
   '/forms': typeof FormsRoute
+  '/funnel-tracker.js': typeof FunnelTrackerDotjsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/respostas': typeof RespostasRoute
@@ -402,6 +420,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -410,6 +429,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/agenda'
     | '/forms'
+    | '/funnel-tracker.js'
     | '/landing'
     | '/login'
     | '/respostas'
@@ -448,12 +468,14 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/tracker-event/$workspaceId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/agenda'
     | '/forms'
+    | '/funnel-tracker.js'
     | '/landing'
     | '/login'
     | '/respostas'
@@ -492,6 +514,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/tracker-event/$workspaceId'
   id:
     | '__root__'
     | '/'
@@ -499,6 +522,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/agenda'
     | '/forms'
+    | '/funnel-tracker.js'
     | '/landing'
     | '/login'
     | '/respostas'
@@ -537,6 +561,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/_app/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/tracker-event/$workspaceId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -545,11 +570,13 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AgendaRoute: typeof AgendaRoute
   FormsRoute: typeof FormsRoute
+  FunnelTrackerDotjsRoute: typeof FunnelTrackerDotjsRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   RespostasRoute: typeof RespostasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
+  ApiPublicTrackerEventWorkspaceIdRoute: typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -587,6 +614,13 @@ declare module '@tanstack/react-router' {
       path: '/forms'
       fullPath: '/forms'
       preLoaderRoute: typeof FormsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/funnel-tracker.js': {
+      id: '/funnel-tracker.js'
+      path: '/funnel-tracker.js'
+      fullPath: '/funnel-tracker.js'
+      preLoaderRoute: typeof FunnelTrackerDotjsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -855,6 +889,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsClosePastCallsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/tracker-event/$workspaceId': {
+      id: '/api/public/tracker-event/$workspaceId'
+      path: '/api/public/tracker-event/$workspaceId'
+      fullPath: '/api/public/tracker-event/$workspaceId'
+      preLoaderRoute: typeof ApiPublicTrackerEventWorkspaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -956,11 +997,13 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AgendaRoute: AgendaRoute,
   FormsRoute: FormsRoute,
+  FunnelTrackerDotjsRoute: FunnelTrackerDotjsRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   RespostasRoute: RespostasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
+  ApiPublicTrackerEventWorkspaceIdRoute: ApiPublicTrackerEventWorkspaceIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
