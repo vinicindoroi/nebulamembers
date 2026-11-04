@@ -23,6 +23,7 @@ import { Route as AppCommunityRouteImport } from './routes/_app.community'
 import { Route as AppCoursesRouteImport } from './routes/_app.courses'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppForumRouteImport } from './routes/_app.forum'
+import { Route as AppFunnelTrackerRouteImport } from './routes/_app.funnel-tracker'
 import { Route as AppFunnelsRouteImport } from './routes/_app.funnels'
 import { Route as AppNotesRouteImport } from './routes/_app.notes'
 import { Route as AppOffersRouteImport } from './routes/_app.offers'
@@ -122,6 +123,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppForumRoute = AppForumRouteImport.update({
   id: '/forum',
   path: '/forum',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFunnelTrackerRoute = AppFunnelTrackerRouteImport.update({
+  id: '/funnel-tracker',
+  path: '/funnel-tracker',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFunnelsRoute = AppFunnelsRouteImport.update({
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/courses': typeof AppCoursesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/forum': typeof AppForumRoute
+  '/funnel-tracker': typeof AppFunnelTrackerRoute
   '/funnels': typeof AppFunnelsRoute
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/courses': typeof AppCoursesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/forum': typeof AppForumRoute
+  '/funnel-tracker': typeof AppFunnelTrackerRoute
   '/funnels': typeof AppFunnelsRoute
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
@@ -390,6 +398,7 @@ export interface FileRoutesById {
   '/_app/courses': typeof AppCoursesRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/forum': typeof AppForumRoute
+  '/_app/funnel-tracker': typeof AppFunnelTrackerRoute
   '/_app/funnels': typeof AppFunnelsRoute
   '/_app/notes': typeof AppNotesRoute
   '/_app/offers': typeof AppOffersRoute
@@ -438,6 +447,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/dashboard'
     | '/forum'
+    | '/funnel-tracker'
     | '/funnels'
     | '/notes'
     | '/offers'
@@ -484,6 +494,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/dashboard'
     | '/forum'
+    | '/funnel-tracker'
     | '/funnels'
     | '/notes'
     | '/offers'
@@ -531,6 +542,7 @@ export interface FileRouteTypes {
     | '/_app/courses'
     | '/_app/dashboard'
     | '/_app/forum'
+    | '/_app/funnel-tracker'
     | '/_app/funnels'
     | '/_app/notes'
     | '/_app/offers'
@@ -677,6 +689,13 @@ declare module '@tanstack/react-router' {
       path: '/forum'
       fullPath: '/forum'
       preLoaderRoute: typeof AppForumRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/funnel-tracker': {
+      id: '/_app/funnel-tracker'
+      path: '/funnel-tracker'
+      fullPath: '/funnel-tracker'
+      preLoaderRoute: typeof AppFunnelTrackerRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/funnels': {
@@ -916,6 +935,7 @@ interface AppRouteChildren {
   AppCoursesRoute: typeof AppCoursesRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
   AppForumRoute: typeof AppForumRoute
+  AppFunnelTrackerRoute: typeof AppFunnelTrackerRoute
   AppFunnelsRoute: typeof AppFunnelsRoute
   AppNotesRoute: typeof AppNotesRoute
   AppOffersRoute: typeof AppOffersRoute
@@ -933,6 +953,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCoursesRoute: AppCoursesRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
   AppForumRoute: AppForumRoute,
+  AppFunnelTrackerRoute: AppFunnelTrackerRoute,
   AppFunnelsRoute: AppFunnelsRoute,
   AppNotesRoute: AppNotesRoute,
   AppOffersRoute: AppOffersRoute,
