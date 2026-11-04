@@ -1,6 +1,5 @@
 import { creativeKey, parseCreative } from "./creative";
 import { scopeJourney, type OfferScope } from "./offer-scope";
-import { offerOf } from "./offer-classification";
 import type { FunnelBreakdownRow, FunnelReport, FunnelStepRow, FunnelSummary } from "./types";
 
 interface EventRow {
@@ -74,58 +73,15 @@ async function loadEvents(ctx: Ctx): Promise<EventRow[]> {
   return out.filter((e) => human.has(e.session_id));
 }
 
-/** Vendas pagas já registradas pelos webhooks de checkout, casadas pelo click_id ou UTM. */
-async function loadPaidOrders(ctx: Ctx): Promise<
+/** Nebula não tem webhooks de pedidos: vendas vêm apenas dos eventos do funil. */
+async function loadPaidOrders(_ctx: Ctx): Promise<
   { clickId: string; amount: number; createdAt: string; utmContent: string | null; utmCampaign: string | null }[]
 > {
-  // Nebula não tem webhooks de pedidos: vendas vêm apenas dos eventos do funil.
-  if (ctx) return [];
-  let q = ctx.supabase
-    .from("orders")
-    .select("click_id, amount, status, created_at, utm_content, utm_campaign")
-    .eq("workspace_id", ctx.workspaceId)
-    .eq("status", "paid")
-    .gte("created_at", ctx.from)
-    .lte("created_at", ctx.to)
-    .limit(5000);
-  if (ctx.source) q = q.ilike("utm_source", `%${ctx.source}%`);
-  const { data } = await q;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return ((data ?? []) as any[]).filter((o) => !ctx.offer || ctx.offer === "all" || !o.utm_campaign || offerOf(o.utm_campaign) === ctx.offer).map((o) => ({
-    clickId: o.click_id ? String(o.click_id) : "",
-    amount: Number(o.amount ?? 0),
-    createdAt: String(o.created_at),
-    utmContent: o.utm_content ? String(o.utm_content) : null,
-    utmCampaign: o.utm_campaign ? String(o.utm_campaign) : null,
-  }));
+  return [];
 }
 
-async function loadRefusedCount(ctx: Ctx): Promise<number> {
-  if (ctx) return 0;
-  if (ctx.offer && ctx.offer !== "all") {
-    const rows: { utm_campaign: string | null; click_id: string | null }[] = [];
-    for (let from = 0; ; from += 1000) {
-      let query = ctx.supabase.from("orders").select("utm_campaign,click_id")
-        .eq("workspace_id", ctx.workspaceId).in("status", ["refused", "canceled"])
-        .gte("created_at", ctx.from).lte("created_at", ctx.to).order("id").range(from, from + 999);
-      if (ctx.source) query = query.ilike("utm_source", `%${ctx.source}%`);
-      const { data, error } = await query;
-      if (error) throw new Error(error.message);
-      rows.push(...(data ?? []));
-      if (!data || data.length < 1000) break;
-    }
-    return rows.filter((row) => offerOf(row.utm_campaign ?? "") === ctx.offer).length;
-  }
-  let q = ctx.supabase
-    .from("orders")
-    .select("id", { count: "exact", head: true })
-    .eq("workspace_id", ctx.workspaceId)
-    .in("status", ["refused", "canceled"])
-    .gte("created_at", ctx.from)
-    .lte("created_at", ctx.to);
-  if (ctx.source) q = q.ilike("utm_source", `%${ctx.source}%`);
-  const { count } = await q;
-  return count ?? 0;
+async function loadRefusedCount(_ctx: Ctx): Promise<number> {
+  return 0;
 }
 
 function eventContainsClickId(event: EventRow, clickId: string) {
