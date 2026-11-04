@@ -78,6 +78,8 @@ async function loadEvents(ctx: Ctx): Promise<EventRow[]> {
 async function loadPaidOrders(ctx: Ctx): Promise<
   { clickId: string; amount: number; createdAt: string; utmContent: string | null; utmCampaign: string | null }[]
 > {
+  // Nebula não tem webhooks de pedidos: vendas vêm apenas dos eventos do funil.
+  if (ctx) return [];
   let q = ctx.supabase
     .from("orders")
     .select("click_id, amount, status, created_at, utm_content, utm_campaign")
@@ -99,6 +101,7 @@ async function loadPaidOrders(ctx: Ctx): Promise<
 }
 
 async function loadRefusedCount(ctx: Ctx): Promise<number> {
+  if (ctx) return 0;
   if (ctx.offer && ctx.offer !== "all") {
     const rows: { utm_campaign: string | null; click_id: string | null }[] = [];
     for (let from = 0; ; from += 1000) {

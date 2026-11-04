@@ -121,11 +121,7 @@ export const getFunnelReport = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { computeFunnelReport } = await import("./funnel-tracker/compute.server");
-    const { data: ws } = await context.supabase
-      .from("workspaces")
-      .select("display_currency")
-      .eq("id", data.workspaceId)
-      .maybeSingle();
+    
     return computeFunnelReport({
       supabase: context.supabase,
       workspaceId: data.workspaceId,
@@ -133,7 +129,7 @@ export const getFunnelReport = createServerFn({ method: "POST" })
       from: data.from,
       to: data.to,
       compare: data.compareFrom && data.compareTo ? { from: data.compareFrom, to: data.compareTo } : null,
-      currency: (ws as { display_currency?: string } | null)?.display_currency ?? "BRL",
+      currency: "BRL",
       source: data.source ?? null,
       offer: data.offer ?? "all",
     });
