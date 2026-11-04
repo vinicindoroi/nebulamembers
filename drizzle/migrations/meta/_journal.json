@@ -134,6 +134,13 @@
       "when": 1793828476500,
       "tag": "0018_funnel_tracker",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793829351063,
+      "tag": "0019_uptime_monitor",
+      "breakpoints": true
     }
   ]
 }
