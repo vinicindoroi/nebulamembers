@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
 
-export const FUNNEL_PUBLIC_ORIGIN = "https://click-charm-73.lovable.app";
+export const FUNNEL_PUBLIC_ORIGIN = "https://nebulamembers.online";
 
 function Snippet({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);

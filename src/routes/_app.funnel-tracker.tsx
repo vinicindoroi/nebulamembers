@@ -689,10 +689,10 @@ function PromptBox({ value }: { value: string }) {
 function SetupTab({ workspaceId, funnelId }: { workspaceId: string; funnelId: string }) {
   // Snippets precisam de uma origem pública: o preview exige login e não carrega no site do cliente.
   const origin = FUNNEL_PUBLIC_ORIGIN;
-  const eventUrl = `${origin}/api/public/funnel-event/${workspaceId}`;
+  const eventUrl = `${origin}/api/public/tracker-event/${workspaceId}`;
   const payUrl = `${origin}/api/public/funnel-payment/${workspaceId}`;
-  const autoScript = `<script src="${origin}/funnel.js?w=${workspaceId}&f=${funnelId}" data-auto="true" defer></script>`;
-  const manualScript = `<script src="${origin}/funnel.js?w=${workspaceId}&f=${funnelId}" data-step="chegou" defer></script>`;
+  const autoScript = `<script src="${origin}/funnel-tracker.js?w=${workspaceId}&f=${funnelId}" data-auto="true" defer></script>`;
+  const manualScript = `<script src="${origin}/funnel-tracker.js?w=${workspaceId}&f=${funnelId}" data-step="chegou" defer></script>`;
   const listFn = useServerFn(listRecentFunnelEvents);
   const stepsFn = useServerFn(getFunnelSteps);
   const { data: recent, refetch: refetchRecent } = useQuery({
@@ -721,7 +721,7 @@ function SetupTab({ workspaceId, funnelId }: { workspaceId: string; funnelId: st
   };
 
   const stepLines = steps.map((s, i) => `${i + 1}. "${s.label}" -> chave: ${s.key}`).join("\n");
-  const aiPrompt = `Implemente o rastreamento de funil do Trackly nesta página/site.
+  const aiPrompt = `Implemente o rastreamento de funil nesta página/site.
 
 1) Adicione este script uma única vez dentro da tag <head> de TODAS as páginas do funil:
 ${autoScript}
@@ -854,35 +854,15 @@ Ao final, liste em qual elemento você colocou cada chave.`;
       </Card>
 
       <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-base">Webhook de pagamento aprovado</CardTitle></CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <p className="text-muted-foreground">
-            Aponte o postback do seu gateway (PIX, cartão, boleto, Stripe, etc.) para essa URL. Deduplicamos por{" "}
-            <code>transaction_id</code>.
-          </p>
-          <CopyBox value={payUrl} />
-          <p className="text-xs text-muted-foreground">
-            Campos aceitos: <code>transaction_id</code>, <code>status</code> (paid/refunded/chargeback),{" "}
-            <code>sessionId</code>/<code>src</code>/<code>xcod</code>, <code>amount</code>, <code>utm_*</code>.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
         <CardHeader className="pb-2"><CardTitle className="text-base">Testar integração</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-sm">
           <p className="text-muted-foreground">
-            Dispara um evento fake (sessão <code>TEST-…</code>) para conferir se o endpoint responde. Não afeta o
-            faturamento: o teste de pagamento usa valor 0.
+            Dispara um evento fake (sessão <code>TEST-…</code>) para conferir se o endpoint responde.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="outline" disabled={testing !== null} onClick={() => void runTest("event")}>
               {testing === "event" ? <RefreshCw className="mr-2 h-3.5 w-3.5 animate-spin" /> : null}
               Enviar evento de teste ({k})
-            </Button>
-            <Button size="sm" variant="outline" disabled={testing !== null} onClick={() => void runTest("payment")}>
-              {testing === "payment" ? <RefreshCw className="mr-2 h-3.5 w-3.5 animate-spin" /> : null}
-              Testar webhook de pagamento
             </Button>
           </div>
           {testResult ? (
