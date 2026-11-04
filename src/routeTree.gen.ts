@@ -34,6 +34,7 @@ import { Route as AppSavedRouteImport } from './routes/_app.saved'
 import { Route as AppScheduleRouteImport } from './routes/_app.schedule'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppTranscriptRouteImport } from './routes/_app.transcript'
+import { Route as AppUptimeRouteImport } from './routes/_app.uptime'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCommentsRouteImport } from './routes/admin.comments'
 import { Route as AdminCommunityRouteImport } from './routes/admin.community'
@@ -54,6 +55,7 @@ import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 import { Route as ApiPublicJobsClosePastCallsRouteImport } from './routes/api/public/jobs/close-past-calls'
+import { Route as ApiPublicJobsUptimeCheckRouteImport } from './routes/api/public/jobs/uptime-check'
 import { Route as ApiPublicTrackerEventWorkspaceIdRouteImport } from './routes/api/public/tracker-event.$workspaceId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -180,6 +182,11 @@ const AppTranscriptRoute = AppTranscriptRouteImport.update({
   path: '/transcript',
   getParentRoute: () => AppRoute,
 } as any)
+const AppUptimeRoute = AppUptimeRouteImport.update({
+  id: '/uptime',
+  path: '/uptime',
+  getParentRoute: () => AppRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -281,6 +288,12 @@ const ApiPublicJobsClosePastCallsRoute =
     path: '/api/public/jobs/close-past-calls',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicJobsUptimeCheckRoute =
+  ApiPublicJobsUptimeCheckRouteImport.update({
+    id: '/api/public/jobs/uptime-check',
+    path: '/api/public/jobs/uptime-check',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTrackerEventWorkspaceIdRoute =
   ApiPublicTrackerEventWorkspaceIdRouteImport.update({
     id: '/api/public/tracker-event/$workspaceId',
@@ -313,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/schedule': typeof AppScheduleRoute
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
+  '/uptime': typeof AppUptimeRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/comments': typeof AdminCommentsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -333,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRoutesByTo {
@@ -360,6 +375,7 @@ export interface FileRoutesByTo {
   '/schedule': typeof AppScheduleRoute
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
+  '/uptime': typeof AppUptimeRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/comments': typeof AdminCommentsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -380,6 +396,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRoutesById {
@@ -409,6 +426,7 @@ export interface FileRoutesById {
   '/_app/schedule': typeof AppScheduleRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/transcript': typeof AppTranscriptRoute
+  '/_app/uptime': typeof AppUptimeRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/comments': typeof AdminCommentsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -429,6 +447,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRouteTypes {
@@ -458,6 +477,7 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/settings'
     | '/transcript'
+    | '/uptime'
     | '/admin/categories'
     | '/admin/comments'
     | '/admin/community'
@@ -478,6 +498,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -505,6 +526,7 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/settings'
     | '/transcript'
+    | '/uptime'
     | '/admin/categories'
     | '/admin/comments'
     | '/admin/community'
@@ -525,6 +547,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   id:
     | '__root__'
@@ -553,6 +576,7 @@ export interface FileRouteTypes {
     | '/_app/schedule'
     | '/_app/settings'
     | '/_app/transcript'
+    | '/_app/uptime'
     | '/admin/categories'
     | '/admin/comments'
     | '/admin/community'
@@ -573,6 +597,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/_app/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesById: FileRoutesById
 }
@@ -588,6 +613,7 @@ export interface RootRouteChildren {
   RespostasRoute: typeof RespostasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
+  ApiPublicJobsUptimeCheckRoute: typeof ApiPublicJobsUptimeCheckRoute
   ApiPublicTrackerEventWorkspaceIdRoute: typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 
@@ -768,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTranscriptRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/uptime': {
+      id: '/_app/uptime'
+      path: '/uptime'
+      fullPath: '/uptime'
+      preLoaderRoute: typeof AppUptimeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -908,6 +941,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsClosePastCallsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/uptime-check': {
+      id: '/api/public/jobs/uptime-check'
+      path: '/api/public/jobs/uptime-check'
+      fullPath: '/api/public/jobs/uptime-check'
+      preLoaderRoute: typeof ApiPublicJobsUptimeCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/tracker-event/$workspaceId': {
       id: '/api/public/tracker-event/$workspaceId'
       path: '/api/public/tracker-event/$workspaceId'
@@ -946,6 +986,7 @@ interface AppRouteChildren {
   AppScheduleRoute: typeof AppScheduleRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTranscriptRoute: typeof AppTranscriptRoute
+  AppUptimeRoute: typeof AppUptimeRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -964,6 +1005,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppScheduleRoute: AppScheduleRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTranscriptRoute: AppTranscriptRoute,
+  AppUptimeRoute: AppUptimeRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -1024,6 +1066,7 @@ const rootRouteChildren: RootRouteChildren = {
   RespostasRoute: RespostasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
+  ApiPublicJobsUptimeCheckRoute: ApiPublicJobsUptimeCheckRoute,
   ApiPublicTrackerEventWorkspaceIdRoute: ApiPublicTrackerEventWorkspaceIdRoute,
 }
 export const routeTree = rootRouteImport
