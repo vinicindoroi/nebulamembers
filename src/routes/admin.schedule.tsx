@@ -586,9 +586,11 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
   const { tags, assignments: tagAssign } = useMemberTags();
   const memberGroups = useMemberGroups();
   const lessons = useMemberLessons();
+  const calls = useMemberCalls();
   const { groups, groupOf } = memberGroups;
   const [tagF, setTagF] = useState("");
   const [groupF, setGroupF] = useState("");
+  const [callF, setCallF] = useState("all");
   const [grouped, setGrouped] = useState(true);
   const [newGroup, setNewGroup] = useState("");
   async function createGroup() {
@@ -601,7 +603,8 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
   }
   const shown = members
     .filter((p) => !tagF || tagAssign.some((a) => a.member_id === p.id && a.tag_id === tagF))
-    .filter((p) => matchesMemberGroup(p.id, groupF, groupOf));
+    .filter((p) => matchesMemberGroup(p.id, groupF, groupOf))
+    .filter((p) => matchesCallCount(callsOf(p.id, calls.counts), callF));
   const sections = groupMembers(shown, groups, groupOf, grouped);
   useEffect(() => {
     if (!memberGroups.loading && groupF && groupF !== "none" && !groups.some((g) => g.id === groupF)) setGroupF("");
@@ -639,7 +642,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
       </section>
       <section className="space-y-3 rounded-xl border border-border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-semibold">Alunos com acesso ({shown.length}) <span className="ml-1 text-xs font-normal text-muted-foreground">· {formatLessons(lessonsOfGroup(shown.map((p) => p.id), lessons.counts))} até agora</span></p>
+          <p className="font-semibold">Alunos com acesso ({shown.length}) <span className="ml-1 text-xs font-normal text-muted-foreground">· {formatLessons(lessonsOfGroup(shown.map((p) => p.id), lessons.counts))} até agora · {formatCalls(callsOfGroup(shown.map((p) => p.id), calls.counts))} realizadas</span></p>
           <Input placeholder="Buscar aluno..." value={q} onChange={(e) => setQ(e.target.value)} className="h-9 max-w-xs" />
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -651,6 +654,9 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
             <option value="">Todos os grupos</option>
             <option value="none">Sem grupo</option>
             {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+          <select value={callF} onChange={(e) => setCallF(e.target.value)} aria-label="Filtrar por quantidade de calls" className="h-9 rounded-md border border-border bg-background px-2 text-sm">
+            {CALL_FILTERS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
           </select>
           <label className="flex cursor-pointer items-center gap-2 text-sm"><Checkbox checked={grouped} onCheckedChange={(v) => setGrouped(!!v)} /> Agrupar</label>
           <form className="ml-auto flex gap-2" onSubmit={(e) => { e.preventDefault(); void createGroup(); }}>
