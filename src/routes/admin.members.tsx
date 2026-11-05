@@ -12,6 +12,8 @@ import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberS
 import { useMemberGroups } from "@/hooks/use-member-groups";
 import { useMemberLessons } from "@/hooks/use-member-lessons";
 import { formatLessons, lessonsOf, lessonsOfGroup } from "@/lib/member-lessons";
+import { useMemberCalls } from "@/hooks/use-member-calls";
+import { CALL_FILTERS, callsOf, callsOfGroup, formatCalls, matchesCallCount } from "@/lib/member-calls";
 import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
 import { MemberGroupSelect, MemberGroupsDialog } from "@/components/admin/MemberGroups";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -126,7 +128,9 @@ function Page() {
   const memberTags = useMemberTags();
   const memberGroups = useMemberGroups();
   const lessons = useMemberLessons();
+  const calls = useMemberCalls();
   const [groupFilter, setGroupFilter] = useState("all");
+  const [callFilter, setCallFilter] = useState("all");
   const [grouped, setGrouped] = useState(false);
   const [groupsOpen, setGroupsOpen] = useState(false);
   const { plans } = usePlans();
@@ -140,7 +144,7 @@ function Page() {
   useEffect(() => {
     if (!memberGroups.loading && groupFilter !== "all" && groupFilter !== "none" && !memberGroups.groups.some((g) => g.id === groupFilter)) setGroupFilter("all");
   }, [memberGroups.groups, memberGroups.loading, groupFilter]);
-  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all" || groupFilter !== "all";
+  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all" || groupFilter !== "all" || callFilter !== "all";
 
   const clearFilters = () => {
     setQ("");
@@ -148,6 +152,7 @@ function Page() {
     setPlanFilter("all");
     setTagFilter("all");
     setGroupFilter("all");
+    setCallFilter("all");
     setSelectedIds([]);
   };
 
@@ -167,12 +172,13 @@ function Page() {
     if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
     else if (planFilter !== "all" && (r.plan ?? "") !== planFilter) return false;
     if (!memberMatchesQuery(r, q)) return false;
+    if (!matchesCallCount(callsOf(r.id, calls.counts), callFilter)) return false;
     return true;
   });
 
   const sorted = useMemo(
-    () => sortMembers(filtered, sort, plans.map((p) => p.name), lessons.counts),
-    [filtered, sort, plans, lessons.counts],
+    () => sortMembers(filtered, sort, plans.map((p) => p.name), lessons.counts, calls.counts),
+    [filtered, sort, plans, lessons.counts, calls.counts],
   );
 
   const changeSort = (key: MemberSortKey) => {
