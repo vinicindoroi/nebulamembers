@@ -398,7 +398,7 @@ function Page() {
 
       <div className="glass rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-sm">
+          <table className="w-full min-w-[1020px] text-sm">
             <thead className="sticky top-0 z-10 bg-card text-xs text-muted-foreground">
               <tr className="border-b border-border">
                 <th scope="col" className="w-14 px-4 py-3 text-center">
