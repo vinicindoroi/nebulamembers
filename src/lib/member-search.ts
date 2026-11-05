@@ -10,7 +10,7 @@ export type MemberSearchable = {
   last_seen_at?: string | null;
 };
 
-export type MemberSortKey = "name" | "plan" | "status" | "created_at" | "last_seen_at" | "lessons";
+export type MemberSortKey = "name" | "plan" | "status" | "created_at" | "last_seen_at" | "lessons" | "calls";
 export type MemberSort = { key: MemberSortKey; dir: "asc" | "desc" };
 
 const text = (value: unknown) => (value == null ? "" : String(value)).trim().toLowerCase();
@@ -48,6 +48,7 @@ export function sortMembers<T extends MemberSearchable>(
   sort: MemberSort,
   planOrder: string[] = [],
   lessons: Record<string, number> = {},
+  calls: Record<string, number> = {},
 ) {
   const dir = sort.dir === "asc" ? 1 : -1;
   const rank = (plan: string | null | undefined) => {
@@ -74,6 +75,8 @@ export function sortMembers<T extends MemberSearchable>(
       cmp = (STATUS_RANK[text(a.status)] ?? 9) - (STATUS_RANK[text(b.status)] ?? 9) || nameCompare(a, b);
     } else if (sort.key === "lessons") {
       cmp = (lessons[a.id] ?? 0) - (lessons[b.id] ?? 0);
+    } else if (sort.key === "calls") {
+      cmp = (calls[a.id] ?? 0) - (calls[b.id] ?? 0);
     } else {
       cmp = nameCompare(a, b);
     }

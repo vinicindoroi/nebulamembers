@@ -12,6 +12,8 @@ import { useMemberGroups } from "@/hooks/use-member-groups";
 import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
 import { useMemberLessons } from "@/hooks/use-member-lessons";
 import { formatLessons, lessonsOf, lessonsOfGroup } from "@/lib/member-lessons";
+import { useMemberCalls } from "@/hooks/use-member-calls";
+import { CALL_FILTERS, callsOf, callsOfGroup, formatCalls, matchesCallCount } from "@/lib/member-calls";
 import { MemberGroupSelect } from "@/components/admin/MemberGroups";
 import { CallLinkEditor, fetchBookingLinks } from "@/components/admin/CallLinkEditor";
 import { Calendar } from "@/components/ui/calendar";
@@ -584,9 +586,11 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
   const { tags, assignments: tagAssign } = useMemberTags();
   const memberGroups = useMemberGroups();
   const lessons = useMemberLessons();
+  const calls = useMemberCalls();
   const { groups, groupOf } = memberGroups;
   const [tagF, setTagF] = useState("");
   const [groupF, setGroupF] = useState("");
+  const [callF, setCallF] = useState("all");
   const [grouped, setGrouped] = useState(true);
   const [newGroup, setNewGroup] = useState("");
   async function createGroup() {
@@ -599,7 +603,8 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
   }
   const shown = members
     .filter((p) => !tagF || tagAssign.some((a) => a.member_id === p.id && a.tag_id === tagF))
-    .filter((p) => matchesMemberGroup(p.id, groupF, groupOf));
+    .filter((p) => matchesMemberGroup(p.id, groupF, groupOf))
+    .filter((p) => matchesCallCount(callsOf(p.id, calls.counts), callF));
   const sections = groupMembers(shown, groups, groupOf, grouped);
   useEffect(() => {
     if (!memberGroups.loading && groupF && groupF !== "none" && !groups.some((g) => g.id === groupF)) setGroupF("");
@@ -637,7 +642,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
       </section>
       <section className="space-y-3 rounded-xl border border-border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-semibold">Alunos com acesso ({shown.length}) <span className="ml-1 text-xs font-normal text-muted-foreground">· {formatLessons(lessonsOfGroup(shown.map((p) => p.id), lessons.counts))} até agora</span></p>
+          <p className="font-semibold">Alunos com acesso ({shown.length}) <span className="ml-1 text-xs font-normal text-muted-foreground">· {formatLessons(lessonsOfGroup(shown.map((p) => p.id), lessons.counts))} até agora · {formatCalls(callsOfGroup(shown.map((p) => p.id), calls.counts))} realizadas</span></p>
           <Input placeholder="Buscar aluno..." value={q} onChange={(e) => setQ(e.target.value)} className="h-9 max-w-xs" />
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -650,6 +655,9 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
             <option value="none">Sem grupo</option>
             {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
           </select>
+          <select value={callF} onChange={(e) => setCallF(e.target.value)} aria-label="Filtrar por quantidade de calls" className="h-9 rounded-md border border-border bg-background px-2 text-sm">
+            {CALL_FILTERS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+          </select>
           <label className="flex cursor-pointer items-center gap-2 text-sm"><Checkbox checked={grouped} onCheckedChange={(v) => setGrouped(!!v)} /> Agrupar</label>
           <form className="ml-auto flex gap-2" onSubmit={(e) => { e.preventDefault(); void createGroup(); }}>
             <Input placeholder="Novo grupo (ex: Sócios X)" value={newGroup} onChange={(e) => setNewGroup(e.target.value)} className="h-9 w-48" />
@@ -660,7 +668,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
           {shown.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : sections.map(({ id, name: label, members: list }) => (
             <div key={id} className="mb-3">
               {grouped && <div className="flex items-center justify-between border-b border-border py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <span>{label} ({list.length}) <span className="font-normal normal-case tracking-normal">· {formatLessons(lessonsOfGroup(list.map((p) => p.id), lessons.counts))} até agora</span></span>
+                <span>{label} ({list.length}) <span className="font-normal normal-case tracking-normal">· {formatLessons(lessonsOfGroup(list.map((p) => p.id), lessons.counts))} até agora · {formatCalls(callsOfGroup(list.map((p) => p.id), calls.counts))} realizadas</span></span>
                 {id !== "none" && <Button variant="ghost" size="icon" onClick={() => deleteGroup(label)} aria-label="Excluir grupo"><Trash2 className="h-3.5 w-3.5" /></Button>}
               </div>}
               <div className="divide-y divide-border">
@@ -672,9 +680,10 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
                         <p className="font-medium">{p.full_name || "Sem nome"}</p>
                         <p className="truncate text-xs text-muted-foreground">{p.email}{myTags.length ? ` · ${myTags.join(", ")}` : ""}</p>
                       </div>
-                      <span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground" title="Aulas concluídas até agora">
-                        {formatLessons(lessonsOf(p.id, lessons.counts))}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-3 text-xs tabular-nums text-muted-foreground">
+                        <span className="whitespace-nowrap" title="Aulas concluídas até agora">{formatLessons(lessonsOf(p.id, lessons.counts))}</span>
+                        <span className="whitespace-nowrap" title="Calls realizadas até agora">{formatCalls(callsOf(p.id, calls.counts))}</span>
+                      </div>
                       <MemberGroupSelect state={memberGroups} memberIds={[p.id]} label={`Grupo de ${p.full_name || "Sem nome"}`} />
                     </div>
                   );

@@ -12,6 +12,8 @@ import { memberMatchesQuery, sortMembers, statusLabel, relativeDay, type MemberS
 import { useMemberGroups } from "@/hooks/use-member-groups";
 import { useMemberLessons } from "@/hooks/use-member-lessons";
 import { formatLessons, lessonsOf, lessonsOfGroup } from "@/lib/member-lessons";
+import { useMemberCalls } from "@/hooks/use-member-calls";
+import { CALL_FILTERS, callsOf, callsOfGroup, formatCalls, matchesCallCount } from "@/lib/member-calls";
 import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
 import { MemberGroupSelect, MemberGroupsDialog } from "@/components/admin/MemberGroups";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -126,7 +128,9 @@ function Page() {
   const memberTags = useMemberTags();
   const memberGroups = useMemberGroups();
   const lessons = useMemberLessons();
+  const calls = useMemberCalls();
   const [groupFilter, setGroupFilter] = useState("all");
+  const [callFilter, setCallFilter] = useState("all");
   const [grouped, setGrouped] = useState(false);
   const [groupsOpen, setGroupsOpen] = useState(false);
   const { plans } = usePlans();
@@ -140,7 +144,7 @@ function Page() {
   useEffect(() => {
     if (!memberGroups.loading && groupFilter !== "all" && groupFilter !== "none" && !memberGroups.groups.some((g) => g.id === groupFilter)) setGroupFilter("all");
   }, [memberGroups.groups, memberGroups.loading, groupFilter]);
-  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all" || groupFilter !== "all";
+  const filtersActive = q.trim() !== "" || statusFilter !== "all" || planFilter !== "all" || tagFilter !== "all" || groupFilter !== "all" || callFilter !== "all";
 
   const clearFilters = () => {
     setQ("");
@@ -148,6 +152,7 @@ function Page() {
     setPlanFilter("all");
     setTagFilter("all");
     setGroupFilter("all");
+    setCallFilter("all");
     setSelectedIds([]);
   };
 
@@ -167,12 +172,13 @@ function Page() {
     if (planFilter === "pending") { if (!isPendingPlan(r.plan)) return false; }
     else if (planFilter !== "all" && (r.plan ?? "") !== planFilter) return false;
     if (!memberMatchesQuery(r, q)) return false;
+    if (!matchesCallCount(callsOf(r.id, calls.counts), callFilter)) return false;
     return true;
   });
 
   const sorted = useMemo(
-    () => sortMembers(filtered, sort, plans.map((p) => p.name), lessons.counts),
-    [filtered, sort, plans, lessons.counts],
+    () => sortMembers(filtered, sort, plans.map((p) => p.name), lessons.counts, calls.counts),
+    [filtered, sort, plans, lessons.counts, calls.counts],
   );
 
   const changeSort = (key: MemberSortKey) => {
@@ -267,8 +273,8 @@ function Page() {
   };
 
   const exportCsv = () => {
-    const head = "Nome,Email,Plano,Status,Aulas,Cadastro\n";
-    const body = sorted.map((r) => `"${r.full_name ?? ""}","${r.email ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${statusLabel(r.status)}","${lessonsOf(r.id, lessons.counts)}","${r.created_at}"`).join("\n");
+    const head = "Nome,Email,Plano,Status,Aulas,Calls,Cadastro\n";
+    const body = sorted.map((r) => `"${r.full_name ?? ""}","${r.email ?? ""}","${isPendingPlan(r.plan) ? "Pendente" : r.plan}","${statusLabel(r.status)}","${lessonsOf(r.id, lessons.counts)}","${callsOf(r.id, calls.counts)}","${r.created_at}"`).join("\n");
     const blob = new Blob(["\uFEFF" + head + body], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "membros.csv"; a.click();
@@ -328,6 +334,9 @@ function Page() {
         <select aria-label="Filtrar por grupo" value={groupFilter} disabled={memberGroups.loading} onChange={(e) => { setGroupFilter(e.target.value); setSelectedIds([]); lastClickedIndex.current = null; }} className={filterSelectClass}>
           <option value="all">Todos os grupos</option><option value="none">Sem grupo</option>
           {memberGroups.groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+        </select>
+        <select aria-label="Filtrar por quantidade de calls" value={callFilter} disabled={calls.loading} onChange={(e) => { setCallFilter(e.target.value); setSelectedIds([]); }} className={filterSelectClass}>
+          {CALL_FILTERS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
         </select>
         <label className="flex cursor-pointer items-center gap-2 px-2 text-sm"><Checkbox checked={grouped} onCheckedChange={(v) => { setGrouped(v === true); lastClickedIndex.current = null; }} />Agrupar</label>
       </div>
@@ -389,7 +398,7 @@ function Page() {
 
       <div className="glass rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-sm">
+          <table className="w-full min-w-[1020px] text-sm">
             <thead className="sticky top-0 z-10 bg-card text-xs text-muted-foreground">
               <tr className="border-b border-border">
                 <th scope="col" className="w-14 px-4 py-3 text-center">
@@ -407,6 +416,7 @@ function Page() {
                 <SortHeader label="Membro" sortKey="name" sort={sort} onSort={changeSort} className="w-[320px]" />
                 <SortHeader label="Plano" sortKey="plan" sort={sort} onSort={changeSort} />
                 <SortHeader label="Aulas" sortKey="lessons" sort={sort} onSort={changeSort} />
+                <SortHeader label="Calls" sortKey="calls" sort={sort} onSort={changeSort} />
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">Tags</th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">Grupo</th>
                 <SortHeader label="Status" sortKey="status" sort={sort} onSort={changeSort} />
@@ -418,7 +428,7 @@ function Page() {
             <tbody className="divide-y divide-border">
               {loading && Array.from({ length: 6 }).map((_, i) => (
                 <tr key={`skeleton-${i}`}>
-                  <td colSpan={10} className="px-4 py-4">
+                  <td colSpan={11} className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-muted/60" />
                       <div className="flex-1 space-y-2">
@@ -431,7 +441,7 @@ function Page() {
               ))}
               {!loading && sorted.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-14 text-center">
+                  <td colSpan={11} className="px-4 py-14 text-center">
                     <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
                       <div className="rounded-full border border-border bg-muted/30 p-3">
                         {rows.length === 0 ? <UserPlus className="h-5 w-5 text-muted-foreground" /> : <Search className="h-5 w-5 text-muted-foreground" />}
@@ -451,7 +461,7 @@ function Page() {
                 </tr>
               )}
               {sections.map((section) => <Fragment key={section.id}>
-              {grouped && <tr className="bg-muted/30"><td colSpan={10} className="px-4 py-3 text-sm font-semibold">{section.name} <span className="ml-2 text-xs font-normal text-muted-foreground">{section.members.length} {section.members.length === 1 ? "membro" : "membros"} · {formatLessons(lessonsOfGroup(section.members.map((m) => m.id), lessons.counts))} até agora</span></td></tr>}
+              {grouped && <tr className="bg-muted/30"><td colSpan={11} className="px-4 py-3 text-sm font-semibold">{section.name} <span className="ml-2 text-xs font-normal text-muted-foreground">{section.members.length} {section.members.length === 1 ? "membro" : "membros"} · {formatLessons(lessonsOfGroup(section.members.map((m) => m.id), lessons.counts))} até agora · {formatCalls(callsOfGroup(section.members.map((m) => m.id), calls.counts))} realizadas</span></td></tr>}
               {section.members.map((r) => {
                 const index = displayed.findIndex((member) => member.id === r.id);
                 const rowTags = tagsFor(r.id);
@@ -504,6 +514,9 @@ function Page() {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 tabular-nums text-muted-foreground" title="Aulas concluídas até agora">
                     {formatLessons(lessonsOf(r.id, lessons.counts))}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 tabular-nums text-muted-foreground" title="Calls realizadas até agora">
+                    {formatCalls(callsOf(r.id, calls.counts))}
                   </td>
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex max-w-56 flex-wrap items-center gap-1.5">
