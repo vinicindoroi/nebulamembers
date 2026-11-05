@@ -668,7 +668,7 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
           {shown.length === 0 ? <p className="py-3 text-sm text-muted-foreground">Nenhum aluno.</p> : sections.map(({ id, name: label, members: list }) => (
             <div key={id} className="mb-3">
               {grouped && <div className="flex items-center justify-between border-b border-border py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <span>{label} ({list.length}) <span className="font-normal normal-case tracking-normal">· {formatLessons(lessonsOfGroup(list.map((p) => p.id), lessons.counts))} até agora</span></span>
+                <span>{label} ({list.length}) <span className="font-normal normal-case tracking-normal">· {formatLessons(lessonsOfGroup(list.map((p) => p.id), lessons.counts))} até agora · {formatCalls(callsOfGroup(list.map((p) => p.id), calls.counts))} realizadas</span></span>
                 {id !== "none" && <Button variant="ghost" size="icon" onClick={() => deleteGroup(label)} aria-label="Excluir grupo"><Trash2 className="h-3.5 w-3.5" /></Button>}
               </div>}
               <div className="divide-y divide-border">
@@ -680,9 +680,10 @@ function Access({ settings, profiles, reload }: { settings: ScheduleSettings; pr
                         <p className="font-medium">{p.full_name || "Sem nome"}</p>
                         <p className="truncate text-xs text-muted-foreground">{p.email}{myTags.length ? ` · ${myTags.join(", ")}` : ""}</p>
                       </div>
-                      <span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground" title="Aulas concluídas até agora">
-                        {formatLessons(lessonsOf(p.id, lessons.counts))}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-3 text-xs tabular-nums text-muted-foreground">
+                        <span className="whitespace-nowrap" title="Aulas concluídas até agora">{formatLessons(lessonsOf(p.id, lessons.counts))}</span>
+                        <span className="whitespace-nowrap" title="Calls realizadas até agora">{formatCalls(callsOf(p.id, calls.counts))}</span>
+                      </div>
                       <MemberGroupSelect state={memberGroups} memberIds={[p.id]} label={`Grupo de ${p.full_name || "Sem nome"}`} />
                     </div>
                   );
