@@ -86,6 +86,20 @@ export const Route = createFileRoute("/api/public/jobs/uptime-check")({
               .update({ last_checked_at: new Date().toISOString(), last_ok: ok } as never)
               .eq("id", site.id);
 
+            // Aviso no sino do app quando o status muda (ok → caiu / caiu → voltou)
+            if (site.notify_push && site.last_ok !== null && site.last_ok !== ok) {
+              const name = site.label || site.url;
+              await supabaseAdmin.from("notifications").insert({
+                title: ok ? `✅ ${name} voltou` : `🔴 ${name} caiu`,
+                content: ok
+                  ? `${site.url} está respondendo de novo (${ms} ms).`
+                  : `${site.url} parou de responder${errMsg ? `: ${errMsg}` : status ? ` (HTTP ${status})` : ""}.`,
+                audience: "all",
+                sent_at: new Date().toISOString(),
+                recipient_id: site.workspace_id,
+              } as never);
+            }
+
           }),
         );
 
