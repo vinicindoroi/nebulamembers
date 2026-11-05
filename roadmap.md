@@ -6,4 +6,5 @@
 - [x] Compartilhar grupos entre Membros e Agendamento, com atribuição e filtro em Membros
 - [x] Impedir mais de uma call por semana para integrantes do mesmo grupo
 - [x] Adicionar banners de Cursos configuráveis no admin e alternância suave
+- [x] Colapsar por padrão a lista "Todas as próximas calls" em Admin → Agendamentos
 - [ ] Ativar push no celular para quedas e recuperação de domínios — aguardando conexão Firebase com web push (conexão recusada)
