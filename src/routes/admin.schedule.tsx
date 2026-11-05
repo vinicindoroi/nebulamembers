@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { CalendarClock, Check, Loader2, MessageCircle, Plus, Trash2, X } from "lucide-react";
+import { CalendarClock, Check, ChevronDown, Loader2, MessageCircle, Plus, Trash2, X } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import { toast } from "sonner";
@@ -134,6 +134,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
   const [rReason, setRReason] = useState("");
   const [cancelB, setCancelB] = useState<Booking | null>(null);
   const [cReason, setCReason] = useState("");
+  const [allOpen, setAllOpen] = useState(false);
 
   async function doReschedule() {
     if (!resched || !rDate || !/^\d{2}:\d{2}$/.test(rTime)) return toast.error("Informe data e horário.");
@@ -336,11 +337,26 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               </>
             )}
           </section>
-          <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Todas as próximas calls</h2>
-            {upcoming.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma call marcada.</p>
-            ) : upcoming.map((b) => <Row key={b.id} b={b} showDate />)}
+          <section className="overflow-hidden rounded-xl border border-border bg-muted/25">
+            <button
+              type="button"
+              onClick={() => setAllOpen((o) => !o)}
+              aria-expanded={allOpen}
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+            >
+              <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Todas as próximas calls</span>
+              <span className="flex items-center gap-2">
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] tabular-nums text-muted-foreground">{upcoming.length}</span>
+                <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${allOpen ? "rotate-180" : ""}`} />
+              </span>
+            </button>
+            {allOpen && (
+              <div className="space-y-3 border-t border-border p-4">
+                {upcoming.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhuma call marcada.</p>
+                ) : upcoming.map((b) => <Row key={b.id} b={b} showDate />)}
+              </div>
+            )}
           </section>
         </div>
       </div>
