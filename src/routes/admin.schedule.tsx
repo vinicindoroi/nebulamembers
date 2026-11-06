@@ -52,6 +52,7 @@ function AdminSchedule() {
   const [settings, setSettings] = useState<ScheduleSettings | null>(null);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [extras, setExtras] = useState<string[]>([]);
+  const [blockedSlots, setBlockedSlots] = useState<string[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [links, setLinks] = useState<Record<string, string>>({});
@@ -63,6 +64,7 @@ function AdminSchedule() {
       setSettings(cfg.settings);
       setAvailability(cfg.availability);
       setExtras(cfg.extras);
+      setBlockedSlots(cfg.blockedSlots);
       const [b, p] = await Promise.all([
         supabase.from("mentor_bookings").select("*").order("starts_at"),
         (supabase as any).rpc("admin_list_profiles"),
@@ -118,7 +120,7 @@ function AdminSchedule() {
           <Access settings={settings} profiles={profiles} reload={load} />
         </TabsContent>
         <TabsContent value="config">
-          <Config settings={settings} availability={availability} extras={extras} bookings={bookings} reload={load} />
+          <Config settings={settings} availability={availability} extras={extras} blockedSlots={blockedSlots} bookings={bookings} reload={load} />
         </TabsContent>
       </Tabs>
     </div>
@@ -378,7 +380,7 @@ const Step = ({ n, title, desc, children }: { n: number; title: string; desc: st
   );
 
 
-function Config({ settings, availability, extras, bookings, reload }: { settings: ScheduleSettings; availability: Availability[]; extras: string[]; bookings: Booking[]; reload: () => void }) {
+function Config({ settings, availability, extras, blockedSlots, bookings, reload }: { settings: ScheduleSettings; availability: Availability[]; extras: string[]; blockedSlots: string[]; bookings: Booking[]; reload: () => void }) {
   const [form, setForm] = useState(settings);
   const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState<number | null>(null);
@@ -459,7 +461,7 @@ function Config({ settings, availability, extras, bookings, reload }: { settings
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_480px]">
         <div className="space-y-5 min-w-0">
         <Step n={1} title="Agenda da semana" desc="Clique num horário vazio para liberar um horário avulso (vale até para hoje). Clique de novo para remover.">
-          <WeekAgenda settings={form} availability={availability} extras={extras} bookings={bookings} reload={reload} />
+          <WeekAgenda settings={form} availability={availability} extras={extras} blockedSlots={blockedSlots} bookings={bookings} reload={reload} />
         </Step>
         <Step n={2} title="Horários fixos da semana" desc="Faixas que se repetem toda semana. São divididas pela duração da call.">
           <div className="divide-y divide-border">
