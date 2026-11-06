@@ -460,7 +460,7 @@ function Config({ settings, availability, extras, blockedSlots, bookings, reload
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_480px]">
         <div className="space-y-5 min-w-0">
-        <Step n={1} title="Agenda da semana" desc="Clique num horário vazio para liberar um horário avulso (vale até para hoje). Clique de novo para remover.">
+        <Step n={1} title="Agenda da semana" desc="Clique num horário vazio para liberar um avulso (vale até para hoje). Clique num horário fixo para removê-lo só daquele dia — e de novo para restaurar.">
           <WeekAgenda settings={form} availability={availability} extras={extras} blockedSlots={blockedSlots} bookings={bookings} reload={reload} />
         </Step>
         <Step n={2} title="Horários fixos da semana" desc="Faixas que se repetem toda semana. São divididas pela duração da call.">
