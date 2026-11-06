@@ -79,7 +79,7 @@ export function WeekAgenda({ settings, availability, extras, blockedSlots, booki
     for (const m of rows) {
       const ms = zonedToDate(ymd, m, tz).getTime();
       if (bookedSet.has(ms)) booked++;
-      else if (ms > now && (extraSet.has(ms) || (fx.has(m) && !off))) free++;
+      else if (ms > now && !blockedSet.has(ms) && (extraSet.has(ms) || (fx.has(m) && !off))) free++;
     }
     return { free, booked, off };
   };
@@ -129,26 +129,29 @@ export function WeekAgenda({ settings, availability, extras, blockedSlots, booki
                 const off = settings.blocked_dates.includes(ymd);
                 const fixed = fixedMins(weekdayOf(ymd)).has(min) && !off;
                 const extra = extraSet.has(ms);
+                const blocked = blockedSet.has(ms);
                 const booked = bookedSet.has(ms);
                 const isNowRow = ymd === today && nowMin >= min && nowMin < min + step;
                 const cls = booked ? "border-2 border-primary/70 bg-primary/10 text-foreground shadow-sm"
                   : extra ? "bg-primary text-primary-foreground shadow-sm hover:brightness-110 hover:scale-[1.03]"
-                  : fixed ? "bg-muted/70 text-muted-foreground"
+                  : blocked ? "border border-dashed border-border/60 text-muted-foreground/50 line-through hover:border-primary hover:text-primary hover:no-underline"
+                  : fixed ? "bg-muted/70 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   : off ? "bg-muted/20 text-transparent"
                   : "border border-dashed border-border/60 text-transparent hover:border-primary hover:bg-primary/5 hover:text-primary";
-                const canClick = !past && !booked && !(fixed && !extra);
+                const canClick = !past && !booked && (!fixed || extra || blocked);
                 return (
                   <button
                     key={ymd}
                     disabled={!canClick || busy === ms}
-                    onClick={() => toggle(ymd, min)}
-                    title={booked ? "Call marcada" : extra ? "Remover horário avulso" : fixed ? "Horário fixo" : past ? "" : "Liberar este horário"}
+                    onClick={() => (fixed && !extra ? toggleBlock(ymd, min) : toggle(ymd, min))}
+                    title={booked ? "Call marcada" : extra ? "Remover horário avulso" : blocked ? "Restaurar horário fixo" : fixed ? "Remover este horário só deste dia" : past ? "" : "Liberar este horário"}
                     className={`group relative flex h-10 items-center justify-center gap-1 rounded-lg text-[11px] font-medium transition-all duration-200 ${past && !booked ? "opacity-25" : ""} ${past && booked ? "opacity-60" : ""} ${cls} disabled:cursor-default ${busy === ms ? "animate-pulse" : ""}`}
                   >
                     {isNowRow && <span className="pointer-events-none absolute inset-x-0 z-10 h-0.5 bg-primary" style={{ top: `${((nowMin - min) / step) * 100}%` }}><i className="absolute -left-1 -top-[3px] h-2 w-2 rounded-full bg-primary" /></span>}
                     {booked ? <><CalendarCheck className="h-3.5 w-3.5 text-primary" />Marcada</>
                       : extra ? <><span className="group-hover:hidden">{hhmm(min)}</span><X className="hidden h-3.5 w-3.5 group-hover:block" /></>
-                      : fixed ? hhmm(min)
+                      : blocked ? <><span className="group-hover:hidden">{hhmm(min)}</span><span className="hidden text-[10px] font-semibold group-hover:inline">Restaurar</span></>
+                      : fixed ? <><span className="group-hover:hidden">{hhmm(min)}</span><X className="hidden h-3.5 w-3.5 group-hover:block" /></>
                       : !past && !off && <><Plus className="h-3.5 w-3.5" /><span className="hidden lg:inline">Liberar</span></>}
                   </button>
                 );
