@@ -15,8 +15,8 @@ function addDays(ymd: string, n: number) {
 }
 
 /** Week grid: fixed hours (from weekly windows), one-off extra slots and bookings. */
-export function WeekAgenda({ settings, availability, extras, bookings, reload }: {
-  settings: ScheduleSettings; availability: Availability[]; extras: string[]; bookings: Booking[]; reload: () => void;
+export function WeekAgenda({ settings, availability, extras, blockedSlots, bookings, reload }: {
+  settings: ScheduleSettings; availability: Availability[]; extras: string[]; blockedSlots: string[]; bookings: Booking[]; reload: () => void;
 }) {
   const tz = settings.timezone;
   const step = settings.slot_minutes || 60;
@@ -41,6 +41,7 @@ export function WeekAgenda({ settings, availability, extras, bookings, reload }:
   }, [availability, step]);
 
   const extraSet = new Set(extras.map((x) => new Date(x).getTime()));
+  const blockedSet = new Set(blockedSlots.map((x) => new Date(x).getTime()));
   const bookedSet = new Set(bookings.filter((b) => b.status !== "cancelled").map((b) => new Date(b.starts_at).getTime()));
   const now = Date.now();
 
@@ -54,6 +55,19 @@ export function WeekAgenda({ settings, availability, extras, bookings, reload }:
     setBusy(null);
     if (error) return toast.error(error.message);
     toast.success(extraSet.has(ms) ? "Horário avulso removido." : "Horário liberado para os alunos.");
+    reload();
+  }
+
+  async function toggleBlock(ymd: string, min: number) {
+    const d = zonedToDate(ymd, min, tz);
+    const ms = d.getTime();
+    setBusy(ms);
+    const { error } = blockedSet.has(ms)
+      ? await supabase.from("mentor_blocked_slots").delete().eq("starts_at", d.toISOString())
+      : await supabase.from("mentor_blocked_slots").insert({ starts_at: d.toISOString() });
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success(blockedSet.has(ms) ? "Horário restaurado." : "Horário removido só deste dia.");
     reload();
   }
 
