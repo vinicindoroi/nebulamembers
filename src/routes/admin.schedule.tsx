@@ -30,6 +30,7 @@ import {
 import { callsQueue } from "@/lib/call-queue";
 import { waLink } from "@/lib/whatsapp";
 import { RealizedCalls } from "@/components/admin/RealizedCalls";
+import { WeekAgenda } from "@/components/admin/WeekAgenda";
 
 export const Route = createFileRoute("/admin/schedule")({
   head: () => ({
@@ -522,7 +523,7 @@ function Config({ settings, availability, extras, bookings, reload }: { settings
             <p className="text-xs text-muted-foreground">Limite fixo: cada aluno pode ter 1 call marcada por vez.</p>
           </Step>
 
-          <Step n={3} title="Dias de folga" desc="Clique nos dias em que você não vai atender. Salva na hora.">
+          <Step n={4} title="Dias de folga" desc="Clique nos dias em que você não vai atender. Salva na hora.">
             <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="outline" onClick={() => setBlocked(mergeDays(blocked, weekendsAhead(365)))}>+ Todos os fins de semana</Button>
               <Button size="sm" variant="outline" onClick={() => setBlocked(mergeDays(blocked, brHolidays()))}>+ Feriados nacionais</Button>
