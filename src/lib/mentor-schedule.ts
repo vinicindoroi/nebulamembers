@@ -26,15 +26,17 @@ export type Booking = {
 export const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
 export async function fetchScheduleConfig() {
-  const [s, a] = await Promise.all([
+  const [s, a, e] = await Promise.all([
     supabase.from("mentor_schedule_settings").select("*").eq("id", 1).maybeSingle(),
     supabase.from("mentor_availability").select("*").order("weekday").order("start_time"),
+    supabase.from("mentor_extra_slots").select("starts_at").gte("starts_at", new Date(Date.now() - 86400_000).toISOString()),
   ]);
   if (s.error) throw s.error;
   if (a.error) throw a.error;
   return {
     settings: (s.data ?? null) as ScheduleSettings | null,
     availability: (a.data ?? []) as Availability[],
+    extras: ((e.data ?? []) as { starts_at: string }[]).map((x) => x.starts_at),
   };
 }
 
@@ -72,8 +74,13 @@ const toMin = (t: string) => {
 };
 
 /** All bookable slot start instants for a local day, ignoring existing bookings. */
-export function slotsForDay(ymd: string, settings: ScheduleSettings, availability: Availability[], now = new Date()) {
-  if (settings.blocked_dates.includes(ymd)) return [];
+export function slotsForDay(ymd: string, settings: ScheduleSettings, availability: Availability[], now = new Date(), extras: string[] = []) {
+  const extra = extras.map((x) => new Date(x)).filter((d) => d.getTime() > now.getTime() && ymdOf(d, settings.timezone) === ymd);
+  const merge = (list: Date[]) => {
+    const seen = new Set(list.map((d) => d.getTime()));
+    return [...list, ...extra.filter((d) => !seen.has(d.getTime()))].sort((a, b) => a.getTime() - b.getTime());
+  };
+  if (settings.blocked_dates.includes(ymd)) return merge([]);
   const wd = weekdayOf(ymd);
   const minStart = now.getTime() + settings.min_notice_hours * 3600_000;
   const maxStart = now.getTime() + settings.max_days_ahead * 86400_000;
@@ -85,7 +92,7 @@ export function slotsForDay(ymd: string, settings: ScheduleSettings, availabilit
       if (d.getTime() >= minStart && d.getTime() <= maxStart) out.push(d);
     }
   }
-  return out.sort((a, b) => a.getTime() - b.getTime());
+  return merge(out);
 }
 
 /** Monday-based week key in the mentor's timezone (matches the database rule). */

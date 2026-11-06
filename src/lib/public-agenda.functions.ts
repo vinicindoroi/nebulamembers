@@ -6,10 +6,12 @@ export type PublicAgendaDay = { ymd: string; slots: string[] };
 /** Public, anonymous: returns only free slot times (no names, notes or links). */
 export const getPublicAgenda = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const [s, a] = await Promise.all([
+  const [s, a, e] = await Promise.all([
     supabaseAdmin.from("mentor_schedule_settings").select("*").eq("id", 1).maybeSingle(),
     supabaseAdmin.from("mentor_availability").select("*"),
+    supabaseAdmin.from("mentor_extra_slots").select("starts_at"),
   ]);
+  const extras = ((e.data ?? []) as { starts_at: string }[]).map((x) => x.starts_at);
   const settings = s.data as ScheduleSettings | null;
   if (!settings) return { enabled: false, timezone: "America/Sao_Paulo", slotMinutes: 30, days: [] as PublicAgendaDay[] };
   const now = new Date();
@@ -24,7 +26,7 @@ export const getPublicAgenda = createServerFn({ method: "GET" }).handler(async (
   for (let i = 0; i <= settings.max_days_ahead; i++) {
     const ymd = ymdOf(new Date(now.getTime() + i * 86400_000), settings.timezone);
     if (days.some((d) => d.ymd === ymd)) continue;
-    const slots = slotsForDay(ymd, { ...settings, blocked_dates: blocked }, (a.data ?? []) as Availability[], now)
+    const slots = slotsForDay(ymd, { ...settings, blocked_dates: blocked }, (a.data ?? []) as Availability[], now, extras)
       .filter((d) => !busy.has(d.getTime()))
       .map((d) => d.toISOString());
     if (slots.length) days.push({ ymd, slots });

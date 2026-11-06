@@ -1323,6 +1323,24 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_extra_slots: {
+        Row: {
+          created_at: string
+          id: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          starts_at?: string
+        }
+        Relationships: []
+      }
       mentor_schedule_settings: {
         Row: {
           allowed_plans: string[]

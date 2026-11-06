@@ -34,6 +34,7 @@ function SchedulePage() {
   const { isAdmin } = useAdmin();
   const [settings, setSettings] = useState<ScheduleSettings | null>(null);
   const [availability, setAvailability] = useState<Availability[]>([]);
+  const [extras, setExtras] = useState<string[]>([]);
   const [busy, setBusy] = useState<Set<number>>(new Set());
   const [mine, setMine] = useState<Booking[]>([]);
   const [usedWeeks, setUsedWeeks] = useState<Set<string>>(new Set());
@@ -53,6 +54,7 @@ function SchedulePage() {
       setAllowed(!!acc.data);
       setSettings(cfg.settings);
       setAvailability(cfg.availability);
+      setExtras(cfg.extras);
       const from = new Date();
       const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
       const [b, m, w] = await Promise.all([
@@ -101,7 +103,7 @@ function SchedulePage() {
 
   const tz = settings?.timezone ?? "America/Sao_Paulo";
   const freeSlots = (ymd: string) =>
-    settings ? slotsForDay(ymd, settings, availability).filter((d) => !busy.has(d.getTime()) && !usedWeeks.has(weekKey(d, settings.timezone ?? "America/Sao_Paulo"))) : [];
+    settings ? slotsForDay(ymd, settings, availability, new Date(), extras).filter((d) => !busy.has(d.getTime()) && !usedWeeks.has(weekKey(d, settings.timezone ?? "America/Sao_Paulo"))) : [];
   const daySlots = day ? freeSlots(ymdFromLocal(day)) : [];
   const upcoming = mine.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date());
   const past = mine.filter((b) => !upcoming.includes(b));

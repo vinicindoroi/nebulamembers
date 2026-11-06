@@ -141,6 +141,13 @@
       "when": 1793829351063,
       "tag": "0019_uptime_monitor",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793992111167,
+      "tag": "0020_mentor_extra_slots",
+      "breakpoints": true
     }
   ]
 }
