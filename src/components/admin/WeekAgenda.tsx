@@ -138,7 +138,7 @@ export function WeekAgenda({ settings, availability, extras, blockedSlots, booki
                   : fixed ? "bg-muted/70 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   : off ? "bg-muted/20 text-transparent"
                   : "border border-dashed border-border/60 text-transparent hover:border-primary hover:bg-primary/5 hover:text-primary";
-                const canClick = !past && !booked && (!fixed || extra || blocked);
+                const canClick = !past && !booked && !off;
                 return (
                   <button
                     key={ymd}
