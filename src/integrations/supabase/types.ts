@@ -1261,6 +1261,24 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_blocked_slots: {
+        Row: {
+          created_at: string
+          id: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          starts_at?: string
+        }
+        Relationships: []
+      }
       mentor_booking_links: {
         Row: {
           booking_id: string
