@@ -34,6 +34,7 @@ import { FunnelAnalyticsPanel } from './FunnelAnalyticsPanel';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X, Eraser, Trash2, Paintbrush, Circle } from 'lucide-react';
 import { Funnel } from '@/hooks/useFunnels';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useFunnelAnalytics } from '@/hooks/useFunnelAnalytics';
 
 interface FunnelCanvasProps {
@@ -49,6 +50,7 @@ interface FunnelCanvasProps {
 const SNAP_THRESHOLD = 10;
 
 export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presentationMode = false, onPresentationModeChange }: FunnelCanvasProps) {
+  const isMobile = useIsMobile();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -691,6 +693,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presen
   const onNodeClick = useCallback(
     (event: React.MouseEvent, node: Node) => {
       if (interactionMode === 'draw' || interactionMode === 'sticky-note' || interactionMode === 'free-text') return;
+      if (window.matchMedia('(pointer: coarse)').matches && !event.shiftKey) { setSelectedNode(node); return; }
       if (event.shiftKey) {
         // Shift+Click: toggle this node as a multi-connect source
         event.stopPropagation();
@@ -1020,53 +1023,7 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presen
     return () => window.removeEventListener('paste', handlePaste);
   }, [presentationMode, reactFlowInstance, setNodes]);
 
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
-
-      // Check for image files dropped
-      if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-        const file = event.dataTransfer.files[0];
-        if (file.type.startsWith('image/') && reactFlowInstance) {
-          const position = reactFlowInstance.screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY,
-          });
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const base64 = e.target?.result as string;
-            const img = new Image();
-            img.onload = () => {
-              const newNode: Node = {
-                id: `image-${Date.now()}`,
-                type: 'funnel-image',
-                position,
-                data: {
-                  imageUrl: base64,
-                  width: img.width,
-                  height: img.height,
-                },
-              };
-              setNodes((nds) => [...nds, newNode as any]);
-              toast.success('Imagem adicionada ao canvas!');
-            };
-            img.src = base64;
-          };
-          reader.readAsDataURL(file);
-          return;
-        }
-      }
-
-      const type = event.dataTransfer.getData('application/reactflow/type');
-      const label = event.dataTransfer.getData('application/reactflow/label');
-
-      if (!type || !reactFlowInstance) return;
-
-      const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
-
+  const addElement = useCallback((type: string, label: string, position: { x: number; y: number }) => {
       // Handle standalone line - create two anchor nodes and an edge
       if (type === 'standalone-line') {
         const timestamp = Date.now();
@@ -1118,8 +1075,58 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presen
       };
 
       setNodes((nds) => nds.concat(newNode));
+  }, [setNodes, setEdges]);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      // Check for image files dropped
+      if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+        const file = event.dataTransfer.files[0];
+        if (file.type.startsWith('image/') && reactFlowInstance) {
+          const position = reactFlowInstance.screenToFlowPosition({
+            x: event.clientX,
+            y: event.clientY,
+          });
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target?.result as string;
+            const img = new Image();
+            img.onload = () => {
+              const newNode: Node = {
+                id: `image-${Date.now()}`,
+                type: 'funnel-image',
+                position,
+                data: {
+                  imageUrl: base64,
+                  width: img.width,
+                  height: img.height,
+                },
+              };
+              setNodes((nds) => [...nds, newNode as any]);
+              toast.success('Imagem adicionada ao canvas!');
+            };
+            img.src = base64;
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+      }
+
+      const type = event.dataTransfer.getData('application/reactflow/type');
+      const label = event.dataTransfer.getData('application/reactflow/label');
+
+      if (!type || !reactFlowInstance) return;
+
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      addElement(type, label, position);
     },
-    [reactFlowInstance, setNodes, setEdges]
+    [reactFlowInstance, setNodes, addElement]
   );
 
   const onNodeDoubleClick = useCallback((_: React.MouseEvent, node: Node) => {
@@ -1577,7 +1584,12 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presen
 
   return (
     <div className="flex h-full min-w-0 bg-background">
-      <FunnelElementsSidebar collapsed={sidebarCollapsed || presentationMode} onClose={() => setSidebarCollapsed(true)} />
+      <FunnelElementsSidebar collapsed={sidebarCollapsed || presentationMode} onClose={() => setSidebarCollapsed(true)} onAddElement={(type, label) => {
+        const rect = reactFlowWrapper.current?.getBoundingClientRect();
+        if (!rect || !reactFlowInstance) return;
+        addElement(type, label, reactFlowInstance.screenToFlowPosition({ x: rect.left + rect.width / 2 - 60, y: rect.top + rect.height / 2 - 40 }));
+        if (window.matchMedia('(max-width: 1099px)').matches) setSidebarCollapsed(true);
+      }} />
 
       <div className={cn("funnel-canvas flex-1 relative min-w-0 overflow-hidden", selectedNode && !presentationMode && "has-inspector")}>
         {presentationMode && <div className="funnel-presentation-bar"><div><span className="funnel-editor-eyebrow">APRESENTAÇÃO</span><p className="text-sm font-medium">{funnel.name}</p></div><Button variant="outline" size="sm" onClick={() => onPresentationModeChange?.(false)} aria-label="Sair da apresentação"><X className="h-4 w-4" />Sair <kbd>Esc</kbd></Button></div>}
@@ -1793,10 +1805,10 @@ export function FunnelCanvas({ funnel, onSave, isSaving, onRegisterFlush, presen
               edgeTypes={edgeTypes}
               defaultEdgeOptions={{ type: 'funnel' }}
               connectionMode={ConnectionMode.Loose}
-              panOnDrag={interactionMode === 'pan' ? true : [1, 2]}
+              panOnDrag={interactionMode === 'pan' || isMobile ? true : [1, 2]}
               panOnScroll={false}
               zoomOnScroll
-              selectionOnDrag={interactionMode === 'select'}
+              selectionOnDrag={interactionMode === 'select' && !isMobile}
               selectionMode={SelectionMode.Partial}
               nodesDraggable={!isRestrictedMode}
               nodesFocusable={!isRestrictedMode}

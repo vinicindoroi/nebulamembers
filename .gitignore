@@ -31,3 +31,6 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Browser regression artifacts
+/test-results/

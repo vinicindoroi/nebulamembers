@@ -119,7 +119,7 @@ export function MindMapFloatingToolbar({
 
   return (
     <div
-      className="bg-[#111115]/95 backdrop-blur-md border border-[#2a2a35] rounded-xl shadow-2xl shadow-black/50 px-1.5 py-1 flex items-center gap-0.5 whitespace-nowrap animate-in fade-in slide-in-from-bottom-1 duration-150"
+      className="mindmap-inline-tools bg-[#111115]/95 backdrop-blur-md border border-[#2a2a35] rounded-xl shadow-2xl shadow-black/50 px-1.5 py-1 flex items-center gap-0.5 whitespace-nowrap animate-in fade-in slide-in-from-bottom-1 duration-150"
     >
       {/* Primary MindMeister-style action icons */}
       <ToolbarIconButton icon={CheckCircle2} label="Criar task" onClick={() => onOpenDetail('tasks')} />

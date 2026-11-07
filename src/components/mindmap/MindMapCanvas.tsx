@@ -1411,8 +1411,9 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
   }
 
   return (
-    <div className="w-full h-full relative" ref={canvasRef}>
+    <div className="mindmap-canvas w-full h-full relative" ref={canvasRef}>
       <ReactFlow
+        colorMode="dark"
         nodes={visibleNodes}
         edges={visibleEdges}
         onNodesChange={onNodesChange}
@@ -1444,7 +1445,7 @@ export function MindMapCanvas({ funnel, onSave, isSaving, onRegisterFlush }: Min
         />
 
         {/* Bottom controls */}
-        <Panel position="bottom-center" className="flex gap-1.5 mb-2">
+        <Panel position="bottom-center" className="mindmap-mobile-controls flex gap-1.5 mb-2">
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg bg-[#1a1a1f]/90 border border-border shadow-lg backdrop-blur-sm hover:bg-[#2a2a30]" onClick={() => zoomIn({ duration: 200 })} title="Zoom In">
             <ZoomIn className="h-4 w-4" />
           </Button>

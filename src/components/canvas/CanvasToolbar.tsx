@@ -159,7 +159,7 @@ export function CanvasToolbar({
   return (
     <>
       {/* 1. MIRO DARK VERTICAL SIDEBAR TOOLBAR (LEFT SIDE) */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3 bg-[#0f0f13]/95 border border-white/10 py-4 px-2 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)] select-none w-14 backdrop-blur-md">
+      <div className="canvas-main-tools absolute left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3 bg-[#0f0f13]/95 border border-white/10 py-4 px-2 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)] select-none w-14 backdrop-blur-md">
         
         {/* Select Tool */}
         <Button
@@ -436,7 +436,7 @@ export function CanvasToolbar({
 
       {/* 3. MIRO PEN VERTICAL SUB-BAR (FLOATS NEXT TO SIDEBAR WHEN PENCIL ACTIVE) */}
       {(activeTool === 'draw' || activeTool === 'eraser') && (
-        <div className="absolute left-[72px] top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3.5 bg-[#0f0f13]/95 border border-white/10 py-4.5 px-2 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)] w-12 nodrag nopan select-none backdrop-blur-md">
+        <div className="canvas-detail-tools absolute left-[72px] top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3.5 bg-[#0f0f13]/95 border border-white/10 py-4.5 px-2 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)] w-12 nodrag nopan select-none backdrop-blur-md">
           {/* Active Tool selection indicators (Pen / Eraser) */}
           <Button
             variant="ghost"
@@ -559,7 +559,7 @@ export function CanvasToolbar({
 
       {/* 3b. MIRO STICKY NOTE COLOR SUB-BAR */}
       {(activeTool === 'sticky' || hasSelectedSticky) && (
-        <div className="absolute left-[72px] top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3 bg-[#0f0f13]/95 border border-white/10 py-4.5 px-3 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] w-[96px] nodrag nopan select-none backdrop-blur-md animate-in fade-in slide-in-from-left-2 duration-150">
+        <div className="canvas-detail-tools absolute left-[72px] top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3 bg-[#0f0f13]/95 border border-white/10 py-4.5 px-3 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] w-[96px] nodrag nopan select-none backdrop-blur-md animate-in fade-in slide-in-from-left-2 duration-150">
           <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center mb-0.5">
             Cor da Nota
           </div>
@@ -609,7 +609,7 @@ export function CanvasToolbar({
       )}
 
       {/* 4. DYNAMIC TOP-RIGHT ZOOM & EXPORT INDICATOR (DARK CARD) */}
-      <div className="absolute top-4 right-4 z-50 flex items-center gap-2 bg-[#0f0f13]/95 border border-white/10 px-3.5 py-1.5 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)] select-none nodrag nopan backdrop-blur-md">
+      <div className="canvas-zoom-tools absolute top-4 right-4 z-50 flex items-center gap-2 bg-[#0f0f13]/95 border border-white/10 px-3.5 py-1.5 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.5)] select-none nodrag nopan backdrop-blur-md">
         <Button
           variant="ghost"
           size="icon"

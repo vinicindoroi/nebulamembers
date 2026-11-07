@@ -5,6 +5,7 @@ import {
   PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock, Package, Flame, CalendarClock, Activity, HeartPulse,
 } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useMobileDrawer } from "@/hooks/use-mobile-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { usePresence } from "@/hooks/use-presence";
@@ -61,6 +62,8 @@ const allNav: NavItem[] = navGroups.flatMap((g) => g.items);
 export function AppShell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  useMobileDrawer(open, () => setOpen(false), mobileMenuRef);
   const [collapsed, setCollapsed] = useState(() => {
     const saved = localStorage.getItem("sidebar_collapsed");
     return saved === "true";
@@ -276,22 +279,13 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // ESC fecha o menu mobile e trava o scroll quando aberto
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
-  }, [open]);
-
   const onSignOut = async () => {
     await signOut();
     navigate({ to: "/login" });
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="member-shell min-h-dvh flex">
       {/* Sidebar - single element with smooth width transition */}
       <aside
         className={`hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-border bg-background flex-col transition-all duration-300 ease-in-out overflow-visible ${
@@ -492,7 +486,7 @@ export function AppShell() {
         role="dialog"
         aria-modal="true"
         aria-label="Menu de navegação"
-        className={`fixed md:hidden top-0 left-0 z-40 h-screen w-72 border-r border-border bg-background transition-transform duration-300 ${
+        ref={mobileMenuRef} aria-hidden={!open} inert={!open} className={`member-mobile-menu fixed md:hidden top-0 left-0 z-40 h-dvh w-72 border-r border-border bg-background transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -563,8 +557,8 @@ export function AppShell() {
 
       <div className="flex-1 min-w-0 flex flex-col">
         {!isFunnelsPage && (
-        <header className="sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
-            <button className="md:hidden p-2 rounded-lg hover:bg-muted/50" onClick={() => setOpen(true)} aria-label="Abrir menu">
+        <header className="member-header sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
+            <button className="md:hidden p-2 rounded-lg hover:bg-muted/50" onClick={() => setOpen(true)} aria-label="Abrir menu" aria-expanded={open}>
               <Menu className="h-5 w-5" />
             </button>
             <button
@@ -615,7 +609,7 @@ export function AppShell() {
           </header>
         )}
         {!isFunnelsPage && mobileSearch && (
-          <div className="sm:hidden sticky top-16 z-20 px-4 py-2 border-b border-border bg-background/90 backdrop-blur-xl">
+          <div className="member-mobile-search sm:hidden sticky top-16 z-20 px-4 py-2 border-b border-border bg-background/90 backdrop-blur-xl">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -627,8 +621,8 @@ export function AppShell() {
             </div>
           </div>
         )}
-        <main ref={mainRef} className={`flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
-          <div className={isFunnelsPage ? 'h-full' : 'admin-route-slot w-full max-w-[1600px] mx-auto'}>
+        <main ref={mainRef} className={`member-main min-w-0 flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
+          <div data-route={path} className={isFunnelsPage ? 'h-full min-w-0' : 'mobile-route-content admin-route-slot min-w-0 w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
               <><Outlet /><WhatsappPrompt /></>
             ) : (
@@ -638,9 +632,10 @@ export function AppShell() {
         </main>
       </div>
 
+      {isFunnelsPage && <button className="mobile-workspace-menu md:hidden" onClick={() => setOpen(true)} aria-label="Abrir menu da plataforma" aria-expanded={open}><Menu className="h-5 w-5" /></button>}
       {/* Bottom nav (mobile) */}
       {!isFunnelsPage && (
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
+        <nav aria-label="Navegação principal" className="member-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
           {[
             { to: "/dashboard", label: "Início", icon: LayoutDashboard },
             { to: "/courses", label: "Cursos", icon: GraduationCap },

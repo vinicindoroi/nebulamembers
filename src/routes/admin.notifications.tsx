@@ -87,7 +87,7 @@ function Page() {
         <p className="text-sm text-muted-foreground mt-1">Comunique-se com seus membros em tempo real ou agende.</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Stat icon={Bell} label="Total" value={stats.total} />
         <Stat icon={CheckCircle2} label="Enviadas" value={stats.sent} accent="emerald" />
         <Stat icon={Clock} label="Agendadas" value={stats.scheduled} accent="amber" />

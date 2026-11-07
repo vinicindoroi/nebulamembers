@@ -216,7 +216,7 @@ export function FunnelsSidebar({
           e.dataTransfer.setData('application/json', JSON.stringify({ type: 'funnel', id: funnel.id }));
           e.dataTransfer.effectAllowed = 'move';
         }}
-        onClick={() => onSelectFunnel(funnel)}
+        onClick={() => { onSelectFunnel(funnel); if (window.matchMedia('(max-width: 1099px)').matches) onToggleCollapse?.(); }}
         className={cn(
           'funnel-list-item w-full overflow-hidden group relative flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150',
           isNested && 'ml-4 w-[calc(100%-1rem)]',
@@ -346,8 +346,7 @@ export function FunnelsSidebar({
     );
   };
 
-  if (collapsed) {
-    return (
+  const collapsedRail = (
       <div className="funnel-panel funnel-list-rail w-12 border-r border-border flex flex-col items-center py-4 gap-2 shrink-0 h-full">
         <Tooltip>
           <TooltipTrigger asChild>
@@ -365,7 +364,7 @@ export function FunnelsSidebar({
             <Button
               variant="ghost"
               size="icon"
-              onClick={onCreateFunnel}
+              aria-label="Novo funil" onClick={onCreateFunnel}
               className="hover:bg-primary/10 hover:text-primary"
             >
               <Plus className="w-4 h-4" />
@@ -379,7 +378,7 @@ export function FunnelsSidebar({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsImportDialogOpen(true)}
+              aria-label="Importar funil" onClick={() => setIsImportDialogOpen(true)}
               className="hover:bg-muted/50"
             >
               <Upload className="w-4 h-4" />
@@ -388,12 +387,11 @@ export function FunnelsSidebar({
           <TooltipContent side="right">Importar JSON</TooltipContent>
         </Tooltip>
       </div>
-    );
-  }
+  );
 
   return (
     <>
-      <div className="funnel-panel funnel-list-panel w-full sm:w-56 shrink-0 border-r border-border flex flex-col h-full z-10">
+      {collapsed ? collapsedRail : <div className="funnel-panel funnel-list-panel w-full sm:w-56 shrink-0 border-r border-border flex flex-col h-full z-10">
         {/* Header */}
         <div className="px-4 py-4 border-b border-border/70 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -413,7 +411,7 @@ export function FunnelsSidebar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={onCreateFunnel}
+                  aria-label="Novo funil" onClick={onCreateFunnel}
                   className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
                 >
                   <Plus className="w-4 h-4" />
@@ -443,7 +441,7 @@ export function FunnelsSidebar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setIsImportDialogOpen(true)}
+                  aria-label="Importar funil" onClick={() => setIsImportDialogOpen(true)}
                   className="h-8 w-8 hover:bg-muted/50"
                 >
                   <Upload className="w-4 h-4" />
@@ -500,7 +498,7 @@ export function FunnelsSidebar({
                 </p>
                 {!search && (
                   <button
-                    onClick={onCreateFunnel}
+                    aria-label="Novo funil" onClick={onCreateFunnel}
                     className="mt-3 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
                   >
                     + Criar primeiro funil
@@ -603,7 +601,7 @@ export function FunnelsSidebar({
             )}
           </div>
         </ScrollArea>
-      </div>
+      </div>}
 
       {/* Delete Funnel Confirmation */}
       <AlertDialog open={!!funnelToDelete} onOpenChange={() => setFunnelToDelete(null)}>

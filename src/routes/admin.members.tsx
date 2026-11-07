@@ -295,7 +295,7 @@ function Page() {
             )}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex max-w-full flex-wrap gap-2">
           <Button variant="outline" onClick={() => setGroupsOpen(true)}><User />Grupos</Button>
           <Button variant="outline" onClick={() => setTagTarget({ memberIds: [], title: "Gerenciar tags" })}><Tag />Tags</Button>
           <button type="button" onClick={exportCsv} className="glass px-3.5 py-2 rounded-xl text-sm flex items-center gap-2 hover:bg-muted/60"><Download className="h-4 w-4" />CSV</button>

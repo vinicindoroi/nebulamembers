@@ -4,7 +4,8 @@ import {
   CreditCard, Ticket, Bell, Settings, ScrollText, Search, Menu, X, LogOut, Shield, ArrowLeft, Play, Crown, Package, CalendarClock,
 } from "lucide-react";
 import { NotificationBell } from "@/components/members/NotificationBell";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useMobileDrawer } from "@/hooks/use-mobile-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
 
@@ -56,6 +57,8 @@ const allNav: NavItem[] = navGroups.flatMap((g) => g.items);
 export function AdminShell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  const isMobile = useMobileDrawer(open, () => setOpen(false), mobileMenuRef);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const email = user?.email ?? "";
@@ -65,17 +68,17 @@ export function AdminShell() {
   const onSignOut = async () => { await signOut(); navigate({ to: "/login" }); };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="admin-shell min-h-dvh flex">
       <aside
-        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-72 shrink-0 transition-transform duration-300 border-r border-border bg-background ${
+        ref={mobileMenuRef} role={isMobile ? "dialog" : undefined} aria-modal={isMobile && open ? true : undefined} aria-label="Menu administrativo" aria-hidden={isMobile && !open ? true : undefined} inert={isMobile && !open} className={`admin-mobile-menu fixed md:sticky top-0 left-0 z-40 h-dvh w-72 shrink-0 transition-transform duration-300 border-r border-border bg-background ${
           open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         <div className="h-full flex flex-col p-5">
-          <Link to="/admin/dashboard" className="flex min-w-0 items-center gap-3 px-2 py-2 mb-8">
+          <div className="mb-6 flex items-center gap-2"><Link to="/admin/dashboard" className="flex flex-1 min-w-0 items-center gap-3 px-2 py-2">
             <img src={brandLogo.url} alt="Nebula Members" className="h-10 w-full object-contain object-left" />
             <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/20">ADMIN</span>
-          </Link>
+          </Link><button onClick={() => setOpen(false)} className="md:hidden shrink-0 p-2" aria-label="Fechar menu"><X className="h-5 w-5" /></button></div>
 
           <nav className="flex-1 overflow-y-auto -mx-1 px-1 space-y-5">
             {navGroups.map((group) => (
@@ -138,11 +141,11 @@ export function AdminShell() {
       )}
 
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
+        <header className="admin-header sticky top-0 z-20 h-16 border-b border-border bg-background/60 backdrop-blur-xl flex items-center gap-3 px-4 md:px-8">
           <button
             className="md:hidden p-2 rounded-lg hover:bg-muted/50"
             onClick={() => setOpen(true)}
-            aria-label="Abrir menu"
+            aria-label="Abrir menu" aria-expanded={open}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -175,8 +178,8 @@ export function AdminShell() {
             {initials}
           </div>
         </header>
-        <main className="flex-1 px-4 md:px-8 py-6 md:py-8">
-          <div key={path} className="admin-route-slot">
+        <main className="admin-main min-w-0 flex-1 px-4 md:px-8 py-6 md:py-8">
+          <div key={path} data-route={path} className="mobile-route-content admin-route-slot min-w-0">
             <Outlet />
           </div>
         </main>

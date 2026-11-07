@@ -236,7 +236,7 @@ function ProfilePage() {
               </div>
             )}
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="w-full sm:w-auto flex-1 min-w-0">
             <h2 className="text-xl font-semibold truncate">{form.full_name || "Sem nome"}</h2>
             <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap mt-1">
               <span className="inline-flex items-center gap-1">
@@ -363,7 +363,7 @@ function ProfilePage() {
                   <div className="text-[10px] text-muted-foreground leading-tight truncate w-full">{a.title}</div>
 
                   {/* Premium pure CSS Tooltip */}
-                  <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2.5 w-48 -translate-x-1/2 scale-95 rounded-xl border border-border bg-black/95 p-2.5 text-center opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
+                  <div className="achievement-tooltip pointer-events-none absolute bottom-full left-1/2 z-50 mb-2.5 w-48 -translate-x-1/2 scale-95 rounded-xl border border-border bg-black/95 p-2.5 text-center opacity-0 shadow-2xl backdrop-blur-md transition-all duration-200 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
                     <p className={`font-bold text-[11px] mb-0.5 ${a.unlocked ? cfg.color : "text-muted-foreground"}`}>{a.title}</p>
                     <p className="text-[9px] text-muted-foreground/80 leading-relaxed mb-1">{a.description}</p>
                     {a.unlocked ? (

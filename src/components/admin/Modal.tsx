@@ -34,13 +34,13 @@ export function Modal({ open, onClose, title, kicker, description, size = "lg", 
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] overflow-y-auto bg-black/70 backdrop-blur-md"
+      className="admin-modal-overlay fixed inset-0 z-[100] overflow-y-auto bg-black/70 backdrop-blur-md"
       style={{ animation: "modal-overlay-in 0.18s ease-out both" }}
       onClick={onClose}
     >
       <div className="min-h-full flex items-center justify-center p-4">
         <div
-          className={`relative w-full ${sizeMap[size]} rounded-2xl border border-border bg-[oklch(0.16_0.015_270)] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7)] overflow-hidden`}
+          role="dialog" aria-modal="true" aria-label={title} className={`admin-modal relative w-full ${sizeMap[size]} rounded-2xl border border-border bg-[oklch(0.16_0.015_270)] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7)] overflow-hidden`}
           style={{ animation: "modal-card-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -67,12 +67,12 @@ export function Modal({ open, onClose, title, kicker, description, size = "lg", 
             </div>
           </div>
 
-          <div className="px-6 py-5 space-y-5 max-h-[min(70vh,640px)] overflow-y-auto">
+          <div className="admin-modal-body px-4 sm:px-6 py-5 space-y-5 max-h-[min(60dvh,640px)] overflow-y-auto">
             {children}
           </div>
 
           {footer && (
-            <div className="px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
+            <div className="admin-modal-footer px-4 sm:px-6 py-4 border-t border-border bg-card flex flex-wrap items-center justify-end gap-2">
               {footer}
             </div>
           )}

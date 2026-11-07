@@ -4,11 +4,12 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight, Layers, Search, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Layers, Search, X, Plus } from 'lucide-react';
 
 interface FunnelElementsSidebarProps {
   collapsed?: boolean;
   onClose?: () => void;
+  onAddElement?: (type: string, label: string) => void;
 }
 
 // Color mappings for each element type
@@ -54,26 +55,28 @@ interface ElementItemProps {
   onDragStart: (e: React.DragEvent, type: string, label: string) => void;
   onExpandFacebook?: () => void;
   isFacebookExpanded?: boolean;
+  onAddElement?: (type: string, label: string) => void;
 }
 
-function ElementItem({ element, isPageType, onDragStart, onExpandFacebook, isFacebookExpanded }: ElementItemProps) {
+function ElementItem({ element, isPageType, onDragStart, onExpandFacebook, isFacebookExpanded, onAddElement }: ElementItemProps) {
   const isCondition = element.type.startsWith('condition-');
   const isStickyNote = element.type === 'sticky-note';
   const isFreeText = element.type === 'free-text';
   const hasSub = element.hasSubcategories;
   
   return (
-    <div
+    <button
+      type="button"
       draggable
       data-element-item
       data-element-label={element.label}
       onDragStart={(e) => onDragStart(e, element.type, element.label)}
-      onClick={() => hasSub && onExpandFacebook?.()}
+      onClick={() => hasSub ? onExpandFacebook?.() : onAddElement?.(element.type, element.label)}
       className={cn(
-        'funnel-element-item group/item flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-grab active:cursor-grabbing',
+        'funnel-element-item w-full text-left group/item flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-grab active:cursor-grabbing',
         'bg-transparent hover:bg-card/70 border border-transparent hover:border-border/80',
         'transition-all duration-150',
-        hasSub && 'cursor-pointer'
+        hasSub && 'cursor-pointer pr-10'
       )}
     >
       {isPageType ? (
@@ -127,7 +130,7 @@ function ElementItem({ element, isPageType, onDragStart, onExpandFacebook, isFac
           )
         )}
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -141,6 +144,7 @@ interface SectionProps {
   facebookExpanded?: boolean;
   onToggleFacebookExpanded?: () => void;
   query?: string;
+  onAddElement?: (type: string, label: string) => void;
 }
 
 function Section({ 
@@ -153,6 +157,7 @@ function Section({
   facebookExpanded,
   onToggleFacebookExpanded,
   query = "",
+  onAddElement,
 }: SectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -174,14 +179,16 @@ function Section({
       <CollapsibleContent>
         <div className="space-y-0.5 mt-1">
           {visible.map((element) => (
-            <div key={element.type}>
+            <div key={element.type} className="relative">
               <ElementItem
                 element={element}
                 isPageType={isPageType}
                 onDragStart={onDragStart}
+                onAddElement={onAddElement}
                 onExpandFacebook={element.hasSubcategories ? onToggleFacebookExpanded : undefined}
                 isFacebookExpanded={facebookExpanded}
               />
+              {element.hasSubcategories && onAddElement && <Button variant="ghost" size="icon" className="absolute right-0 top-1 h-9 w-9" aria-label={`Adicionar ${element.label}`} onClick={() => onAddElement(element.type, element.label)}><Plus className="h-4 w-4" /></Button>}
               {/* Facebook subcategories */}
               {element.hasSubcategories && (facebookExpanded || !!query) && showFacebookSubcategories && (
                 <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-[#1877F2]/30 pl-2">
@@ -190,6 +197,7 @@ function Section({
                       key={subElement.type}
                       element={subElement}
                       onDragStart={onDragStart}
+                onAddElement={onAddElement}
                     />
                   ))}
                 </div>
@@ -202,7 +210,7 @@ function Section({
   );
 }
 
-export function FunnelElementsSidebar({ collapsed, onClose }: FunnelElementsSidebarProps) {
+export function FunnelElementsSidebar({ collapsed, onClose, onAddElement }: FunnelElementsSidebarProps) {
   const [facebookExpanded, setFacebookExpanded] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -228,14 +236,14 @@ export function FunnelElementsSidebar({ collapsed, onClose }: FunnelElementsSide
     <div className="funnel-panel funnel-elements-panel w-60 border-r border-border flex flex-col">
       <div className="funnel-library-header">
         <div className="flex items-center justify-between"><div className="flex items-center gap-2"><Layers className="h-4 w-4 text-primary" /><h2 className="text-sm font-semibold">Biblioteca de blocos</h2></div><Button size="icon" variant="ghost" className="h-7 w-7" onClick={onClose} aria-label="Fechar biblioteca de blocos"><X className="h-3.5 w-3.5" /></Button></div>
-        <p className="mt-1 text-xs text-muted-foreground">Arraste uma ideia para o canvas.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Toque para adicionar ou arraste ao canvas.</p>
         <div className="relative mt-4"><Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground" /><input type="search" aria-label="Buscar blocos" placeholder="Buscar blocos..." value={query} onChange={e => setQuery(e.target.value)} className="funnel-search w-full rounded-lg border border-border py-2 pl-9 pr-3 text-xs outline-none focus:border-primary/60" /></div>
       </div>
 
       <ScrollArea className="flex-1">
         <div className="funnel-library-sections p-3 space-y-3">
           {query && !Object.values(funnelElements).some(group => Array.isArray(group) && group.some(element => element.label.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR")))) && <p className="px-2 py-6 text-center text-xs text-muted-foreground">Nenhum bloco encontrado.</p>}
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Tráfego" 
             elements={funnelElements.traffic} 
             onDragStart={onDragStart}
@@ -244,44 +252,44 @@ export function FunnelElementsSidebar({ collapsed, onClose }: FunnelElementsSide
             onToggleFacebookExpanded={() => setFacebookExpanded(!facebookExpanded)}
           />
           
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Páginas" 
             elements={funnelElements.pages} 
             isPageType
             onDragStart={onDragStart}
           />
           
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Pagamento" 
             elements={funnelElements.payment} 
             onDragStart={onDragStart}
           />
 
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="IA" 
             elements={funnelElements.ai} 
             onDragStart={onDragStart}
           />
           
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Automação" 
             elements={funnelElements.automation} 
             onDragStart={onDragStart}
           />
           
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Ações" 
             elements={funnelElements.actions} 
             onDragStart={onDragStart}
           />
           
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Condições" 
             elements={funnelElements.conditions} 
             onDragStart={onDragStart}
           />
           
-          <Section query={query}
+          <Section query={query} onAddElement={onAddElement}
             title="Conectores" 
             elements={funnelElements.connectors || []} 
             onDragStart={onDragStart}
