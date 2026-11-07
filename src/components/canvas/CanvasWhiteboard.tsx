@@ -717,6 +717,7 @@ export function CanvasWhiteboard({
         onContextMenu={(e) => e.preventDefault()}
       >
         <ReactFlow
+          colorMode="dark"
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}

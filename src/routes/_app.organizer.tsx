@@ -961,7 +961,7 @@ function OrganizerPage() {
   return (
     <div className="space-y-6 stagger-enter pb-16">
       {/* Hero Welcome Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 relative z-50">
+      <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 pb-2 relative z-50">
         <div>
           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-primary mb-2">
             <Sparkles className="h-3 w-3" /> Workspace Pessoal
@@ -976,7 +976,7 @@ function OrganizerPage() {
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-start sm:items-center gap-3 min-w-0">
           <div className="flex items-center gap-1.5 bg-card border border-border rounded-xl p-1 shadow-sm">
              <div className="relative z-[100]">
                <button
@@ -1155,7 +1155,7 @@ function OrganizerPage() {
 
       {/* Main Grid: Kanban (Full Width) */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-2">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center justify-between border-b border-border pb-2">
           <h2 className="text-sm font-semibold flex items-center gap-2">
             {viewMode === "kanban" && (
               <>
@@ -1964,11 +1964,11 @@ function OrganizerPage() {
             <p className="text-[10px] text-muted-foreground/60 mt-0.5">Capture rascunhos, copies rápidas e ideias para a operação sem formalidades. Dê dois cliques para editar.</p>
           </div>
           
-          <form onSubmit={handleAddNote} className="flex items-center gap-2 shrink-0">
+          <form onSubmit={handleAddNote} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] sm:flex items-center gap-2">
             <select
               value={newNoteColor}
               onChange={(e) => setNewNoteColor(e.target.value as any)}
-              className="glass rounded-lg px-2.5 py-2 text-[10px] text-foreground outline-none bg-background cursor-pointer"
+              className="col-span-2 min-w-0 glass rounded-lg px-2.5 py-2 text-[10px] text-foreground outline-none bg-background cursor-pointer"
             >
               <option value="purple">Roxo Space</option>
               <option value="blue">Azul Ads</option>
@@ -1980,7 +1980,7 @@ function OrganizerPage() {
               placeholder="Insight rápido..."
               value={newNoteText}
               onChange={(e) => setNewNoteText(e.target.value)}
-              className="glass rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/40 transition bg-background w-44 sm:w-60"
+              className="glass rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/40 transition bg-background min-w-0 w-full sm:w-60"
             />
             <button
               type="submit"
@@ -2156,7 +2156,7 @@ function OrganizerPage() {
                           type="text"
                           value={editColTitle}
                           onChange={(e) => setEditColTitle(e.target.value)}
-                          className="flex-1 glass rounded-lg px-2.5 py-1.5 text-xs text-foreground bg-background border border-border outline-none focus:border-primary/40"
+                          className="min-w-0 flex-1 glass rounded-lg px-2.5 py-1.5 text-xs text-foreground bg-background border border-border outline-none focus:border-primary/40"
                           placeholder="Título da coluna"
                           autoFocus
                           onKeyDown={(e) => {
@@ -2425,7 +2425,7 @@ function OrganizerPage() {
                     addSubtaskToAddModal();
                   }
                 }}
-                className="flex-1 glass rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition bg-background"
+                className="min-w-0 flex-1 glass rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition bg-background"
               />
               <button
                 type="button"
@@ -2623,7 +2623,7 @@ function OrganizerPage() {
                     addSubtaskToEditModal();
                   }
                 }}
-                className="flex-1 glass rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition bg-background"
+                className="min-w-0 flex-1 glass rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/35 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition bg-background"
               />
               <button
                 type="button"

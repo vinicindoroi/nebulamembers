@@ -309,12 +309,12 @@ function FunnelsPage() {
 
           <TabsContent value="funnel" className="mt-4 space-y-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+              <CardHeader className="flex flex-col items-start sm:flex-row sm:items-center justify-between gap-3 pb-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <CardTitle className="text-base">Etapa por etapa</CardTitle>
                   <TrafficQualityBadge traffic={traffic} />
                 </div>
-                <div className="flex items-center gap-1 rounded-md border border-border p-0.5">
+                <div className="flex max-w-full flex-wrap items-center gap-1 rounded-md border border-border p-0.5">
                   <Button variant={view === "canvas" ? "secondary" : "ghost"} size="sm" onClick={() => setView("canvas")}>
                     Canvas
                   </Button>
@@ -393,7 +393,7 @@ function FunnelsPage() {
 
           <TabsContent value="creatives" className="mt-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+              <CardHeader className="flex flex-col items-start sm:flex-row sm:items-center justify-between gap-3 pb-2">
                 <CardTitle className="text-base">Por criativo (utm_content)</CardTitle>
                 <div className="flex items-center gap-2">
                   <Button variant={minSales ? "default" : "outline"} size="sm" onClick={() => setMinSales((v) => !v)}>
@@ -499,7 +499,7 @@ function FunnelPicker({
   return (
     <div className="flex items-center gap-1">
       <Select value={funnelId} onValueChange={onChange}>
-        <SelectTrigger className="w-[190px]">
+        <SelectTrigger className="w-[150px] sm:w-[190px]">
           <SelectValue placeholder="Selecione o funil" />
         </SelectTrigger>
         <SelectContent>

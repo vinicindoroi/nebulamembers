@@ -65,7 +65,7 @@ export function NotificationBell() {
 
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 w-[360px] max-h-[480px] flex flex-col rounded-2xl overflow-hidden z-50"
+          className="notification-popover fixed left-3 right-3 top-[calc(4rem+env(safe-area-inset-top)+0.5rem)] md:absolute md:left-auto md:right-0 md:top-full mt-2 w-auto md:w-[360px] max-h-[min(480px,70dvh)] flex flex-col rounded-2xl overflow-hidden z-50"
           style={{
             background: "linear-gradient(180deg, oklch(0.16 0.015 270 / 0.85), oklch(0.14 0.015 270 / 0.9))",
             backdropFilter: "blur(24px) saturate(1.4)",

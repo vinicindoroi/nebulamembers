@@ -77,7 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" },
       { title: "Nebula Members — Área exclusiva" },
       { name: "description", content: "Aprenda, evolua e acompanhe seu progresso na Nebula Members." },
       { name: "author", content: "Nebula Members" },
@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Aprenda, evolua e acompanhe seu progresso na Nebula Members." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "theme-color", content: "#7c3aed" },
+      { name: "theme-color", content: "#131313" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
     ],
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/pwa-icon-180.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -110,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: `
@@ -145,21 +145,22 @@ function RootComponent() {
             }
           }
           if (enabled && "Notification" in window && Notification.permission === "granted") {
-            new Notification(title, {
-              body,
-              icon: "/favicon.png"
-            });
+            const options = { body, icon: "/pwa-icon-192.png" };
+            if ("serviceWorker" in navigator) {
+              void navigator.serviceWorker.getRegistration().then((registration) => {
+                if (registration) return registration.showNotification(title, options);
+                new Notification(title, options);
+              }).catch(() => {});
+            } else new Notification(title, options);
           }
         } catch (_) {}
       };
 
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) => console.log("Service Worker registrado com sucesso no escopo:", reg.scope))
-            .catch((err) => console.error("Erro ao registrar Service Worker:", err));
-        });
+      if (import.meta.env.PROD && "serviceWorker" in navigator) {
+        const register = () => { navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch((error) => console.error("Falha ao registrar PWA:", error)); };
+        if (document.readyState === "complete") register();
+        else window.addEventListener("load", register, { once: true });
+        return () => window.removeEventListener("load", register);
       }
     }
   }, []);

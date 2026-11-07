@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint . --quiet || exit 0",
     "format": "prettier --write .",
-    "test:offers": "node tests/member-offers.mjs"
+    "test:offers": "node tests/member-offers.mjs",
+    "test:mobile": "node tests/mobile-layout.mjs",
+    "test:pwa": "node tests/pwa-mobile.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
@@ -104,6 +106,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
-    "@electric-sql/pglite": "0.5.12"
+    "@electric-sql/pglite": "0.5.12",
+    "playwright": "1.64.1"
   }
 }

@@ -309,7 +309,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
             onSelect={setDay}
             modifiers={{ booked: bookedDays }}
             modifiersClassNames={{ booked: "[&_button]:after:absolute [&_button]:after:bottom-1.5 [&_button]:after:h-1 [&_button]:after:w-1 [&_button]:after:rounded-full [&_button]:after:bg-primary [&_button]:relative [&_button]:font-bold" }}
-            className="bg-transparent p-0 pointer-events-auto [--cell-size:2.75rem] sm:[--cell-size:3.25rem] [&_.rdp-caption_label]:capitalize"
+            className="bg-transparent p-0 pointer-events-auto [--cell-size:2rem] sm:[--cell-size:3.25rem] [&_.rdp-caption_label]:capitalize"
           />
           <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-primary" /> Dias com call marcada</p>
         </div>

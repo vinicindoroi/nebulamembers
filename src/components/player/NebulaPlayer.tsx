@@ -229,6 +229,7 @@ export function NebulaPlayer({
       ref={containerRef}
       className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border group select-none focus:outline-none"
       onMouseMove={wake}
+      onTouchStart={wake}
       onMouseLeave={() => { if (playing) setShowControls(false); }}
       tabIndex={0}
       style={{ "--player-accent": settings.accent_color, "--player-progress": settings.progress_color } as React.CSSProperties}
@@ -341,7 +342,7 @@ export function NebulaPlayer({
           onSeek={seek}
         />
 
-        <div className="flex items-center gap-2 mt-2 text-white">
+        <div className="nebula-player-controls flex flex-wrap sm:flex-nowrap items-center gap-1 sm:gap-2 mt-2 text-white">
           <button onClick={togglePlay} className="p-1.5 rounded-lg hover:bg-white/10" aria-label="Play/Pause">
             {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </button>
