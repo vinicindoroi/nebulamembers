@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { parseStepList } from "@/lib/funnel-tracker/steps-parse";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -1012,8 +1014,27 @@ function StepsDialog({ workspaceId, funnelId, onSaved }: { workspaceId: string; 
     enabled: open && !!funnelId,
   });
   const [draft, setDraft] = useState<StepDraft[] | null>(null);
+  const [bulk, setBulk] = useState("");
   const rows: StepDraft[] = draft ?? (data ?? []).map((s) => ({ key: s.key, label: s.label, manualKey: true }));
   const set = (next: StepDraft[]) => setDraft(next);
+  const bulkParsed = parseStepList(bulk, rows);
+  const applyBulk = (mode: "replace" | "append") => {
+    if (bulkParsed.length === 0) return;
+    if (mode === "replace") set(bulkParsed.slice(0, 20));
+    else {
+      const used = new Set(rows.map((r) => r.key));
+      const extra = bulkParsed.map((s) => {
+        let k = s.key;
+        let n = 2;
+        while (used.has(k)) k = `${s.key}_${n++}`;
+        used.add(k);
+        return { ...s, key: k };
+      });
+      set([...rows, ...extra].slice(0, 20));
+    }
+    setBulk("");
+    toast.success(`${bulkParsed.length} etapa(s) organizada(s) — revise e salve`);
+  };
 
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
@@ -1051,6 +1072,27 @@ function StepsDialog({ workspaceId, funnelId, onSaved }: { workspaceId: string; 
                   {p.name}
                 </Button>
               ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Criar rápido</div>
+            <Textarea
+              rows={2}
+              placeholder="Seleção do Alvo, Avaliação, Telefone, VSL, Oferta, checkout, upsell_1, Obrigado"
+              value={bulk}
+              onChange={(e) => setBulk(e.target.value)}
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="sm" variant="secondary" disabled={bulkParsed.length === 0} onClick={() => applyBulk("replace")}>
+                Organizar (substituir)
+              </Button>
+              <Button size="sm" variant="outline" disabled={bulkParsed.length === 0} onClick={() => applyBulk("append")}>
+                Adicionar ao final
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Separe por vírgula, na ordem do funil. Nomes iguais aos atuais mantêm a chave. Use "Nome = chave" para fixar.
+              </span>
             </div>
           </div>
 
