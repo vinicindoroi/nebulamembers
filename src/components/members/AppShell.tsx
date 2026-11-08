@@ -547,6 +547,22 @@ export function AppShell() {
                 </div>
               </div>
             ))}
+
+            {isAdmin && (
+              <div>
+                <div className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                  Administração
+                </div>
+                <a
+                  href="/admin/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all"
+                >
+                  <Shield className="h-4 w-4" />
+                  <span className="font-medium">Painel Admin</span>
+                </a>
+              </div>
+            )}
           </nav>
         </div>
       </aside>
