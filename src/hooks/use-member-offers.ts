@@ -19,6 +19,8 @@ export type MemberOffer = {
   access_levels: string[];
   created_at: string;
   link_url: string | null;
+  links: unknown;
+  prompts: unknown;
   member_offer_files: OfferFile[];
 };
 

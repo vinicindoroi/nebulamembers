@@ -1,6 +1,31 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Package, Upload, X, Link as LinkIcon } from "lucide-react";
-import { normalizeOfferLink } from "@/lib/offer-link";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Package,
+  Upload,
+  X,
+  Link as LinkIcon,
+  MessageSquareText,
+} from "lucide-react";
+import {
+  cleanOfferLinks,
+  cleanOfferPrompts,
+  readOfferLinks,
+  readOfferPrompts,
+  MAX_OFFER_LABEL,
+  type OfferLink,
+  type OfferPrompt,
+} from "@/lib/offer-link";
+
+function offerSummary(offer: MemberOffer) {
+  const links = readOfferLinks(offer.links, offer.link_url).length;
+  const prompts = readOfferPrompts(offer.prompts).length;
+  const parts = [links ? `${links} link(s)` : `${offer.member_offer_files.length} arquivo(s)`];
+  if (prompts) parts.push(`${prompts} prompt(s)`);
+  return parts.join(" · ");
+}
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,8 +118,7 @@ export function MemberOffers() {
               <h2 className="text-lg font-semibold">{offer.title}</h2>
               <p className="line-clamp-2 text-sm text-muted-foreground">{offer.description}</p>
               <p className="text-xs text-muted-foreground">
-                {offer.link_url ? "Link" : `${offer.member_offer_files.length} arquivo(s)`} ·{" "}
-                {offer.access_levels.join(", ") || "Nenhum plano"}
+                {offerSummary(offer)} · {offer.access_levels.join(", ") || "Nenhum plano"}
               </p>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => setEditing(offer)}>
@@ -146,8 +170,14 @@ function OfferEditor({
   const [active, setActive] = useState(initial?.active ?? true);
   const [existing, setExisting] = useState(initial?.member_offer_files ?? []);
   const [files, setFiles] = useState<File[]>([]);
-  const [mode, setMode] = useState<"files" | "link">(initial?.link_url ? "link" : "files");
-  const [link, setLink] = useState(initial?.link_url ?? "");
+  const initialLinks = initial ? readOfferLinks(initial.links, initial.link_url) : [];
+  const [mode, setMode] = useState<"files" | "link">(initialLinks.length ? "link" : "files");
+  const [links, setLinks] = useState<OfferLink[]>(
+    initialLinks.length ? initialLinks : [{ label: "", url: "" }],
+  );
+  const [prompts, setPrompts] = useState<OfferPrompt[]>(
+    initial ? readOfferPrompts(initial.prompts) : [],
+  );
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
   function addFiles(list: FileList | null) {
@@ -164,12 +194,21 @@ function OfferEditor({
   async function save() {
     if (!title.trim()) return toast.error("Informe o título da oferta.");
     if (!selected.length) return toast.error("Selecione pelo menos um plano de acesso.");
-    const linkUrl = mode === "link" ? normalizeOfferLink(link) : null;
-    if (mode === "link" && link.trim() && !linkUrl)
-      return toast.error("Link inválido. Use um endereço começando com https://");
-    if (active && mode === "link" && !linkUrl) return toast.error("Informe o link para publicar.");
-    if (active && mode === "files" && !files.length && !existing.length)
-      return toast.error("Adicione pelo menos um arquivo para publicar.");
+    let cleanLinks: OfferLink[] = [];
+    if (mode === "link") {
+      const res = cleanOfferLinks(links);
+      if (!res.ok)
+        return toast.error(`Link ${res.row} inválido. Use um endereço começando com https://`);
+      cleanLinks = res.links;
+    }
+    const cleanPrompts = cleanOfferPrompts(prompts);
+    const hasMain = mode === "link" ? cleanLinks.length > 0 : files.length + existing.length > 0;
+    if (active && !hasMain && !cleanPrompts.length)
+      return toast.error(
+        mode === "link"
+          ? "Adicione pelo menos um link ou prompt para publicar."
+          : "Adicione pelo menos um arquivo ou prompt para publicar.",
+      );
     if (
       mode === "link" &&
       existing.length &&
@@ -217,7 +256,9 @@ function OfferEditor({
           description: description.trim(),
           active,
           access_levels: selected,
-          link_url: linkUrl,
+          link_url: null,
+          links: cleanLinks,
+          prompts: cleanPrompts,
         })
         .eq("id", id);
       if (result.error) throw result.error;
@@ -278,7 +319,7 @@ function OfferEditor({
     <Modal
       open
       title={initial ? "Editar oferta" : "Nova oferta"}
-      description="Arquivos ou link, liberados apenas para os planos selecionados."
+      description="Arquivos ou links, e prompts, liberados apenas para os planos selecionados."
       onClose={() => {
         if (!busy) onClose();
       }}
@@ -364,7 +405,7 @@ function OfferEditor({
             {(
               [
                 { key: "files", label: "Arquivos", Icon: Upload },
-                { key: "link", label: "Link", Icon: LinkIcon },
+                { key: "link", label: "Links", Icon: LinkIcon },
               ] as const
             ).map(({ key, label, Icon }) => (
               <button
@@ -387,20 +428,59 @@ function OfferEditor({
         </div>
         {mode === "link" ? (
           <div className="space-y-2">
-            <label htmlFor="offer-link" className="text-sm">
-              Link
-            </label>
-            <Input
-              id="offer-link"
-              type="url"
-              inputMode="url"
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
-              placeholder="https://drive.google.com/..."
-              autoComplete="off"
-            />
+            {links.map((row, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input
+                  aria-label={`Tag do link ${i + 1}`}
+                  value={row.label}
+                  maxLength={MAX_OFFER_LABEL}
+                  onChange={(e) =>
+                    setLinks((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, label: e.target.value } : r)),
+                    )
+                  }
+                  placeholder="Tag (ex: Drive)"
+                  className="w-36 shrink-0"
+                  autoComplete="off"
+                />
+                <Input
+                  aria-label={`Endereço do link ${i + 1}`}
+                  type="url"
+                  inputMode="url"
+                  value={row.url}
+                  onChange={(e) =>
+                    setLinks((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, url: e.target.value } : r)),
+                    )
+                  }
+                  placeholder="https://..."
+                  autoComplete="off"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`Remover link ${i + 1}`}
+                  onClick={() =>
+                    setLinks((prev) =>
+                      prev.length === 1 ? [{ label: "", url: "" }] : prev.filter((_, j) => j !== i),
+                    )
+                  }
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setLinks((prev) => [...prev, { label: "", url: "" }])}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Adicionar link
+            </Button>
             <p className="text-xs text-muted-foreground">
-              O aluno verá um botão “Abrir link”. Use para Drive, Notion, Canva, etc.
+              A tag mostra ao aluno do que se trata cada link (Drive, Página de vendas, Canva…).
               {existing.length > 0 &&
                 ` Ao salvar, os ${existing.length} arquivo(s) atuais serão removidos.`}
             </p>
@@ -456,6 +536,64 @@ function OfferEditor({
             ))}
           </div>
         )}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Prompts para copiar</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPrompts((prev) => [...prev, { title: "", text: "" }])}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Adicionar prompt
+            </Button>
+          </div>
+          {prompts.length === 0 && (
+            <p className="text-xs text-muted-foreground">
+              Opcional. O aluno verá cada prompt com um botão “Copiar”.
+            </p>
+          )}
+          {prompts.map((row, i) => (
+            <div key={i} className="space-y-2 rounded-xl border border-border p-3">
+              <div className="flex items-center gap-2">
+                <MessageSquareText className="h-4 w-4 shrink-0 text-primary/70" />
+                <Input
+                  aria-label={`Título do prompt ${i + 1}`}
+                  value={row.title}
+                  maxLength={120}
+                  onChange={(e) =>
+                    setPrompts((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, title: e.target.value } : r)),
+                    )
+                  }
+                  placeholder="Título (ex: Copy do anúncio)"
+                  autoComplete="off"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`Remover prompt ${i + 1}`}
+                  onClick={() => setPrompts((prev) => prev.filter((_, j) => j !== i))}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              <Textarea
+                aria-label={`Texto do prompt ${i + 1}`}
+                value={row.text}
+                rows={4}
+                onChange={(e) =>
+                  setPrompts((prev) =>
+                    prev.map((r, j) => (j === i ? { ...r, text: e.target.value } : r)),
+                  )
+                }
+                placeholder="Cole aqui o prompt que o aluno vai copiar."
+                className="font-mono text-xs"
+              />
+            </div>
+          ))}
+        </div>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
