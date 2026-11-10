@@ -14,6 +14,10 @@ import {
   fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
   type ScheduleSettings, type Availability, type Booking,
 } from "@/lib/mentor-schedule";
+import { normalizeTasks, pendingFeedback, type CallNotes } from "@/lib/call-feedback";
+import { CallFeedbackCard } from "@/components/schedule/CallFeedbackCard";
+import { PastCallItem } from "@/components/schedule/PastCallItem";
+import { WaitlistToggle } from "@/components/schedule/WaitlistToggle";
 
 export const Route = createFileRoute("/_app/schedule")({
   head: () => ({
@@ -45,6 +49,9 @@ function SchedulePage() {
   const [slot, setSlot] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [notesMap, setNotesMap] = useState<Record<string, CallNotes>>({});
+  const [onWaitlist, setOnWaitlist] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   async function load() {
@@ -59,11 +66,17 @@ function SchedulePage() {
       setBlockedSlots(cfg.blockedSlots);
       const from = new Date();
       const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
-      const [b, m, w] = await Promise.all([
+      const [b, m, w, fb, nt, wl] = await Promise.all([
         supabase.rpc("mentor_busy_slots", { _from: from.toISOString(), _to: to.toISOString() }),
         supabase.from("mentor_bookings").select("*").eq("user_id", user.id).order("starts_at", { ascending: false }),
         supabase.rpc("mentor_my_booked_weeks"),
+        supabase.from("mentor_call_feedback").select("booking_id, rating").eq("user_id", user.id),
+        supabase.from("mentor_call_notes").select("booking_id, summary, tasks, updated_at"),
+        supabase.from("mentor_waitlist").select("user_id").eq("user_id", user.id).maybeSingle(),
       ]);
+      setRatings(Object.fromEntries((fb.data ?? []).map((x) => [x.booking_id, x.rating])));
+      setNotesMap(Object.fromEntries((nt.data ?? []).map((x) => [x.booking_id, { booking_id: x.booking_id, summary: x.summary ?? "", tasks: normalizeTasks(x.tasks), updated_at: x.updated_at }])));
+      setOnWaitlist(!!wl.data);
       setUsedWeeks(new Set(((w.data ?? []) as { week_start: string }[]).map((x) => String(x.week_start).slice(0, 10))));
       if (b.error || m.error) throw b.error || m.error;
       setBusy(new Set((b.data ?? []).map((x) => new Date(x.starts_at).getTime())));
@@ -112,6 +125,7 @@ function SchedulePage() {
   const daySlots = day ? freeSlots(ymdFromLocal(day)) : [];
   const upcoming = mine.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date());
   const past = mine.filter((b) => !upcoming.includes(b));
+  const toRate = pendingFeedback(mine, new Set(Object.keys(ratings)));
 
   async function book() {
     if (!slot) return;
@@ -151,6 +165,16 @@ function SchedulePage() {
           </p>
         )}
       </header>
+
+      {toRate && user && (
+        <CallFeedbackCard
+          key={toRate.id}
+          bookingId={toRate.id}
+          userId={user.id}
+          label={new Date(toRate.starts_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: tz })}
+          onDone={load}
+        />
+      )}
 
       {upcoming.length > 0 && (
         <section className="space-y-3">
@@ -266,14 +290,15 @@ function SchedulePage() {
         </section>
       )}
 
+      {allowed && settings?.enabled && upcoming.length === 0 && user && (
+        <WaitlistToggle userId={user.id} joined={onWaitlist} onChange={setOnWaitlist} />
+      )}
+
       {past.length > 0 && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Histórico</h2>
           {past.map((b) => (
-            <div key={b.id} className="flex items-center justify-between rounded-lg border border-border px-4 py-3 text-sm">
-              <span className="capitalize">{fmtDate(b.starts_at, tz)} · {fmtTime(b.starts_at, tz)}</span>
-              <span className="text-muted-foreground">{b.status === "cancelled" ? "Cancelada" : "Realizada"}</span>
-            </div>
+            <PastCallItem key={b.id} startsAt={b.starts_at} status={b.status} tz={tz} notes={notesMap[b.id]} rating={ratings[b.id]} />
           ))}
         </section>
       )}
