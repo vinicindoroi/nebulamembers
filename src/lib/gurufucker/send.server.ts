@@ -84,6 +84,10 @@ export async function fireBuyer(admin: AdminClient, config: GuruConfigRow, sourc
       error: r.error,
     });
     if (!r.ok) {
+      if (r.error && /API_CREDENTIAL/i.test(r.error)) {
+        lastError = "Token da Utmify inválido ou apagado.";
+        break;
+      }
       lastError = r.status ? `Utmify respondeu ${r.status}${r.error ? `: ${r.error}` : ""}` : r.error;
       break;
     }

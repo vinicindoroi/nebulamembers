@@ -311,14 +311,14 @@ function GurufuckerPage() {
                           />
                         </div>
                         {i > 0 && (
-                          <div className="relative" title="Chance de quem comprou o produto anterior comprar este">
+                          <div className="relative" aria-label="% de compra" title="Chance de quem comprou o produto anterior comprar este">
                             <Input
-                              className="pr-14 text-right tabular-nums"
+                              className="pr-8 text-right tabular-nums"
                               inputMode="numeric"
                               value={String(r.conv)}
                               onChange={(e) => updateRow(r.id, { conv: Math.min(100, Math.max(0, Math.round(Number(e.target.value.replace(/\D/g, "")) || 0))) })}
                             />
-                            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">% compra</span>
+                            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
                           </div>
                         )}
                       </div>
