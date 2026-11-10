@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import {
-  buildOrderBody, expectedTicketCents, parsePriceToCents, reachChances, simulateBuyer,
+  buildOrderBody, DEFAULT_SETTINGS, expectedTicketCents, normalizeSettings, parsePriceToCents, reachChances, simulateBuyer,
 } from "../src/lib/gurufucker/core.ts";
+
+// Pagamento vem pré-definido como Cartão
+assert.equal(DEFAULT_SETTINGS.paymentMethod, "credit_card");
+assert.equal(normalizeSettings({}).paymentMethod, "credit_card");
+assert.equal(normalizeSettings({ paymentMethod: "pix" }).paymentMethod, "pix");
+assert.equal(normalizeSettings({ paymentMethod: "nada" }).paymentMethod, "credit_card");
 
 // Valores digitados
 assert.equal(parsePriceToCents("97,00"), 9700);
