@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Package, Upload, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, Upload, X, Link as LinkIcon } from "lucide-react";
+import { normalizeOfferLink } from "@/lib/offer-link";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,7 +93,7 @@ export function MemberOffers() {
               <h2 className="text-lg font-semibold">{offer.title}</h2>
               <p className="line-clamp-2 text-sm text-muted-foreground">{offer.description}</p>
               <p className="text-xs text-muted-foreground">
-                {offer.member_offer_files.length} arquivo(s) ·{" "}
+                {offer.link_url ? "Link" : `${offer.member_offer_files.length} arquivo(s)`} ·{" "}
                 {offer.access_levels.join(", ") || "Nenhum plano"}
               </p>
               <div className="flex gap-2">
@@ -145,6 +146,8 @@ function OfferEditor({
   const [active, setActive] = useState(initial?.active ?? true);
   const [existing, setExisting] = useState(initial?.member_offer_files ?? []);
   const [files, setFiles] = useState<File[]>([]);
+  const [mode, setMode] = useState<"files" | "link">(initial?.link_url ? "link" : "files");
+  const [link, setLink] = useState(initial?.link_url ?? "");
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
   function addFiles(list: FileList | null) {
@@ -161,8 +164,19 @@ function OfferEditor({
   async function save() {
     if (!title.trim()) return toast.error("Informe o título da oferta.");
     if (!selected.length) return toast.error("Selecione pelo menos um plano de acesso.");
-    if (active && !files.length && !existing.length)
+    const linkUrl = mode === "link" ? normalizeOfferLink(link) : null;
+    if (mode === "link" && link.trim() && !linkUrl)
+      return toast.error("Link inválido. Use um endereço começando com https://");
+    if (active && mode === "link" && !linkUrl)
+      return toast.error("Informe o link para publicar.");
+    if (active && mode === "files" && !files.length && !existing.length)
       return toast.error("Adicione pelo menos um arquivo para publicar.");
+    if (
+      mode === "link" &&
+      existing.length &&
+      !confirm(`Usar link vai remover ${existing.length} arquivo(s) desta oferta. Continuar?`)
+    )
+      return;
     setBusy(true);
     const id = initial?.id ?? crypto.randomUUID();
     const uploaded: string[] = [];
@@ -177,8 +191,9 @@ function OfferEditor({
         created = true;
       }
       const records = [];
-      for (const [index, file] of files.entries()) {
-        setProgress(`Enviando arquivo ${index + 1} de ${files.length}...`);
+      const toUpload = mode === "files" ? files : [];
+      for (const [index, file] of toUpload.entries()) {
+        setProgress(`Enviando arquivo ${index + 1} de ${toUpload.length}...`);
         const safeName =
           file.name
             .normalize("NFKD")
@@ -203,10 +218,20 @@ function OfferEditor({
           description: description.trim(),
           active,
           access_levels: selected,
+          link_url: linkUrl,
         })
         .eq("id", id);
       if (result.error) throw result.error;
       committed = true;
+      if (mode === "link" && existing.length) {
+        const paths = existing.map((f) => f.storage_path);
+        const del = await supabase.from("member_offer_files").delete().eq("offer_id", id);
+        if (!del.error) {
+          const cleanup = await supabase.storage.from(OFFER_BUCKET).remove(paths);
+          if (cleanup.error)
+            toast.warning("Arquivos desvinculados. Alguns precisam ser limpos no armazenamento.");
+        }
+      }
       toast.success("Oferta salva");
       onSaved();
     } catch (error) {
@@ -254,7 +279,7 @@ function OfferEditor({
     <Modal
       open
       title={initial ? "Editar oferta" : "Nova oferta"}
-      description="Arquivos privados, liberados apenas para os planos selecionados."
+      description="Arquivos ou link, liberados apenas para os planos selecionados."
       onClose={() => {
         if (!busy) onClose();
       }}
@@ -330,6 +355,58 @@ function OfferEditor({
             cursos.
           </p>
         </fieldset>
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Conteúdo da oferta</p>
+          <div
+            role="radiogroup"
+            aria-label="Tipo de conteúdo"
+            className="inline-flex rounded-xl border border-border bg-muted/30 p-1"
+          >
+            {(
+              [
+                { key: "files", label: "Arquivos", Icon: Upload },
+                { key: "link", label: "Link", Icon: LinkIcon },
+              ] as const
+            ).map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                type="button"
+                role="radio"
+                aria-checked={mode === key}
+                onClick={() => setMode(key)}
+                className={`flex items-center gap-2 rounded-lg px-4 py-1.5 text-sm transition-colors ${
+                  mode === key
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {mode === "link" ? (
+          <div className="space-y-2">
+            <label htmlFor="offer-link" className="text-sm">
+              Link
+            </label>
+            <Input
+              id="offer-link"
+              type="url"
+              inputMode="url"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="https://drive.google.com/..."
+              autoComplete="off"
+            />
+            <p className="text-xs text-muted-foreground">
+              O aluno verá um botão “Abrir link”. Use para Drive, Notion, Canva, etc.
+              {existing.length > 0 &&
+                ` Ao salvar, os ${existing.length} arquivo(s) atuais serão removidos.`}
+            </p>
+          </div>
+        ) : (
         <div className="space-y-3">
           <label
             htmlFor="offer-files"
@@ -379,6 +456,7 @@ function OfferEditor({
             </div>
           ))}
         </div>
+        )}
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
