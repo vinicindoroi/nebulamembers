@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint . --quiet || exit 0",
     "format": "prettier --write .",
-    "test:offers": "node tests/member-offers.mjs",
+    "test:offers": "node tests/member-offers.mjs && node tests/offer-link.mjs",
     "test:mobile": "node tests/mobile-layout.mjs",
     "test:pwa": "node tests/pwa-mobile.mjs",
     "test:call-feedback": "node tests/call-feedback.mjs"

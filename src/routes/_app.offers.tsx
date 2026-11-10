@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Download, FileText, Package, Search, Loader2 } from "lucide-react";
+import {
+  Download,
+  FileText,
+  Package,
+  Search,
+  Loader2,
+  ExternalLink,
+  Link as LinkIcon,
+} from "lucide-react";
+import { offerLinkLabel } from "@/lib/offer-link";
 import { toast } from "sonner";
 import {
   useMemberOffers,
@@ -87,7 +96,7 @@ function OffersPage() {
                 <Package className="h-6 w-6 text-primary" />
                 <span className="text-xs font-medium text-primary">MATERIAL DO MENTOR</span>
                 <span className="ml-auto text-xs text-muted-foreground">
-                  {offer.member_offer_files.length} arquivo(s)
+                  {offer.link_url ? "Link" : `${offer.member_offer_files.length} arquivo(s)`}
                 </span>
               </div>
               <div className="space-y-4 p-6">
@@ -97,40 +106,62 @@ function OffersPage() {
                     {offer.description}
                   </p>
                 )}
-                <ul className="space-y-2">
-                  {offer.member_offer_files.map((file) => (
-                    <li
-                      key={file.id}
-                      className="flex items-center gap-3 rounded-xl border border-border p-3"
+                {offer.link_url ? (
+                  <div className="flex items-center gap-3 rounded-xl border border-border p-3">
+                    <LinkIcon className="h-5 w-5 shrink-0 text-primary/70" />
+                    <p
+                      className="min-w-0 flex-1 truncate text-sm text-muted-foreground"
+                      title={offer.link_url}
                     >
-                      <FileText className="h-5 w-5 shrink-0 text-primary/70" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm" title={file.name}>
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={downloading !== null}
-                        onClick={() => download(file)}
-                        aria-label={`Baixar ${file.name}`}
-                      >
-                        {downloading === file.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4" />
-                        )}
-                        Baixar
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-                {!offer.member_offer_files.length && (
-                  <p className="text-sm text-muted-foreground">
-                    O mentor está preparando os arquivos desta oferta.
-                  </p>
+                      {offerLinkLabel(offer.link_url)}
+                    </p>
+                    <Button size="sm" asChild>
+                      <a href={offer.link_url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                        Abrir link
+                      </a>
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <ul className="space-y-2">
+                      {offer.member_offer_files.map((file) => (
+                        <li
+                          key={file.id}
+                          className="flex items-center gap-3 rounded-xl border border-border p-3"
+                        >
+                          <FileText className="h-5 w-5 shrink-0 text-primary/70" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm" title={file.name}>
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatFileSize(file.size)}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={downloading !== null}
+                            onClick={() => download(file)}
+                            aria-label={`Baixar ${file.name}`}
+                          >
+                            {downloading === file.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Download className="h-4 w-4" />
+                            )}
+                            Baixar
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                    {!offer.member_offer_files.length && (
+                      <p className="text-sm text-muted-foreground">
+                        O mentor está preparando os arquivos desta oferta.
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </article>
