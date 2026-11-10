@@ -907,6 +907,58 @@ export type Database = {
           },
         ]
       }
+      lesson_questions: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          content: string
+          created_at: string
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_questions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_questions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_questions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_video_progress: {
         Row: {
           current_time: number
@@ -1388,6 +1440,70 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_call_feedback: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_call_feedback_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_call_notes: {
+        Row: {
+          booking_id: string
+          created_at: string
+          summary: string
+          tasks: Json
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          summary?: string
+          tasks?: Json
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          summary?: string
+          tasks?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_call_notes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_extra_slots: {
         Row: {
           created_at: string
@@ -1445,6 +1561,21 @@ export type Database = {
           slot_minutes?: number
           timezone?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      mentor_waitlist: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -2418,6 +2549,10 @@ export type Database = {
         }[]
       }
       my_call_link: { Args: { _booking_id: string }; Returns: string }
+      notify_mentor_waitlist: {
+        Args: { _except: string; _starts: string }
+        Returns: undefined
+      }
       plan_level: { Args: { _plan: string }; Returns: number }
       plan_slug: { Args: { _plan: string }; Returns: string }
       set_content_password: {

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { CalendarClock, Check, ChevronDown, Loader2, MessageCircle, Plus, Trash2, X } from "lucide-react";
+import { CalendarClock, Check, ChevronDown, Loader2, MessageCircle, NotebookPen, Plus, Trash2, X } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import { toast } from "sonner";
@@ -33,6 +33,10 @@ import { RealizedCalls } from "@/components/admin/RealizedCalls";
 import { WeekAgenda } from "@/components/admin/WeekAgenda";
 import { AddCallDialog } from "@/components/admin/AddCallDialog";
 import { CallHistory } from "@/components/admin/CallHistory";
+import { CallNotesDialog } from "@/components/admin/CallNotesDialog";
+import { WaitlistPanel } from "@/components/admin/WaitlistPanel";
+import { StarRating } from "@/components/schedule/StarRating";
+import { averageRating, type CallFeedback } from "@/lib/call-feedback";
 
 export const Route = createFileRoute("/admin/schedule")({
   head: () => ({
@@ -58,6 +62,8 @@ function AdminSchedule() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [links, setLinks] = useState<Record<string, string>>({});
+  const [feedback, setFeedback] = useState<Record<string, CallFeedback>>({});
+  const [noted, setNoted] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -67,10 +73,14 @@ function AdminSchedule() {
       setAvailability(cfg.availability);
       setExtras(cfg.extras);
       setBlockedSlots(cfg.blockedSlots);
-      const [b, p] = await Promise.all([
+      const [b, p, f, n] = await Promise.all([
         supabase.from("mentor_bookings").select("*").order("starts_at"),
         (supabase as any).rpc("admin_list_profiles"),
+        supabase.from("mentor_call_feedback").select("*"),
+        supabase.from("mentor_call_notes").select("booking_id"),
       ]);
+      setFeedback(Object.fromEntries(((f.data ?? []) as CallFeedback[]).map((x) => [x.booking_id, x])));
+      setNoted(new Set((n.data ?? []).map((x) => x.booking_id)));
       setBookings((b.data ?? []) as Booking[]);
       setProfiles(Object.fromEntries(((p.data ?? []) as Profile[]).map((x) => [x.id, x])));
       setLinks(await fetchBookingLinks((b.data ?? []).map((x) => x.id)));
@@ -116,7 +126,7 @@ function AdminSchedule() {
           <TabsTrigger value="access">Quem tem acesso</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda">
-          <Agenda settings={settings} bookings={bookings} profiles={profiles} links={links} reload={load} />
+          <Agenda settings={settings} bookings={bookings} profiles={profiles} links={links} feedback={feedback} noted={noted} reload={load} />
         </TabsContent>
         <TabsContent value="access">
           <Access settings={settings} profiles={profiles} reload={load} />
@@ -129,8 +139,9 @@ function AdminSchedule() {
   );
 }
 
-function Agenda({ settings, bookings, profiles, links, reload }: {
-  settings: ScheduleSettings; bookings: Booking[]; profiles: Record<string, Profile>; links: Record<string, string>; reload: () => void;
+function Agenda({ settings, bookings, profiles, links, feedback, noted, reload }: {
+  settings: ScheduleSettings; bookings: Booking[]; profiles: Record<string, Profile>; links: Record<string, string>;
+  feedback: Record<string, CallFeedback>; noted: Set<string>; reload: () => void;
 }) {
   const tz = settings.timezone;
   const [day, setDay] = useState<Date | undefined>(new Date());
@@ -143,6 +154,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
   const [cReason, setCReason] = useState("");
   const [allOpen, setAllOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [notesFor, setNotesFor] = useState<Booking | null>(null);
 
   async function doReschedule() {
     if (!resched || !rDate || !/^\d{2}:\d{2}$/.test(rTime)) return toast.error("Informe data e horário.");
@@ -188,6 +200,8 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
     { label: "Total agendadas", value: upcoming.length },
     { label: "Realizadas", value: bookings.filter((b) => b.status === "done").length },
   ];
+  const ratings = Object.values(feedback);
+  const avg = averageRating(ratings);
   const next = upcoming[0];
   const dayLabel = realized.length > 0 && pending.length > 0
     ? `${pending.length} ${pending.length === 1 ? "pendente" : "pendentes"} · ${realized.length} ${realized.length === 1 ? "realizada" : "realizadas"}`
@@ -215,6 +229,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               <div className="flex flex-wrap items-center gap-2">
                 <p className="truncate font-semibold">{name}</p>
                 {b.status === "done" && <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">Realizada</span>}
+                {feedback[b.id] && <StarRating value={feedback[b.id].rating} size="sm" />}
               </div>
               <p className="truncate text-xs text-muted-foreground">{p?.email}</p>
               {b.notes && <p className="line-clamp-2 whitespace-pre-line text-sm text-muted-foreground">“{b.notes}”</p>}
@@ -228,6 +243,9 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
             ) : (
               <span className="self-center text-xs text-muted-foreground/70">Sem WhatsApp</span>
             )}
+            <Button size="sm" variant={noted.has(b.id) ? "secondary" : "ghost"} onClick={() => setNotesFor(b)} title="Anotações e tarefas da call">
+              <NotebookPen className="h-4 w-4" /> {noted.has(b.id) ? "Anotações" : "Anotar"}
+            </Button>
             {b.status === "booked" && (
               <>
                 <Button size="sm" variant="outline" onClick={() => { setResched(b); setRDate(ymdOf(new Date(b.starts_at), tz)); setRTime(fmtTime(b.starts_at, tz)); setRReason(""); }}><CalendarClock className="h-4 w-4" /> Remarcar</Button>
@@ -249,6 +267,13 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
 
   return (
     <div className="space-y-6">
+      <CallNotesDialog
+        bookingId={notesFor?.id ?? null}
+        studentName={notesFor ? (profiles[notesFor.user_id]?.full_name || profiles[notesFor.user_id]?.email || "Aluno") : ""}
+        when={notesFor ? `${fmtDate(notesFor.starts_at, tz)} às ${fmtTime(notesFor.starts_at, tz)}` : ""}
+        onOpenChange={(o) => !o && setNotesFor(null)}
+        onSaved={reload}
+      />
       <AddCallDialog
         open={addOpen}
         onOpenChange={setAddOpen}
@@ -289,13 +314,25 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
           </div>
         </DialogContent>
       </Dialog>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="rounded-xl border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className="mt-1 text-2xl font-bold tabular-nums">{s.value}</p>
           </div>
         ))}
+        <div className="col-span-2 rounded-xl border border-border bg-card p-4 lg:col-span-1">
+          <p className="text-xs text-muted-foreground">Nota média das calls</p>
+          {avg === null ? (
+            <p className="mt-1 text-sm text-muted-foreground">Sem avaliações ainda</p>
+          ) : (
+            <div className="mt-1 flex items-center gap-2">
+              <span className="text-2xl font-bold tabular-nums">{avg.toLocaleString("pt-BR")}</span>
+              <StarRating value={Math.round(avg)} size="sm" />
+              <span className="text-xs text-muted-foreground">({ratings.length})</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {next && (
@@ -346,8 +383,12 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
                     tz={tz}
                     calls={realized.map((b) => {
                       const p = profiles[b.user_id];
-                      return { id: b.id, starts_at: b.starts_at, ends_at: b.ends_at, name: p?.full_name || p?.email || "Aluno", email: p?.email, phone: p?.phone };
+                      return {
+                        id: b.id, starts_at: b.starts_at, ends_at: b.ends_at, name: p?.full_name || p?.email || "Aluno", email: p?.email, phone: p?.phone,
+                        rating: feedback[b.id]?.rating ?? null, comment: feedback[b.id]?.comment ?? null, hasNotes: noted.has(b.id),
+                      };
                     })}
+                    onNotes={(id) => setNotesFor(realized.find((x) => x.id === id) ?? null)}
                     onUndo={(id) => {
                       const b = realized.find((x) => x.id === id);
                       if (b) setStatus(b, "booked");
@@ -378,6 +419,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               </div>
             )}
           </section>
+          <WaitlistPanel profiles={profiles} refreshKey={bookings} />
           <CallHistory tz={tz} bookings={bookings} profiles={profiles} />
         </div>
       </div>
