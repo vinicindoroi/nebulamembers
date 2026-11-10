@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Package, Upload, X, Link as LinkIcon } from "lucide-react";
-import { normalizeOfferLink } from "@/lib/offer-link";
+import {
+  cleanOfferLinks,
+  cleanOfferPrompts,
+  readOfferLinks,
+  readOfferPrompts,
+  MAX_OFFER_LABEL,
+  type OfferLink,
+  type OfferPrompt,
+} from "@/lib/offer-link";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -146,8 +154,14 @@ function OfferEditor({
   const [active, setActive] = useState(initial?.active ?? true);
   const [existing, setExisting] = useState(initial?.member_offer_files ?? []);
   const [files, setFiles] = useState<File[]>([]);
-  const [mode, setMode] = useState<"files" | "link">(initial?.link_url ? "link" : "files");
-  const [link, setLink] = useState(initial?.link_url ?? "");
+  const initialLinks = initial ? readOfferLinks(initial.links, initial.link_url) : [];
+  const [mode, setMode] = useState<"files" | "link">(initialLinks.length ? "link" : "files");
+  const [links, setLinks] = useState<OfferLink[]>(
+    initialLinks.length ? initialLinks : [{ label: "", url: "" }],
+  );
+  const [prompts, setPrompts] = useState<OfferPrompt[]>(
+    initial ? readOfferPrompts(initial.prompts) : [],
+  );
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
   function addFiles(list: FileList | null) {
@@ -164,12 +178,21 @@ function OfferEditor({
   async function save() {
     if (!title.trim()) return toast.error("Informe o título da oferta.");
     if (!selected.length) return toast.error("Selecione pelo menos um plano de acesso.");
-    const linkUrl = mode === "link" ? normalizeOfferLink(link) : null;
-    if (mode === "link" && link.trim() && !linkUrl)
-      return toast.error("Link inválido. Use um endereço começando com https://");
-    if (active && mode === "link" && !linkUrl) return toast.error("Informe o link para publicar.");
-    if (active && mode === "files" && !files.length && !existing.length)
-      return toast.error("Adicione pelo menos um arquivo para publicar.");
+    let cleanLinks: OfferLink[] = [];
+    if (mode === "link") {
+      const res = cleanOfferLinks(links);
+      if (!res.ok)
+        return toast.error(`Link ${res.row} inválido. Use um endereço começando com https://`);
+      cleanLinks = res.links;
+    }
+    const cleanPrompts = cleanOfferPrompts(prompts);
+    const hasMain = mode === "link" ? cleanLinks.length > 0 : files.length + existing.length > 0;
+    if (active && !hasMain && !cleanPrompts.length)
+      return toast.error(
+        mode === "link"
+          ? "Adicione pelo menos um link ou prompt para publicar."
+          : "Adicione pelo menos um arquivo ou prompt para publicar.",
+      );
     if (
       mode === "link" &&
       existing.length &&
@@ -217,7 +240,9 @@ function OfferEditor({
           description: description.trim(),
           active,
           access_levels: selected,
-          link_url: linkUrl,
+          link_url: null,
+          links: cleanLinks,
+          prompts: cleanPrompts,
         })
         .eq("id", id);
       if (result.error) throw result.error;
