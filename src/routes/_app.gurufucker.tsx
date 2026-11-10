@@ -271,6 +271,12 @@ function GurufuckerPage() {
                 </div>
               </div>
 
+              <div className="mb-1 hidden gap-2 px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px]">
+                <span>Produto</span>
+                <span>Preço ({currency})</span>
+                <span className="text-right">% de compra</span>
+              </div>
+
               <ol className="space-y-2">
                 {rows.map((r, i) => {
                   const idx = sellable.findIndex((s) => s.id === r.id);
@@ -297,7 +303,7 @@ function GurufuckerPage() {
                           </Button>
                         </div>
                       </div>
-                      <div className={cn("grid gap-2", i > 0 ? "sm:grid-cols-[1fr_140px_120px]" : "sm:grid-cols-[1fr_140px]")}>
+                      <div className="grid gap-2 sm:grid-cols-[1fr_140px_120px]">
                         <Input placeholder="Nome do produto" value={r.name} maxLength={120} onChange={(e) => updateRow(r.id, { name: e.target.value })} />
                         <div className="relative">
                           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{currency}</span>
@@ -310,15 +316,26 @@ function GurufuckerPage() {
                             onBlur={() => updateRow(r.id, { priceInput: r.priceCents ? centsToInput(r.priceCents) : "" })}
                           />
                         </div>
-                        {i > 0 && (
-                          <div className="relative" aria-label="% de compra" title="Chance de quem comprou o produto anterior comprar este">
-                            <Input
-                              className="pr-8 text-right tabular-nums"
-                              inputMode="numeric"
-                              value={String(r.conv)}
-                              onChange={(e) => updateRow(r.id, { conv: Math.min(100, Math.max(0, Math.round(Number(e.target.value.replace(/\D/g, "")) || 0))) })}
-                            />
-                            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                        {i > 0 ? (
+                          <div title="Chance de quem comprou o produto anterior comprar este">
+                            <span className="mb-1 block text-[11px] text-muted-foreground sm:hidden">% de compra</span>
+                            <div className="relative">
+                              <Input
+                                className="pr-8 text-right tabular-nums"
+                                inputMode="numeric"
+                                placeholder="100"
+                                value={String(r.conv)}
+                                onChange={(e) => updateRow(r.id, { conv: Math.min(100, Math.max(0, Math.round(Number(e.target.value.replace(/\D/g, "")) || 0))) })}
+                              />
+                              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="mb-1 block text-[11px] text-muted-foreground sm:hidden">% de compra</span>
+                            <div className="flex h-9 items-center justify-end rounded-md border border-border/50 bg-muted/10 px-3 text-xs text-muted-foreground">
+                              sempre
+                            </div>
                           </div>
                         )}
                       </div>
@@ -342,7 +359,7 @@ function GurufuckerPage() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Cada comprador sempre compra o produto principal. Os seguintes entram de acordo com a % de compra, e o funil para no primeiro que ele recusar. Cada produto vira um pedido separado na Utmify.
+                A % de compra é a chance de quem comprou o produto anterior comprar este. O comprador sempre leva o produto principal; o funil para no primeiro que ele recusar. Cada produto vira um pedido separado na Utmify.
               </p>
             </CardContent>
           </Card>
