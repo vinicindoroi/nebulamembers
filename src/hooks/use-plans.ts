@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./use-auth";
 
 export type PlanFeatureFlags = {
   courses_access?: boolean;
@@ -66,20 +67,13 @@ export async function fetchPlans(): Promise<PlanOption[]> {
 
 /** List of plans configured in the admin (Planos page). */
 export function usePlans() {
-  const [plans, setPlans] = useState<PlanOption[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let alive = true;
-    fetchPlans().then((p) => {
-      if (!alive) return;
-      setPlans(p);
-      setLoading(false);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  return { plans, loading };
+  const { user } = useAuth();
+  // Cached and shared: opening a form no longer waits for a fresh plans request.
+  const { data, isPending } = useQuery({
+    queryKey: ["plans-config", user?.id ?? null],
+    queryFn: fetchPlans,
+    staleTime: 30_000,
+  });
+  return { plans: data ?? EMPTY_PLANS, loading: isPending };
 }
+const EMPTY_PLANS: PlanOption[] = [];
