@@ -169,6 +169,13 @@
       "when": 1794279142993,
       "tag": "0023_admin_add_call",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794284499960,
+      "tag": "0024_mentor_booking_history",
+      "breakpoints": true
     }
   ]
 }

@@ -32,6 +32,7 @@ import { waLink } from "@/lib/whatsapp";
 import { RealizedCalls } from "@/components/admin/RealizedCalls";
 import { WeekAgenda } from "@/components/admin/WeekAgenda";
 import { AddCallDialog } from "@/components/admin/AddCallDialog";
+import { CallHistory } from "@/components/admin/CallHistory";
 
 export const Route = createFileRoute("/admin/schedule")({
   head: () => ({
@@ -377,6 +378,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               </div>
             )}
           </section>
+          <CallHistory tz={tz} bookings={bookings} profiles={profiles} />
         </div>
       </div>
     </div>
