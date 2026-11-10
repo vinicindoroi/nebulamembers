@@ -271,6 +271,12 @@ function GurufuckerPage() {
                 </div>
               </div>
 
+              <div className="mb-1 hidden gap-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px]">
+                <span>Produto</span>
+                <span>Preço ({currency})</span>
+                <span className="text-right">% de compra</span>
+              </div>
+
               <ol className="space-y-2">
                 {rows.map((r, i) => {
                   const idx = sellable.findIndex((s) => s.id === r.id);
@@ -297,7 +303,7 @@ function GurufuckerPage() {
                           </Button>
                         </div>
                       </div>
-                      <div className={cn("grid gap-2", i > 0 ? "sm:grid-cols-[1fr_140px_120px]" : "sm:grid-cols-[1fr_140px]")}>
+                      <div className="grid gap-2 sm:grid-cols-[1fr_140px_120px]">
                         <Input placeholder="Nome do produto" value={r.name} maxLength={120} onChange={(e) => updateRow(r.id, { name: e.target.value })} />
                         <div className="relative">
                           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{currency}</span>
