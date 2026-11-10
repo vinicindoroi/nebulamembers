@@ -1312,6 +1312,7 @@ export type Database = {
           ends_at: string
           google_event_id: string | null
           id: string
+          makeup_pending: boolean
           notes: string | null
           starts_at: string
           status: string
@@ -1323,6 +1324,7 @@ export type Database = {
           ends_at: string
           google_event_id?: string | null
           id?: string
+          makeup_pending?: boolean
           notes?: string | null
           starts_at: string
           status?: string
@@ -1334,6 +1336,7 @@ export type Database = {
           ends_at?: string
           google_event_id?: string | null
           id?: string
+          makeup_pending?: boolean
           notes?: string | null
           starts_at?: string
           status?: string
