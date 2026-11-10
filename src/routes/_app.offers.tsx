@@ -106,7 +106,7 @@ function OffersPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid items-start gap-4 md:grid-cols-2">
           {filtered.map((offer) => (
             <OfferCard
               key={offer.id}
