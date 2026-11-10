@@ -1279,6 +1279,50 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_booking_events: {
+        Row: {
+          booking_id: string
+          by_admin: boolean
+          created_at: string
+          id: string
+          kind: string
+          new_starts_at: string | null
+          old_starts_at: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          by_admin?: boolean
+          created_at?: string
+          id?: string
+          kind: string
+          new_starts_at?: string | null
+          old_starts_at: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          by_admin?: boolean
+          created_at?: string
+          id?: string
+          kind?: string
+          new_starts_at?: string | null
+          old_starts_at?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_booking_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_booking_links: {
         Row: {
           booking_id: string
