@@ -12,4 +12,5 @@
 - [x] Lista de espera de horários (avisa todos, quem marcar primeiro leva)
 - [x] Dúvidas privadas embaixo das aulas, respondidas em Admin → Dúvidas das aulas
 - [x] Avaliação de 1 a 5 depois da call, com nome
+- [x] Colapsar por padrão os cards de Oferta na tela do aluno
 - [ ] Ativar push no celular para quedas e recuperação de domínios — aguardando conexão Firebase com web push (conexão recusada)
