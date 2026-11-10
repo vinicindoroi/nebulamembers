@@ -271,7 +271,7 @@ function GurufuckerPage() {
                 </div>
               </div>
 
-              <div className="mb-1 hidden gap-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px]">
+              <div className="mb-1 hidden gap-2 px-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px]">
                 <span>Produto</span>
                 <span>Preço ({currency})</span>
                 <span className="text-right">% de compra</span>
