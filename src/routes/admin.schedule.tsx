@@ -31,6 +31,7 @@ import { callsQueue } from "@/lib/call-queue";
 import { waLink } from "@/lib/whatsapp";
 import { RealizedCalls } from "@/components/admin/RealizedCalls";
 import { WeekAgenda } from "@/components/admin/WeekAgenda";
+import { AddCallDialog } from "@/components/admin/AddCallDialog";
 
 export const Route = createFileRoute("/admin/schedule")({
   head: () => ({
@@ -140,6 +141,7 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
   const [cancelB, setCancelB] = useState<Booking | null>(null);
   const [cReason, setCReason] = useState("");
   const [allOpen, setAllOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
 
   async function doReschedule() {
     if (!resched || !rDate || !/^\d{2}:\d{2}$/.test(rTime)) return toast.error("Informe data e horário.");
@@ -246,6 +248,15 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
 
   return (
     <div className="space-y-6">
+      <AddCallDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        profiles={profiles}
+        tz={tz}
+        slotMinutes={settings.slot_minutes}
+        defaultDate={day ? ymdFromLocal(day) : todayYmd}
+        onSaved={reload}
+      />
       <Dialog open={!!resched} onOpenChange={(o) => !o && setResched(null)}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -319,7 +330,10 @@ function Agenda({ settings, bookings, profiles, links, reload }: {
               <h2 className="text-lg font-semibold capitalize">
                 {day ? day.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : "Selecione um dia"}
               </h2>
-              <span className="text-xs text-muted-foreground">{dayLabel}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">{dayLabel}</span>
+                <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}><Plus className="h-4 w-4" /> Registrar call</Button>
+              </div>
             </div>
             {selected.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nenhuma call neste dia.</div>
