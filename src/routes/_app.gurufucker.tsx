@@ -406,7 +406,7 @@ function GurufuckerPage() {
 
         <div className="space-y-5">
           {/* Disparo */}
-          <Card className="lg:sticky lg:top-4">
+          <Card>
             <CardContent className="space-y-4 p-5">
               <h2 className="text-base font-semibold">Disparar</h2>
               <Button className="w-full" onClick={handleFire} disabled={firing || !canFire}>
