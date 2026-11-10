@@ -2295,6 +2295,15 @@ export type Database = {
       }
     }
     Functions: {
+      admin_add_call: {
+        Args: {
+          _notes?: string
+          _starts_at: string
+          _status?: string
+          _user_id: string
+        }
+        Returns: string
+      }
       admin_list_profiles: {
         Args: never
         Returns: {
