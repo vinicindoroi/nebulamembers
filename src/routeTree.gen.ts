@@ -25,6 +25,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppForumRouteImport } from './routes/_app.forum'
 import { Route as AppFunnelTrackerRouteImport } from './routes/_app.funnel-tracker'
 import { Route as AppFunnelsRouteImport } from './routes/_app.funnels'
+import { Route as AppGurufuckerRouteImport } from './routes/_app.gurufucker'
 import { Route as AppNotesRouteImport } from './routes/_app.notes'
 import { Route as AppOffersRouteImport } from './routes/_app.offers'
 import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
@@ -137,6 +138,11 @@ const AppFunnelTrackerRoute = AppFunnelTrackerRouteImport.update({
 const AppFunnelsRoute = AppFunnelsRouteImport.update({
   id: '/funnels',
   path: '/funnels',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGurufuckerRoute = AppGurufuckerRouteImport.update({
+  id: '/gurufucker',
+  path: '/gurufucker',
   getParentRoute: () => AppRoute,
 } as any)
 const AppNotesRoute = AppNotesRouteImport.update({
@@ -329,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/forum': typeof AppForumRoute
   '/funnel-tracker': typeof AppFunnelTrackerRoute
   '/funnels': typeof AppFunnelsRoute
+  '/gurufucker': typeof AppGurufuckerRoute
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
@@ -380,6 +387,7 @@ export interface FileRoutesByTo {
   '/forum': typeof AppForumRoute
   '/funnel-tracker': typeof AppFunnelTrackerRoute
   '/funnels': typeof AppFunnelsRoute
+  '/gurufucker': typeof AppGurufuckerRoute
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
@@ -433,6 +441,7 @@ export interface FileRoutesById {
   '/_app/forum': typeof AppForumRoute
   '/_app/funnel-tracker': typeof AppFunnelTrackerRoute
   '/_app/funnels': typeof AppFunnelsRoute
+  '/_app/gurufucker': typeof AppGurufuckerRoute
   '/_app/notes': typeof AppNotesRoute
   '/_app/offers': typeof AppOffersRoute
   '/_app/organizer': typeof AppOrganizerRoute
@@ -486,6 +495,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/funnel-tracker'
     | '/funnels'
+    | '/gurufucker'
     | '/notes'
     | '/offers'
     | '/organizer'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/funnel-tracker'
     | '/funnels'
+    | '/gurufucker'
     | '/notes'
     | '/offers'
     | '/organizer'
@@ -589,6 +600,7 @@ export interface FileRouteTypes {
     | '/_app/forum'
     | '/_app/funnel-tracker'
     | '/_app/funnels'
+    | '/_app/gurufucker'
     | '/_app/notes'
     | '/_app/offers'
     | '/_app/organizer'
@@ -754,6 +766,13 @@ declare module '@tanstack/react-router' {
       path: '/funnels'
       fullPath: '/funnels'
       preLoaderRoute: typeof AppFunnelsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/gurufucker': {
+      id: '/_app/gurufucker'
+      path: '/gurufucker'
+      fullPath: '/gurufucker'
+      preLoaderRoute: typeof AppGurufuckerRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/notes': {
@@ -1016,6 +1035,7 @@ interface AppRouteChildren {
   AppForumRoute: typeof AppForumRoute
   AppFunnelTrackerRoute: typeof AppFunnelTrackerRoute
   AppFunnelsRoute: typeof AppFunnelsRoute
+  AppGurufuckerRoute: typeof AppGurufuckerRoute
   AppNotesRoute: typeof AppNotesRoute
   AppOffersRoute: typeof AppOffersRoute
   AppOrganizerRoute: typeof AppOrganizerRoute
@@ -1035,6 +1055,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppForumRoute: AppForumRoute,
   AppFunnelTrackerRoute: AppFunnelTrackerRoute,
   AppFunnelsRoute: AppFunnelsRoute,
+  AppGurufuckerRoute: AppGurufuckerRoute,
   AppNotesRoute: AppNotesRoute,
   AppOffersRoute: AppOffersRoute,
   AppOrganizerRoute: AppOrganizerRoute,
