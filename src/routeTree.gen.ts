@@ -56,6 +56,7 @@ import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 import { Route as ApiPublicJobsClosePastCallsRouteImport } from './routes/api/public/jobs/close-past-calls'
+import { Route as ApiPublicJobsGurufuckerRouteImport } from './routes/api/public/jobs/gurufucker'
 import { Route as ApiPublicJobsUptimeCheckRouteImport } from './routes/api/public/jobs/uptime-check'
 import { Route as ApiPublicTrackerEventWorkspaceIdRouteImport } from './routes/api/public/tracker-event.$workspaceId'
 
@@ -294,6 +295,11 @@ const ApiPublicJobsClosePastCallsRoute =
     path: '/api/public/jobs/close-past-calls',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicJobsGurufuckerRoute = ApiPublicJobsGurufuckerRouteImport.update({
+  id: '/api/public/jobs/gurufucker',
+  path: '/api/public/jobs/gurufucker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJobsUptimeCheckRoute =
   ApiPublicJobsUptimeCheckRouteImport.update({
     id: '/api/public/jobs/uptime-check',
@@ -354,6 +360,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -404,6 +411,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -456,6 +464,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -508,6 +517,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesByTo: FileRoutesByTo
@@ -558,6 +568,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   id:
@@ -609,6 +620,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/_app/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesById: FileRoutesById
@@ -625,6 +637,7 @@ export interface RootRouteChildren {
   RespostasRoute: typeof RespostasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
+  ApiPublicJobsGurufuckerRoute: typeof ApiPublicJobsGurufuckerRoute
   ApiPublicJobsUptimeCheckRoute: typeof ApiPublicJobsUptimeCheckRoute
   ApiPublicTrackerEventWorkspaceIdRoute: typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -960,6 +973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsClosePastCallsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/gurufucker': {
+      id: '/api/public/jobs/gurufucker'
+      path: '/api/public/jobs/gurufucker'
+      fullPath: '/api/public/jobs/gurufucker'
+      preLoaderRoute: typeof ApiPublicJobsGurufuckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/uptime-check': {
       id: '/api/public/jobs/uptime-check'
       path: '/api/public/jobs/uptime-check'
@@ -1087,6 +1107,7 @@ const rootRouteChildren: RootRouteChildren = {
   RespostasRoute: RespostasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
+  ApiPublicJobsGurufuckerRoute: ApiPublicJobsGurufuckerRoute,
   ApiPublicJobsUptimeCheckRoute: ApiPublicJobsUptimeCheckRoute,
   ApiPublicTrackerEventWorkspaceIdRoute: ApiPublicTrackerEventWorkspaceIdRoute,
 }
