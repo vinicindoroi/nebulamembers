@@ -22,9 +22,7 @@ import {
 function offerSummary(offer: MemberOffer) {
   const links = readOfferLinks(offer.links, offer.link_url).length;
   const prompts = readOfferPrompts(offer.prompts).length;
-  const parts = [
-    links ? `${links} link(s)` : `${offer.member_offer_files.length} arquivo(s)`,
-  ];
+  const parts = [links ? `${links} link(s)` : `${offer.member_offer_files.length} arquivo(s)`];
   if (prompts) parts.push(`${prompts} prompt(s)`);
   return parts.join(" · ");
 }
@@ -120,8 +118,7 @@ export function MemberOffers() {
               <h2 className="text-lg font-semibold">{offer.title}</h2>
               <p className="line-clamp-2 text-sm text-muted-foreground">{offer.description}</p>
               <p className="text-xs text-muted-foreground">
-                {offerSummary(offer)} ·{" "}
-                {offer.access_levels.join(", ") || "Nenhum plano"}
+                {offerSummary(offer)} · {offer.access_levels.join(", ") || "Nenhum plano"}
               </p>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => setEditing(offer)}>

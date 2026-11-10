@@ -29,10 +29,16 @@ assert.deepEqual(
   },
 );
 // Tag without a valid URL is rejected with its row number
-assert.deepEqual(cleanOfferLinks([{ label: "a", url: "https://x.com" }, { label: "b", url: "" }]), {
-  ok: false,
-  row: 2,
-});
+assert.deepEqual(
+  cleanOfferLinks([
+    { label: "a", url: "https://x.com" },
+    { label: "b", url: "" },
+  ]),
+  {
+    ok: false,
+    row: 2,
+  },
+);
 
 // Prompts without text are dropped
 assert.deepEqual(
@@ -45,6 +51,8 @@ assert.deepEqual(
 
 // Stored unsafe links are never rendered; legacy single link still shows
 assert.deepEqual(readOfferLinks([{ label: "x", url: "javascript:alert(1)" }]), []);
-assert.deepEqual(readOfferLinks([], "https://old.com/a"), [{ label: "", url: "https://old.com/a" }]);
+assert.deepEqual(readOfferLinks([], "https://old.com/a"), [
+  { label: "", url: "https://old.com/a" },
+]);
 
 console.log("offer-link: ok");

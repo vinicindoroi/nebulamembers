@@ -49,7 +49,10 @@ export function cleanOfferLinks(
 /** Drops prompts without text; trims title/text. */
 export function cleanOfferPrompts(rows: OfferPrompt[]): OfferPrompt[] {
   return rows
-    .map((r) => ({ title: r.title.trim().slice(0, 120), text: r.text.trim().slice(0, MAX_OFFER_PROMPT) }))
+    .map((r) => ({
+      title: r.title.trim().slice(0, 120),
+      text: r.text.trim().slice(0, MAX_OFFER_PROMPT),
+    }))
     .filter((r) => r.text.length > 0);
 }
 
