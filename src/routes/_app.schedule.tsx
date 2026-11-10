@@ -145,6 +145,11 @@ function SchedulePage() {
         <p className="mt-2 text-sm text-muted-foreground">
           Escolha o dia e o horário da sua call com o mentor. Você pode ter uma call marcada por vez — assim que ela terminar, já pode agendar a próxima a partir da semana seguinte.
         </p>
+        {makeup && upcoming.length === 0 && (
+          <p className="mt-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
+            Sua call foi cancelada pelo mentor. Você pode remarcar em qualquer horário livre, mesmo para amanhã.
+          </p>
+        )}
       </header>
 
       {upcoming.length > 0 && (
