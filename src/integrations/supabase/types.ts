@@ -760,6 +760,123 @@ export type Database = {
         }
         Relationships: []
       }
+      gurufucker_configs: {
+        Row: {
+          api_token: string
+          funnel: Json
+          settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_token?: string
+          funnel?: Json
+          settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_token?: string
+          funnel?: Json
+          settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      gurufucker_jobs: {
+        Row: {
+          active: boolean
+          interval_sec: number
+          last_run_at: string | null
+          last_status: string | null
+          next_run_at: string
+          random_enabled: boolean
+          random_max_sec: number
+          random_min_sec: number
+          remaining: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          interval_sec?: number
+          last_run_at?: string | null
+          last_status?: string | null
+          next_run_at?: string
+          random_enabled?: boolean
+          random_max_sec?: number
+          random_min_sec?: number
+          remaining?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          interval_sec?: number
+          last_run_at?: string | null
+          last_status?: string | null
+          next_run_at?: string
+          random_enabled?: boolean
+          random_max_sec?: number
+          random_min_sec?: number
+          remaining?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      gurufucker_logs: {
+        Row: {
+          amount_cents: number
+          buyer_id: string | null
+          currency: string
+          error: string | null
+          fired_at: string
+          id: string
+          ok: boolean
+          order_id: string | null
+          product_name: string | null
+          source: string
+          status_code: number | null
+          step_index: number
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number
+          buyer_id?: string | null
+          currency?: string
+          error?: string | null
+          fired_at?: string
+          id?: string
+          ok: boolean
+          order_id?: string | null
+          product_name?: string | null
+          source?: string
+          status_code?: number | null
+          step_index?: number
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          buyer_id?: string | null
+          currency?: string
+          error?: string | null
+          fired_at?: string
+          id?: string
+          ok?: boolean
+          order_id?: string | null
+          product_name?: string | null
+          source?: string
+          status_code?: number | null
+          step_index?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_attachments: {
         Row: {
           created_at: string

@@ -25,6 +25,7 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppForumRouteImport } from './routes/_app.forum'
 import { Route as AppFunnelTrackerRouteImport } from './routes/_app.funnel-tracker'
 import { Route as AppFunnelsRouteImport } from './routes/_app.funnels'
+import { Route as AppGurufuckerRouteImport } from './routes/_app.gurufucker'
 import { Route as AppNotesRouteImport } from './routes/_app.notes'
 import { Route as AppOffersRouteImport } from './routes/_app.offers'
 import { Route as AppOrganizerRouteImport } from './routes/_app.organizer'
@@ -56,6 +57,7 @@ import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
 import { Route as ApiPublicJobsClosePastCallsRouteImport } from './routes/api/public/jobs/close-past-calls'
+import { Route as ApiPublicJobsGurufuckerRouteImport } from './routes/api/public/jobs/gurufucker'
 import { Route as ApiPublicJobsUptimeCheckRouteImport } from './routes/api/public/jobs/uptime-check'
 import { Route as ApiPublicTrackerEventWorkspaceIdRouteImport } from './routes/api/public/tracker-event.$workspaceId'
 
@@ -136,6 +138,11 @@ const AppFunnelTrackerRoute = AppFunnelTrackerRouteImport.update({
 const AppFunnelsRoute = AppFunnelsRouteImport.update({
   id: '/funnels',
   path: '/funnels',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGurufuckerRoute = AppGurufuckerRouteImport.update({
+  id: '/gurufucker',
+  path: '/gurufucker',
   getParentRoute: () => AppRoute,
 } as any)
 const AppNotesRoute = AppNotesRouteImport.update({
@@ -294,6 +301,11 @@ const ApiPublicJobsClosePastCallsRoute =
     path: '/api/public/jobs/close-past-calls',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicJobsGurufuckerRoute = ApiPublicJobsGurufuckerRouteImport.update({
+  id: '/api/public/jobs/gurufucker',
+  path: '/api/public/jobs/gurufucker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJobsUptimeCheckRoute =
   ApiPublicJobsUptimeCheckRouteImport.update({
     id: '/api/public/jobs/uptime-check',
@@ -323,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/forum': typeof AppForumRoute
   '/funnel-tracker': typeof AppFunnelTrackerRoute
   '/funnels': typeof AppFunnelsRoute
+  '/gurufucker': typeof AppGurufuckerRoute
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
@@ -354,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -373,6 +387,7 @@ export interface FileRoutesByTo {
   '/forum': typeof AppForumRoute
   '/funnel-tracker': typeof AppFunnelTrackerRoute
   '/funnels': typeof AppFunnelsRoute
+  '/gurufucker': typeof AppGurufuckerRoute
   '/notes': typeof AppNotesRoute
   '/offers': typeof AppOffersRoute
   '/organizer': typeof AppOrganizerRoute
@@ -404,6 +419,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -425,6 +441,7 @@ export interface FileRoutesById {
   '/_app/forum': typeof AppForumRoute
   '/_app/funnel-tracker': typeof AppFunnelTrackerRoute
   '/_app/funnels': typeof AppFunnelsRoute
+  '/_app/gurufucker': typeof AppGurufuckerRoute
   '/_app/notes': typeof AppNotesRoute
   '/_app/offers': typeof AppOffersRoute
   '/_app/organizer': typeof AppOrganizerRoute
@@ -456,6 +473,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRoute
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
+  '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -477,6 +495,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/funnel-tracker'
     | '/funnels'
+    | '/gurufucker'
     | '/notes'
     | '/offers'
     | '/organizer'
@@ -508,6 +527,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesByTo: FileRoutesByTo
@@ -527,6 +547,7 @@ export interface FileRouteTypes {
     | '/forum'
     | '/funnel-tracker'
     | '/funnels'
+    | '/gurufucker'
     | '/notes'
     | '/offers'
     | '/organizer'
@@ -558,6 +579,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   id:
@@ -578,6 +600,7 @@ export interface FileRouteTypes {
     | '/_app/forum'
     | '/_app/funnel-tracker'
     | '/_app/funnels'
+    | '/_app/gurufucker'
     | '/_app/notes'
     | '/_app/offers'
     | '/_app/organizer'
@@ -609,6 +632,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/_app/courses/$courseId'
     | '/api/public/jobs/close-past-calls'
+    | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesById: FileRoutesById
@@ -625,6 +649,7 @@ export interface RootRouteChildren {
   RespostasRoute: typeof RespostasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
+  ApiPublicJobsGurufuckerRoute: typeof ApiPublicJobsGurufuckerRoute
   ApiPublicJobsUptimeCheckRoute: typeof ApiPublicJobsUptimeCheckRoute
   ApiPublicTrackerEventWorkspaceIdRoute: typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
@@ -741,6 +766,13 @@ declare module '@tanstack/react-router' {
       path: '/funnels'
       fullPath: '/funnels'
       preLoaderRoute: typeof AppFunnelsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/gurufucker': {
+      id: '/_app/gurufucker'
+      path: '/gurufucker'
+      fullPath: '/gurufucker'
+      preLoaderRoute: typeof AppGurufuckerRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/notes': {
@@ -960,6 +992,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsClosePastCallsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/gurufucker': {
+      id: '/api/public/jobs/gurufucker'
+      path: '/api/public/jobs/gurufucker'
+      fullPath: '/api/public/jobs/gurufucker'
+      preLoaderRoute: typeof ApiPublicJobsGurufuckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/uptime-check': {
       id: '/api/public/jobs/uptime-check'
       path: '/api/public/jobs/uptime-check'
@@ -996,6 +1035,7 @@ interface AppRouteChildren {
   AppForumRoute: typeof AppForumRoute
   AppFunnelTrackerRoute: typeof AppFunnelTrackerRoute
   AppFunnelsRoute: typeof AppFunnelsRoute
+  AppGurufuckerRoute: typeof AppGurufuckerRoute
   AppNotesRoute: typeof AppNotesRoute
   AppOffersRoute: typeof AppOffersRoute
   AppOrganizerRoute: typeof AppOrganizerRoute
@@ -1015,6 +1055,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppForumRoute: AppForumRoute,
   AppFunnelTrackerRoute: AppFunnelTrackerRoute,
   AppFunnelsRoute: AppFunnelsRoute,
+  AppGurufuckerRoute: AppGurufuckerRoute,
   AppNotesRoute: AppNotesRoute,
   AppOffersRoute: AppOffersRoute,
   AppOrganizerRoute: AppOrganizerRoute,
@@ -1087,6 +1128,7 @@ const rootRouteChildren: RootRouteChildren = {
   RespostasRoute: RespostasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
+  ApiPublicJobsGurufuckerRoute: ApiPublicJobsGurufuckerRoute,
   ApiPublicJobsUptimeCheckRoute: ApiPublicJobsUptimeCheckRoute,
   ApiPublicTrackerEventWorkspaceIdRoute: ApiPublicTrackerEventWorkspaceIdRoute,
 }
