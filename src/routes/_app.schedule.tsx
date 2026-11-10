@@ -104,8 +104,11 @@ function SchedulePage() {
   const notifyOthers = () => channelRef.current?.send({ type: "broadcast", event: "changed", payload: {} });
 
   const tz = settings?.timezone ?? "America/Sao_Paulo";
+  // Call cancelada pelo mentor: o aluno pode remarcar sem a antecedência mínima.
+  const makeup = mine.some((b) => b.status === "cancelled" && (b as Booking & { makeup_pending?: boolean }).makeup_pending);
+  const effSettings = settings && makeup ? { ...settings, min_notice_hours: 0 } : settings;
   const freeSlots = (ymd: string) =>
-    settings ? slotsForDay(ymd, settings, availability, new Date(), extras, blockedSlots).filter((d) => !busy.has(d.getTime()) && !usedWeeks.has(weekKey(d, settings.timezone ?? "America/Sao_Paulo"))) : [];
+    effSettings ? slotsForDay(ymd, effSettings, availability, new Date(), extras, blockedSlots).filter((d) => !busy.has(d.getTime()) && !usedWeeks.has(weekKey(d, effSettings.timezone ?? "America/Sao_Paulo"))) : [];
   const daySlots = day ? freeSlots(ymdFromLocal(day)) : [];
   const upcoming = mine.filter((b) => b.status === "booked" && new Date(b.ends_at) > new Date());
   const past = mine.filter((b) => !upcoming.includes(b));
