@@ -104,7 +104,7 @@ export function CallHistory({ tz, bookings, profiles }: {
             <>
               {groups.slice(0, days).map(([ymd, list]) => (
                 <div key={ymd} className="space-y-2">
-                  <p className="text-xs font-semibold capitalize text-muted-foreground">
+                  <p className="text-xs font-semibold text-muted-foreground first-letter:uppercase">
                     {dayTitle(ymd, list[0].created_at)} <span className="font-normal">· {list.length}</span>
                   </p>
                   <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
