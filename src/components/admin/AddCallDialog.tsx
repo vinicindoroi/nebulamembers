@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,10 +39,10 @@ export function AddCallDialog({ open, onOpenChange, profiles, tz, slotMinutes, d
   }, [profiles, q]);
   const chosen = userId ? profiles[userId] : null;
 
-  function reset(o: boolean) {
-    if (o) { setQ(""); setUserId(null); setDate(defaultDate); setTime("15:00"); setStatus("done"); setNotes(""); }
-    onOpenChange(o);
-  }
+  useEffect(() => {
+    if (open) { setQ(""); setUserId(null); setDate(defaultDate); setTime("15:00"); setStatus("done"); setNotes(""); }
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  const reset = onOpenChange;
 
   async function save() {
     if (!userId) return toast.error("Escolha o aluno.");
