@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CheckCircle2, ChevronDown, MessageCircle, Undo2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, MessageCircle, NotebookPen, Undo2 } from "lucide-react";
+import { StarRating } from "@/components/schedule/StarRating";
 import { fmtTime } from "@/lib/mentor-schedule";
 import { waLink } from "@/lib/whatsapp";
 
@@ -10,13 +11,17 @@ export type RealizedCall = {
   name: string;
   email?: string | null;
   phone?: string | null;
+  rating?: number | null;
+  comment?: string | null;
+  hasNotes?: boolean;
 };
 
 /** Calls already realized: kept out of the active queue, grouped under a verifiable header. */
-export function RealizedCalls({ calls, tz, onUndo }: {
+export function RealizedCalls({ calls, tz, onUndo, onNotes }: {
   calls: RealizedCall[];
   tz: string;
   onUndo?: (id: string) => void;
+  onNotes?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(true);
   if (calls.length === 0) return null;
@@ -54,6 +59,23 @@ export function RealizedCalls({ calls, tz, onUndo }: {
                 >
                   <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
                 </a>
+              )}
+              {c.rating ? (
+                <span className="inline-flex shrink-0 items-center gap-1.5" title={c.comment || undefined}>
+                  <StarRating value={c.rating} size="sm" />
+                  {c.comment && <span className="max-w-[180px] truncate text-xs text-muted-foreground">“{c.comment}”</span>}
+                </span>
+              ) : (
+                <span className="shrink-0 text-xs text-muted-foreground/70">Sem avaliação</span>
+              )}
+              {onNotes && (
+                <button
+                  type="button"
+                  onClick={() => onNotes(c.id)}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors hover:text-foreground ${c.hasNotes ? "border-primary/40 text-primary" : "border-border text-muted-foreground"}`}
+                >
+                  <NotebookPen className="h-3.5 w-3.5" /> {c.hasNotes ? "Ver anotações" : "Anotar"}
+                </button>
               )}
               {onUndo && (
                 <button
