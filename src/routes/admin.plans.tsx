@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Edit3, Trash2, Package, Crown, Zap, Users, BookOpen,
   Layers, GitFork, MessageSquare, Check, Trello, StickyNote
