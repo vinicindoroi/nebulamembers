@@ -408,7 +408,7 @@ function OfferEditor({
             {(
               [
                 { key: "files", label: "Arquivos", Icon: Upload },
-                { key: "link", label: "Link", Icon: LinkIcon },
+                { key: "link", label: "Links", Icon: LinkIcon },
               ] as const
             ).map(({ key, label, Icon }) => (
               <button
