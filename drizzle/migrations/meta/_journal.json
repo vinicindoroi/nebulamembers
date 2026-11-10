@@ -197,6 +197,13 @@
       "when": 1794318356757,
       "tag": "0027_member_offer_links_prompts",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794319138863,
+      "tag": "0028_tighten_settings_and_storage_reads",
+      "breakpoints": true
     }
   ]
 }
