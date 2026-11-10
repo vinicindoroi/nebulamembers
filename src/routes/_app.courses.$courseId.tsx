@@ -8,7 +8,7 @@ import { usePlans } from "@/hooks/use-plans";
 import { toast } from "sonner";
 import { useAddXp } from "@/hooks/use-xp";
 import { NebulaPlayer, type Chapter } from "@/components/player/NebulaPlayer";
-import { LessonComments } from "@/components/lessons/LessonComments";
+import { LessonQuestions } from "@/components/lessons/LessonQuestions";
 import { Button } from "@/components/ui/button";
 import { getSignedVideoUrl, isStoragePath, getAttachmentDownloadUrl } from "@/lib/storage";
 import {
@@ -631,7 +631,7 @@ function CourseDetail() {
 
             {/* Comentários da aula */}
             <LessonAttachments lessonId={activeLesson.id} />
-            <LessonComments lessonId={activeLesson.id} />
+            <LessonQuestions lessonId={activeLesson.id} />
           </div>
 
           {/* Sidebar com módulos/aulas */}
