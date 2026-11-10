@@ -123,43 +123,45 @@ function OffersPage() {
                     </Button>
                   </div>
                 ) : (
-                <>
-                <ul className="space-y-2">
-                  {offer.member_offer_files.map((file) => (
-                    <li
-                      key={file.id}
-                      className="flex items-center gap-3 rounded-xl border border-border p-3"
-                    >
-                      <FileText className="h-5 w-5 shrink-0 text-primary/70" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm" title={file.name}>
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={downloading !== null}
-                        onClick={() => download(file)}
-                        aria-label={`Baixar ${file.name}`}
-                      >
-                        {downloading === file.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4" />
-                        )}
-                        Baixar
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-                {!offer.member_offer_files.length && (
-                  <p className="text-sm text-muted-foreground">
-                    O mentor está preparando os arquivos desta oferta.
-                  </p>
-                )}
-                </>
+                  <>
+                    <ul className="space-y-2">
+                      {offer.member_offer_files.map((file) => (
+                        <li
+                          key={file.id}
+                          className="flex items-center gap-3 rounded-xl border border-border p-3"
+                        >
+                          <FileText className="h-5 w-5 shrink-0 text-primary/70" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm" title={file.name}>
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatFileSize(file.size)}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={downloading !== null}
+                            onClick={() => download(file)}
+                            aria-label={`Baixar ${file.name}`}
+                          >
+                            {downloading === file.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Download className="h-4 w-4" />
+                            )}
+                            Baixar
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                    {!offer.member_offer_files.length && (
+                      <p className="text-sm text-muted-foreground">
+                        O mentor está preparando os arquivos desta oferta.
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </article>

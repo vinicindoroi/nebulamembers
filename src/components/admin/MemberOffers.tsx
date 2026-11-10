@@ -167,8 +167,7 @@ function OfferEditor({
     const linkUrl = mode === "link" ? normalizeOfferLink(link) : null;
     if (mode === "link" && link.trim() && !linkUrl)
       return toast.error("Link inválido. Use um endereço começando com https://");
-    if (active && mode === "link" && !linkUrl)
-      return toast.error("Informe o link para publicar.");
+    if (active && mode === "link" && !linkUrl) return toast.error("Informe o link para publicar.");
     if (active && mode === "files" && !files.length && !existing.length)
       return toast.error("Adicione pelo menos um arquivo para publicar.");
     if (
@@ -407,55 +406,55 @@ function OfferEditor({
             </p>
           </div>
         ) : (
-        <div className="space-y-3">
-          <label
-            htmlFor="offer-files"
-            className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-5 text-sm"
-          >
-            <Upload className="h-4 w-4" />
-            Adicionar arquivos (até 50 MB por arquivo)
-          </label>
-          <input
-            id="offer-files"
-            type="file"
-            multiple
-            className="sr-only"
-            onChange={(e) => {
-              addFiles(e.target.files);
-              e.target.value = "";
-            }}
-          />
-          {existing.map((file) => (
-            <div key={file.id} className="flex items-center gap-2 text-sm">
-              <span className="min-w-0 flex-1 truncate">
-                {file.name} · {formatFileSize(file.size)}
-              </span>
-              <Button
-                size="icon"
-                variant="ghost"
-                aria-label={`Remover ${file.name}`}
-                onClick={() => removeFile(file.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          {files.map((file, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
-              <span className="min-w-0 flex-1 truncate">
-                {file.name} · {formatFileSize(file.size)} · Novo
-              </span>
-              <Button
-                size="icon"
-                variant="ghost"
-                aria-label={`Cancelar envio de ${file.name}`}
-                onClick={() => setFiles((prev) => prev.filter((_, i) => i !== index))}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
+          <div className="space-y-3">
+            <label
+              htmlFor="offer-files"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-5 text-sm"
+            >
+              <Upload className="h-4 w-4" />
+              Adicionar arquivos (até 50 MB por arquivo)
+            </label>
+            <input
+              id="offer-files"
+              type="file"
+              multiple
+              className="sr-only"
+              onChange={(e) => {
+                addFiles(e.target.files);
+                e.target.value = "";
+              }}
+            />
+            {existing.map((file) => (
+              <div key={file.id} className="flex items-center gap-2 text-sm">
+                <span className="min-w-0 flex-1 truncate">
+                  {file.name} · {formatFileSize(file.size)}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`Remover ${file.name}`}
+                  onClick={() => removeFile(file.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            {files.map((file, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <span className="min-w-0 flex-1 truncate">
+                  {file.name} · {formatFileSize(file.size)} · Novo
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`Cancelar envio de ${file.name}`}
+                  onClick={() => setFiles((prev) => prev.filter((_, i) => i !== index))}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
         )}
         <label className="flex items-center gap-2 text-sm">
           <input
