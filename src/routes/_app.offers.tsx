@@ -43,9 +43,7 @@ export const Route = createFileRoute("/_app/offers")({
   component: OffersPage,
 });
 
-type Offer = ReturnType<typeof useMemberOffers>["data"] extends (infer T)[] | undefined
-  ? T
-  : never;
+type Offer = MemberOffer;
 
 function OffersPage() {
   const { data: offers = [], isPending, error, refetch } = useMemberOffers();
