@@ -319,7 +319,7 @@ function OfferEditor({
     <Modal
       open
       title={initial ? "Editar oferta" : "Nova oferta"}
-      description="Arquivos ou link, liberados apenas para os planos selecionados."
+      description="Arquivos ou links, e prompts, liberados apenas para os planos selecionados."
       onClose={() => {
         if (!busy) onClose();
       }}
