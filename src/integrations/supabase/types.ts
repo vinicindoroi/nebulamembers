@@ -2544,6 +2544,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_member: { Args: { _user_id?: string }; Returns: boolean }
       mentor_busy_slots: {
         Args: { _from: string; _to: string }
         Returns: {
