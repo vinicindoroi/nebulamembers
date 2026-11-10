@@ -83,7 +83,7 @@ export type GuruSettings = {
 
 export const DEFAULT_SETTINGS: GuruSettings = {
   platform: "Nebula",
-  paymentMethod: "pix",
+  paymentMethod: "credit_card",
   currency: "BRL",
   isTest: false,
   randomCustomer: true,
@@ -101,7 +101,7 @@ export function normalizeSettings(raw: unknown): GuruSettings {
   const r = (raw && typeof raw === "object" ? raw : {}) as Partial<GuruSettings>;
   const s = { ...DEFAULT_SETTINGS, ...r };
   if (!isCurrency(s.currency)) s.currency = "BRL";
-  if (!["pix", "credit_card", "boleto"].includes(s.paymentMethod)) s.paymentMethod = "pix";
+  if (!["pix", "credit_card", "boleto"].includes(s.paymentMethod)) s.paymentMethod = "credit_card";
   s.stepDelaySec = clamp(Math.floor(Number(s.stepDelaySec) || 0), 0, 30);
   s.isTest = !!s.isTest;
   s.randomCustomer = s.randomCustomer !== false;
