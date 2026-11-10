@@ -18,6 +18,7 @@ export type MemberOffer = {
   active: boolean;
   access_levels: string[];
   created_at: string;
+  link_url: string | null;
   member_offer_files: OfferFile[];
 };
 
