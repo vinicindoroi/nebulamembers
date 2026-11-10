@@ -17,6 +17,7 @@ import {
   useMemberOffers,
   downloadOfferFile,
   formatFileSize,
+  type MemberOffer,
   type OfferFile,
 } from "@/hooks/use-member-offers";
 import { Button } from "@/components/ui/button";
