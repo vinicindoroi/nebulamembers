@@ -1212,6 +1212,8 @@ export type Database = {
           description: string
           id: string
           link_url: string | null
+          links: Json
+          prompts: Json
           title: string
         }
         Insert: {
@@ -1221,6 +1223,8 @@ export type Database = {
           description?: string
           id?: string
           link_url?: string | null
+          links?: Json
+          prompts?: Json
           title: string
         }
         Update: {
@@ -1230,6 +1234,8 @@ export type Database = {
           description?: string
           id?: string
           link_url?: string | null
+          links?: Json
+          prompts?: Json
           title?: string
         }
         Relationships: []
