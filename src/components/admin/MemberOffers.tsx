@@ -30,6 +30,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { usePlans } from "@/hooks/use-plans";
+
 import {
   useMemberOffers,
   OFFER_BUCKET,
@@ -256,14 +257,21 @@ function OfferEditor({
           const result = await supabase.storage
             .from(OFFER_BUCKET)
             .upload(path, file, { upsert: false });
-          if (result.error) throw result.error;
+          if (result.error) {
+            queue.length = 0;
+            throw result.error;
+          }
           uploaded.push(path);
           records.push({ offer_id: id, name: file.name, storage_path: path, size: file.size });
           done += 1;
           setProgress(`Enviando ${done} de ${toUpload.length} arquivo(s)...`);
         }
       };
-      await Promise.all(Array.from({ length: Math.min(3, toUpload.length) }, worker));
+      const sent = await Promise.allSettled(
+        Array.from({ length: Math.min(3, toUpload.length) }, worker),
+      );
+      const failed = sent.find((r): r is PromiseRejectedResult => r.status === "rejected");
+      if (failed) throw failed.reason;
       if (records.length) {
         const result = await supabase.from("member_offer_files").insert(records);
         if (result.error) throw result.error;
