@@ -75,7 +75,8 @@ export const Route = createFileRoute("/api/public/jobs/gurufucker")({
                 return;
               }
               const r = await fireBuyer(db, cfg, "auto");
-              const remaining = Math.max(0, job.remaining - 1);
+              const badToken = !r.ok && /token/i.test(r.error ?? "");
+              const remaining = badToken ? 0 : Math.max(0, job.remaining - 1);
               await db
                 .from("gurufucker_jobs")
                 .update({
