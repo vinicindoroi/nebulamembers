@@ -9,6 +9,8 @@ type AuthCtx = {
   signOut: () => Promise<void>;
 };
 
+const ensuredUsers = new Set<string>();
+
 const Ctx = createContext<AuthCtx>({ session: null, user: null, loading: true, signOut: async () => {} });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -18,7 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const ensureProfile = async (s: Session | null) => {
       const u = s?.user;
-      if (!u) return;
+      // Roda uma vez por usuário; antes repetia a cada evento de login/atualização de sessão.
+      if (!u || ensuredUsers.has(u.id)) return;
+      ensuredUsers.add(u.id);
       try {
         const { data: existing } = await supabase.from("profiles").select("id").eq("id", u.id).maybeSingle();
         if (!existing) {

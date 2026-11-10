@@ -30,6 +30,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { usePlans } from "@/hooks/use-plans";
+
 import {
   useMemberOffers,
   OFFER_BUCKET,
@@ -44,6 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export function MemberOffers() {
   const { data: offers = [], isPending, error, refetch } = useMemberOffers(true);
+  usePlans(); // pré-carrega os planos para a janela abrir pronta
   const cache = useQueryClient();
   const [editing, setEditing] = useState<MemberOffer | "new" | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -221,47 +223,63 @@ function OfferEditor({
     let created = false;
     let committed = false;
     try {
+      const toUpload = mode === "files" ? files : [];
+      const fields = {
+        title: title.trim(),
+        description: description.trim(),
+        active,
+        access_levels: selected,
+        link_url: null,
+        links: cleanLinks,
+        prompts: cleanPrompts,
+      };
       if (!initial) {
+        // Sem arquivos novos, a oferta é criada completa numa única gravação.
         const result = await supabase
           .from("member_offers")
-          .insert({ id, title: title.trim(), active: false, access_levels: selected });
+          .insert(toUpload.length ? { ...fields, id, active: false } : { ...fields, id });
         if (result.error) throw result.error;
         created = true;
       }
-      const records = [];
-      const toUpload = mode === "files" ? files : [];
-      for (const [index, file] of toUpload.entries()) {
-        setProgress(`Enviando arquivo ${index + 1} de ${toUpload.length}...`);
-        const safeName =
-          file.name
-            .normalize("NFKD")
-            .replace(/[^a-zA-Z0-9._-]/g, "-")
-            .slice(-120) || "arquivo";
-        const path = `${id}/${crypto.randomUUID()}-${safeName}`;
-        const result = await supabase.storage
-          .from(OFFER_BUCKET)
-          .upload(path, file, { upsert: false });
-        if (result.error) throw result.error;
-        uploaded.push(path);
-        records.push({ offer_id: id, name: file.name, storage_path: path, size: file.size });
-      }
+      const records: { offer_id: string; name: string; storage_path: string; size: number }[] = [];
+      let done = 0;
+      if (toUpload.length) setProgress(`Enviando 0 de ${toUpload.length} arquivo(s)...`);
+      // Envia até 3 arquivos ao mesmo tempo em vez de um por vez.
+      const queue = [...toUpload];
+      const worker = async () => {
+        for (let file = queue.shift(); file; file = queue.shift()) {
+          const safeName =
+            file.name
+              .normalize("NFKD")
+              .replace(/[^a-zA-Z0-9._-]/g, "-")
+              .slice(-120) || "arquivo";
+          const path = `${id}/${crypto.randomUUID()}-${safeName}`;
+          const result = await supabase.storage
+            .from(OFFER_BUCKET)
+            .upload(path, file, { upsert: false });
+          if (result.error) {
+            queue.length = 0;
+            throw result.error;
+          }
+          uploaded.push(path);
+          records.push({ offer_id: id, name: file.name, storage_path: path, size: file.size });
+          done += 1;
+          setProgress(`Enviando ${done} de ${toUpload.length} arquivo(s)...`);
+        }
+      };
+      const sent = await Promise.allSettled(
+        Array.from({ length: Math.min(3, toUpload.length) }, worker),
+      );
+      const failed = sent.find((r): r is PromiseRejectedResult => r.status === "rejected");
+      if (failed) throw failed.reason;
       if (records.length) {
         const result = await supabase.from("member_offer_files").insert(records);
         if (result.error) throw result.error;
       }
-      const result = await supabase
-        .from("member_offers")
-        .update({
-          title: title.trim(),
-          description: description.trim(),
-          active,
-          access_levels: selected,
-          link_url: null,
-          links: cleanLinks,
-          prompts: cleanPrompts,
-        })
-        .eq("id", id);
-      if (result.error) throw result.error;
+      if (initial || toUpload.length) {
+        const result = await supabase.from("member_offers").update(fields).eq("id", id);
+        if (result.error) throw result.error;
+      }
       committed = true;
       if (mode === "link" && existing.length) {
         const paths = existing.map((f) => f.storage_path);

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Edit3, Trash2, Package, Crown, Zap, Users, BookOpen,
   Layers, GitFork, MessageSquare, Check, Trello, StickyNote
@@ -113,7 +114,7 @@ async function loadPlans(): Promise<Plan[]> {
   return DEFAULT_PLANS;
 }
 
-async function savePlans(plans: Plan[]) {
+async function savePlansRaw(plans: Plan[]) {
   const { error } = await (supabase
     .from("app_settings" as any) as any)
     .upsert({ key: PLANS_KEY, value: plans, updated_at: new Date().toISOString() }, { onConflict: "key" });
@@ -161,8 +162,13 @@ function PlanCheckItem({ children, color = "text-primary" }: { children: React.R
 }
 
 function Page() {
+  const cache = useQueryClient();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [editing, setEditing] = useState<Partial<Plan> | null>(null);
+  const savePlans = async (next: Plan[]) => {
+    await savePlansRaw(next);
+    void cache.invalidateQueries({ queryKey: ["plans-config"] });
+  };
 
   const load = async () => {
     const data = await loadPlans();
