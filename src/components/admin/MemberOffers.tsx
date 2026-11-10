@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Package, Upload, X, Link as LinkIcon } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Package,
+  Upload,
+  X,
+  Link as LinkIcon,
+  MessageSquareText,
+} from "lucide-react";
 import {
   cleanOfferLinks,
   cleanOfferPrompts,
@@ -9,6 +18,16 @@ import {
   type OfferLink,
   type OfferPrompt,
 } from "@/lib/offer-link";
+
+function offerSummary(offer: MemberOffer) {
+  const links = readOfferLinks(offer.links, offer.link_url).length;
+  const prompts = readOfferPrompts(offer.prompts).length;
+  const parts = [
+    links ? `${links} link(s)` : `${offer.member_offer_files.length} arquivo(s)`,
+  ];
+  if (prompts) parts.push(`${prompts} prompt(s)`);
+  return parts.join(" · ");
+}
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,7 +120,7 @@ export function MemberOffers() {
               <h2 className="text-lg font-semibold">{offer.title}</h2>
               <p className="line-clamp-2 text-sm text-muted-foreground">{offer.description}</p>
               <p className="text-xs text-muted-foreground">
-                {offer.link_url ? "Link" : `${offer.member_offer_files.length} arquivo(s)`} ·{" "}
+                {offerSummary(offer)} ·{" "}
                 {offer.access_levels.join(", ") || "Nenhum plano"}
               </p>
               <div className="flex gap-2">
@@ -412,20 +431,59 @@ function OfferEditor({
         </div>
         {mode === "link" ? (
           <div className="space-y-2">
-            <label htmlFor="offer-link" className="text-sm">
-              Link
-            </label>
-            <Input
-              id="offer-link"
-              type="url"
-              inputMode="url"
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
-              placeholder="https://drive.google.com/..."
-              autoComplete="off"
-            />
+            {links.map((row, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input
+                  aria-label={`Tag do link ${i + 1}`}
+                  value={row.label}
+                  maxLength={MAX_OFFER_LABEL}
+                  onChange={(e) =>
+                    setLinks((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, label: e.target.value } : r)),
+                    )
+                  }
+                  placeholder="Tag (ex: Drive)"
+                  className="w-36 shrink-0"
+                  autoComplete="off"
+                />
+                <Input
+                  aria-label={`Endereço do link ${i + 1}`}
+                  type="url"
+                  inputMode="url"
+                  value={row.url}
+                  onChange={(e) =>
+                    setLinks((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, url: e.target.value } : r)),
+                    )
+                  }
+                  placeholder="https://..."
+                  autoComplete="off"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`Remover link ${i + 1}`}
+                  onClick={() =>
+                    setLinks((prev) =>
+                      prev.length === 1 ? [{ label: "", url: "" }] : prev.filter((_, j) => j !== i),
+                    )
+                  }
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setLinks((prev) => [...prev, { label: "", url: "" }])}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Adicionar link
+            </Button>
             <p className="text-xs text-muted-foreground">
-              O aluno verá um botão “Abrir link”. Use para Drive, Notion, Canva, etc.
+              A tag mostra ao aluno do que se trata cada link (Drive, Página de vendas, Canva…).
               {existing.length > 0 &&
                 ` Ao salvar, os ${existing.length} arquivo(s) atuais serão removidos.`}
             </p>
@@ -481,6 +539,64 @@ function OfferEditor({
             ))}
           </div>
         )}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Prompts para copiar</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPrompts((prev) => [...prev, { title: "", text: "" }])}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Adicionar prompt
+            </Button>
+          </div>
+          {prompts.length === 0 && (
+            <p className="text-xs text-muted-foreground">
+              Opcional. O aluno verá cada prompt com um botão “Copiar”.
+            </p>
+          )}
+          {prompts.map((row, i) => (
+            <div key={i} className="space-y-2 rounded-xl border border-border p-3">
+              <div className="flex items-center gap-2">
+                <MessageSquareText className="h-4 w-4 shrink-0 text-primary/70" />
+                <Input
+                  aria-label={`Título do prompt ${i + 1}`}
+                  value={row.title}
+                  maxLength={120}
+                  onChange={(e) =>
+                    setPrompts((prev) =>
+                      prev.map((r, j) => (j === i ? { ...r, title: e.target.value } : r)),
+                    )
+                  }
+                  placeholder="Título (ex: Copy do anúncio)"
+                  autoComplete="off"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label={`Remover prompt ${i + 1}`}
+                  onClick={() => setPrompts((prev) => prev.filter((_, j) => j !== i))}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              <Textarea
+                aria-label={`Texto do prompt ${i + 1}`}
+                value={row.text}
+                rows={4}
+                onChange={(e) =>
+                  setPrompts((prev) =>
+                    prev.map((r, j) => (j === i ? { ...r, text: e.target.value } : r)),
+                  )
+                }
+                placeholder="Cole aqui o prompt que o aluno vai copiar."
+                className="font-mono text-xs"
+              />
+            </div>
+          ))}
+        </div>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
