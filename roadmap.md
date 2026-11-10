@@ -8,4 +8,8 @@
 - [x] Adicionar banners de Cursos configuráveis no admin e alternância suave
 - [x] Colapsar por padrão a lista "Todas as próximas calls" em Admin → Agendamentos
 - [x] Histórico de calls canceladas e remarcadas na Agenda
+- [x] Anotações e tarefas por call (aluno vê tudo)
+- [x] Lista de espera de horários (avisa todos, quem marcar primeiro leva)
+- [x] Dúvidas privadas embaixo das aulas, respondidas em Admin → Dúvidas das aulas
+- [x] Avaliação de 1 a 5 depois da call, com nome
 - [ ] Ativar push no celular para quedas e recuperação de domínios — aguardando conexão Firebase com web push (conexão recusada)
