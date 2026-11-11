@@ -17,6 +17,7 @@ import { Route as FormsRouteImport } from './routes/forms'
 import { Route as FunnelTrackerDotjsRouteImport } from './routes/funnel-tracker[.]js'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RespostasRouteImport } from './routes/respostas'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AppCommunityRouteImport } from './routes/_app.community'
@@ -98,6 +99,11 @@ const LandingRoute = LandingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RespostasRoute = RespostasRouteImport.update({
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/funnel-tracker.js': typeof FunnelTrackerDotjsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/respostas': typeof RespostasRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/community': typeof AppCommunityRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/funnel-tracker.js': typeof FunnelTrackerDotjsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/respostas': typeof RespostasRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/community': typeof AppCommunityRoute
@@ -433,6 +441,7 @@ export interface FileRoutesById {
   '/funnel-tracker.js': typeof FunnelTrackerDotjsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/respostas': typeof RespostasRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_app/community': typeof AppCommunityRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/funnel-tracker.js'
     | '/landing'
     | '/login'
+    | '/reset-password'
     | '/respostas'
     | '/sitemap.xml'
     | '/community'
@@ -539,6 +549,7 @@ export interface FileRouteTypes {
     | '/funnel-tracker.js'
     | '/landing'
     | '/login'
+    | '/reset-password'
     | '/respostas'
     | '/sitemap.xml'
     | '/community'
@@ -592,6 +603,7 @@ export interface FileRouteTypes {
     | '/funnel-tracker.js'
     | '/landing'
     | '/login'
+    | '/reset-password'
     | '/respostas'
     | '/sitemap.xml'
     | '/_app/community'
@@ -646,6 +658,7 @@ export interface RootRouteChildren {
   FunnelTrackerDotjsRoute: typeof FunnelTrackerDotjsRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RespostasRoute: typeof RespostasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
@@ -710,6 +723,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/respostas': {
@@ -1125,6 +1145,7 @@ const rootRouteChildren: RootRouteChildren = {
   FunnelTrackerDotjsRoute: FunnelTrackerDotjsRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RespostasRoute: RespostasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
