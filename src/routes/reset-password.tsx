@@ -114,9 +114,9 @@ function ResetPasswordPage() {
           {(status === "ready" || status === "saving") && (
             <form onSubmit={onSubmit} className="space-y-4">
               <Field icon={<KeyRound className="h-4 w-4" />} type="password" label="Nova senha" placeholder="••••••••"
-                value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
+                value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
               <Field icon={<Lock className="h-4 w-4" />} type="password" label="Confirmar nova senha" placeholder="••••••••"
-                value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={6} autoComplete="new-password" />
+                value={confirm} onChange={(e) => setConfirm(e.target.value)} required autoComplete="new-password" />
               {error && <p className="text-destructive text-xs">{error}</p>}
               <button
                 type="submit"

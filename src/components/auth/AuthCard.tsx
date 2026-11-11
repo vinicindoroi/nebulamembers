@@ -171,7 +171,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
                 value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
               {mode !== "forgot" && (
                 <Field icon={<Lock className="h-4 w-4" />} type="password" label="Senha" placeholder="••••••••"
-                  value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+                  value={password} onChange={(e) => setPassword(e.target.value)} required
                   autoComplete={mode === "signup" ? "new-password" : "current-password"} />
               )}
 
