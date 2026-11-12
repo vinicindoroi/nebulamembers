@@ -211,6 +211,13 @@
       "when": 1794329497947,
       "tag": "0029_gurufucker",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794448394547,
+      "tag": "0030_member_approval_gate",
+      "breakpoints": true
     }
   ]
 }
