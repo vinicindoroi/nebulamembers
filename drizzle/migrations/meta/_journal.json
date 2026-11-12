@@ -225,6 +225,13 @@
       "when": 1794448424438,
       "tag": "0031_approval_gate_no_user_param",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1794448465789,
+      "tag": "0032_approval_gate_single_self_only_predicate",
+      "breakpoints": true
     }
   ]
 }
