@@ -37,6 +37,7 @@ import { Route as AppScheduleRouteImport } from './routes/_app.schedule'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppTranscriptRouteImport } from './routes/_app.transcript'
 import { Route as AppUptimeRouteImport } from './routes/_app.uptime'
+import { Route as AdminAccessRouteImport } from './routes/admin.access'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCommentsRouteImport } from './routes/admin.comments'
 import { Route as AdminCommunityRouteImport } from './routes/admin.community'
@@ -201,6 +202,11 @@ const AppUptimeRoute = AppUptimeRouteImport.update({
   path: '/uptime',
   getParentRoute: () => AppRoute,
 } as any)
+const AdminAccessRoute = AdminAccessRouteImport.update({
+  id: '/access',
+  path: '/access',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -353,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
   '/uptime': typeof AppUptimeRoute
+  '/admin/access': typeof AdminAccessRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/comments': typeof AdminCommentsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -406,6 +413,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/transcript': typeof AppTranscriptRoute
   '/uptime': typeof AppUptimeRoute
+  '/admin/access': typeof AdminAccessRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/comments': typeof AdminCommentsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -461,6 +469,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/transcript': typeof AppTranscriptRoute
   '/_app/uptime': typeof AppUptimeRoute
+  '/admin/access': typeof AdminAccessRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/comments': typeof AdminCommentsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -516,6 +525,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transcript'
     | '/uptime'
+    | '/admin/access'
     | '/admin/categories'
     | '/admin/comments'
     | '/admin/community'
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transcript'
     | '/uptime'
+    | '/admin/access'
     | '/admin/categories'
     | '/admin/comments'
     | '/admin/community'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/transcript'
     | '/_app/uptime'
+    | '/admin/access'
     | '/admin/categories'
     | '/admin/comments'
     | '/admin/community'
@@ -865,6 +877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUptimeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/admin/access': {
+      id: '/admin/access'
+      path: '/access'
+      fullPath: '/admin/access'
+      preLoaderRoute: typeof AdminAccessRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -1091,6 +1110,7 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AdminRouteChildren {
+  AdminAccessRoute: typeof AdminAccessRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCommentsRoute: typeof AdminCommentsRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
@@ -1113,6 +1133,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccessRoute: AdminAccessRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCommentsRoute: AdminCommentsRoute,
   AdminCommunityRoute: AdminCommunityRoute,

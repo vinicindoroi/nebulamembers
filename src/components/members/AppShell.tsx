@@ -16,6 +16,7 @@ import { WhatsappPrompt } from "@/components/members/WhatsappPrompt";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } from "@/hooks/use-plans";
+import { isTabAllowed } from "@/lib/plan-access";
 import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
 import brandMark from "@/assets/nebula-mark-n.png.asset.json";
 
@@ -136,13 +137,7 @@ export function AppShell() {
       if (isAdmin) return false;
       if (ALWAYS_ALLOWED.includes(to)) return false;
       if (planPending) return true;
-      if (to === "/organizer") return features.organizer_access === false;
-      if (to === "/courses") return features.courses_access === false;
-      if (to === "/community") return features.community_access === false;
-      if (to === "/forum") return features.forum_access === false;
-      if (to === "/notes") return features.notes_access === false;
-      if (to === "/funnels") return features.funnels_access === false;
-      return false;
+      return !isTabAllowed(features, to);
     };
   }, [userPlanFeatures, planPending, isAdmin]);
 

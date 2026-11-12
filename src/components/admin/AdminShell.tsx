@@ -1,7 +1,7 @@
 import { Link, useRouterState, Outlet, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, BookOpen, Layers, FolderTree, MessageSquare, MessagesSquare,
-  CreditCard, Ticket, Bell, Settings, ScrollText, Search, Menu, X, LogOut, Shield, ArrowLeft, Play, Crown, Package, CalendarClock, HelpCircle,
+  CreditCard, Ticket, Bell, Settings, ScrollText, Search, Menu, X, LogOut, Shield, ArrowLeft, Play, Crown, Package, CalendarClock, HelpCircle, KeyRound,
 } from "lucide-react";
 import { NotificationBell } from "@/components/members/NotificationBell";
 import { useState, useRef } from "react";
@@ -39,6 +39,7 @@ const navGroups: NavGroup[] = [
       { to: "/admin/forms", label: "Respostas Forms", icon: ScrollText },
       { to: "/admin/offers", label: "Ofertas", icon: Crown },
       { to: "/admin/plans", label: "Planos", icon: Package },
+      { to: "/admin/access", label: "Acessos", icon: KeyRound },
       { to: "/admin/sales", label: "Vendas", icon: CreditCard },
       { to: "/admin/coupons", label: "Cupons", icon: Ticket },
     ],
