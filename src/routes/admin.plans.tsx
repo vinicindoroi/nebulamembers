@@ -287,7 +287,7 @@ function Page() {
                   onClick={() => setEditing(p)}
                   className={`flex-1 py-3 px-4 rounded-xl text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${theme.buttonBorder}`}
                 >
-                  Gerenciar Plano <Edit3 className="h-3.5 w-3.5" />
+                  Gerenciar <Edit3 className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => startDuplicate(p)}
