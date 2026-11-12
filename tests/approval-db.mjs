@@ -22,10 +22,11 @@ ok("sql rejects the same pending plans as the app", () => {
   assert.deepEqual(rejected.slice().sort(), ["", "pendente", "pending"]);
 });
 
-ok("predicate is security definer and granted to both api roles", () => {
-  assert.match(sql, /CREATE OR REPLACE FUNCTION public\.is_member_approved\(_user_id uuid DEFAULT auth\.uid\(\)\)/);
+ok("predicate is security definer, speaks only for the caller, and is granted to the api roles", () => {
+  assert.match(sql, /CREATE OR REPLACE FUNCTION public\.is_member_approved\(\)/);
   assert.match(sql, /SECURITY DEFINER/);
-  assert.match(sql, /GRANT EXECUTE ON FUNCTION public\.is_member_approved\(uuid\) TO anon, authenticated;/);
+  assert.match(sql, /GRANT EXECUTE ON FUNCTION public\.is_member_approved\(\) TO anon, authenticated, service_role;/);
+  assert.ok(!/_user_id uuid/.test(sql), "the predicate must not accept an arbitrary user id");
 });
 
 // Every table that used to be readable by any signed-in account must now be gated.

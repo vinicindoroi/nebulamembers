@@ -218,6 +218,13 @@
       "when": 1794448394547,
       "tag": "0030_member_approval_gate",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794448424438,
+      "tag": "0031_approval_gate_no_user_param",
+      "breakpoints": true
     }
   ]
 }
