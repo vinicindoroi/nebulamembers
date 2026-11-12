@@ -15,4 +15,5 @@
 - [x] Colapsar por padrão os cards de Oferta na tela do aluno
 - [x] Aba Gurufucker (BETA): funil com valores, ordem, moeda e disparos para a Utmify
 - [x] "Esqueci minha senha" na tela de login + página /reset-password para criar senha nova
+- [x] Bloquear contas sem nível também no banco (RLS): nada da plataforma antes da aprovação, mesmo acessando a API direto
 - [ ] Ativar push no celular para quedas e recuperação de domínios — aguardando conexão Firebase com web push (conexão recusada)
