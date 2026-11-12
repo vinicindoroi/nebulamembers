@@ -2,8 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { isPendingPlan } from "../src/lib/approval.ts";
 
-const MIGRATIONS = ["0030_member_approval_gate.sql", "0031_approval_gate_no_user_param.sql", "0032_drop_approval_gate_user_param_overload.sql"];
-const sql = MIGRATIONS.map((f) => readFileSync(new URL(`../drizzle/migrations/${f}`, import.meta.url), "utf8")).join("\n");
+// 0030 gates the tables and views; 0032 is the current definition of the predicate.
+const MIGRATIONS = ["0030_member_approval_gate.sql", "0032_approval_gate_single_self_only_predicate.sql"];
+const sql = MIGRATIONS
+  .map((f) => readFileSync(new URL(`../drizzle/migrations/${f}`, import.meta.url), "utf8"))
+  .join("\n");
+const predicate = readFileSync(new URL("../drizzle/migrations/0032_approval_gate_single_self_only_predicate.sql", import.meta.url), "utf8");
 
 let passed = 0;
 const ok = (label, fn) => {
@@ -12,22 +16,30 @@ const ok = (label, fn) => {
 };
 
 // The SQL predicate must reject exactly the plans the app treats as pending.
-const PENDING = ["", "pending", "pendente", "Pendente", "  pending  "];
-for (const plan of PENDING) assert.equal(isPendingPlan(plan), true, `${JSON.stringify(plan)} should be pending in the app`);
-for (const plan of ["Free", "Pro", "Individual", "Nebula Members"]) assert.equal(isPendingPlan(plan), false);
+for (const plan of ["", "pending", "pendente", "Pendente", "  pending  "]) {
+  assert.equal(isPendingPlan(plan), true, `${JSON.stringify(plan)} should be pending in the app`);
+}
+for (const plan of ["Free", "Pro", "Individual", "Nebula Members"]) {
+  assert.equal(isPendingPlan(plan), false);
+}
 
 ok("sql rejects the same pending plans as the app", () => {
-  const list = sql.match(/plan_slug\(p\.plan\) NOT IN \(([^)]*)\)/);
+  const list = predicate.match(/plan_slug\(p\.plan\) NOT IN \(([^)]*)\)/);
   assert.ok(list, "approval predicate missing");
   const rejected = list[1].split(",").map((s) => s.trim().replace(/^'|'$/g, ""));
   assert.deepEqual(rejected.slice().sort(), ["", "pendente", "pending"]);
 });
 
-ok("predicate is security definer, speaks only for the caller, and is granted to the api roles", () => {
-  assert.match(sql, /CREATE OR REPLACE FUNCTION public\.is_member_approved\(\)/);
-  assert.match(sql, /SECURITY DEFINER/);
-  assert.match(sql, /GRANT EXECUTE ON FUNCTION public\.is_member_approved\(\) TO anon, authenticated, service_role;/);
-  assert.ok(!/_user_id uuid/.test(sql), "the predicate must not accept an arbitrary user id");
+ok("predicate is security definer and granted to the api roles", () => {
+  assert.match(predicate, /CREATE OR REPLACE FUNCTION public\.is_member_approved\(_user_id uuid DEFAULT auth\.uid\(\)\)/);
+  assert.match(predicate, /SECURITY DEFINER/);
+  assert.match(predicate, /GRANT EXECUTE ON FUNCTION public\.is_member_approved\(uuid\) TO anon, authenticated, service_role;/);
+});
+
+ok("predicate only ever speaks for the caller", () => {
+  assert.match(predicate, /WHERE p\.id = auth\.uid\(\)/);
+  assert.ok(!/p\.id = _user_id/.test(predicate), "the predicate must not honour a passed-in user id");
+  assert.match(predicate, /DROP FUNCTION IF EXISTS public\.is_member_approved\(\);/);
 });
 
 // Every table that used to be readable by any signed-in account must now be gated.
