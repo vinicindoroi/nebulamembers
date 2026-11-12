@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Edit3, Trash2, Package, Crown, Zap, Users, BookOpen,
-  Layers, GitFork, MessageSquare, Check, Trello, StickyNote
+  Layers, GitFork, MessageSquare, Check, Trello, StickyNote, Copy
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { MEMBER_TABS, isTabAllowed, withTabAccess, duplicatePlan, slugify } from "@/lib/plan-access";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass } from "@/components/admin/Modal";
@@ -35,6 +37,7 @@ type Plan = {
 
 // Apenas features que o app realmente aplica (bloqueio de abas no AppShell).
 type PlanFeatures = {
+  tabs?: Record<string, boolean>;
   courses_access: boolean;
   community_access: boolean;
   forum_access: boolean;
@@ -52,7 +55,7 @@ const DEFAULT_FEATURES: PlanFeatures = {
   funnels_access: false,
 };
 
-const FEATURE_LABELS: Record<keyof PlanFeatures, { label: string; icon: typeof Zap }> = {
+const FEATURE_LABELS: Record<Exclude<keyof PlanFeatures, "tabs">, { label: string; icon: typeof Zap }> = {
   courses_access: { label: "Acesso a Cursos (LMS)", icon: BookOpen },
   community_access: { label: "Acesso a Comunidade", icon: Users },
   forum_access: { label: "Acesso ao Fórum", icon: MessageSquare },
@@ -165,6 +168,13 @@ function Page() {
   const cache = useQueryClient();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [editing, setEditing] = useState<Partial<Plan> | null>(null);
+  const [duplicateFrom, setDuplicateFrom] = useState<Plan | null>(null);
+  const startDuplicate = (p: Plan) => {
+    const copy = duplicatePlan(p, plans, "");
+    const { id: _id, ...rest } = copy;
+    setDuplicateFrom(p);
+    setEditing(rest);
+  };
   const savePlans = async (next: Plan[]) => {
     await savePlansRaw(next);
     void cache.invalidateQueries({ queryKey: ["plans-config"] });
@@ -206,8 +216,7 @@ function Page() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {plans.map((p) => {
           const theme = getTheme(p.slug);
-          const activeFeatures = Object.entries(FEATURE_LABELS)
-            .filter(([key]) => p.features?.[key as keyof PlanFeatures]);
+          const allowedTabs = MEMBER_TABS.filter((t) => isTabAllowed(p.features, t.path));
           return (
             <div
               key={p.id}
@@ -261,21 +270,33 @@ function Page() {
 
               {/* Áreas liberadas (reais) */}
               <ul className="space-y-3 px-1 mb-6">
-                {activeFeatures.map(([key, { label }]) => (
-                  <PlanCheckItem key={key} color={theme.text}>{label}</PlanCheckItem>
+                {allowedTabs.slice(0, 6).map((t) => (
+                  <PlanCheckItem key={t.path} color={theme.text}>{t.label}</PlanCheckItem>
                 ))}
-                {activeFeatures.length === 0 && (
+                {allowedTabs.length > 6 && (
+                  <li className="text-xs text-white/40 pl-6">+{allowedTabs.length - 6} abas · <Link to="/admin/access" className="hover:underline">ver em Acessos</Link></li>
+                )}
+                {allowedTabs.length === 0 && (
                   <PlanCheckItem color={theme.text}>Nenhuma área liberada</PlanCheckItem>
                 )}
               </ul>
 
               {/* Edit CTA */}
-              <button
-                onClick={() => setEditing(p)}
-                className={`w-full py-3 px-4 rounded-xl text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-auto border ${theme.buttonBorder}`}
-              >
-                Gerenciar Plano <Edit3 className="h-3.5 w-3.5" />
-              </button>
+              <div className="mt-auto flex gap-2">
+                <button
+                  onClick={() => setEditing(p)}
+                  className={`flex-1 py-3 px-4 rounded-xl text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${theme.buttonBorder}`}
+                >
+                  Gerenciar Plano <Edit3 className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => startDuplicate(p)}
+                  title="Duplicar plano com todas as permissões"
+                  className="py-3 px-3.5 rounded-xl text-xs font-bold border border-border bg-card hover:bg-muted/50 text-foreground flex items-center gap-1.5 cursor-pointer transition"
+                >
+                  <Copy className="h-3.5 w-3.5" />Duplicar
+                </button>
+              </div>
             </div>
           );
         })}
@@ -293,15 +314,28 @@ function Page() {
       {editing !== null && (
         <PlanModal
           initial={editing}
-          onClose={() => setEditing(null)}
+          duplicateOf={duplicateFrom?.name}
+          onClose={() => { setEditing(null); setDuplicateFrom(null); }}
           onSaved={async (plan) => {
+            const slug = (plan.slug ?? "").trim().toLowerCase();
+            if (plans.some(p => p.id !== plan.id && p.slug.toLowerCase() === slug)) {
+              toast.error("Já existe um plano com esse slug");
+              return;
+            }
             const updated = plan.id
               ? plans.map(p => p.id === plan.id ? plan as Plan : p)
-              : [...plans, { ...plan, id: crypto.randomUUID(), created_at: new Date().toISOString() } as Plan];
+              : [...plans, { ...plan, slug, id: crypto.randomUUID(), created_at: new Date().toISOString() } as Plan];
             await savePlans(updated);
             setPlans(updated);
+            if (duplicateFrom) {
+              const { error } = await supabase.rpc("admin_copy_plan_access" as any, { _from: duplicateFrom.slug, _to: slug } as any);
+              if (error) toast.error("Plano criado, mas não foi possível copiar o acesso aos conteúdos");
+              else toast.success(`Plano duplicado com todas as permissões de ${duplicateFrom.name}`);
+            } else {
+              toast.success("Plano salvo");
+            }
             setEditing(null);
-            toast.success("Plano salvo");
+            setDuplicateFrom(null);
           }}
         />
       )}
@@ -309,10 +343,11 @@ function Page() {
   );
 }
 
-function PlanModal({ initial, onClose, onSaved }: {
+function PlanModal({ initial, duplicateOf, onClose, onSaved }: {
   initial: Partial<Plan>;
+  duplicateOf?: string;
   onClose: () => void;
-  onSaved: (plan: Partial<Plan>) => void;
+  onSaved: (plan: Partial<Plan>) => void | Promise<void>;
 }) {
   const [f, setF] = useState({
     name: initial.name ?? "",
@@ -326,29 +361,34 @@ function PlanModal({ initial, onClose, onSaved }: {
   const [saving, setSaving] = useState(false);
 
   const handleNameChange = (name: string) => {
-    const slug = name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    const slug = slugify(name);
     setF({ ...f, name, slug });
   };
 
-  const toggleFeature = (key: keyof PlanFeatures) => {
-    setF({ ...f, features: { ...f.features, [key]: !f.features[key] } });
+  const toggleFeature = (key: string) => {
+    const path = MEMBER_TABS.find((t) => t.legacyKey === key)?.path;
+    if (!path) return;
+    setF({ ...f, features: withTabAccess(f.features, path, !isTabAllowed(f.features, path)) });
+  };
+  const featureOn = (key: string) => {
+    const path = MEMBER_TABS.find((t) => t.legacyKey === key)?.path;
+    return path ? isTabAllowed(f.features, path) : false;
   };
 
   const save = () => {
     if (!f.name.trim()) return toast.error("Informe o nome do plano");
     if (!f.slug.trim()) return toast.error("Informe o slug");
     setSaving(true);
-    onSaved({ ...initial, ...f });
-    setSaving(false);
+    Promise.resolve(onSaved({ ...initial, ...f })).finally(() => setSaving(false));
   };
 
   return (
     <Modal
       open
       onClose={onClose}
-      title={initial.id ? "Editar plano" : "Novo plano"}
-      kicker={initial.id ? "Editar" : "Criar"}
-      description="Configure o nível de acesso e as áreas liberadas deste plano."
+      title={initial.id ? "Editar plano" : duplicateOf ? `Duplicar ${duplicateOf}` : "Novo plano"}
+      kicker={initial.id ? "Editar" : duplicateOf ? "Duplicar" : "Criar"}
+      description={duplicateOf ? `A cópia leva todas as permissões de ${duplicateOf}: abas, cursos, módulos, aulas, ofertas e agendamento.` : "Configure o nível de acesso e as áreas liberadas deste plano."}
       size="xl"
       footer={
         <>
@@ -360,7 +400,7 @@ function PlanModal({ initial, onClose, onSaved }: {
             disabled={saving}
             className="gradient-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-50 shadow-[0_8px_24px_-8px_oklch(0.65_0.22_290/0.6)]"
           >
-            {saving ? "Salvando..." : initial.id ? "Salvar" : "Criar plano"}
+            {saving ? "Salvando..." : initial.id ? "Salvar" : duplicateOf ? "Duplicar plano" : "Criar plano"}
           </button>
         </>
       }
@@ -395,14 +435,14 @@ function PlanModal({ initial, onClose, onSaved }: {
 
       {/* Áreas da plataforma (as únicas features reais hoje) */}
       <div className="pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Áreas liberadas</div>
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Áreas liberadas <span className="normal-case tracking-normal font-normal">· todas as abas em <Link to="/admin/access" className="text-primary hover:underline">Acessos</Link></span></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {Object.entries(FEATURE_LABELS).map(([key, { label, icon: Icon }]) => (
             <label key={key} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-card border border-border hover:border-border cursor-pointer transition">
               <input
                 type="checkbox"
-                checked={!!f.features[key as keyof PlanFeatures]}
-                onChange={() => toggleFeature(key as keyof PlanFeatures)}
+                checked={featureOn(key)}
+                onChange={() => toggleFeature(key)}
                 className="accent-primary"
               />
               <Icon className="h-3.5 w-3.5 text-muted-foreground" />
