@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X } from "lucide-react";
+import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
@@ -17,6 +17,7 @@ import { CALL_FILTERS, callsOf, callsOfGroup, formatCalls, matchesCallCount } fr
 import { groupMembers, matchesMemberGroup } from "@/lib/member-groups";
 import { MemberGroupSelect, MemberGroupsDialog } from "@/components/admin/MemberGroups";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PaymentRemindersModal } from "@/components/admin/PaymentReminders";
 
 const filterSelectClass =
   "h-9 shrink-0 cursor-pointer rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none transition hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50";
@@ -122,6 +123,7 @@ function Page() {
   const [adding, setAdding] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewing, setViewing] = useState<Member | null>(null);
+  const [billing, setBilling] = useState<Member | null>(null);
   const [sort, setSort] = useState<MemberSort>({ key: "created_at", dir: "desc" });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const lastClickedIndex = useRef<number | null>(null);
@@ -566,6 +568,7 @@ function Page() {
                     <div className="inline-flex gap-1">
                       <button type="button" onClick={() => setViewing(r)} aria-label="Visualizar detalhes" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Eye className="h-3.5 w-3.5" /></button>
                       <button type="button" onClick={() => setEditing(r)} aria-label="Editar membro" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Edit3 className="h-3.5 w-3.5" /></button>
+                      <button type="button" onClick={() => setBilling(r)} aria-label="Cobranças" title="Cobranças" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Wallet className="h-3.5 w-3.5" /></button>
                       <button type="button" onClick={() => setStatus(r.id, r.status === "active" ? "suspended" : "active")} aria-label={r.status === "active" ? "Suspender membro" : "Reativar membro"} className="p-1.5 rounded-lg transition hover:bg-muted/60">
                         {r.status === "active" ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                       </button>
@@ -582,6 +585,7 @@ function Page() {
 
       {viewing && <MemberDetailsModal member={viewing} onClose={() => setViewing(null)} onEdit={() => setEditing(viewing)} />}
       {editing && <EditModal member={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
+      {billing && <PaymentRemindersModal member={billing} onClose={() => setBilling(null)} />}
       {adding && <AddMemberModal onClose={() => setAdding(false)} onSaved={() => { setAdding(false); load(); }} />}
       {tagTarget && <MemberTagsModal {...memberTags} {...tagTarget} onClose={() => setTagTarget(null)} />}
       <MemberGroupsDialog state={memberGroups} open={groupsOpen} onOpenChange={setGroupsOpen} />

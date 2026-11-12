@@ -14,6 +14,7 @@ import { callsQueue } from "@/lib/call-queue";
 import { waLink } from "@/lib/whatsapp";
 import { RealizedCalls } from "@/components/admin/RealizedCalls";
 import { toast } from "sonner";
+import { DuePaymentsPanel } from "@/components/admin/PaymentReminders";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [
@@ -154,6 +155,8 @@ function Page() {
       </div>
 
       <TodayCalls settings={schedSettings} calls={calls} loading={callsLoading} reload={reloadCalls} />
+
+      <DuePaymentsPanel />
 
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
