@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { isPendingPlan } from "../src/lib/approval.ts";
 
-const sql = readFileSync(new URL("../drizzle/migrations/0030_member_approval_gate.sql", import.meta.url), "utf8");
+const MIGRATIONS = ["0030_member_approval_gate.sql", "0031_approval_gate_no_user_param.sql", "0032_drop_approval_gate_user_param_overload.sql"];
+const sql = MIGRATIONS.map((f) => readFileSync(new URL(`../drizzle/migrations/${f}`, import.meta.url), "utf8")).join("\n");
 
 let passed = 0;
 const ok = (label, fn) => {
