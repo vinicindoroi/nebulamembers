@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Edit3, Trash2, Package, Crown, Zap, Users, BookOpen,
-  Layers, GitFork, MessageSquare, Check, Trello, StickyNote, Copy
+  Layers, GitFork, MessageSquare, Check, Trello, StickyNote, Copy,
+  LayoutDashboard, Gift, Bookmark, BarChart3, Activity, Crosshair, FileText, CalendarDays
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { MEMBER_TABS, isTabAllowed, withTabAccess, duplicatePlan, slugify } from "@/lib/plan-access";
@@ -55,14 +56,36 @@ const DEFAULT_FEATURES: PlanFeatures = {
   funnels_access: false,
 };
 
-const FEATURE_LABELS: Record<Exclude<keyof PlanFeatures, "tabs">, { label: string; icon: typeof Zap }> = {
-  courses_access: { label: "Acesso a Cursos (LMS)", icon: BookOpen },
-  community_access: { label: "Acesso a Comunidade", icon: Users },
-  forum_access: { label: "Acesso ao Fórum", icon: MessageSquare },
-  organizer_access: { label: "Acesso ao Organizador (Trello)", icon: Trello },
-  notes_access: { label: "Acesso a Notas (Tiptap)", icon: StickyNote },
-  funnels_access: { label: "Acesso a Funis (Builder)", icon: GitFork },
+const TAB_ICONS: Record<string, typeof Zap> = {
+  "/dashboard": LayoutDashboard,
+  "/organizer": Trello,
+  "/courses": BookOpen,
+  "/offers": Gift,
+  "/community": Users,
+  "/forum": MessageSquare,
+  "/saved": Bookmark,
+  "/notes": StickyNote,
+  "/funnels": GitFork,
+  "/funnel-tracker": BarChart3,
+  "/uptime": Activity,
+  "/pixel-feeder": Crosshair,
+  "/gurufucker": Zap,
+  "/transcript": FileText,
 };
+
+/** Liga/desliga o plano na lista de planos com agendamento (remove o slug antigo se foi renomeado). */
+async function syncSchedulePlan(slug: string, allowed: boolean, oldSlug?: string) {
+  const s = slug.trim().toLowerCase();
+  const old = (oldSlug ?? "").trim().toLowerCase();
+  const { data, error } = await supabase.from("mentor_schedule_settings").select("allowed_plans").eq("id", 1).maybeSingle();
+  if (error) return false;
+  const current = (((data as any)?.allowed_plans ?? []) as string[]).map((x) => x.toLowerCase());
+  const next = current.filter((x) => x !== s && (!old || x !== old));
+  if (allowed) next.push(s);
+  if (next.length === current.length && next.every((x) => current.includes(x))) return true;
+  const { error: upErr } = await supabase.from("mentor_schedule_settings").update({ allowed_plans: next } as any).eq("id", 1);
+  return !upErr;
+}
 
 const DEFAULT_PLANS: Plan[] = [
   {
@@ -315,8 +338,9 @@ function Page() {
         <PlanModal
           initial={editing}
           duplicateOf={duplicateFrom?.name}
+          scheduleSource={duplicateFrom?.slug ?? editing.slug}
           onClose={() => { setEditing(null); setDuplicateFrom(null); }}
-          onSaved={async (plan) => {
+          onSaved={async (plan, scheduleOn) => {
             const slug = (plan.slug ?? "").trim().toLowerCase();
             if (plans.some(p => p.id !== plan.id && p.slug.toLowerCase() === slug)) {
               toast.error("Já existe um plano com esse slug");
@@ -334,6 +358,10 @@ function Page() {
             } else {
               toast.success("Plano salvo");
             }
+            const oldSlug = plan.id ? plans.find((p) => p.id === plan.id)?.slug : undefined;
+            if (!(await syncSchedulePlan(slug, scheduleOn, oldSlug !== slug ? oldSlug : undefined))) {
+              toast.error("Não foi possível salvar o acesso ao Agendamento");
+            }
             setEditing(null);
             setDuplicateFrom(null);
           }}
@@ -343,12 +371,24 @@ function Page() {
   );
 }
 
-function PlanModal({ initial, duplicateOf, onClose, onSaved }: {
+function PlanModal({ initial, duplicateOf, scheduleSource, onClose, onSaved }: {
   initial: Partial<Plan>;
   duplicateOf?: string;
+  scheduleSource?: string;
   onClose: () => void;
-  onSaved: (plan: Partial<Plan>) => void | Promise<void>;
+  onSaved: (plan: Partial<Plan>, scheduleOn: boolean) => void | Promise<void>;
 }) {
+  const [scheduleOn, setScheduleOn] = useState(false);
+  useEffect(() => {
+    const src = (scheduleSource ?? "").trim().toLowerCase();
+    if (!src) return;
+    let alive = true;
+    supabase.from("mentor_schedule_settings").select("allowed_plans").eq("id", 1).maybeSingle().then(({ data }) => {
+      const list = (((data as any)?.allowed_plans ?? []) as string[]).map((x) => x.toLowerCase());
+      if (alive) setScheduleOn(list.includes(src));
+    });
+    return () => { alive = false; };
+  }, [scheduleSource]);
   const [f, setF] = useState({
     name: initial.name ?? "",
     slug: initial.slug ?? "",
@@ -365,21 +405,15 @@ function PlanModal({ initial, duplicateOf, onClose, onSaved }: {
     setF({ ...f, name, slug });
   };
 
-  const toggleFeature = (key: string) => {
-    const path = MEMBER_TABS.find((t) => t.legacyKey === key)?.path;
-    if (!path) return;
+  const toggleTab = (path: string) => {
     setF({ ...f, features: withTabAccess(f.features, path, !isTabAllowed(f.features, path)) });
-  };
-  const featureOn = (key: string) => {
-    const path = MEMBER_TABS.find((t) => t.legacyKey === key)?.path;
-    return path ? isTabAllowed(f.features, path) : false;
   };
 
   const save = () => {
     if (!f.name.trim()) return toast.error("Informe o nome do plano");
     if (!f.slug.trim()) return toast.error("Informe o slug");
     setSaving(true);
-    Promise.resolve(onSaved({ ...initial, ...f })).finally(() => setSaving(false));
+    Promise.resolve(onSaved({ ...initial, ...f }, scheduleOn)).finally(() => setSaving(false));
   };
 
   return (
@@ -435,20 +469,23 @@ function PlanModal({ initial, duplicateOf, onClose, onSaved }: {
 
       {/* Áreas da plataforma (as únicas features reais hoje) */}
       <div className="pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Áreas liberadas <span className="normal-case tracking-normal font-normal">· todas as abas em <Link to="/admin/access" className="text-primary hover:underline">Acessos</Link></span></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {Object.entries(FEATURE_LABELS).map(([key, { label, icon: Icon }]) => (
-            <label key={key} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-card border border-border hover:border-border cursor-pointer transition">
-              <input
-                type="checkbox"
-                checked={featureOn(key)}
-                onChange={() => toggleFeature(key)}
-                className="accent-primary"
-              />
-              <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-sm">{label}</span>
-            </label>
-          ))}
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Abas liberadas <span className="normal-case tracking-normal font-normal">· Perfil e Configurações sempre liberados · cursos e ofertas em <Link to="/admin/access" className="text-primary hover:underline">Acessos</Link></span></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {MEMBER_TABS.map((t) => {
+            const Icon = TAB_ICONS[t.path] ?? Package;
+            return (
+              <label key={t.path} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-card border border-border cursor-pointer transition">
+                <input type="checkbox" checked={isTabAllowed(f.features, t.path)} onChange={() => toggleTab(t.path)} className="accent-primary" />
+                <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-sm">{t.label}</span>
+              </label>
+            );
+          })}
+          <label className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-card border border-border cursor-pointer transition">
+            <input type="checkbox" checked={scheduleOn} onChange={() => setScheduleOn((v) => !v)} className="accent-primary" />
+            <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-sm">Agendamento</span>
+          </label>
         </div>
       </div>
     </Modal>
