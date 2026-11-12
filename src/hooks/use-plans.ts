@@ -42,10 +42,7 @@ export const FULL_ACCESS_FEATURES: PlanFeatureFlags = {
 };
 
 
-export function isPendingPlan(plan: string | null | undefined) {
-  const p = (plan ?? "").trim().toLowerCase();
-  return p === "" || p === "pending" || p === "pendente";
-}
+export { isPendingPlan } from "@/lib/approval";
 
 export async function fetchPlans(): Promise<PlanOption[]> {
   try {
