@@ -16,7 +16,8 @@
     "test:call-feedback": "node tests/call-feedback.mjs",
     "test:gurufucker": "node tests/gurufucker.mjs",
     "test:approval": "node tests/approval.mjs",
-    "test:plan-access": "node tests/plan-access.mjs"
+    "test:plan-access": "node tests/plan-access.mjs",
+    "test:payments": "node tests/payment-reminders.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

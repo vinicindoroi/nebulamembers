@@ -239,6 +239,13 @@
       "when": 1794497313289,
       "tag": "0033_copy_plan_access",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794520095673,
+      "tag": "0034_payment_reminders",
+      "breakpoints": true
     }
   ]
 }
