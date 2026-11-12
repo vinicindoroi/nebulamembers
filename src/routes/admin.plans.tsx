@@ -56,15 +56,6 @@ const DEFAULT_FEATURES: PlanFeatures = {
   funnels_access: false,
 };
 
-const FEATURE_LABELS: Record<Exclude<keyof PlanFeatures, "tabs">, { label: string; icon: typeof Zap }> = {
-  courses_access: { label: "Acesso a Cursos (LMS)", icon: BookOpen },
-  community_access: { label: "Acesso a Comunidade", icon: Users },
-  forum_access: { label: "Acesso ao Fórum", icon: MessageSquare },
-  organizer_access: { label: "Acesso ao Organizador (Trello)", icon: Trello },
-  notes_access: { label: "Acesso a Notas (Tiptap)", icon: StickyNote },
-  funnels_access: { label: "Acesso a Funis (Builder)", icon: GitFork },
-};
-
 const TAB_ICONS: Record<string, typeof Zap> = {
   "/dashboard": LayoutDashboard,
   "/organizer": Trello,
@@ -479,7 +470,7 @@ function PlanModal({ initial, duplicateOf, scheduleSource, onClose, onSaved }: {
       {/* Áreas da plataforma (as únicas features reais hoje) */}
       <div className="pt-2">
         <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 mb-3">Abas liberadas <span className="normal-case tracking-normal font-normal">· Perfil e Configurações sempre liberados · cursos e ofertas em <Link to="/admin/access" className="text-primary hover:underline">Acessos</Link></span></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {MEMBER_TABS.map((t) => {
             const Icon = TAB_ICONS[t.path] ?? Package;
             return (
