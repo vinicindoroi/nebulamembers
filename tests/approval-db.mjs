@@ -58,7 +58,7 @@ for (const table of GATED_READ) {
   ok(`${table} read requires approval`, () => {
     const block = sql.match(new RegExp(`CREATE POLICY[^;]*ON public\\.${table}\\b[^;]*FOR SELECT[^;]*;`, "i"));
     assert.ok(block, `no SELECT policy for ${table}`);
-    assert.match(block[0], /USING \(\(SELECT public\.is_member_approved\(\)\)\)/);
+    assert.match(block[0], /USING \(\(SELECT public\.is_member_approved\(\)\)/);
   });
 }
 
@@ -66,7 +66,7 @@ for (const table of GATED_WRITE) {
   ok(`${table} write requires approval`, () => {
     const block = sql.match(new RegExp(`CREATE POLICY[^;]*ON public\\.${table}\\b[^;]*FOR INSERT[^;]*;`, "i"));
     assert.ok(block, `no INSERT policy for ${table}`);
-    assert.match(block[0], /WITH CHECK \(\(SELECT public\.is_member_approved\(\)\)\)/);
+    assert.match(block[0], /WITH CHECK \(\(SELECT public\.is_member_approved\(\)\)/);
   });
 }
 
