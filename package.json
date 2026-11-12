@@ -14,7 +14,8 @@
     "test:mobile": "node tests/mobile-layout.mjs",
     "test:pwa": "node tests/pwa-mobile.mjs",
     "test:call-feedback": "node tests/call-feedback.mjs",
-    "test:gurufucker": "node tests/gurufucker.mjs"
+    "test:gurufucker": "node tests/gurufucker.mjs",
+    "test:approval": "node tests/approval.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
