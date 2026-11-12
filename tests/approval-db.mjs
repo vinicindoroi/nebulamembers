@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { isPendingPlan } from "../src/lib/approval.ts";
 
-const sql = readFileSync(new URL("../supabase/migrations/20261112020000_member_approval_gate.sql", import.meta.url), "utf8");
+const sql = readFileSync(new URL("../drizzle/migrations/0030_member_approval_gate.sql", import.meta.url), "utf8");
 
 let passed = 0;
 const ok = (label, fn) => {
