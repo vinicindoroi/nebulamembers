@@ -142,10 +142,16 @@ export function AppShell() {
   }, [userPlanFeatures, planPending, isAdmin]);
 
   const filteredNavGroups = useMemo(
-    () => navGroups.map((group) => ({
-      ...group,
-      items: group.items.filter((item) => item.to !== "/schedule" || isAdmin || scheduleEnabled).map((item) => ({ ...item, locked: isLocked(item.to) })),
-    })),
+    // Abas não liberadas pelo plano somem do menu (não aparecem bloqueadas).
+    () => navGroups
+      .map((group) => ({
+        ...group,
+        items: group.items
+          .filter((item) => item.to !== "/schedule" || isAdmin || scheduleEnabled)
+          .filter((item) => !isLocked(item.to))
+          .map((item) => ({ ...item, locked: false })),
+      }))
+      .filter((group) => group.items.length > 0),
     [isLocked, scheduleEnabled, isAdmin],
   );
 
@@ -654,7 +660,7 @@ export function AppShell() {
             { to: "/community", label: "Comunidade", icon: Users },
             { to: "/notes", label: "Notas", icon: StickyNote },
             { to: "/profile", label: "Perfil", icon: User },
-          ].map((item) => {
+          ].filter((item) => !isLocked(item.to)).map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
             if (isLocked(item.to)) {
