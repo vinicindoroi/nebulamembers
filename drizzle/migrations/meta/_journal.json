@@ -232,6 +232,13 @@
       "when": 1794448465789,
       "tag": "0032_approval_gate_single_self_only_predicate",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794497313289,
+      "tag": "0033_copy_plan_access",
+      "breakpoints": true
     }
   ]
 }

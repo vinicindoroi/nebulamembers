@@ -2605,6 +2605,10 @@ export type Database = {
         }
         Returns: string
       }
+      admin_copy_plan_access: {
+        Args: { _from: string; _to: string }
+        Returns: undefined
+      }
       admin_list_profiles: {
         Args: never
         Returns: {
