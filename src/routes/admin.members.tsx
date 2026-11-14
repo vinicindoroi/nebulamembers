@@ -562,7 +562,14 @@ function Page() {
                     className="whitespace-nowrap px-4 py-3 text-muted-foreground"
                     title={r.last_seen_at ? new Date(r.last_seen_at).toLocaleString("pt-BR") : undefined}
                   >
-                    {r.last_seen_at ? relativeDay(r.last_seen_at) : "—"}
+                    {r.last_seen_at ? (
+                      <div className="leading-tight">
+                        <div>{relativeDay(r.last_seen_at)}</div>
+                        <div className="text-[11px] text-muted-foreground/70">
+                          {new Date(r.last_seen_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        </div>
+                      </div>
+                    ) : "Nunca acessou"}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="inline-flex gap-1">
