@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X, Wallet } from "lucide-react";
+import { Search, Trash2, Edit3, Download, Plus, Shield, Pause, Play, Mail, User, UserPlus, FileText, Activity, Eye, Phone, MapPin, Instagram, ExternalLink, Calendar, Clock, Tag, ArrowUp, ArrowDown, ChevronsUpDown, Copy, Check, X, Wallet, MessageCircle } from "lucide-react";
+import { waLink } from "@/lib/whatsapp";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass, selectClass, selectStyle } from "@/components/admin/Modal";
