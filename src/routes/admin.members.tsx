@@ -574,6 +574,18 @@ function Page() {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="inline-flex gap-1">
+                      {hasWhatsapp(r.phone) && (
+                        <a
+                          href={waLink(r.phone!)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Abrir WhatsApp de ${r.full_name ?? "Sem nome"}`}
+                          title={`WhatsApp: ${r.phone}`}
+                          className="p-1.5 rounded-lg text-emerald-400 transition hover:bg-emerald-500/10"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                        </a>
+                      )}
                       <button type="button" onClick={() => setViewing(r)} aria-label="Visualizar detalhes" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Eye className="h-3.5 w-3.5" /></button>
                       <button type="button" onClick={() => setEditing(r)} aria-label="Editar membro" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Edit3 className="h-3.5 w-3.5" /></button>
                       <button type="button" onClick={() => setBilling(r)} aria-label="Cobranças" title="Cobranças" className="p-1.5 rounded-lg transition hover:bg-muted/60"><Wallet className="h-3.5 w-3.5" /></button>
