@@ -26,7 +26,10 @@ export const Route = createFileRoute("/api/public/jobs/close-past-calls")({
         const client = supabaseAdmin as unknown as Parameters<typeof closePastCalls>[0];
         try {
           const { closed } = await closePastCalls(client);
-          return Response.json({ closed });
+          // Também cria o Meet das calls futuras que ficaram sem evento no Google.
+          const { syncMissingGoogleEvents } = await import("@/lib/google-calendar.server");
+          const synced = await syncMissingGoogleEvents(supabaseAdmin).catch(() => 0);
+          return Response.json({ closed, synced });
         } catch (error) {
           return Response.json(
             { error: error instanceof Error ? error.message : "falha ao encerrar" },
