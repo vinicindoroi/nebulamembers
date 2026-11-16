@@ -161,7 +161,7 @@ function SchedulePage() {
         </p>
         {makeup && upcoming.length === 0 && (
           <p className="mt-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
-            Sua call foi cancelada pelo mentor. Você pode remarcar em qualquer horário livre, mesmo para amanhã.
+            Sua call foi cancelada pelo mentor. Você pode remarcar em qualquer horário livre a partir de amanhã.
           </p>
         )}
       </header>

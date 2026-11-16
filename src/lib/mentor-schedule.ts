@@ -77,6 +77,8 @@ const toMin = (t: string) => {
 
 /** All bookable slot start instants for a local day, ignoring existing bookings. */
 export function slotsForDay(ymd: string, settings: ScheduleSettings, availability: Availability[], now = new Date(), extras: string[] = [], blockedSlots: string[] = []) {
+  // Students can never book a call for the current day (mentor timezone), not even extra or make-up slots.
+  if (ymd <= ymdOf(now, settings.timezone)) return [];
   const removed = new Set(blockedSlots.map((x) => new Date(x).getTime()));
   const extra = extras.map((x) => new Date(x)).filter((d) => d.getTime() > now.getTime() && ymdOf(d, settings.timezone) === ymd && !removed.has(d.getTime()));
   const merge = (list: Date[]) => {
