@@ -17,7 +17,8 @@
     "test:gurufucker": "node tests/gurufucker.mjs",
     "test:approval": "node tests/approval.mjs",
     "test:plan-access": "node tests/plan-access.mjs",
-    "test:payments": "node tests/payment-reminders.mjs"
+    "test:payments": "node tests/payment-reminders.mjs",
+    "test:no-same-day": "node tests/mentor-no-same-day.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
