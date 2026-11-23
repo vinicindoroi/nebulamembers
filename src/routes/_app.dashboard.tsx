@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { TrendingUp, Clock, Award, Flame, Play, ArrowRight, BookOpen, Target, Trophy, Lock, Compass, Check, ChevronRight } from "lucide-react";
+import { TrendingUp, Clock, Award, Flame, Play, ArrowRight, BookOpen, Target, Trophy, Lock, Compass, Check, ChevronRight, Sparkles } from "lucide-react";
 import { useCourses } from "@/hooks/use-courses";
 import { useAuth } from "@/hooks/use-auth";
 import { useMemberProgress } from "@/hooks/use-member-progress";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
 import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 
@@ -153,31 +153,66 @@ function Dashboard() {
     { label: "Em andamento", value: inProgress.length, icon: Flame, hint: "continue" },
   ];
 
+  const todayRaw = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+  const today = todayRaw.charAt(0).toUpperCase() + todayRaw.slice(1);
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6">
-        <div className="min-w-0">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            {getGreeting()}, {name}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1.5">
-            {inProgress.length > 0
-              ? `${inProgress.length} ${inProgress.length === 1 ? "curso em andamento" : "cursos em andamento"}.`
-              : "Comece um curso e construa o hábito de aprender todo dia."}
-          </p>
+    <div className="dash space-y-6 dash-enter">
+      {/* Hero */}
+      <header className="dash-hero rounded-2xl border border-border p-6 sm:p-8">
+        <div className="dash-hero-orb" aria-hidden />
+        <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
+        <div className="flex flex-col md:flex-row md:items-center gap-6">
+          <div className="min-w-0 flex-1 space-y-4">
+            <span suppressHydrationWarning className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 backdrop-blur px-2.5 py-1 text-[11px] text-muted-foreground">
+              <Sparkles className="h-3 w-3 text-primary" /> {today}
+            </span>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight">
+                {getGreeting()}, <span className="text-gradient-primary">{name}</span>
+              </h1>
+              <p className="text-sm text-muted-foreground mt-2 max-w-lg">
+                {inProgress.length > 0
+                  ? `Você tem ${inProgress.length} ${inProgress.length === 1 ? "curso em andamento" : "cursos em andamento"}. Bora manter o ritmo.`
+                  : "Comece um curso e construa o hábito de aprender todo dia."}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {continueCourse && (
+                <Link
+                  to="/courses/$courseId"
+                  params={{ courseId: continueCourse.id }}
+                  className="sales-glow-cta inline-flex items-center gap-2 pl-2 pr-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity max-w-full"
+                >
+                  <span className="h-7 w-7 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
+                    <Play className="h-3.5 w-3.5" fill="currentColor" />
+                  </span>
+                  <span className="truncate max-w-[260px]">Continuar {continueCourse.label}</span>
+                </Link>
+              )}
+              {streak && streak.currentStreak > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 px-3 py-1.5 text-xs">
+                  <Flame className="h-3.5 w-3.5 text-primary" />
+                  <span className="tabular-nums font-medium">{streak.currentStreak}</span>
+                  <span className="text-muted-foreground">{streak.currentStreak === 1 ? "dia seguido" : "dias seguidos"}</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Level ring */}
+          <div className="flex items-center gap-4 md:flex-col md:gap-2 shrink-0">
+            <Ring pct={mounted ? xpProgressPct : 0} size={112} stroke={7}>
+              <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Nível</span>
+              <span className="text-3xl font-semibold tabular-nums leading-none mt-0.5">{level}</span>
+            </Ring>
+            <div className="md:text-center">
+              <p className="text-xs tabular-nums"><span className="font-medium">{xpInCurrentLevel}</span><span className="text-muted-foreground"> / {xpNeededPerLevel} XP</span></p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{xpNeededPerLevel - xpInCurrentLevel} XP para o nível {level + 1}</p>
+            </div>
+          </div>
         </div>
-        {continueCourse && (
-          <Link
-            to="/courses/$courseId"
-            params={{ courseId: continueCourse.id }}
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            <Play className="h-3.5 w-3.5" fill="currentColor" />
-            <span className="hidden sm:inline max-w-[220px] truncate">Continuar {continueCourse.label}</span>
-            <span className="sm:hidden">Continuar</span>
-          </Link>
-        )}
       </header>
 
       <PaymentReminderBanner />
@@ -185,17 +220,24 @@ function Dashboard() {
       <StripeSalesPanel />
 
       {/* Stats */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-xl overflow-hidden border border-border bg-border">
-        {stats.map((s) => {
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {stats.map((s, i) => {
           const Icon = s.icon;
           return (
-            <Link key={s.label} to="/courses" className="bg-card p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Icon className="h-3.5 w-3.5" />
-                <span className="text-xs">{s.label}</span>
+            <Link key={s.label} to="/courses" className="dash-card dash-card-hover p-4 sm:p-5 overflow-hidden">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-xs text-muted-foreground">{s.label}</span>
+                <span className="dash-icon-tile h-8 w-8 rounded-lg flex items-center justify-center shrink-0">
+                  <Icon className="h-4 w-4" />
+                </span>
               </div>
-              <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight">{s.value}</div>
-              <div className="text-[11px] text-muted-foreground mt-0.5">{s.hint}</div>
+              <div className="mt-3 text-3xl font-semibold tabular-nums tracking-tight">{s.value}</div>
+              <div className="text-[11px] text-muted-foreground mt-1">{s.hint}</div>
+              {i === 0 && (
+                <div className="dash-bar mt-3 h-1 rounded-full overflow-hidden">
+                  <span style={{ width: mounted ? `${overall}%` : "0%" }} />
+                </div>
+              )}
             </Link>
           );
         })}
@@ -205,33 +247,32 @@ function Dashboard() {
         {/* Left */}
         <div className="lg:col-span-8 space-y-6 min-w-0">
           {/* Focus tasks */}
-          <section className="rounded-xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-medium">Foco imediato</h2>
-              <Link to="/organizer" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                Organização <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-
+          <section className="dash-card p-5 sm:p-6">
+            <SectionHead icon={Target} title="Foco imediato" to="/organizer" linkLabel="Organização" />
             {dashboardPendingTasks.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente. Crie metas no seu quadro de organização.</p>
+              <div className="rounded-xl border border-dashed border-border px-4 py-6 text-center">
+                <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente. Crie metas no seu quadro de organização.</p>
+              </div>
             ) : (
-              <ul className="divide-y divide-border -mx-1">
+              <ul className="space-y-2">
                 {dashboardPendingTasks.map((task) => (
-                  <li key={task.id} className="flex items-center gap-3 px-1 py-3 group">
+                  <li key={task.id} className="flex items-center gap-3 rounded-xl border border-border bg-background/40 px-3 py-3 group hover:border-primary/30 transition-colors">
                     <button
                       onClick={() => handleToggleLocalTask(task.id)}
                       aria-label={`Concluir ${task.title}`}
-                      className="h-[18px] w-[18px] shrink-0 rounded border border-border hover:border-primary flex items-center justify-center transition-colors"
+                      className="h-5 w-5 shrink-0 rounded-full border border-border hover:border-primary hover:bg-primary/10 flex items-center justify-center transition-colors"
                     >
-                      <Check className="h-3 w-3 opacity-0 group-hover:opacity-60 text-primary transition-opacity" />
+                      <Check className="h-3 w-3 opacity-0 group-hover:opacity-70 text-primary transition-opacity" />
                     </button>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm truncate">{task.title}</div>
                       {task.description && <div className="text-xs text-muted-foreground truncate mt-0.5">{task.description}</div>}
                     </div>
-                    <span className="shrink-0 text-[10px] uppercase tracking-wide text-muted-foreground">{task.priority}</span>
-                    <Link to="/organizer" className="shrink-0 text-muted-foreground hover:text-foreground transition-colors">
+                    <span className="shrink-0 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      <span className={`h-1.5 w-1.5 rounded-full prio-${task.priority}`} />
+                      {task.priority === "media" ? "média" : task.priority}
+                    </span>
+                    <Link to="/organizer" className="shrink-0 text-muted-foreground hover:text-foreground transition-colors" aria-label="Abrir organização">
                       <ChevronRight className="h-4 w-4" />
                     </Link>
                   </li>
@@ -242,18 +283,13 @@ function Dashboard() {
 
           {/* Continue */}
           <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium">Cursos em andamento</h2>
-              <Link to="/courses" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                Ver todos <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
+            <SectionHead icon={Play} title="Cursos em andamento" to="/courses" linkLabel="Ver todos" />
             {isLoading ? (
               <SkeletonGrid />
             ) : inProgress.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border p-8 text-center">
+              <div className="dash-card border-dashed p-8 text-center">
                 <p className="text-sm text-muted-foreground">Nenhum curso em andamento.</p>
-                <Link to="/courses" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
+                <Link to="/courses" className="sales-glow-cta mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
                   Explorar cursos <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -269,12 +305,7 @@ function Dashboard() {
           {/* New courses */}
           {notStarted.length > 0 && (
             <section className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-medium">Comece um novo curso</h2>
-                <Link to="/courses" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
-                  Ver todos <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
+              <SectionHead icon={Compass} title="Comece um novo curso" to="/courses" linkLabel="Ver todos" />
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {notStarted.slice(0, 3).map((c) => (
                   <NewCourseCard key={c.id} course={c} />
@@ -286,29 +317,38 @@ function Dashboard() {
 
         {/* Right */}
         <aside className="lg:col-span-4 space-y-6 min-w-0">
-          {isProgressLoading && <div className="rounded-xl border border-border bg-card h-40 animate-pulse" />}
+          {isProgressLoading && <div className="dash-card h-40 animate-pulse" />}
 
-          {/* Level */}
-          <section className="rounded-xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium">Nível {level}</h2>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                {xpInCurrentLevel} / {xpNeededPerLevel} XP
-              </span>
-            </div>
-            <div className="mt-3 h-1 w-full rounded-full bg-muted overflow-hidden">
-              <div className="h-full rounded-full bg-primary transition-all duration-700" style={{ width: mounted ? `${xpProgressPct}%` : "0%" }} />
+          {/* Progress donut */}
+          <section className="dash-card p-5 sm:p-6">
+            <SectionHead icon={TrendingUp} title="Progresso" meta={`${courses.length} cursos`} />
+            <div className="flex items-center gap-5">
+              <Ring pct={mounted ? overall : 0} size={92} stroke={6}>
+                <span className="text-xl font-semibold tabular-nums leading-none">{overall}%</span>
+              </Ring>
+              <dl className="flex-1 space-y-2.5">
+                {[
+                  { k: "Concluídos", v: completed, cls: "bg-primary" },
+                  { k: "Em andamento", v: inProgress.length, cls: "bg-primary/50" },
+                  { k: "Restantes", v: notStarted.length, cls: "bg-muted-foreground/40" },
+                ].map((it) => (
+                  <div key={it.k} className="flex items-center gap-2 text-xs">
+                    <span className={`h-2 w-2 rounded-full ${it.cls}`} />
+                    <dt className="flex-1 text-muted-foreground">{it.k}</dt>
+                    <dd className="font-medium tabular-nums">{it.v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </section>
 
           {/* Streak */}
           {streak && (
-            <section className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium">Sequência</h2>
-                <span className="text-xs text-muted-foreground">
-                  {streak.currentStreak} {streak.currentStreak === 1 ? "dia" : "dias"} · recorde {streak.longestStreak}
-                </span>
+            <section className="dash-card p-5 sm:p-6">
+              <SectionHead icon={Flame} title="Sequência" meta={`recorde ${streak.longestStreak}`} />
+              <div className="flex items-end gap-2 mb-4">
+                <span className="text-3xl font-semibold tabular-nums leading-none">{streak.currentStreak}</span>
+                <span className="text-xs text-muted-foreground pb-0.5">{streak.currentStreak === 1 ? "dia seguido" : "dias seguidos"}</span>
               </div>
               <div className="flex items-center justify-between gap-1.5">
                 {streak.weekDays.map((day) => {
@@ -316,8 +356,8 @@ function Dashboard() {
                   return (
                     <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5" title={day.date.split("-").reverse().slice(0, 2).join("/")}>
                       <span className="text-[10px] text-muted-foreground">{DAY_LABELS[dateObj.getDay()]}</span>
-                      <div className={`h-7 w-full rounded-md flex items-center justify-center text-[10px] tabular-nums ${day.active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
-                        {day.active ? <Check className="h-3 w-3" /> : dateObj.getDate()}
+                      <div className={`h-8 w-full rounded-lg flex items-center justify-center text-[10px] tabular-nums ${day.active ? "dash-day-active" : "dash-bar text-muted-foreground"}`}>
+                        {day.active ? <Check className="h-3.5 w-3.5" /> : dateObj.getDate()}
                       </div>
                     </div>
                   );
@@ -326,51 +366,23 @@ function Dashboard() {
             </section>
           )}
 
-          {/* Progress breakdown */}
-          <section className="rounded-xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-medium">Progresso</h2>
-              <span className="text-xs text-muted-foreground">{courses.length} cursos</span>
-            </div>
-            <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all duration-700" style={{ width: mounted ? `${overall}%` : "0%" }} />
-            </div>
-            <dl className="mt-4 grid grid-cols-3 gap-3">
-              {[
-                { k: "Concluídos", v: completed },
-                { k: "Andamento", v: inProgress.length },
-                { k: "Restantes", v: notStarted.length },
-              ].map((it) => (
-                <div key={it.k}>
-                  <dt className="text-[11px] text-muted-foreground">{it.k}</dt>
-                  <dd className="text-sm font-medium tabular-nums mt-0.5">{it.v}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-
           {/* Achievements */}
           {achievements.length > 0 && (
-            <section className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium">Conquistas</h2>
-                <span className="text-xs text-muted-foreground tabular-nums">
-                  {achievements.filter((a) => a.unlocked).length}/{achievements.length}
-                </span>
-              </div>
+            <section className="dash-card p-5 sm:p-6">
+              <SectionHead icon={Trophy} title="Conquistas" meta={`${unlockedCount}/${achievements.length}`} />
               <ul className="space-y-3">
                 {achievements.map((a) => {
                   const Icon = ACHIEVEMENT_ICONS[a.id] || Trophy;
                   return (
-                    <li key={a.id} className="flex items-center gap-3">
-                      <div className={`h-8 w-8 shrink-0 rounded-lg flex items-center justify-center ${a.unlocked ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    <li key={a.id} className={`flex items-center gap-3 ${a.unlocked ? "" : "opacity-80"}`}>
+                      <div className={`h-9 w-9 shrink-0 rounded-xl flex items-center justify-center ${a.unlocked ? "dash-badge-on" : "dash-bar text-muted-foreground"}`}>
                         {a.unlocked ? <Icon className="h-4 w-4" /> : <Lock className="h-3.5 w-3.5" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-medium truncate">{a.title}</div>
                         {!a.unlocked && a.progress !== undefined ? (
-                          <div className="mt-1.5 h-1 w-full rounded-full bg-muted overflow-hidden">
-                            <div className="h-full bg-primary/60 rounded-full" style={{ width: `${a.progress}%` }} />
+                          <div className="dash-bar mt-1.5 h-1 w-full rounded-full overflow-hidden">
+                            <span style={{ width: `${a.progress}%` }} />
                           </div>
                         ) : (
                           <div className="text-[11px] text-muted-foreground truncate">{a.description}</div>
@@ -393,27 +405,77 @@ function Dashboard() {
   );
 }
 
+function Ring({ pct, size, stroke, children }: { pct: number; size: number; stroke: number; children?: React.ReactNode }) {
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(100, pct));
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90" aria-hidden>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="dash-ring-track" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c - (clamped / 100) * c}
+          className="dash-ring-value"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
+    </div>
+  );
+}
+
+function SectionHead({ icon: Icon, title, to, linkLabel, meta }: { icon: React.ComponentType<{ className?: string }>; title: string; to?: "/courses" | "/organizer"; linkLabel?: string; meta?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 mb-4">
+      <h2 className="text-sm font-medium inline-flex items-center gap-2">
+        <span className="dash-icon-tile h-6 w-6 rounded-md flex items-center justify-center">
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+        {title}
+      </h2>
+      {to && linkLabel ? (
+        <Link to={to} className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1">
+          {linkLabel} <ArrowRight className="h-3 w-3" />
+        </Link>
+      ) : meta ? (
+        <span className="text-xs text-muted-foreground tabular-nums">{meta}</span>
+      ) : null}
+    </div>
+  );
+}
+
 function CourseProgressCard({ course }: { course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
   const c = course!;
   return (
-    <Link
-      to="/courses/$courseId"
-      params={{ courseId: c.id }}
-      className="group rounded-xl border border-border bg-card p-4 flex items-center gap-3 hover:border-primary/40 transition-colors"
-    >
-      <div className="h-10 w-10 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-        <Play className="h-4 w-4" fill="currentColor" />
+    <Link to="/courses/$courseId" params={{ courseId: c.id }} className="dash-card dash-card-hover group p-3 flex items-center gap-4 overflow-hidden">
+      <div className="relative h-16 w-24 shrink-0 rounded-xl overflow-hidden bg-muted">
+        {c.cover_url ? (
+          <img src={c.cover_url} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        ) : (
+          <div className="dash-icon-tile absolute inset-0" />
+        )}
+        <div className="absolute inset-0 flex items-center justify-center bg-background/30 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+            <Play className="h-3.5 w-3.5" fill="currentColor" />
+          </span>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pr-1">
         <div className="text-sm font-medium truncate">{c.title}</div>
         <div className="text-xs text-muted-foreground mt-0.5">
           {c.completedLessons} de {c.totalLessons} aulas
         </div>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
-            <div className="h-full bg-primary rounded-full" style={{ width: `${c.progress}%` }} />
+        <div className="mt-2.5 flex items-center gap-2">
+          <div className="dash-bar flex-1 h-1 rounded-full overflow-hidden">
+            <span style={{ width: `${c.progress}%` }} />
           </div>
-          <span className="text-[11px] text-muted-foreground tabular-nums w-8 text-right">{c.progress}%</span>
+          <span className="text-[11px] text-primary tabular-nums w-8 text-right">{c.progress}%</span>
         </div>
       </div>
     </Link>
@@ -423,27 +485,22 @@ function CourseProgressCard({ course }: { course: ReturnType<typeof useCourses>[
 function NewCourseCard({ course }: { course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
   const c = course!;
   return (
-    <Link
-      to="/courses/$courseId"
-      params={{ courseId: c.id }}
-      className="group rounded-xl border border-border bg-card overflow-hidden hover:border-primary/40 transition-colors"
-    >
-      <div className="aspect-[16/9] relative overflow-hidden bg-muted">
+    <Link to="/courses/$courseId" params={{ courseId: c.id }} className="dash-card dash-card-hover group overflow-hidden">
+      <div className="aspect-[16/9] relative overflow-hidden bg-muted rounded-t-[15px]">
         {c.cover_url && (
-          <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+          <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
         )}
+        <div className="dash-cover-shade absolute inset-0" />
+        <span className="absolute bottom-2.5 left-3 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur px-2 py-0.5 text-[10px] text-muted-foreground">
+          <BookOpen className="h-3 w-3" />
+          {c.totalLessons} aulas
+        </span>
       </div>
       <div className="p-4">
         <div className="text-sm font-medium leading-tight truncate">{c.title}</div>
-        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{c.description}</div>
-        <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <BookOpen className="h-3 w-3" />
-            {c.totalLessons} aulas
-          </span>
-          <span className="inline-flex items-center gap-1 text-primary">
-            Começar <ArrowRight className="h-3 w-3" />
-          </span>
+        <div className="text-xs text-muted-foreground mt-1 line-clamp-2 min-h-[2rem]">{c.description}</div>
+        <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-primary">
+          Começar <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
         </div>
       </div>
     </Link>
@@ -454,7 +511,7 @@ function SkeletonGrid() {
   return (
     <div className="grid md:grid-cols-2 gap-3">
       {[0, 1].map((i) => (
-        <div key={i} className="rounded-xl border border-border bg-card p-4 h-24 animate-pulse" />
+        <div key={i} className="dash-card p-4 h-24 animate-pulse" />
       ))}
     </div>
   );
