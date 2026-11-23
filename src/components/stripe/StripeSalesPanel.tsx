@@ -70,17 +70,24 @@ export function StripeSalesPanel() {
 
   if (!d || !d.connected) {
     return (
-      <section className="rounded-xl border border-dashed border-border bg-card p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="h-10 w-10 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-          <Globe2 className="h-5 w-5" />
+      <section className="rounded-xl border border-border bg-card overflow-hidden grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center">
+        <div className="p-5 border-b lg:border-b-0 lg:border-r border-border">
+          <ClientOnly fallback={<GlobeFallback />}>
+            <Suspense fallback={<GlobeFallback />}>
+              <SalesGlobe points={[]} focus={[-14, -51]} />
+            </Suspense>
+          </ClientOnly>
         </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-medium">Veja suas vendas no mapa</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Conecte sua Stripe para ver faturamento, países e campanhas que mais vendem.</p>
+        <div className="p-6 space-y-3">
+          <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <Globe2 className="h-5 w-5" />
+          </div>
+          <h2 className="text-lg font-semibold tracking-tight">Veja suas vendas no mapa</h2>
+          <p className="text-sm text-muted-foreground">Conecte sua Stripe e o globo mostra de onde vêm suas vendas, com faturamento, país e campanha que mais vendem.</p>
+          <Link to="/settings" search={{ tab: "integrations" } as never} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
+            Conectar Stripe <ArrowRight className="h-3 w-3" />
+          </Link>
         </div>
-        <Link to="/settings" search={{ tab: "integrations" } as never} className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
-          Conectar Stripe <ArrowRight className="h-3 w-3" />
-        </Link>
       </section>
     );
   }
