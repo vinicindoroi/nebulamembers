@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMemberProgress } from "@/hooks/use-member-progress";
 import { useState, useEffect } from "react";
 import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
+import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
@@ -180,6 +181,8 @@ function Dashboard() {
       </header>
 
       <PaymentReminderBanner />
+
+      <StripeSalesPanel />
 
       {/* Stats */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-xl overflow-hidden border border-border bg-border">

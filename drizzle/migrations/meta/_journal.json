@@ -253,6 +253,13 @@
       "when": 1794847535179,
       "tag": "0035_mentor_no_same_day_booking",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795453942996,
+      "tag": "0036_student_stripe_connections",
+      "breakpoints": true
     }
   ]
 }

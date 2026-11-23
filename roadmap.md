@@ -17,3 +17,5 @@
 - [x] "Esqueci minha senha" na tela de login + página /reset-password para criar senha nova
 - [x] Bloquear contas sem nível também no banco (RLS): nada da plataforma antes da aprovação, mesmo acessando a API direto
 - [ ] Ativar push no celular para quedas e recuperação de domínios — aguardando conexão Firebase com web push (conexão recusada)
+- [x] Configurações → Integrações: aluno conecta a própria Stripe (chave restrita, só leitura, guardada criptografada)
+- [x] Dashboard do aluno: globo girando com os locais das vendas + faturamento, país e campanha (utm_campaign) que mais venderam

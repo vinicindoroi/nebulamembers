@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate, useSearch, useRouter } from "@tanstack/re
 import { useEffect, useState } from "react";
 import {
   Bell, Lock, Palette, Globe, LogOut, KeyRound, Eye, EyeOff,
-  User as UserIcon, ShieldCheck, AlertTriangle, Check,
+  User as UserIcon, ShieldCheck, AlertTriangle, Check, Plug,
 } from "lucide-react";
+import { StripeConnectCard } from "@/components/stripe/StripeConnectCard";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -43,6 +44,7 @@ const TABS = [
   { id: "account", label: "Conta", icon: UserIcon },
   { id: "notifications", label: "Notificações", icon: Bell },
   { id: "security", label: "Segurança", icon: ShieldCheck },
+  { id: "integrations", label: "Integrações", icon: Plug },
   { id: "about", label: "Sobre", icon: Globe },
 ] as const;
 
@@ -308,6 +310,12 @@ function SettingsPage() {
                 </div>
               </Section>
             </>
+          )}
+
+          {tab === "integrations" && (
+            <Section title="Stripe" description="Conecte sua conta para ver suas vendas no Dashboard.">
+              <StripeConnectCard />
+            </Section>
           )}
 
           {tab === "about" && (

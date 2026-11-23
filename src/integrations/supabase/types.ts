@@ -2192,6 +2192,36 @@ export type Database = {
         }
         Relationships: []
       }
+      student_stripe_connections: {
+        Row: {
+          account_name: string | null
+          connected_at: string
+          key_ciphertext: string
+          key_last4: string
+          livemode: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          connected_at?: string
+          key_ciphertext: string
+          key_last4: string
+          livemode?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string | null
+          connected_at?: string
+          key_ciphertext?: string
+          key_last4?: string
+          livemode?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tracker_funnel_events: {
         Row: {
           amount: number | null

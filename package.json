@@ -18,7 +18,8 @@
     "test:approval": "node tests/approval.mjs",
     "test:plan-access": "node tests/plan-access.mjs",
     "test:payments": "node tests/payment-reminders.mjs",
-    "test:no-same-day": "node tests/mentor-no-same-day.mjs"
+    "test:no-same-day": "node tests/mentor-no-same-day.mjs",
+    "test:stripe-sales": "node tests/stripe-sales.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
@@ -71,6 +72,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "cobe": "^2.0.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "html-to-image": "^1.11.13",
