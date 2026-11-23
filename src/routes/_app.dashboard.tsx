@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
 import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 import { StripeSalesHistory } from "@/components/stripe/StripeSalesHistory";
+import { useScrollReveal, revealDelay } from "@/hooks/use-scroll-reveal";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
@@ -157,19 +158,20 @@ function Dashboard() {
     .sort((a, b) => (b.progress ?? 0) - (a.progress ?? 0));
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   const visibleLocked = showAllAchievements ? locked : locked.slice(0, 3);
+  const revealRef = useScrollReveal<HTMLDivElement>();
 
   return (
-    <div className="dash space-y-6 dash-enter">
+    <div ref={revealRef} className="dash space-y-6">
       {/* Hero */}
       <header className="dash-hero rounded-2xl border border-border p-6 sm:p-8">
         <div className="dash-hero-orb" aria-hidden />
         <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="min-w-0 flex-1 space-y-4">
-            <span suppressHydrationWarning className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 backdrop-blur px-2.5 py-1 text-[11px] text-muted-foreground">
+            <span data-reveal style={revealDelay(0)} suppressHydrationWarning className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 backdrop-blur px-2.5 py-1 text-[11px] text-muted-foreground">
               <Sparkles className="h-3 w-3 text-primary" /> {today}
             </span>
-            <div>
+            <div data-reveal style={revealDelay(1)}>
               <h1 className="text-3xl md:text-4xl font-semibold tracking-tight leading-tight">
                 {getGreeting()}, <span className="text-gradient-primary">{name}</span>
               </h1>
@@ -179,7 +181,7 @@ function Dashboard() {
                   : "Comece um curso e construa o hábito de aprender todo dia."}
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <div data-reveal style={revealDelay(2)} className="flex flex-wrap items-center gap-3">
               {continueCourse && (
                 <Link
                   to="/courses/$courseId"
@@ -203,7 +205,7 @@ function Dashboard() {
           </div>
 
           {/* Level ring */}
-          <div className="flex items-center gap-4 md:flex-col md:gap-2 shrink-0">
+          <div data-reveal style={revealDelay(2)} className="flex items-center gap-4 md:flex-col md:gap-2 shrink-0">
             <Ring pct={mounted ? xpProgressPct : 0} size={112} stroke={7}>
               <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Nível</span>
               <span className="text-3xl font-semibold tabular-nums leading-none mt-0.5">{level}</span>
@@ -218,12 +220,16 @@ function Dashboard() {
 
       <PaymentReminderBanner />
 
-      <StripeSalesPanel />
+      <div data-reveal>
+        <StripeSalesPanel />
+      </div>
 
-      <StripeSalesHistory />
+      <div data-reveal>
+        <StripeSalesHistory />
+      </div>
 
       {/* Progress strip */}
-      <section className="dash-card p-4 sm:p-5">
+      <section data-reveal className="dash-card p-4 sm:p-5">
         <div className="grid grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] gap-4 lg:gap-0 lg:divide-x lg:divide-border">
           <div className="col-span-2 lg:col-span-1 lg:pr-6 flex items-center gap-4">
             <span className="dash-icon-tile h-10 w-10 rounded-xl flex items-center justify-center shrink-0">
@@ -235,7 +241,7 @@ function Dashboard() {
                 <span className="text-xs tabular-nums text-muted-foreground">{completedLessons} de {totalLessons} aulas</span>
               </div>
               <div className="flex items-center gap-3 mt-1.5">
-                <span className="text-2xl font-semibold tabular-nums leading-none">{overall}%</span>
+                <span className="text-2xl font-semibold tabular-nums leading-none"><CountUp value={overall} />%</span>
                 <div className="dash-bar flex-1 h-1.5 rounded-full overflow-hidden">
                   <span style={{ width: mounted ? `${overall}%` : "0%" }} />
                 </div>
@@ -252,7 +258,7 @@ function Dashboard() {
               <div key={m.label} className="lg:px-6 flex items-center gap-3 min-w-0">
                 <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-xl font-semibold tabular-nums leading-none">{m.value}</div>
+                  <div className="text-xl font-semibold tabular-nums leading-none">{typeof m.value === "number" ? <CountUp value={m.value} /> : m.value}</div>
                   <div className="text-[11px] text-muted-foreground mt-1 truncate">{m.label}</div>
                 </div>
               </div>
@@ -270,8 +276,8 @@ function Dashboard() {
             <section>
               <SectionHead icon={Play} title="Continue de onde parou" to="/courses" linkLabel="Ver todos" />
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {inProgress.slice(0, 3).map((c) => (
-                  <CourseProgressCard key={c.id} course={c} />
+                {inProgress.slice(0, 3).map((c, i) => (
+                  <CourseProgressCard key={c.id} course={c} index={i} />
                 ))}
               </div>
             </section>
@@ -286,8 +292,8 @@ function Dashboard() {
                 linkLabel="Ver todos"
               />
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {notStarted.slice(0, 4).map((c) => (
-                  <NewCourseCard key={c.id} course={c} />
+                {notStarted.slice(0, 4).map((c, i) => (
+                  <NewCourseCard key={c.id} course={c} index={i} />
                 ))}
               </div>
             </section>
@@ -301,7 +307,7 @@ function Dashboard() {
         {isProgressLoading ? (
           <div className="dash-card h-48 animate-pulse" />
         ) : streak ? (
-          <section className="dash-card p-5 flex flex-col">
+          <section data-reveal style={revealDelay(0, 90)} className="dash-card p-5 flex flex-col">
             <SectionHead icon={Flame} title="Sequência" meta={`recorde ${streak.longestStreak}`} />
             <div className="flex items-end gap-2">
               <span className="text-3xl font-semibold tabular-nums leading-none">{streak.currentStreak}</span>
@@ -327,7 +333,7 @@ function Dashboard() {
 
         {/* Achievements */}
         {achievements.length > 0 && (
-          <section className="dash-card p-5 flex flex-col">
+          <section data-reveal style={revealDelay(1, 90)} className="dash-card p-5 flex flex-col">
             <SectionHead icon={Trophy} title="Conquistas" meta={`${unlockedCount} de ${achievements.length}`} />
             {unlocked.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
@@ -381,7 +387,7 @@ function Dashboard() {
         )}
 
         {/* Tasks */}
-        <section className="dash-card p-5 flex flex-col md:col-span-2 lg:col-span-1">
+        <section data-reveal style={revealDelay(2, 90)} className="dash-card p-5 flex flex-col md:col-span-2 lg:col-span-1">
           <SectionHead icon={Target} title="Suas tarefas" to="/organizer" linkLabel="Abrir" />
           {dashboardPendingTasks.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center gap-3 py-4">
@@ -440,7 +446,7 @@ function Ring({ pct, size, stroke, children }: { pct: number; size: number; stro
 
 function SectionHead({ icon: Icon, title, to, linkLabel, meta }: { icon: React.ComponentType<{ className?: string }>; title: string; to?: "/courses" | "/organizer"; linkLabel?: string; meta?: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 mb-4">
+    <div data-reveal className="flex items-center justify-between gap-3 mb-4">
       <h2 className="text-sm font-medium inline-flex items-center gap-2">
         <span className="dash-icon-tile h-6 w-6 rounded-md flex items-center justify-center">
           <Icon className="h-3.5 w-3.5" />
@@ -458,10 +464,10 @@ function SectionHead({ icon: Icon, title, to, linkLabel, meta }: { icon: React.C
   );
 }
 
-function CourseProgressCard({ course }: { course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
+function CourseProgressCard({ course, index = 0 }: { index?: number;  course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
   const c = course!;
   return (
-    <Link to="/courses/$courseId" params={{ courseId: c.id }} className="dash-card dash-card-hover group p-3 flex items-center gap-4 overflow-hidden">
+    <Link to="/courses/$courseId" params={{ courseId: c.id }} data-reveal style={revealDelay(index + 1)} className="dash-card dash-card-hover group p-3 flex items-center gap-4 overflow-hidden">
       <div className="relative h-16 w-24 shrink-0 rounded-xl overflow-hidden bg-muted">
         {c.cover_url ? (
           <img src={c.cover_url} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -490,10 +496,10 @@ function CourseProgressCard({ course }: { course: ReturnType<typeof useCourses>[
   );
 }
 
-function NewCourseCard({ course }: { course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
+function NewCourseCard({ course, index = 0 }: { index?: number;  course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
   const c = course!;
   return (
-    <Link to="/courses/$courseId" params={{ courseId: c.id }} className="dash-card dash-card-hover group overflow-hidden">
+    <Link to="/courses/$courseId" params={{ courseId: c.id }} data-reveal style={revealDelay(index + 1)} className="dash-card dash-card-hover group overflow-hidden">
       <div className="aspect-[16/9] relative overflow-hidden bg-muted rounded-t-[15px]">
         {c.cover_url && (
           <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -523,4 +529,24 @@ function SkeletonGrid() {
       ))}
     </div>
   );
+}
+
+function CountUp({ value }: { value: number }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      setN(value);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / 1100);
+      setN(Math.round(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{n}</>;
 }

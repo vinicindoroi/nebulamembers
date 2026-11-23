@@ -700,15 +700,39 @@
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 35%, transparent), 0 0 16px -6px var(--primary);
 }
 .dash-cover-shade { background: linear-gradient(180deg, transparent 35%, color-mix(in oklab, var(--card) 92%, transparent)); }
-.dash-enter > * { animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.dash-enter > *:nth-child(2) { animation-delay: 60ms; }
-.dash-enter > *:nth-child(3) { animation-delay: 120ms; }
-.dash-enter > *:nth-child(4) { animation-delay: 180ms; }
-.dash-enter > *:nth-child(n+5) { animation-delay: 240ms; }
+/* Scroll reveal: soft blur + rise as blocks enter the viewport (armed by useScrollReveal) */
+.dash[data-reveal-armed] [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  filter: blur(14px);
+  translate: 0 26px;
+  scale: 0.98;
+}
+.dash[data-reveal-armed] [data-reveal] [data-reveal]:not([data-revealed]) { filter: blur(6px); translate: 0 10px; scale: 1; }
+.dash[data-reveal-armed] [data-reveal][data-revealed] {
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0ms),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0ms),
+    translate 1.1s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0ms),
+    scale 1.1s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0ms),
+    border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+/* Cursor spotlight on cards */
+.dash .dash-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), color-mix(in oklab, var(--primary) 9%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.dash .dash-card:hover::before { opacity: 1; }
 .prio-alta { background: var(--destructive); box-shadow: 0 0 8px var(--destructive); }
 .prio-media { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
 .prio-baixa { background: var(--muted-foreground); }
 @media (prefers-reduced-motion: reduce) {
-  .dash-hero-orb, .dash-enter > * { animation: none; }
+  .dash-hero-orb { animation: none; }
   .dash-card-hover:hover { transform: none; }
 }
