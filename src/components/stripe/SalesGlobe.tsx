@@ -40,7 +40,7 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
     const markers = points.map((p) => ({ location: p.location, size: 0.035 + 0.09 * (p.weight / max) }));
 
     // Start facing the best-selling country (cobe: phi rotates around Y, theta tilts).
-    let phi = focus ? -((focus[1] * Math.PI) / 180) - Math.PI / 2 : 0;
+    const phi = focus ? -((focus[1] * Math.PI) / 180) - Math.PI / 2 : 0;
     const theta = focus ? Math.max(-0.6, Math.min(0.6, (focus[0] * Math.PI) / 180 * 0.6)) : 0.25;
 
     const globe = createGlobe(canvas, {
@@ -61,10 +61,34 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
     });
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Smooth motion: slow auto-spin plus a gentle tilt/turn toward the cursor while hovering.
+    const baseTheta = theta;
+    let spin = phi;
+    let offPhi = 0, offTheta = 0;      // current (eased) cursor offsets
+    let tgtPhi = 0, tgtTheta = 0;      // cursor targets
+    let speed = 0.0018, tgtSpeed = 0.0018;
+    const onMove = (e: PointerEvent) => {
+      const r = wrap.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * 2 - 1;   // -1..1
+      const y = ((e.clientY - r.top) / r.height) * 2 - 1;
+      tgtPhi = x * 0.6;
+      tgtTheta = y * 0.35;
+      tgtSpeed = 0.0006;               // nearly pause the spin while the user explores
+    };
+    const onLeave = () => { tgtPhi = 0; tgtTheta = 0; tgtSpeed = 0.0018; };
+    if (!reduce) {
+      wrap.addEventListener("pointermove", onMove);
+      wrap.addEventListener("pointerleave", onLeave);
+    }
     let raf = 0;
     const tick = () => {
-      if (!reduce) phi += 0.0035;
-      globe.update({ phi });
+      if (!reduce) {
+        speed += (tgtSpeed - speed) * 0.03;
+        spin += speed;
+        offPhi += (tgtPhi - offPhi) * 0.045;
+        offTheta += (tgtTheta - offTheta) * 0.045;
+      }
+      globe.update({ phi: spin + offPhi, theta: Math.max(-0.8, Math.min(0.8, baseTheta + offTheta)) });
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -78,6 +102,8 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
 
     return () => {
       cancelAnimationFrame(raf);
+      wrap.removeEventListener("pointermove", onMove);
+      wrap.removeEventListener("pointerleave", onLeave);
       ro.disconnect();
       globe.destroy();
     };
