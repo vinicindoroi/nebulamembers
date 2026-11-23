@@ -165,6 +165,7 @@ function Dashboard() {
       {/* Hero */}
       <header className="dash-hero rounded-2xl border border-border p-6 sm:p-8">
         <div className="dash-hero-orb" aria-hidden />
+        <div className="dash-hero-orb-2" aria-hidden />
         <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="min-w-0 flex-1 space-y-4">
@@ -186,7 +187,7 @@ function Dashboard() {
                 <Link
                   to="/courses/$courseId"
                   params={{ courseId: continueCourse.id }}
-                  className="sales-glow-cta inline-flex items-center gap-2 pl-2 pr-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity max-w-full"
+                  className="sales-glow-cta dash-shine inline-flex items-center gap-2 pl-2 pr-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity max-w-full"
                 >
                   <span className="h-7 w-7 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
                     <Play className="h-3.5 w-3.5" fill="currentColor" />
@@ -420,12 +421,20 @@ function Dashboard() {
 }
 
 function Ring({ pct, size, stroke, children }: { pct: number; size: number; stroke: number; children?: React.ReactNode }) {
+  const gid = React.useId().replace(/:/g, "");
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const clamped = Math.max(0, Math.min(100, pct));
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90" aria-hidden>
+      <div className="dash-ring-glow" aria-hidden />
+      <svg width={size} height={size} className="relative -rotate-90" aria-hidden>
+        <defs>
+          <linearGradient id={`ring-${gid}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" style={{ stopColor: "color-mix(in oklab, var(--primary) 35%, transparent)" }} />
+            <stop offset="100%" style={{ stopColor: "var(--primary)" }} />
+          </linearGradient>
+        </defs>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="dash-ring-track" />
         <circle
           cx={size / 2}
@@ -437,6 +446,7 @@ function Ring({ pct, size, stroke, children }: { pct: number; size: number; stro
           strokeDasharray={c}
           strokeDashoffset={c - (clamped / 100) * c}
           className="dash-ring-value"
+          style={{ stroke: `url(#ring-${gid})` }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
@@ -453,6 +463,7 @@ function SectionHead({ icon: Icon, title, to, linkLabel, meta }: { icon: React.C
         </span>
         {title}
       </h2>
+      <span className="dash-head-line flex-1 h-px" aria-hidden />
       {to && linkLabel ? (
         <Link to={to} className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1">
           {linkLabel} <ArrowRight className="h-3 w-3" />
@@ -467,7 +478,8 @@ function SectionHead({ icon: Icon, title, to, linkLabel, meta }: { icon: React.C
 function CourseProgressCard({ course, index = 0 }: { index?: number;  course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
   const c = course!;
   return (
-    <Link to="/courses/$courseId" params={{ courseId: c.id }} data-reveal style={revealDelay(index + 1)} className="dash-card dash-card-hover group p-3 flex items-center gap-4 overflow-hidden">
+    <Link to="/courses/$courseId" params={{ courseId: c.id }} data-reveal data-tilt style={revealDelay(index + 1)} className="dash-card dash-card-hover group p-3 flex items-center gap-4 overflow-hidden">
+      <span className="dash-tilt-glare" aria-hidden />
       <div className="relative h-16 w-24 shrink-0 rounded-xl overflow-hidden bg-muted">
         {c.cover_url ? (
           <img src={c.cover_url} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -499,7 +511,8 @@ function CourseProgressCard({ course, index = 0 }: { index?: number;  course: Re
 function NewCourseCard({ course, index = 0 }: { index?: number;  course: ReturnType<typeof useCourses>["data"] extends Array<infer T> | undefined ? T : never }) {
   const c = course!;
   return (
-    <Link to="/courses/$courseId" params={{ courseId: c.id }} data-reveal style={revealDelay(index + 1)} className="dash-card dash-card-hover group overflow-hidden">
+    <Link to="/courses/$courseId" params={{ courseId: c.id }} data-reveal data-tilt style={revealDelay(index + 1)} className="dash-card dash-card-hover group overflow-hidden">
+      <span className="dash-tilt-glare z-10" aria-hidden />
       <div className="aspect-[16/9] relative overflow-hidden bg-muted rounded-t-[15px]">
         {c.cover_url && (
           <img src={c.cover_url} alt={c.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />

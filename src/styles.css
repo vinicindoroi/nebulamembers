@@ -736,3 +736,119 @@
   .dash-hero-orb { animation: none; }
   .dash-card-hover:hover { transform: none; }
 }
+
+/* Dashboard polish v2 — ambient glow, sweeping hero border, shine, shimmer, tilt */
+@property --dash-ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.dash { position: relative; isolation: isolate; }
+.dash::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: -120px;
+  height: 640px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(45% 60% at 78% 20%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%),
+    radial-gradient(35% 50% at 12% 45%, color-mix(in oklab, var(--primary) 6%, transparent), transparent 70%);
+  filter: blur(20px);
+}
+.dash-hero { border-color: transparent; }
+.dash-hero::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--dash-ang),
+    color-mix(in oklab, var(--foreground) 8%, transparent) 0deg,
+    color-mix(in oklab, var(--primary) 75%, transparent) 50deg,
+    color-mix(in oklab, var(--foreground) 8%, transparent) 110deg,
+    color-mix(in oklab, var(--foreground) 8%, transparent) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: dash-spin 9s linear infinite;
+  pointer-events: none;
+}
+@keyframes dash-spin { to { --dash-ang: 360deg; } }
+.dash-hero-orb { translate: 0 calc(var(--sy, 0) * 0.22px); }
+.dash-hero-orb-2 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  left: -80px;
+  bottom: -150px;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--primary) 18%, transparent), transparent);
+  filter: blur(34px);
+  z-index: -1;
+  animation: ambient-float 24s ease-in-out infinite reverse;
+  translate: 0 calc(var(--sy, 0) * -0.12px);
+  pointer-events: none;
+}
+.dash .text-gradient-primary {
+  background: linear-gradient(110deg, var(--foreground) 20%, var(--primary) 45%, color-mix(in oklab, var(--primary) 55%, var(--foreground)) 60%, var(--foreground) 85%);
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: dash-text-flow 8s ease-in-out infinite alternate;
+}
+@keyframes dash-text-flow { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+.dash-shine { position: relative; overflow: hidden; isolation: isolate; }
+.dash-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, color-mix(in oklab, var(--primary-foreground) 35%, transparent) 50%, transparent 65%);
+  translate: -120% 0;
+  animation: dash-shine 5s ease-in-out 1.6s infinite;
+  pointer-events: none;
+}
+@keyframes dash-shine { 0% { translate: -120% 0; } 30%, 100% { translate: 120% 0; } }
+.dash .dash-bar > span { position: relative; overflow: hidden; }
+.dash .dash-bar > span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--foreground) 45%, transparent), transparent);
+  translate: -100% 0;
+  animation: dash-shimmer 3.2s ease-in-out infinite;
+}
+@keyframes dash-shimmer { 0% { translate: -100% 0; } 60%, 100% { translate: 100% 0; } }
+.dash .dash-card { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent); }
+.dash-head-line {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--border) 100%, transparent), transparent);
+}
+.dash [data-tilt] { transform-style: preserve-3d; will-change: transform; }
+.dash [data-tilt].dash-card-hover:hover {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-3px);
+}
+.dash [data-tilt] .dash-tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), color-mix(in oklab, var(--foreground) 10%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+.dash [data-tilt]:hover .dash-tilt-glare { opacity: 1; }
+.dash-ring-glow {
+  position: absolute;
+  inset: 14%;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--primary) 22%, transparent), transparent);
+  filter: blur(10px);
+  animation: ambient-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-hero::after, .dash-hero-orb-2, .dash .text-gradient-primary, .dash-shine::after,
+  .dash .dash-bar > span::after, .dash-ring-glow { animation: none; }
+  .dash [data-tilt].dash-card-hover:hover { transform: none; }
+}
+.dash .dash-card-hover:hover {
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 7%, transparent), 0 22px 44px -24px color-mix(in oklab, var(--primary) 60%, transparent);
+}
