@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { TrendingUp, Clock, Award, Flame, Play, ArrowRight, BookOpen, Target, Trophy, Lock, Compass, Check, ChevronRight, Sparkles } from "lucide-react";
+import { TrendingUp, Clock, Award, Flame, Play, ArrowRight, BookOpen, Target, Trophy, Compass, Check, Sparkles, Plus } from "lucide-react";
 import { useCourses } from "@/hooks/use-courses";
 import { useAuth } from "@/hooks/use-auth";
 import { useMemberProgress } from "@/hooks/use-member-progress";
@@ -155,7 +155,13 @@ function Dashboard() {
 
   const todayRaw = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
   const today = todayRaw.charAt(0).toUpperCase() + todayRaw.slice(1);
-  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const unlocked = achievements.filter((a) => a.unlocked);
+  const unlockedCount = unlocked.length;
+  const locked = achievements
+    .filter((a) => !a.unlocked)
+    .sort((a, b) => (b.progress ?? 0) - (a.progress ?? 0));
+  const [showAllAchievements, setShowAllAchievements] = useState(false);
+  const visibleLocked = showAllAchievements ? locked : locked.slice(0, 3);
 
   return (
     <div className="dash space-y-6 dash-enter">
@@ -245,18 +251,55 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left */}
-        <div className="lg:col-span-8 space-y-6 min-w-0">
+        <div className="lg:col-span-8 space-y-8 min-w-0">
+          {/* Courses */}
+          {isLoading ? (
+            <SkeletonGrid />
+          ) : (
+            <>
+              {inProgress.length > 0 && (
+                <section>
+                  <SectionHead icon={Play} title="Continue de onde parou" to="/courses" linkLabel="Ver todos" />
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {inProgress.slice(0, 4).map((c) => (
+                      <CourseProgressCard key={c.id} course={c} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {notStarted.length > 0 && (
+                <section>
+                  <SectionHead
+                    icon={Compass}
+                    title={inProgress.length > 0 ? "Comece um novo curso" : "Escolha seu primeiro curso"}
+                    to="/courses"
+                    linkLabel="Ver todos"
+                  />
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {notStarted.slice(0, 3).map((c) => (
+                      <NewCourseCard key={c.id} course={c} />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </>
+          )}
+
           {/* Focus tasks */}
-          <section className="dash-card p-5 sm:p-6">
-            <SectionHead icon={Target} title="Foco imediato" to="/organizer" linkLabel="Organização" />
+          <section>
+            <SectionHead icon={Target} title="Suas tarefas" to="/organizer" linkLabel="Abrir organização" />
             {dashboardPendingTasks.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border px-4 py-6 text-center">
-                <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente. Crie metas no seu quadro de organização.</p>
+              <div className="dash-card px-4 py-3.5 flex items-center justify-between gap-3">
+                <p className="text-xs text-muted-foreground">Nenhuma tarefa pendente.</p>
+                <Link to="/organizer" className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs hover:border-primary/40 hover:text-primary transition-colors">
+                  <Plus className="h-3 w-3" /> Criar tarefa
+                </Link>
               </div>
             ) : (
               <ul className="space-y-2">
                 {dashboardPendingTasks.map((task) => (
-                  <li key={task.id} className="flex items-center gap-3 rounded-xl border border-border bg-background/40 px-3 py-3 group hover:border-primary/30 transition-colors">
+                  <li key={task.id} className="dash-card flex items-center gap-3 px-3 py-3 group hover:border-primary/30 transition-colors">
                     <button
                       onClick={() => handleToggleLocalTask(task.id)}
                       aria-label={`Concluir ${task.title}`}
@@ -272,91 +315,34 @@ function Dashboard() {
                       <span className={`h-1.5 w-1.5 rounded-full prio-${task.priority}`} />
                       {task.priority === "media" ? "média" : task.priority}
                     </span>
-                    <Link to="/organizer" className="shrink-0 text-muted-foreground hover:text-foreground transition-colors" aria-label="Abrir organização">
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
                   </li>
                 ))}
               </ul>
             )}
           </section>
-
-          {/* Continue */}
-          <section className="space-y-3">
-            <SectionHead icon={Play} title="Cursos em andamento" to="/courses" linkLabel="Ver todos" />
-            {isLoading ? (
-              <SkeletonGrid />
-            ) : inProgress.length === 0 ? (
-              <div className="dash-card border-dashed p-8 text-center">
-                <p className="text-sm text-muted-foreground">Nenhum curso em andamento.</p>
-                <Link to="/courses" className="sales-glow-cta mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-opacity">
-                  Explorar cursos <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-3">
-                {inProgress.slice(0, 4).map((c) => (
-                  <CourseProgressCard key={c.id} course={c} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* New courses */}
-          {notStarted.length > 0 && (
-            <section className="space-y-3">
-              <SectionHead icon={Compass} title="Comece um novo curso" to="/courses" linkLabel="Ver todos" />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {notStarted.slice(0, 3).map((c) => (
-                  <NewCourseCard key={c.id} course={c} />
-                ))}
-              </div>
-            </section>
-          )}
         </div>
 
         {/* Right */}
         <aside className="lg:col-span-4 space-y-6 min-w-0">
           {isProgressLoading && <div className="dash-card h-40 animate-pulse" />}
 
-          {/* Progress donut */}
-          <section className="dash-card p-5 sm:p-6">
-            <SectionHead icon={TrendingUp} title="Progresso" meta={`${courses.length} cursos`} />
-            <div className="flex items-center gap-5">
-              <Ring pct={mounted ? overall : 0} size={92} stroke={6}>
-                <span className="text-xl font-semibold tabular-nums leading-none">{overall}%</span>
-              </Ring>
-              <dl className="flex-1 space-y-2.5">
-                {[
-                  { k: "Concluídos", v: completed, cls: "bg-primary" },
-                  { k: "Em andamento", v: inProgress.length, cls: "bg-primary/50" },
-                  { k: "Restantes", v: notStarted.length, cls: "bg-muted-foreground/40" },
-                ].map((it) => (
-                  <div key={it.k} className="flex items-center gap-2 text-xs">
-                    <span className={`h-2 w-2 rounded-full ${it.cls}`} />
-                    <dt className="flex-1 text-muted-foreground">{it.k}</dt>
-                    <dd className="font-medium tabular-nums">{it.v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </section>
-
           {/* Streak */}
           {streak && (
             <section className="dash-card p-5 sm:p-6">
-              <SectionHead icon={Flame} title="Sequência" meta={`recorde ${streak.longestStreak}`} />
-              <div className="flex items-end gap-2 mb-4">
+              <SectionHead icon={Flame} title="Sequência de estudos" meta={`recorde ${streak.longestStreak}`} />
+              <div className="flex items-end gap-2">
                 <span className="text-3xl font-semibold tabular-nums leading-none">{streak.currentStreak}</span>
                 <span className="text-xs text-muted-foreground pb-0.5">{streak.currentStreak === 1 ? "dia seguido" : "dias seguidos"}</span>
               </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5 mb-4">Conclua uma aula por dia para manter a sequência.</p>
               <div className="flex items-center justify-between gap-1.5">
-                {streak.weekDays.map((day) => {
+                {streak.weekDays.map((day, idx) => {
                   const dateObj = new Date(day.date + "T12:00:00");
+                  const isToday = idx === streak.weekDays.length - 1;
                   return (
                     <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5" title={day.date.split("-").reverse().slice(0, 2).join("/")}>
-                      <span className="text-[10px] text-muted-foreground">{DAY_LABELS[dateObj.getDay()]}</span>
-                      <div className={`h-8 w-full rounded-lg flex items-center justify-center text-[10px] tabular-nums ${day.active ? "dash-day-active" : "dash-bar text-muted-foreground"}`}>
+                      <span className={`text-[10px] ${isToday ? "text-primary font-medium" : "text-muted-foreground"}`}>{isToday ? "Hoje" : DAY_LABELS[dateObj.getDay()]}</span>
+                      <div className={`h-8 w-full rounded-lg flex items-center justify-center text-[10px] tabular-nums ${day.active ? "dash-day-active" : "dash-bar text-muted-foreground"} ${isToday && !day.active ? "ring-1 ring-primary/50" : ""}`}>
                         {day.active ? <Check className="h-3.5 w-3.5" /> : dateObj.getDate()}
                       </div>
                     </div>
@@ -369,34 +355,63 @@ function Dashboard() {
           {/* Achievements */}
           {achievements.length > 0 && (
             <section className="dash-card p-5 sm:p-6">
-              <SectionHead icon={Trophy} title="Conquistas" meta={`${unlockedCount}/${achievements.length}`} />
-              <ul className="space-y-3">
-                {achievements.map((a) => {
-                  const Icon = ACHIEVEMENT_ICONS[a.id] || Trophy;
-                  return (
-                    <li key={a.id} className={`flex items-center gap-3 ${a.unlocked ? "" : "opacity-80"}`}>
-                      <div className={`h-9 w-9 shrink-0 rounded-xl flex items-center justify-center ${a.unlocked ? "dash-badge-on" : "dash-bar text-muted-foreground"}`}>
-                        {a.unlocked ? <Icon className="h-4 w-4" /> : <Lock className="h-3.5 w-3.5" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium truncate">{a.title}</div>
-                        {!a.unlocked && a.progress !== undefined ? (
-                          <div className="dash-bar mt-1.5 h-1 w-full rounded-full overflow-hidden">
-                            <span style={{ width: `${a.progress}%` }} />
+              <SectionHead icon={Trophy} title="Conquistas" meta={`${unlockedCount} de ${achievements.length}`} />
+
+              {unlocked.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {unlocked.map((a) => {
+                    const Icon = ACHIEVEMENT_ICONS[a.id] || Trophy;
+                    return (
+                      <span key={a.id} title={a.description} className="dash-badge-on inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
+                        <Icon className="h-3 w-3" /> {a.title}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
+              {visibleLocked.length > 0 && (
+                <>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-3">
+                    {unlocked.length > 0 ? "Próximas" : "Para desbloquear"}
+                  </p>
+                  <ul className="space-y-3.5">
+                    {visibleLocked.map((a) => {
+                      const Icon = ACHIEVEMENT_ICONS[a.id] || Trophy;
+                      return (
+                        <li key={a.id} className="flex items-center gap-3">
+                          <div className="dash-bar h-9 w-9 shrink-0 rounded-xl flex items-center justify-center text-muted-foreground">
+                            <Icon className="h-4 w-4" />
                           </div>
-                        ) : (
-                          <div className="text-[11px] text-muted-foreground truncate">{a.description}</div>
-                        )}
-                      </div>
-                      {!a.unlocked && a.progress !== undefined && (
-                        <span className="text-[11px] text-muted-foreground tabular-nums shrink-0">
-                          {a.current}/{a.target}
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <span className="text-xs font-medium truncate">{a.title}</span>
+                              {a.target !== undefined && (
+                                <span className="text-[11px] text-muted-foreground tabular-nums shrink-0">{a.current ?? 0}/{a.target}</span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground truncate">{a.description}</div>
+                            {a.progress !== undefined && (
+                              <div className="dash-bar mt-1.5 h-1 w-full rounded-full overflow-hidden">
+                                <span style={{ width: `${a.progress}%` }} />
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {locked.length > 3 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllAchievements((v) => !v)}
+                      className="mt-4 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {showAllAchievements ? "Mostrar menos" : `Ver todas (${locked.length})`}
+                    </button>
+                  )}
+                </>
+              )}
             </section>
           )}
         </aside>
@@ -493,12 +508,12 @@ function NewCourseCard({ course }: { course: ReturnType<typeof useCourses>["data
         <div className="dash-cover-shade absolute inset-0" />
         <span className="absolute bottom-2.5 left-3 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur px-2 py-0.5 text-[10px] text-muted-foreground">
           <BookOpen className="h-3 w-3" />
-          {c.totalLessons} aulas
+          {c.totalLessons} {c.totalLessons === 1 ? "aula" : "aulas"}
         </span>
       </div>
       <div className="p-4">
         <div className="text-sm font-medium leading-tight truncate">{c.title}</div>
-        <div className="text-xs text-muted-foreground mt-1 line-clamp-2 min-h-[2rem]">{c.description}</div>
+        {c.description && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{c.description}</div>}
         <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-primary">
           Começar <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
         </div>

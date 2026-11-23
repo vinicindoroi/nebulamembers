@@ -186,7 +186,7 @@ function computeAchievements(items: any[], streak: StreakData): Achievement[] {
     {
       id: "streak_3",
       title: "Consistente",
-      description: "Mantenha um streak de 3 dias",
+      description: "Estude 3 dias seguidos",
       icon: "🔥",
       unlocked: streak.longestStreak >= 3,
       current: Math.min(streak.currentStreak, 3),
@@ -196,7 +196,7 @@ function computeAchievements(items: any[], streak: StreakData): Achievement[] {
     {
       id: "streak_7",
       title: "Imparável",
-      description: "Mantenha um streak de 7 dias",
+      description: "Estude 7 dias seguidos",
       icon: "⚡",
       unlocked: streak.longestStreak >= 7,
       current: Math.min(streak.currentStreak, 7),
