@@ -26,7 +26,7 @@ const TILT_MAX = 1.35;
 const mix = (a: [number, number, number], b: [number, number, number], t: number): [number, number, number] =>
   [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 
-export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[]; focus: [number, number] | null; hub?: [number, number] | null }) {
+export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; focus: [number, number] | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -46,28 +46,34 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
     const baseColor: [number, number, number] = isDark ? mix([0.2, 0.2, 0.2], primary, 0.18) : mix([0.94, 0.94, 0.94], primary, 0.12);
     const fadeTo: [number, number, number] = isDark ? mix([0.03, 0.04, 0.04], primary, 0.1) : baseColor;
     const bright: [number, number, number] = mix(primary, [1, 1, 1], isDark ? 0.55 : 0.15);
-    const sized = points.map((p, i) => ({ location: p.location, core: 0.025 + 0.05 * (p.weight / max), phase: i * 0.37 }));
-    // Each selling country blinks: a pulsing core plus a ripple that expands and fades into the globe.
+    // "Live sales" effect: every country rests as a dim dot and flashes at its own organic rhythm,
+    // like a sale popping up there. Countries that sell more flash more often.
+    const rand = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    const sized = points.map((p, i) => {
+      const w = p.weight / max;
+      return { location: p.location, core: 0.022 + 0.04 * w, period: 5200 - 3400 * w, seed: i + 1 };
+    });
+    const dim: [number, number, number] = mix(primary, fadeTo, 0.55);
+    const FLASH = 900; // ms a flash lasts
     const pulseMarkers = (t: number) => {
-      const ripples = sized.map((m) => {
-        const k = ((t / 1600 + m.phase) % 1 + 1) % 1;          // 0..1 ripple progress
-        return { location: m.location, size: m.core * (1.2 + 2.6 * k), color: mix(primary, fadeTo, Math.pow(k, 0.6)) };
-      });
-      const cores = sized.map((m) => {
-        const b = 0.5 + 0.5 * Math.sin((t / 1600 + m.phase) * Math.PI * 2);
-        return { location: m.location, size: m.core * (0.9 + 0.35 * b), color: mix(primary, bright, b) };
-      });
-      return [...ripples, ...cores];
+      const glows: Array<{ location: [number, number]; size: number; color: [number, number, number] }> = [];
+      const cores: typeof glows = [];
+      for (const m of sized) {
+        const cycle = Math.floor(t / m.period + rand(m.seed));
+        const start = (cycle - rand(m.seed)) * m.period + rand(m.seed * 31 + cycle) * (m.period - FLASH);
+        const e = t - start;
+        const k = e >= 0 && e < FLASH ? e / FLASH : -1;         // 0..1 while flashing
+        if (k < 0) {
+          cores.push({ location: m.location, size: m.core * 0.75, color: dim });
+          continue;
+        }
+        const pop = Math.sin(Math.PI * Math.min(1, k * 1.6));  // fast rise, quick fall
+        glows.push({ location: m.location, size: m.core * (1.4 + 2.2 * k), color: mix(primary, fadeTo, Math.min(1, k * 1.15)) });
+        cores.push({ location: m.location, size: m.core * (0.75 + 0.75 * pop), color: mix(dim, bright, pop) });
+      }
+      return [...glows, ...cores];
     };
-    const markers = pulseMarkers(0);
-    // Sales routes: thin arcs from the hub (best-selling country) to every other selling country.
-    const arcs = hub
-      ? [...points]
-          .filter((p) => Math.abs(p.location[0] - hub[0]) + Math.abs(p.location[1] - hub[1]) > 2)
-          .sort((a, b) => b.weight - a.weight)
-          .slice(0, 8) // only the strongest routes, so many countries don't turn into a tangle
-          .map((p) => ({ from: hub, to: p.location }))
-      : [];
+    const markers = pulseMarkers(performance.now());
 
     // Start facing the best-selling country (cobe: phi rotates around Y, theta tilts).
     const phi = focus ? -((focus[1] * Math.PI) / 180) - Math.PI / 2 : 0;
@@ -88,10 +94,6 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
       markerColor: primary,
       glowColor: isDark ? mix([0.05, 0.05, 0.05], primary, 0.32) : mix(muted, primary, 0.4),
       markers,
-      arcs,
-      arcColor: primary,
-      arcWidth: 0.6,
-      arcHeight: 0.35,
       markerElevation: 0.02,
       opacity: 0.96,
     });
@@ -207,7 +209,7 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
       ro.disconnect();
       globe.destroy();
     };
-  }, [points, focus, hub]);
+  }, [points, focus]);
 
   return (
     <div className="relative w-full max-w-[480px] mx-auto aspect-square">
