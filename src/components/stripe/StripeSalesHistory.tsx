@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AlertTriangle, CalendarDays, CalendarRange, Globe2, History, Megaphone, Receipt, ShoppingBag, Trophy, Wallet } from "lucide-react";
 import { getStripeSalesHistory } from "@/lib/stripe-connect.functions";
 import { toMajor, type DayPoint, type Ranked, type Sale } from "@/lib/stripe-sales";
@@ -177,11 +177,12 @@ export function StripeSalesHistory() {
       </header>
 
       {q.isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-4" aria-busy="true">
+          <p className="text-xs text-muted-foreground">Buscando vendas na Stripe…</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[0, 1, 2, 3].map((i) => <div key={i} className="h-20 rounded-xl bg-muted/30 animate-pulse" />)}
+            {[0, 1, 2, 3].map((i) => <div key={i} className="h-20 rounded-xl bg-muted/50 animate-pulse" />)}
           </div>
-          <div className="h-56 rounded-xl bg-muted/30 animate-pulse" />
+          <div className="h-56 rounded-xl bg-muted/50 animate-pulse" />
         </div>
       ) : q.isError ? (
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -209,7 +210,7 @@ export function StripeSalesHistory() {
           {(h.withoutCampaign > 0 || h.truncated) && (
             <div className="space-y-1 text-[11px] text-muted-foreground">
               {h.withoutCampaign > 0 && <p>{h.withoutCampaign} {h.withoutCampaign === 1 ? "venda sem" : "vendas sem"} utm_campaign no período.</p>}
-              {h.truncated && <p>Muitas vendas no período: mostrando as 1.000 mais recentes. Escolha um período menor para ver tudo.</p>}
+              {h.truncated && <p>Muitas vendas no período: alguns dias podem aparecer incompletos. Escolha um período menor para ver tudo.</p>}
             </div>
           )}
         </div>
@@ -253,6 +254,8 @@ function Kpis({ h }: { h: History }) {
 
 function RevenueChart({ series, currency }: { series: DayPoint[]; currency: string | null }) {
   const data = series.map((p) => ({ ...p, major: currency ? toMajor(p.revenue, currency) : 0 }));
+  // A line needs at least a few days; 1–3 days read better as bars.
+  const few = data.length <= 3;
   const compact = (v: number) =>
     new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(v);
   return (
@@ -260,7 +263,7 @@ function RevenueChart({ series, currency }: { series: DayPoint[]; currency: stri
       <p className="text-xs text-muted-foreground mb-3">Faturamento por dia</p>
       <div className="h-56 text-primary">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
+          <ComposedChart data={data} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
             <defs>
               <linearGradient id="salesHistoryFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" style={{ stopColor: "var(--primary)", stopOpacity: 0.35 }} />
@@ -279,7 +282,7 @@ function RevenueChart({ series, currency }: { series: DayPoint[]; currency: stri
             />
             <YAxis tickLine={false} axisLine={false} fontSize={10} width={48} tick={{ fill: "var(--muted-foreground)" }} tickFormatter={compact} />
             <Tooltip
-              cursor={{ stroke: "var(--border)" }}
+              cursor={few ? { fill: "var(--muted)", fillOpacity: 0.3 } : { stroke: "var(--border)" }}
               content={({ active, payload }) => {
                 const p = active ? (payload?.[0]?.payload as (DayPoint & { major: number }) | undefined) : undefined;
                 if (!p) return null;
@@ -292,8 +295,12 @@ function RevenueChart({ series, currency }: { series: DayPoint[]; currency: stri
                 );
               }}
             />
-            <Area type="monotone" dataKey="major" stroke="currentColor" strokeWidth={2} fill="url(#salesHistoryFill)" />
-          </AreaChart>
+            {few ? (
+              <Bar dataKey="major" fill="currentColor" fillOpacity={0.85} radius={[6, 6, 0, 0]} maxBarSize={56} />
+            ) : (
+              <Area type="monotone" dataKey="major" stroke="currentColor" strokeWidth={2} fill="url(#salesHistoryFill)" />
+            )}
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </div>

@@ -62,8 +62,10 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
     const markers = pulseMarkers(0);
     // Sales routes: thin arcs from the hub (best-selling country) to every other selling country.
     const arcs = hub
-      ? points
+      ? [...points]
           .filter((p) => Math.abs(p.location[0] - hub[0]) + Math.abs(p.location[1] - hub[1]) > 2)
+          .sort((a, b) => b.weight - a.weight)
+          .slice(0, 8) // only the strongest routes, so many countries don't turn into a tangle
           .map((p) => ({ from: hub, to: p.location }))
       : [];
 

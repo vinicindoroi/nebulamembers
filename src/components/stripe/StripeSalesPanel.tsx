@@ -71,7 +71,23 @@ export function StripeSalesPanel() {
     [summary],
   );
 
-  if (q.isLoading) return <section className="rounded-2xl border border-border bg-card h-[460px] animate-pulse" />;
+  if (q.isLoading) {
+    return (
+      <section className="relative rounded-2xl border border-border bg-card overflow-hidden grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-stretch">
+        <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
+        <GlobeStage points={[]} focus={PREVIEW_HUB} hub={null} />
+        <div className="p-6 sm:p-8 flex flex-col justify-center gap-4" aria-busy="true">
+          <p className="inline-flex items-center gap-2 text-xs text-muted-foreground"><LiveDot /> Buscando suas vendas na Stripe…</p>
+          <div className="h-12 w-56 rounded-lg bg-muted/50 animate-pulse" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 rounded-xl bg-muted/40 animate-pulse" />
+            <div className="h-20 rounded-xl bg-muted/40 animate-pulse" />
+          </div>
+          <div className="h-16 rounded-xl bg-muted/40 animate-pulse" />
+        </div>
+      </section>
+    );
+  }
 
   if (q.isError) {
     return (
@@ -217,7 +233,7 @@ export function StripeSalesPanel() {
             {s.otherCurrencies.length > 0 && (
               <p>Também em outras moedas: {s.otherCurrencies.map((c) => `${money(c.revenue, c.key)} (${c.orders})`).join(" · ")}</p>
             )}
-            {d.truncated && <p>Muitas vendas no período: mostrando as 1.000 mais recentes.</p>}
+            {d.truncated && <p>Muitas vendas no período: alguns dias podem aparecer incompletos.</p>}
           </div>
         </div>
       </div>
