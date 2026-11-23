@@ -34,6 +34,7 @@ export function StripeConnectCard() {
       setEditing(false);
       await qc.invalidateQueries({ queryKey: ["stripe-connection"] });
       qc.invalidateQueries({ queryKey: ["stripe-sales"] });
+      qc.invalidateQueries({ queryKey: ["stripe-sales-history"] });
       toast.success(res.accountName ? `Stripe conectada: ${res.accountName}` : "Stripe conectada");
     } catch (e) {
       toast.error((e as Error).message);
@@ -50,6 +51,7 @@ export function StripeConnectCard() {
       await doDisconnect();
       await qc.invalidateQueries({ queryKey: ["stripe-connection"] });
       qc.invalidateQueries({ queryKey: ["stripe-sales"] });
+      qc.invalidateQueries({ queryKey: ["stripe-sales-history"] });
       toast.success("Stripe desconectada");
     } catch (e) {
       toast.error((e as Error).message);
