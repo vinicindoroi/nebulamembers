@@ -41,15 +41,15 @@ async function listAll(key: string, path: string, params: Array<[string, string]
 }
 
 /** Sales since `sinceUnix`; checkout session metadata is merged in when the key can read sessions. */
-export async function fetchSales(key: string, sinceUnix: number): Promise<{ sales: Sale[]; truncated: boolean; checkoutRead: boolean }> {
-  const since: [string, string] = ["created[gte]", String(sinceUnix)];
+export async function fetchSales(key: string, sinceUnix: number, untilUnix?: number): Promise<{ sales: Sale[]; truncated: boolean; checkoutRead: boolean }> {
+  const range: Array<[string, string]> = [["created[gte]", String(sinceUnix)], ...(untilUnix ? [["created[lte]", String(untilUnix)] as [string, string]] : [])];
   const [charges, sessions] = await Promise.all([
-    listAll(key, "/charges", [since, ["expand[]", "data.payment_intent"]]).catch(async (e) => {
+    listAll(key, "/charges", [...range, ["expand[]", "data.payment_intent"]]).catch(async (e) => {
       // Without PaymentIntents read access, list charges without expansion.
-      if (e instanceof StripeError && e.status === 403) return listAll(key, "/charges", [since]);
+      if (e instanceof StripeError && e.status === 403) return listAll(key, "/charges", range);
       throw e;
     }),
-    listAll(key, "/checkout/sessions", [since, ["status", "complete"]]).catch(() => null),
+    listAll(key, "/checkout/sessions", [...range, ["status", "complete"]]).catch(() => null),
   ]);
   const metaByPi = new Map<string, Record<string, unknown>>();
   for (const s of sessions?.items ?? []) {

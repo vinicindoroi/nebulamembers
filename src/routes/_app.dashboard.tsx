@@ -6,6 +6,7 @@ import { useMemberProgress } from "@/hooks/use-member-progress";
 import React, { useState, useEffect } from "react";
 import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
 import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
+import { StripeSalesHistory } from "@/components/stripe/StripeSalesHistory";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
@@ -218,6 +219,8 @@ function Dashboard() {
       <PaymentReminderBanner />
 
       <StripeSalesPanel />
+
+      <StripeSalesHistory />
 
       {/* Progress strip */}
       <section className="dash-card p-4 sm:p-5">

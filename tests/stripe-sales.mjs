@@ -49,3 +49,37 @@ assert.deepEqual(sum.otherCurrencies.map((c) => c.key), ["brl"]);
 assert.equal(summarizeSales([]).topCountry, null);
 
 console.log("stripe-sales: ok");
+
+// ---------- Histórico ----------
+const { validateRange, dayKey, dailySeries, bestDay, recentSales, MAX_HISTORY_DAYS } = await import("../src/lib/stripe-sales.ts");
+const NOW = Date.parse("2026-11-23T18:00:00Z") / 1000;
+assert.equal(MAX_HISTORY_DAYS, 366);
+assert.equal(validateRange(NOW - 30 * 86400, NOW, NOW), null);
+assert.match(validateRange(NOW, NOW - 1, NOW), /antes da final/);
+assert.match(validateRange(NOW + 86400, NOW + 2 * 86400, NOW), /futuro/);
+assert.match(validateRange(NOW - 400 * 86400, NOW, NOW), /366 dias/);
+
+// Dia local no fuso de Brasília (-180 min): 01:00 UTC ainda é o dia anterior
+assert.equal(dayKey(Date.parse("2026-11-23T01:00:00Z") / 1000, -180), "2026-11-22");
+assert.equal(dayKey(Date.parse("2026-11-23T04:00:00Z") / 1000, -180), "2026-11-23");
+
+// Série diária: todos os dias do período, com zero onde não vendeu, só na moeda principal
+const from = Date.parse("2026-11-20T03:00:00Z") / 1000; // 20/11 00:00 em Brasília
+const to = Date.parse("2026-11-24T02:59:59Z") / 1000;   // 23/11 23:59 em Brasília
+const at = (iso, amount, currency = "brl") => ({ amount, currency, country: "BR", campaign: null, created: Date.parse(iso) / 1000 });
+const hist = [
+  at("2026-11-20T12:00:00Z", 1000),
+  at("2026-11-22T12:00:00Z", 3000),
+  at("2026-11-22T20:00:00Z", 2000),
+  at("2026-11-23T01:00:00Z", 500),  // 22/11 22:00 em Brasília
+  at("2026-11-21T12:00:00Z", 9999, "usd"),
+];
+const series = dailySeries(hist, "brl", from, to, -180);
+assert.deepEqual(series.map((p) => p.date), ["2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23"]);
+assert.deepEqual(series.map((p) => p.revenue), [1000, 0, 5500, 0]);
+assert.deepEqual(series.map((p) => p.orders), [1, 0, 3, 0]);
+assert.equal(bestDay(series).date, "2026-11-22");
+assert.equal(bestDay(dailySeries([], "brl", from, to, -180)), null);
+assert.deepEqual(recentSales(hist, 2).map((s) => s.amount), [500, 2000]);
+
+console.log("stripe-sales history: ok");

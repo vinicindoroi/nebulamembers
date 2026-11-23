@@ -128,3 +128,61 @@ export function summarizeSales(sales: Sale[]): SalesSummary {
 
 export const SALES_PERIODS = [7, 30, 90] as const;
 export type SalesPeriod = (typeof SALES_PERIODS)[number];
+
+// ---------- Sales history (date range, daily series, recent sales) ----------
+
+export const MAX_HISTORY_DAYS = 366;
+
+/** Error message for an invalid range (unix seconds), or null when it is fine. */
+export function validateRange(fromUnix: number, toUnix: number, nowUnix: number): string | null {
+  if (!Number.isFinite(fromUnix) || !Number.isFinite(toUnix)) return "Período inválido.";
+  if (fromUnix > toUnix) return "A data inicial precisa ser antes da final.";
+  if (fromUnix > nowUnix) return "A data inicial não pode ser no futuro.";
+  if (toUnix - fromUnix > MAX_HISTORY_DAYS * 86400) return `Escolha um período de até ${MAX_HISTORY_DAYS} dias.`;
+  return null;
+}
+
+/** Local calendar day (YYYY-MM-DD) of a unix time, for a fixed offset in minutes east of UTC. */
+export function dayKey(unix: number, offsetMin: number): string {
+  return new Date((unix + offsetMin * 60) * 1000).toISOString().slice(0, 10);
+}
+
+export type DayPoint = { date: string; revenue: number; orders: number };
+
+/** One point per local day in [from, to], zero-filled; only sales in `currency` are counted. */
+export function dailySeries(sales: Sale[], currency: string | null, fromUnix: number, toUnix: number, offsetMin: number): DayPoint[] {
+  const days: DayPoint[] = [];
+  const index = new Map<string, DayPoint>();
+  const last = dayKey(toUnix, offsetMin);
+  let cursor = Date.parse(`${dayKey(fromUnix, offsetMin)}T00:00:00Z`);
+  for (let i = 0; i <= MAX_HISTORY_DAYS + 1; i++) {
+    const key = new Date(cursor).toISOString().slice(0, 10);
+    const p = { date: key, revenue: 0, orders: 0 };
+    days.push(p);
+    index.set(key, p);
+    if (key >= last) break;
+    cursor += 86400_000;
+  }
+  if (!currency) return days;
+  for (const s of sales) {
+    if (s.currency !== currency || s.created < fromUnix || s.created > toUnix) continue;
+    const p = index.get(dayKey(s.created, offsetMin));
+    if (p) {
+      p.revenue += s.amount;
+      p.orders += 1;
+    }
+  }
+  return days;
+}
+
+/** Day with the highest revenue (earliest on ties), or null when nothing sold. */
+export function bestDay(series: DayPoint[]): DayPoint | null {
+  let best: DayPoint | null = null;
+  for (const p of series) if (p.revenue > 0 && (!best || p.revenue > best.revenue)) best = p;
+  return best;
+}
+
+/** Most recent sales first. */
+export function recentSales(sales: Sale[], n: number): Sale[] {
+  return [...sales].sort((a, b) => b.created - a.created).slice(0, n);
+}

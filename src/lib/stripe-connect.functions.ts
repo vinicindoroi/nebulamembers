@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { isRestrictedStripeKey, keyLast4, SALES_PERIODS, summarizeSales } from "@/lib/stripe-sales";
+import { bestDay, dailySeries, isRestrictedStripeKey, keyLast4, recentSales, SALES_PERIODS, summarizeSales, validateRange } from "@/lib/stripe-sales";
 
 const TABLE = "student_stripe_connections" as never;
 
@@ -110,5 +110,56 @@ export const getStripeSales = createServerFn({ method: "POST" })
         return { connected: true as const, invalidKey: true as const, accountName: r.account_name, livemode: r.livemode };
       }
       throw new Error("Não foi possível buscar suas vendas na Stripe agora.");
+    }
+  });
+
+/** Sales history for a custom range: totals, top countries/campaigns, daily series and latest sales. */
+export const getStripeSalesHistory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        from: z.number().int().min(0),
+        to: z.number().int().min(0),
+        offset: z.number().int().min(-840).max(840),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertApproved(context.supabase);
+    const now = Math.floor(Date.now() / 1000);
+    const to = Math.min(data.to, now);
+    const invalid = validateRange(data.from, to, now);
+    if (invalid) throw new Error(invalid);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from(TABLE)
+      .select("key_ciphertext, livemode")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error((error as any).message);
+    if (!row) return { connected: false as const };
+    const r = row as { key_ciphertext: string; livemode: boolean };
+
+    const { decryptStripeKey } = await import("./stripe-crypto.server");
+    const { fetchSales, StripeError } = await import("./stripe-api.server");
+    const key = await decryptStripeKey(r.key_ciphertext);
+    try {
+      const { sales, truncated } = await fetchSales(key, data.from, to);
+      const summary = summarizeSales(sales);
+      const series = dailySeries(sales, summary.currency, data.from, to, data.offset);
+      return {
+        connected: true as const,
+        livemode: r.livemode,
+        truncated,
+        summary,
+        series,
+        bestDay: bestDay(series),
+        recent: recentSales(sales.filter((s) => s.currency === summary.currency), 8),
+      };
+    } catch (e) {
+      if (e instanceof StripeError && (e.status === 401 || e.status === 403)) return { connected: true as const, invalidKey: true as const };
+      throw new Error("Não foi possível buscar seu histórico na Stripe agora.");
     }
   });

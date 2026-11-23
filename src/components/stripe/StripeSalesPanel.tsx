@@ -4,30 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, ArrowRight, Globe2, Megaphone, ShoppingBag, Receipt, Sparkles, Trophy } from "lucide-react";
 import { getStripeSales } from "@/lib/stripe-connect.functions";
-import { SALES_PERIODS, toMajor, type SalesPeriod } from "@/lib/stripe-sales";
+import { SALES_PERIODS, type SalesPeriod } from "@/lib/stripe-sales";
+import { countryName, flag, money } from "./format";
 import { COUNTRY_CENTROIDS } from "@/lib/country-centroids";
 import type { GlobePoint } from "./SalesGlobe";
 
 const SalesGlobe = lazy(() => import("./SalesGlobe"));
-
-function money(minor: number, currency: string | null) {
-  if (!currency) return "—";
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: currency.toUpperCase(), maximumFractionDigits: 2 }).format(toMajor(minor, currency));
-}
-
-let regionNames: Intl.DisplayNames | null = null;
-function countryName(code: string) {
-  try {
-    regionNames ??= new Intl.DisplayNames(["pt-BR"], { type: "region" });
-    return regionNames.of(code) ?? code;
-  } catch {
-    return code;
-  }
-}
-
-function flag(code: string) {
-  return code.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
-}
 
 const GlobeFallback = () => <div className="w-full aspect-square max-w-[480px] mx-auto rounded-full bg-muted/40 animate-pulse" />;
 
