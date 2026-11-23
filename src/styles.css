@@ -546,3 +546,67 @@
     scrollbar-width: none;
   }
 }
+
+/* Sales globe stage — cyan halo, star dust and slow orbit rings (dashboard) */
+.globe-stage {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(60% 55% at 50% 50%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 70%),
+    radial-gradient(1px 1px at 12% 18%, color-mix(in oklab, var(--foreground) 55%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 82% 12%, color-mix(in oklab, var(--foreground) 40%, transparent), transparent 60%),
+    radial-gradient(1.5px 1.5px at 90% 70%, color-mix(in oklab, var(--primary) 70%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 22% 82%, color-mix(in oklab, var(--foreground) 45%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 64% 92%, color-mix(in oklab, var(--foreground) 30%, transparent), transparent 60%),
+    radial-gradient(1.5px 1.5px at 6% 56%, color-mix(in oklab, var(--primary) 55%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 48% 6%, color-mix(in oklab, var(--foreground) 35%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 36% 40%, color-mix(in oklab, var(--foreground) 20%, transparent), transparent 60%);
+}
+.globe-halo {
+  position: absolute;
+  inset: 6%;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--primary) 34%, transparent), color-mix(in oklab, var(--primary) 8%, transparent) 72%, transparent);
+  filter: blur(18px);
+  z-index: -1;
+  pointer-events: none;
+}
+.globe-orbit {
+  position: absolute;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--primary) 18%, transparent);
+  pointer-events: none;
+}
+.globe-orbit-dashed {
+  border-style: dashed;
+  border-color: color-mix(in oklab, var(--foreground) 12%, transparent);
+  animation: globe-orbit-spin 90s linear infinite;
+}
+.globe-orbit-dot::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 0 12px var(--primary);
+}
+.globe-orbit-dot { animation: globe-orbit-spin 40s linear infinite; }
+.text-gradient-primary {
+  background: linear-gradient(110deg, var(--foreground) 35%, var(--primary));
+  background-clip: text;
+  color: transparent;
+}
+.sales-glow-cta { box-shadow: 0 8px 30px -8px color-mix(in oklab, var(--primary) 70%, transparent); }
+.sales-hairline {
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary) 60%, transparent), transparent);
+}
+@keyframes globe-orbit-spin { to { transform: rotate(360deg); } }
+@keyframes live-ping { 75%, 100% { transform: scale(2.4); opacity: 0; } }
+.live-ping { animation: live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .globe-orbit-dashed, .globe-orbit-dot, .live-ping { animation: none; }
+}

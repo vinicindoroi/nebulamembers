@@ -23,7 +23,10 @@ function token(name: string) {
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const TILT_MAX = 1.35;
 
-export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; focus: [number, number] | null }) {
+const mix = (a: [number, number, number], b: [number, number, number], t: number): [number, number, number] =>
+  [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+
+export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[]; focus: [number, number] | null; hub?: [number, number] | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +43,13 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
     const muted = cssToRgb(token("--muted-foreground") || "#888");
 
     const max = Math.max(1, ...points.map((p) => p.weight));
-    const markers = points.map((p) => ({ location: p.location, size: 0.035 + 0.09 * (p.weight / max) }));
+    const markers = points.map((p) => ({ location: p.location, size: 0.025 + 0.05 * (p.weight / max) }));
+    // Sales routes: thin arcs from the hub (best-selling country) to every other selling country.
+    const arcs = hub
+      ? points
+          .filter((p) => Math.abs(p.location[0] - hub[0]) + Math.abs(p.location[1] - hub[1]) > 2)
+          .map((p) => ({ from: hub, to: p.location }))
+      : [];
 
     // Start facing the best-selling country (cobe: phi rotates around Y, theta tilts).
     const phi = focus ? -((focus[1] * Math.PI) / 180) - Math.PI / 2 : 0;
@@ -53,14 +62,20 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
       phi,
       theta,
       dark: isDark ? 1 : 0,
-      diffuse: 1.2,
-      mapSamples: 16000,
-      mapBrightness: isDark ? 5 : 8,
-      baseColor: isDark ? [0.22, 0.22, 0.22] : [0.92, 0.92, 0.92],
+      diffuse: isDark ? 1.6 : 1.2,
+      mapSamples: 20000,
+      mapBrightness: isDark ? 7 : 8,
+      mapBaseBrightness: isDark ? 0.02 : 0,
+      baseColor: isDark ? mix([0.2, 0.2, 0.2], primary, 0.18) : mix([0.94, 0.94, 0.94], primary, 0.12),
       markerColor: primary,
-      glowColor: isDark ? [0.12, 0.12, 0.12] : muted,
+      glowColor: isDark ? mix([0.05, 0.05, 0.05], primary, 0.32) : mix(muted, primary, 0.4),
       markers,
-      opacity: 0.95,
+      arcs,
+      arcColor: primary,
+      arcWidth: 0.6,
+      arcHeight: 0.35,
+      markerElevation: 0.02,
+      opacity: 0.96,
     });
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -170,15 +185,20 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
       ro.disconnect();
       globe.destroy();
     };
-  }, [points, focus]);
+  }, [points, focus, hub]);
 
   return (
-    <div
-      ref={wrapRef}
-      className="relative w-full aspect-square max-w-[460px] mx-auto cursor-grab select-none"
-      style={{ touchAction: "pan-y" }}
-    >
-      <canvas ref={canvasRef} className="w-full h-full opacity-0 transition-opacity duration-700" style={{ contain: "layout paint size" }} />
+    <div className="relative w-full max-w-[480px] mx-auto aspect-square">
+      <div className="globe-halo" aria-hidden />
+      <div className="globe-orbit globe-orbit-dashed" style={{ inset: "-4%" }} aria-hidden />
+      <div className="globe-orbit globe-orbit-dot" style={{ inset: "3%" }} aria-hidden />
+      <div
+        ref={wrapRef}
+        className="relative w-full h-full cursor-grab select-none"
+        style={{ touchAction: "pan-y" }}
+      >
+        <canvas ref={canvasRef} className="w-full h-full opacity-0 transition-opacity duration-700" style={{ contain: "layout paint size" }} />
+      </div>
     </div>
   );
 }
