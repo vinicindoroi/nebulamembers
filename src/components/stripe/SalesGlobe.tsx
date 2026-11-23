@@ -20,6 +20,9 @@ function token(name: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const TILT_MAX = 1.35;
+
 export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; focus: [number, number] | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -41,7 +44,7 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
 
     // Start facing the best-selling country (cobe: phi rotates around Y, theta tilts).
     const phi = focus ? -((focus[1] * Math.PI) / 180) - Math.PI / 2 : 0;
-    const theta = focus ? Math.max(-0.6, Math.min(0.6, (focus[0] * Math.PI) / 180 * 0.6)) : 0.25;
+    const theta = focus ? clamp((focus[0] * Math.PI) / 180 * 0.6, -0.6, 0.6) : 0.25;
 
     const globe = createGlobe(canvas, {
       devicePixelRatio: dpr,
@@ -61,13 +64,46 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
     });
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Smooth motion: slow auto-spin plus a gentle tilt/turn toward the cursor while hovering.
-    const baseTheta = theta;
-    let spin = phi;
-    let offPhi = 0, offTheta = 0;      // current (eased) cursor offsets
-    let tgtPhi = 0, tgtTheta = 0;      // cursor targets
+    // Drag to explore every country; otherwise a slow auto-spin plus a gentle turn toward the cursor.
+    let spin = phi;            // accumulated horizontal rotation (drag + auto-spin + inertia)
+    let tilt = theta;          // accumulated vertical tilt (drag + inertia)
+    let offPhi = 0, offTheta = 0;   // eased hover parallax
+    let tgtPhi = 0, tgtTheta = 0;   // hover targets
     let speed = 0.0018, tgtSpeed = 0.0018;
+    let velPhi = 0, velTheta = 0;   // rad per frame, kept after release for inertia
+    let dragging = false;
+    let lastX = 0, lastY = 0, lastT = 0;
+
+    const onDown = (e: PointerEvent) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      lastT = performance.now();
+      velPhi = 0;
+      velTheta = 0;
+      tgtPhi = 0;
+      tgtTheta = 0;
+      try { wrap.setPointerCapture(e.pointerId); } catch { /* capture is best-effort */ }
+      wrap.style.cursor = "grabbing";
+      e.preventDefault();
+    };
+
     const onMove = (e: PointerEvent) => {
+      if (dragging) {
+        const now = performance.now();
+        const dt = Math.max(8, now - lastT);
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastT = now;
+        const k = 0.0062;
+        spin += dx * k;
+        tilt = clamp(tilt + dy * k * 0.75, -TILT_MAX, TILT_MAX);
+        velPhi = (dx * k) / dt * 16;
+        velTheta = (dy * k * 0.75) / dt * 16;
+        return;
+      }
       const r = wrap.getBoundingClientRect();
       const x = ((e.clientX - r.left) / r.width) * 2 - 1;   // -1..1
       const y = ((e.clientY - r.top) / r.height) * 2 - 1;
@@ -75,20 +111,44 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
       tgtTheta = y * 0.35;
       tgtSpeed = 0.0006;               // nearly pause the spin while the user explores
     };
-    const onLeave = () => { tgtPhi = 0; tgtTheta = 0; tgtSpeed = 0.0018; };
-    if (!reduce) {
-      wrap.addEventListener("pointermove", onMove);
-      wrap.addEventListener("pointerleave", onLeave);
-    }
+
+    const onUp = (e: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      try { wrap.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+      wrap.style.cursor = "grab";
+    };
+
+    const onLeave = () => {
+      if (dragging) return;
+      tgtPhi = 0;
+      tgtTheta = 0;
+      tgtSpeed = 0.0018;
+    };
+
+    wrap.addEventListener("pointerdown", onDown);
+    wrap.addEventListener("pointermove", onMove);
+    wrap.addEventListener("pointerleave", onLeave);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+
     let raf = 0;
     const tick = () => {
       if (!reduce) {
         speed += (tgtSpeed - speed) * 0.03;
-        spin += speed;
+        if (!dragging) {
+          spin += speed;
+          if (Math.abs(velPhi) > 1e-6 || Math.abs(velTheta) > 1e-6) {
+            spin += velPhi;
+            tilt = clamp(tilt + velTheta, -TILT_MAX, TILT_MAX);
+            velPhi *= 0.9;
+            velTheta *= 0.9;
+          }
+        }
         offPhi += (tgtPhi - offPhi) * 0.045;
         offTheta += (tgtTheta - offTheta) * 0.045;
       }
-      globe.update({ phi: spin + offPhi, theta: Math.max(-0.8, Math.min(0.8, baseTheta + offTheta)) });
+      globe.update({ phi: spin + offPhi, theta: clamp(tilt + offTheta, -1.4, 1.4) });
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -102,15 +162,22 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
 
     return () => {
       cancelAnimationFrame(raf);
+      wrap.removeEventListener("pointerdown", onDown);
       wrap.removeEventListener("pointermove", onMove);
       wrap.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
       ro.disconnect();
       globe.destroy();
     };
   }, [points, focus]);
 
   return (
-    <div ref={wrapRef} className="relative w-full aspect-square max-w-[460px] mx-auto">
+    <div
+      ref={wrapRef}
+      className="relative w-full aspect-square max-w-[460px] mx-auto cursor-grab select-none"
+      style={{ touchAction: "pan-y" }}
+    >
       <canvas ref={canvasRef} className="w-full h-full opacity-0 transition-opacity duration-700" style={{ contain: "layout paint size" }} />
     </div>
   );
