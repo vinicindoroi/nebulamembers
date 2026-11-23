@@ -43,7 +43,23 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
     const muted = cssToRgb(token("--muted-foreground") || "#888");
 
     const max = Math.max(1, ...points.map((p) => p.weight));
-    const markers = points.map((p) => ({ location: p.location, size: 0.025 + 0.05 * (p.weight / max) }));
+    const baseColor: [number, number, number] = isDark ? mix([0.2, 0.2, 0.2], primary, 0.18) : mix([0.94, 0.94, 0.94], primary, 0.12);
+    const fadeTo: [number, number, number] = isDark ? mix([0.03, 0.04, 0.04], primary, 0.1) : baseColor;
+    const bright: [number, number, number] = mix(primary, [1, 1, 1], isDark ? 0.55 : 0.15);
+    const sized = points.map((p, i) => ({ location: p.location, core: 0.025 + 0.05 * (p.weight / max), phase: i * 0.37 }));
+    // Each selling country blinks: a pulsing core plus a ripple that expands and fades into the globe.
+    const pulseMarkers = (t: number) => {
+      const ripples = sized.map((m) => {
+        const k = ((t / 1600 + m.phase) % 1 + 1) % 1;          // 0..1 ripple progress
+        return { location: m.location, size: m.core * (1.2 + 2.6 * k), color: mix(primary, fadeTo, Math.pow(k, 0.6)) };
+      });
+      const cores = sized.map((m) => {
+        const b = 0.5 + 0.5 * Math.sin((t / 1600 + m.phase) * Math.PI * 2);
+        return { location: m.location, size: m.core * (0.9 + 0.35 * b), color: mix(primary, bright, b) };
+      });
+      return [...ripples, ...cores];
+    };
+    const markers = pulseMarkers(0);
     // Sales routes: thin arcs from the hub (best-selling country) to every other selling country.
     const arcs = hub
       ? points
@@ -66,7 +82,7 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
       mapSamples: 20000,
       mapBrightness: isDark ? 7 : 8,
       mapBaseBrightness: isDark ? 0.02 : 0,
-      baseColor: isDark ? mix([0.2, 0.2, 0.2], primary, 0.18) : mix([0.94, 0.94, 0.94], primary, 0.12),
+      baseColor,
       markerColor: primary,
       glowColor: isDark ? mix([0.05, 0.05, 0.05], primary, 0.32) : mix(muted, primary, 0.4),
       markers,
@@ -163,7 +179,11 @@ export default function SalesGlobe({ points, focus, hub }: { points: GlobePoint[
         offPhi += (tgtPhi - offPhi) * 0.045;
         offTheta += (tgtTheta - offTheta) * 0.045;
       }
-      globe.update({ phi: spin + offPhi, theta: clamp(tilt + offTheta, -1.4, 1.4) });
+      globe.update(
+        reduce || sized.length === 0
+          ? { phi: spin + offPhi, theta: clamp(tilt + offTheta, -1.4, 1.4) }
+          : { phi: spin + offPhi, theta: clamp(tilt + offTheta, -1.4, 1.4), markers: pulseMarkers(performance.now()) },
+      );
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
