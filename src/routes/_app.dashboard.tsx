@@ -164,11 +164,11 @@ function Dashboard() {
 
   useEffect(() => {
     const host = window.location.hostname;
-    const isPreview =
-      host === "localhost" ||
-      host === "127.0.0.1" ||
-      host.startsWith("id-preview--");
-    setShowMockToggle(Boolean(import.meta.env.DEV) || isPreview);
+    const isProduction =
+      host === "nebulamembers.lovable.app" ||
+      host === "nebulamembers.online" ||
+      host === "www.nebulamembers.online";
+    setShowMockToggle(!isProduction);
   }, []);
 
   return (
