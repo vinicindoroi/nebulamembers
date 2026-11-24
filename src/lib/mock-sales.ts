@@ -33,7 +33,7 @@ export function mockSalesForRange(fromUnix: number, toUnix: number): Sale[] {
       const si = seed(`${date}#${i}`);
       sales.push({
         amount: PRICES[si % PRICES.length]!,
-        currency: "brl",
+        currency: "usd",
         country: COUNTRIES[si % COUNTRIES.length]!,
         campaign: si % 4 === 0 ? null : CAMPAIGNS[si % CAMPAIGNS.length]!,
         created: t + (si % 86000),

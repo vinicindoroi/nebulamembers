@@ -165,7 +165,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
       <div className="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <GlobeStage points={points} focus={focus}>
           <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            <LiveDot /> {mock ? "Dados fictícios" : d.livemode ? "Ao vivo" : "Modo teste"}
+            <LiveDot /> {mock || d.livemode ? "Ao vivo" : "Modo teste"}
           </span>
           {s.topCountry && (
             <div className="absolute bottom-4 left-4 right-4 sm:right-auto rounded-xl border border-border bg-background/70 backdrop-blur px-3.5 py-2.5 flex items-center gap-3">

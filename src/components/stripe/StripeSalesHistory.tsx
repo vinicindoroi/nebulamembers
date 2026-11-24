@@ -61,7 +61,7 @@ function previewHistory(): History {
   const orders = series.reduce((s, p) => s + p.orders, 0);
   const share = (k: string, f: number, o: number): Ranked => ({ key: k, revenue: Math.round(revenue * f), orders: Math.round(orders * o) });
   return {
-    currency: "brl",
+    currency: "usd",
     revenue,
     orders,
     avgTicket: Math.round(revenue / orders),
@@ -129,15 +129,12 @@ export function StripeSalesHistory({ mock = false }: { mock?: boolean }) {
           <div className="min-w-0">
             <h2 className="text-sm font-medium flex items-center gap-2">
               Histórico de vendas
-              {mock && (
-                <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-primary">Dados fictícios</span>
-              )}
               {preview && (
                 <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Prévia</span>
               )}
             </h2>
             <p suppressHydrationWarning className="text-xs text-muted-foreground mt-0.5">
-              {mock ? "Exemplo gerado para testar o painel" : preview ? "Exemplo do que aparece com sua Stripe conectada" : rangeLabel}
+              {preview ? "Exemplo do que aparece com sua Stripe conectada" : rangeLabel}
             </p>
           </div>
         </div>
