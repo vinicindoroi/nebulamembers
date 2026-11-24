@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMemberProgress } from "@/hooks/use-member-progress";
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useAdmin } from "@/hooks/use-admin";
 import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
 import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 import { StripeSalesHistory } from "@/components/stripe/StripeSalesHistory";
@@ -162,6 +163,7 @@ function Dashboard() {
   const revealRef = useScrollReveal<HTMLDivElement>();
   const [mockSales, setMockSales] = useState(false);
   const [showMockToggle, setShowMockToggle] = useState(false);
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     const host = window.location.hostname;
@@ -174,7 +176,7 @@ function Dashboard() {
 
   return (
     <div ref={revealRef} className="dash space-y-6">
-      {showMockToggle && createPortal(
+      {showMockToggle && isAdmin === true && createPortal(
         <button
           onClick={() => setMockSales((v) => !v)}
           aria-pressed={mockSales}
@@ -250,11 +252,11 @@ function Dashboard() {
       <PaymentReminderBanner />
 
       <div data-reveal>
-        <StripeSalesPanel mock={mockSales} />
+        <StripeSalesPanel mock={mockSales && isAdmin === true} />
       </div>
 
       <div data-reveal>
-        <StripeSalesHistory mock={mockSales} />
+        <StripeSalesHistory mock={mockSales && isAdmin === true} />
       </div>
 
       {/* Progress strip */}
