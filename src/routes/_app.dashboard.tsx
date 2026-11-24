@@ -159,9 +159,25 @@ function Dashboard() {
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   const visibleLocked = showAllAchievements ? locked : locked.slice(0, 3);
   const revealRef = useScrollReveal<HTMLDivElement>();
+  const [mockSales, setMockSales] = useState(false);
 
   return (
     <div ref={revealRef} className="dash space-y-6">
+      {import.meta.env.DEV && (
+        <button
+          onClick={() => setMockSales((v) => !v)}
+          aria-pressed={mockSales}
+          title={mockSales ? "Voltar aos dados reais" : "Ativar dados fictícios"}
+          className={`fixed bottom-5 right-5 z-50 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs shadow-lg backdrop-blur transition-colors ${
+            mockSales
+              ? "border-primary/50 bg-primary text-primary-foreground"
+              : "border-border bg-background/80 text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {"</>"}
+          {mockSales && <span className="font-sans text-[10px] uppercase tracking-wide">fictício</span>}
+        </button>
+      )}
       {/* Hero */}
       <header className="dash-hero rounded-2xl border border-border p-6 sm:p-8">
         <div className="dash-hero-orb" aria-hidden />
@@ -222,11 +238,11 @@ function Dashboard() {
       <PaymentReminderBanner />
 
       <div data-reveal>
-        <StripeSalesPanel />
+        <StripeSalesPanel mock={mockSales} />
       </div>
 
       <div data-reveal>
-        <StripeSalesHistory />
+        <StripeSalesHistory mock={mockSales} />
       </div>
 
       {/* Progress strip */}

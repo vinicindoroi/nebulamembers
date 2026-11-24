@@ -7,6 +7,7 @@ import type { DateRange } from "react-day-picker";
 import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AlertTriangle, CalendarDays, CalendarRange, Globe2, History, Megaphone, Receipt, ShoppingBag, Trophy, Wallet } from "lucide-react";
 import { getStripeSalesHistory } from "@/lib/stripe-connect.functions";
+import { mockHistory } from "@/lib/mock-sales";
 import { toMajor, type DayPoint, type Ranked, type Sale } from "@/lib/stripe-sales";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -75,7 +76,7 @@ function previewHistory(): History {
   };
 }
 
-export function StripeSalesHistory() {
+export function StripeSalesHistory({ mock = false }: { mock?: boolean }) {
   const [preset, setPreset] = useState<Preset>("30");
   const [custom, setCustom] = useState<DateRange | undefined>();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -94,18 +95,23 @@ export function StripeSalesHistory() {
     queryFn: () => fetchHistory({ data: { from: fromUnix, to: toUnix, offset: -new Date().getTimezoneOffset() } }),
     staleTime: 5 * 60_000,
     retry: false,
+    enabled: !mock,
   });
 
   const d = q.data;
-  const preview = !q.isLoading && !q.isError && (!d || !d.connected);
-  const invalidKey = d && d.connected && "invalidKey" in d;
+  const preview = !mock && !q.isLoading && !q.isError && (!d || !d.connected);
+  const invalidKey = !mock && d && d.connected && "invalidKey" in d;
 
   const h: History | null = useMemo(() => {
+    if (mock) {
+      const m = mockHistory(fromUnix, toUnix);
+      return { ...m.summary, series: m.series, bestDay: m.bestDay, recent: m.recent, truncated: m.truncated };
+    }
     if (preview) return previewHistory();
     if (!d || !d.connected || "invalidKey" in d) return null;
     const { summary, series, bestDay, recent, truncated } = d;
     return { ...summary, series, bestDay, recent, truncated };
-  }, [d, preview]);
+  }, [d, preview, mock, fromUnix, toUnix]);
 
   if (invalidKey) return null; // the globe panel above already explains how to reconnect
 
@@ -123,12 +129,15 @@ export function StripeSalesHistory() {
           <div className="min-w-0">
             <h2 className="text-sm font-medium flex items-center gap-2">
               Histórico de vendas
+              {mock && (
+                <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-primary">Dados fictícios</span>
+              )}
               {preview && (
                 <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Prévia</span>
               )}
             </h2>
             <p suppressHydrationWarning className="text-xs text-muted-foreground mt-0.5">
-              {preview ? "Exemplo do que aparece com sua Stripe conectada" : rangeLabel}
+              {mock ? "Exemplo gerado para testar o painel" : preview ? "Exemplo do que aparece com sua Stripe conectada" : rangeLabel}
             </p>
           </div>
         </div>
@@ -176,7 +185,7 @@ export function StripeSalesHistory() {
         </div>
       </header>
 
-      {q.isLoading ? (
+      {!mock && q.isLoading ? (
         <div className="space-y-4" aria-busy="true">
           <p className="text-xs text-muted-foreground">Buscando vendas na Stripe…</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -184,7 +193,7 @@ export function StripeSalesHistory() {
           </div>
           <div className="h-56 rounded-xl dash-skel" />
         </div>
-      ) : q.isError ? (
+      ) : !mock && q.isError ? (
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span className="flex-1">{(q.error as Error).message || "Não foi possível carregar o histórico."}</span>

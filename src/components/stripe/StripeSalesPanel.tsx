@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, ArrowRight, Globe2, Megaphone, ShoppingBag, Receipt, Sparkles, Trophy } from "lucide-react";
 import { getStripeSales } from "@/lib/stripe-connect.functions";
+import { mockSummary } from "@/lib/mock-sales";
 import { SALES_PERIODS, type SalesPeriod } from "@/lib/stripe-sales";
 import { countryName, flag, money } from "./format";
 import { COUNTRY_CENTROIDS } from "@/lib/country-centroids";
@@ -46,7 +47,7 @@ function GlobeStage({ points, focus, children }: { points: GlobePoint[]; focus: 
   );
 }
 
-export function StripeSalesPanel() {
+export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
   const [days, setDays] = useState<SalesPeriod>(30);
   const fetchSales = useServerFn(getStripeSales);
   const q = useQuery({
@@ -54,9 +55,12 @@ export function StripeSalesPanel() {
     queryFn: () => fetchSales({ data: { days } }),
     staleTime: 5 * 60_000,
     retry: false,
+    enabled: !mock,
   });
 
-  const d = q.data;
+  const d = mock
+    ? { connected: true as const, livemode: false, accountName: "Conta de exemplo", summary: mockSummary(days), truncated: false }
+    : q.data;
   const summary = d && d.connected && "summary" in d ? d.summary : null;
 
   const points = useMemo<GlobePoint[]>(
@@ -71,7 +75,7 @@ export function StripeSalesPanel() {
     [summary],
   );
 
-  if (q.isLoading) {
+  if (!mock && q.isLoading) {
     return (
       <section className="relative rounded-2xl border border-border bg-card overflow-hidden grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-stretch">
         <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
@@ -89,7 +93,7 @@ export function StripeSalesPanel() {
     );
   }
 
-  if (q.isError) {
+  if (!mock && q.isError) {
     return (
       <section className="rounded-xl border border-border bg-card p-5 flex items-center gap-3 text-sm text-muted-foreground">
         <AlertTriangle className="h-4 w-4 shrink-0" />
@@ -161,7 +165,7 @@ export function StripeSalesPanel() {
       <div className="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <GlobeStage points={points} focus={focus}>
           <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            <LiveDot /> {d.livemode ? "Ao vivo" : "Modo teste"}
+            <LiveDot /> {mock ? "Dados fictícios" : d.livemode ? "Ao vivo" : "Modo teste"}
           </span>
           {s.topCountry && (
             <div className="absolute bottom-4 left-4 right-4 sm:right-auto rounded-xl border border-border bg-background/70 backdrop-blur px-3.5 py-2.5 flex items-center gap-3">
