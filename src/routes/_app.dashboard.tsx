@@ -4,6 +4,7 @@ import { useCourses } from "@/hooks/use-courses";
 import { useAuth } from "@/hooks/use-auth";
 import { useMemberProgress } from "@/hooks/use-member-progress";
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
 import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 import { StripeSalesHistory } from "@/components/stripe/StripeSalesHistory";
@@ -173,12 +174,12 @@ function Dashboard() {
 
   return (
     <div ref={revealRef} className="dash space-y-6">
-      {showMockToggle && (
+      {showMockToggle && createPortal(
         <button
           onClick={() => setMockSales((v) => !v)}
           aria-pressed={mockSales}
           title={mockSales ? "Voltar aos dados reais" : "Ativar dados fictícios"}
-          className={`fixed bottom-5 right-5 z-50 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs shadow-lg backdrop-blur transition-colors ${
+          className={`fixed bottom-20 right-5 z-[9999] inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs shadow-lg backdrop-blur transition-colors ${
             mockSales
               ? "border-primary/50 bg-primary text-primary-foreground"
               : "border-border bg-background/80 text-muted-foreground hover:text-foreground"
@@ -186,7 +187,8 @@ function Dashboard() {
         >
           {"</>"}
           {mockSales && <span className="font-sans text-[10px] uppercase tracking-wide">fictício</span>}
-        </button>
+        </button>,
+        document.body,
       )}
       {/* Hero */}
       <header className="dash-hero rounded-2xl border border-border p-6 sm:p-8">
