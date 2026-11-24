@@ -852,3 +852,49 @@
 .dash .dash-card-hover:hover {
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 7%, transparent), 0 22px 44px -24px color-mix(in oklab, var(--primary) 60%, transparent);
 }
+
+/* Dashboard v3 — calmer, minimal, fluid */
+.dash { --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1); }
+.dash-hero::before { opacity: 0.45; }
+.dash-hero::after { animation-duration: 16s; opacity: 0.7; }
+.dash .text-gradient-primary { animation-duration: 14s; }
+.dash-shine::after { animation: dash-shine 9s var(--ease-fluid) 2.4s infinite; opacity: 0.6; }
+.dash .dash-bar > span::after { animation-duration: 5s; opacity: 0.5; }
+.dash .dash-card {
+  border-color: color-mix(in oklab, var(--border) 70%, transparent);
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.5s var(--ease-fluid), transform 0.6s var(--ease-fluid), box-shadow 0.6s var(--ease-fluid), background 0.5s var(--ease-fluid);
+}
+.dash .dash-card-hover:hover { transform: translateY(-3px); }
+.dash [data-tilt].dash-card-hover { transition: transform 0.7s var(--ease-fluid), box-shadow 0.6s var(--ease-fluid), border-color 0.5s var(--ease-fluid); }
+.dash img { transition: transform 1.2s var(--ease-fluid), filter 0.8s var(--ease-fluid); }
+.dash .dash-card-hover:hover img { transform: scale(1.04); }
+.dash button, .dash a { transition: color 0.35s var(--ease-fluid), background-color 0.35s var(--ease-fluid), border-color 0.35s var(--ease-fluid), transform 0.35s var(--ease-fluid), box-shadow 0.35s var(--ease-fluid); }
+.dash button:active { transform: scale(0.97); }
+.dash[data-reveal-armed] [data-reveal][data-revealed] {
+  transition:
+    opacity 1.1s var(--ease-fluid) var(--rd, 0ms),
+    filter 1.1s var(--ease-fluid) var(--rd, 0ms),
+    translate 1.3s var(--ease-fluid) var(--rd, 0ms),
+    scale 1.3s var(--ease-fluid) var(--rd, 0ms),
+    border-color 0.5s ease, transform 0.6s var(--ease-fluid), box-shadow 0.6s ease;
+}
+.dash-skel {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--foreground) 4%, transparent);
+}
+.dash-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, color-mix(in oklab, var(--primary) 9%, transparent) 50%, transparent 80%);
+  translate: -100% 0;
+  animation: dash-skel 1.8s var(--ease-fluid, ease) infinite;
+}
+@keyframes dash-skel { to { translate: 100% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .dash-skel::after, .dash-shine::after { animation: none; }
+  .dash .dash-card-hover:hover img { transform: none; }
+}

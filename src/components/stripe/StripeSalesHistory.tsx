@@ -180,9 +180,9 @@ export function StripeSalesHistory() {
         <div className="space-y-4" aria-busy="true">
           <p className="text-xs text-muted-foreground">Buscando vendas na Stripe…</p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[0, 1, 2, 3].map((i) => <div key={i} className="h-20 rounded-xl bg-muted/50 animate-pulse" />)}
+            {[0, 1, 2, 3].map((i) => <div key={i} className="h-20 rounded-xl dash-skel" />)}
           </div>
-          <div className="h-56 rounded-xl bg-muted/50 animate-pulse" />
+          <div className="h-56 rounded-xl dash-skel" />
         </div>
       ) : q.isError ? (
         <div className="flex items-center gap-3 text-sm text-muted-foreground">

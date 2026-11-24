@@ -11,7 +11,7 @@ import type { GlobePoint } from "./SalesGlobe";
 
 const SalesGlobe = lazy(() => import("./SalesGlobe"));
 
-const GlobeFallback = () => <div className="w-full aspect-square max-w-[480px] mx-auto rounded-full bg-muted/40 animate-pulse" />;
+const GlobeFallback = () => <div className="w-full aspect-square max-w-[480px] mx-auto rounded-full dash-skel" />;
 
 // Decorative preview routes shown before the Stripe is connected (labelled "Prévia").
 const PREVIEW_HUB: [number, number] = [-14.24, -51.93];
@@ -78,12 +78,12 @@ export function StripeSalesPanel() {
         <GlobeStage points={[]} focus={PREVIEW_HUB} />
         <div className="p-6 sm:p-8 flex flex-col justify-center gap-4" aria-busy="true">
           <p className="inline-flex items-center gap-2 text-xs text-muted-foreground"><LiveDot /> Buscando suas vendas na Stripe…</p>
-          <div className="h-12 w-56 rounded-lg bg-muted/50 animate-pulse" />
+          <div className="h-12 w-56 rounded-lg dash-skel" />
           <div className="grid grid-cols-2 gap-3">
-            <div className="h-20 rounded-xl bg-muted/40 animate-pulse" />
-            <div className="h-20 rounded-xl bg-muted/40 animate-pulse" />
+            <div className="h-20 rounded-xl dash-skel" />
+            <div className="h-20 rounded-xl dash-skel" />
           </div>
-          <div className="h-16 rounded-xl bg-muted/40 animate-pulse" />
+          <div className="h-16 rounded-xl dash-skel" />
         </div>
       </section>
     );
