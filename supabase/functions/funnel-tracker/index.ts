@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
   if(!sessionId){sessionId='s_'+Math.random().toString(36).substr(2,16);sessionStorage.setItem('_ft_sid',sessionId);}
 
   function send(eventType,nodeId,meta){
-    var data={t:config.token,n:nodeId||config.node,e:eventType,s:sessionId,v:visitorId,u:location.href,r:document.referrer,m:meta||{}};
+    var data={t:config.token,n:nodeId||config.node,e:eventType,s:sessionId,v:visitorId,u:location.href,r:document.referrer,m:meta||{},z:(function(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){return null}})()};
     navigator.sendBeacon?navigator.sendBeacon('${baseUrl}/functions/v1/funnel-tracker',JSON.stringify(data)):
     fetch('${baseUrl}/functions/v1/funnel-tracker',{method:'POST',body:JSON.stringify(data),keepalive:true});
   }
@@ -191,6 +191,9 @@ Deno.serve(async (req) => {
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ||
                  req.headers.get("cf-connecting-ip") || null;
 
+      const hdrCountry = (req.headers.get("cf-ipcountry") || req.headers.get("x-country") || "").toUpperCase();
+      const country = /^[A-Z]{2}$/.test(hdrCountry) && hdrCountry !== "XX" ? hdrCountry : tzCountry((event as any).z);
+
       // Insert event
       const { error: insertError } = await supabase.from("funnel_events").insert({
         funnel_id: funnel.id,
@@ -211,6 +214,7 @@ Deno.serve(async (req) => {
         device_type,
         browser,
         ip_address: ip,
+        country,
         metadata: event.m || {},
       });
 
@@ -240,3 +244,16 @@ Deno.serve(async (req) => {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
+
+// Fallback: visitor's browser timezone → country (only when the edge gives no country header).
+function tzCountry(tz: unknown): string | null {
+  if (typeof tz !== "string") return null;
+  const M: Record<string, string> = {
+    "America/Sao_Paulo":"BR","America/Fortaleza":"BR","America/Recife":"BR","America/Bahia":"BR","America/Belem":"BR","America/Manaus":"BR","America/Cuiaba":"BR","America/Campo_Grande":"BR","America/Porto_Velho":"BR","America/Boa_Vista":"BR","America/Rio_Branco":"BR","America/Maceio":"BR","America/Araguaina":"BR","America/Noronha":"BR",
+    "America/New_York":"US","America/Chicago":"US","America/Denver":"US","America/Los_Angeles":"US","America/Phoenix":"US","America/Anchorage":"US","America/Detroit":"US","Pacific/Honolulu":"US",
+    "America/Toronto":"CA","America/Vancouver":"CA","America/Mexico_City":"MX","America/Argentina/Buenos_Aires":"AR","America/Santiago":"CL","America/Bogota":"CO","America/Lima":"PE","America/Montevideo":"UY","America/Asuncion":"PY","America/Caracas":"VE","America/La_Paz":"BO","America/Guayaquil":"EC",
+    "Europe/Lisbon":"PT","Europe/Madrid":"ES","Europe/London":"GB","Europe/Paris":"FR","Europe/Berlin":"DE","Europe/Rome":"IT","Europe/Amsterdam":"NL","Europe/Brussels":"BE","Europe/Zurich":"CH","Europe/Vienna":"AT","Europe/Dublin":"IE","Europe/Warsaw":"PL","Europe/Stockholm":"SE","Europe/Oslo":"NO","Europe/Copenhagen":"DK",
+    "Asia/Tokyo":"JP","Asia/Kolkata":"IN","Asia/Dubai":"AE","Asia/Singapore":"SG","Australia/Sydney":"AU","Africa/Luanda":"AO","Africa/Maputo":"MZ","Africa/Johannesburg":"ZA",
+  };
+  return M[tz] ?? null;
+}

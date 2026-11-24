@@ -9,6 +9,8 @@ import { SALES_PERIODS, type SalesPeriod } from "@/lib/stripe-sales";
 import { countryName, flag, money } from "./format";
 import { COUNTRY_CENTROIDS } from "@/lib/country-centroids";
 import type { GlobePoint } from "./SalesGlobe";
+import { useFunnelLive } from "@/hooks/use-funnel-live";
+import { Radio, Workflow } from "lucide-react";
 
 const SalesGlobe = lazy(() => import("./SalesGlobe"));
 
@@ -63,12 +65,19 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
     : q.data;
   const summary = d && d.connected && "summary" in d ? d.summary : null;
 
+  const fl = useFunnelLive(days, mock);
+  const liveKey = [...fl.liveByCountry].map(([c, n]) => c + n).join(",");
   const points = useMemo<GlobePoint[]>(
-    () =>
-      (summary?.countries ?? [])
+    () => [
+      ...(summary?.countries ?? [])
         .filter((c) => COUNTRY_CENTROIDS[c.key])
-        .map((c) => ({ location: COUNTRY_CENTROIDS[c.key]!, weight: c.revenue })),
-    [summary],
+        .map((c) => ({ location: COUNTRY_CENTROIDS[c.key]!, weight: c.revenue, kind: "sale" as const })),
+      ...[...fl.liveByCountry]
+        .filter(([c]) => COUNTRY_CENTROIDS[c])
+        .map(([c, n]) => ({ location: COUNTRY_CENTROIDS[c]!, weight: n, kind: "visit" as const })),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [summary, liveKey],
   );
   const focus = useMemo<[number, number] | null>(
     () => (summary?.topCountry && COUNTRY_CENTROIDS[summary.topCountry.key]) || null,
@@ -167,6 +176,10 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
           <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
             <LiveDot /> {mock || d.livemode ? "Ao vivo" : "Modo teste"}
           </span>
+          <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5 text-[10px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--globe-sale)]" /> Vendas</span>
+            {fl.hasFunnels && <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" /> Acessos ao vivo</span>}
+          </div>
           {s.topCountry && (
             <div className="absolute bottom-4 left-4 right-4 sm:right-auto rounded-xl border border-border bg-background/70 backdrop-blur px-3.5 py-2.5 flex items-center gap-3">
               <span className="text-2xl leading-none">{flag(s.topCountry.key)}</span>
@@ -219,6 +232,28 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
               );
             })}
           </div>
+
+          {fl.hasFunnels && (
+            <div className="rounded-xl border border-border bg-muted/20 p-3.5 space-y-3 min-w-0">
+              <div className="flex items-center gap-2">
+                <Radio className="h-3.5 w-3.5 text-primary animate-pulse" />
+                <span className="text-[11px] text-muted-foreground flex-1">Acessos ao vivo nos seus funis</span>
+                <span className="text-lg font-semibold tabular-nums text-primary">{fl.liveTotal}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="min-w-0">
+                  <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Workflow className="h-3 w-3" /> Funil que mais vende</p>
+                  <p className="font-medium truncate" title={fl.topSales?.name}>{fl.topSales?.name ?? "—"}</p>
+                  <p className="text-[11px] text-muted-foreground">{fl.topSales ? `${fl.topSales.sales} vendas · ${days}d` : "Sem vendas no período"}</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Workflow className="h-3 w-3" /> Funil com mais acessos</p>
+                  <p className="font-medium truncate" title={fl.topVisitors?.name}>{fl.topVisitors?.name ?? "—"}</p>
+                  <p className="text-[11px] text-muted-foreground">{fl.topVisitors ? `${fl.topVisitors.visitors.toLocaleString("pt-BR")} acessos · ${days}d` : "Sem acessos no período"}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <Highlight
             icon={Trophy}

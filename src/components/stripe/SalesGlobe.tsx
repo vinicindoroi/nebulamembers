@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import createGlobe from "cobe";
 
-export type GlobePoint = { location: [number, number]; weight: number };
+export type GlobePoint = { location: [number, number]; weight: number; kind?: "sale" | "visit" };
 
 /** Resolve any CSS color (oklch, var-based…) to 0..1 RGB through a 1px canvas. */
 function cssToRgb(color: string): [number, number, number] {
@@ -42,18 +42,27 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
     const primary = cssToRgb(token("--primary") || "#7dd");
     const muted = cssToRgb(token("--muted-foreground") || "#888");
 
-    const max = Math.max(1, ...points.map((p) => p.weight));
+    const sale = cssToRgb(token("--globe-sale") || "#3b82f6");
+    const maxOf = (k: "sale" | "visit") => Math.max(1, ...points.filter((p) => (p.kind ?? "sale") === k).map((p) => p.weight));
+    const max = { sale: maxOf("sale"), visit: maxOf("visit") };
     const baseColor: [number, number, number] = isDark ? mix([0.2, 0.2, 0.2], primary, 0.18) : mix([0.94, 0.94, 0.94], primary, 0.12);
     const fadeTo: [number, number, number] = isDark ? mix([0.03, 0.04, 0.04], primary, 0.1) : baseColor;
-    const bright: [number, number, number] = mix(primary, [1, 1, 1], isDark ? 0.55 : 0.15);
     // "Live sales" effect: every country rests as a dim dot and flashes at its own organic rhythm,
     // like a sale popping up there. Countries that sell more flash more often.
     const rand = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    // Sales flash in blue, live visits in cyan (primary).
     const sized = points.map((p, i) => {
-      const w = p.weight / max;
-      return { location: p.location, core: 0.022 + 0.04 * w, period: 5200 - 3400 * w, seed: i + 1 };
+      const kind = p.kind ?? "sale";
+      const w = p.weight / max[kind];
+      const base = kind === "sale" ? sale : primary;
+      return {
+        location: p.location, seed: i + 1, base,
+        core: (kind === "sale" ? 0.022 : 0.016) + (kind === "sale" ? 0.04 : 0.03) * w,
+        period: (kind === "sale" ? 5200 : 3200) - (kind === "sale" ? 3400 : 2000) * w,
+        dim: mix(base, fadeTo, 0.55),
+        bright: mix(base, [1, 1, 1], isDark ? 0.45 : 0.1),
+      };
     });
-    const dim: [number, number, number] = mix(primary, fadeTo, 0.55);
     const FLASH = 900; // ms a flash lasts
     const pulseMarkers = (t: number) => {
       const glows: Array<{ location: [number, number]; size: number; color: [number, number, number] }> = [];
@@ -64,12 +73,12 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
         const e = t - start;
         const k = e >= 0 && e < FLASH ? e / FLASH : -1;         // 0..1 while flashing
         if (k < 0) {
-          cores.push({ location: m.location, size: m.core * 0.75, color: dim });
+          cores.push({ location: m.location, size: m.core * 0.75, color: m.dim });
           continue;
         }
         const pop = Math.sin(Math.PI * Math.min(1, k * 1.6));  // fast rise, quick fall
-        glows.push({ location: m.location, size: m.core * (1.4 + 2.2 * k), color: mix(primary, fadeTo, Math.min(1, k * 1.15)) });
-        cores.push({ location: m.location, size: m.core * (0.75 + 0.75 * pop), color: mix(dim, bright, pop) });
+        glows.push({ location: m.location, size: m.core * (1.4 + 2.2 * k), color: mix(m.base, fadeTo, Math.min(1, k * 1.15)) });
+        cores.push({ location: m.location, size: m.core * (0.75 + 0.75 * pop), color: mix(m.dim, m.bright, pop) });
       }
       return [...glows, ...cores];
     };
