@@ -160,10 +160,20 @@ function Dashboard() {
   const visibleLocked = showAllAchievements ? locked : locked.slice(0, 3);
   const revealRef = useScrollReveal<HTMLDivElement>();
   const [mockSales, setMockSales] = useState(false);
+  const [showMockToggle, setShowMockToggle] = useState(false);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    const isPreview =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host.startsWith("id-preview--");
+    setShowMockToggle(Boolean(import.meta.env.DEV) || isPreview);
+  }, []);
 
   return (
     <div ref={revealRef} className="dash space-y-6">
-      {import.meta.env.DEV && (
+      {showMockToggle && (
         <button
           onClick={() => setMockSales((v) => !v)}
           aria-pressed={mockSales}
