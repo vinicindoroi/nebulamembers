@@ -99,13 +99,7 @@ export function PaymentRemindersModal({ member, onClose }: { member: { id: strin
                 <span>{open.length} em aberto{openTotal > 0 ? ` · ${formatBRL(openTotal)}` : ""}</span>
                 <span>{list.length - open.length} pagas</span>
               </div>
-              {blocked.length > 0 && (
-        <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2.5 text-sm">
-          <span className="font-medium text-destructive">{blocked.length} {blocked.length === 1 ? "aluno bloqueado" : "alunos bloqueados"}</span>
-          <span className="text-muted-foreground"> por pagamento em aberto. Marque como pago ou desbloqueie.</span>
-        </div>
-      )}
-      <ul className="divide-y divide-border rounded-xl border border-border">
+              <ul className="divide-y divide-border rounded-xl border border-border">
                 {list.map((r) => (
                   <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
                     <div className="min-w-0 flex-1">
