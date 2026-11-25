@@ -86,7 +86,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
 
   if (!mock && q.isLoading) {
     return (
-      <section className="relative rounded-2xl border border-border bg-card overflow-hidden grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-stretch">
+      <section className="relative rounded-2xl border border-border member-surface overflow-hidden grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-stretch">
         <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
         <GlobeStage points={[]} focus={PREVIEW_HUB} />
         <div className="p-6 sm:p-8 flex flex-col justify-center gap-4" aria-busy="true">
@@ -104,7 +104,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
 
   if (!mock && q.isError) {
     return (
-      <section className="rounded-xl border border-border bg-card p-5 flex items-center gap-3 text-sm text-muted-foreground">
+      <section className="rounded-xl border border-border member-surface p-5 flex items-center gap-3 text-sm text-muted-foreground">
         <AlertTriangle className="h-4 w-4 shrink-0" />
         <span className="flex-1">{(q.error as Error).message || "Não foi possível carregar suas vendas."}</span>
         <button onClick={() => q.refetch()} className="text-xs text-foreground hover:underline">Tentar de novo</button>
@@ -114,7 +114,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
 
   if (!d || !d.connected) {
     return (
-      <section className="relative rounded-2xl border border-border bg-card overflow-hidden grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-stretch">
+      <section className="relative rounded-2xl border border-border member-surface overflow-hidden grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-stretch">
         <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
         <GlobeStage points={PREVIEW_POINTS} focus={PREVIEW_HUB}>
           <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
@@ -153,7 +153,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
 
   if ("invalidKey" in d) {
     return (
-      <section className="rounded-xl border border-border bg-card p-5 flex flex-col sm:flex-row sm:items-center gap-3">
+      <section className="rounded-xl border border-border member-surface p-5 flex flex-col sm:flex-row sm:items-center gap-3">
         <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
         <p className="flex-1 text-sm text-muted-foreground">A Stripe não aceitou mais a sua chave. Ela pode ter sido apagada ou perdeu a permissão de leitura.</p>
         <Link to="/settings" search={{ tab: "integrations" } as never} className="text-xs text-foreground hover:underline">Conectar de novo</Link>
@@ -169,7 +169,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
   ];
 
   return (
-    <section className="relative rounded-2xl border border-border bg-card overflow-hidden">
+    <section className="relative rounded-2xl border border-border member-surface overflow-hidden">
       <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
       <div className="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <GlobeStage points={points} focus={focus}>

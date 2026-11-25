@@ -289,10 +289,11 @@ export function AppShell() {
 
   return (
     <div className="member-shell min-h-dvh flex">
+      <EdgesBackground />
       {/* Sidebar - single element with smooth width transition */}
       <aside
-        className={`hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-border bg-background flex-col transition-all duration-300 ease-in-out overflow-visible ${
-          collapsed ? "w-14" : "w-72"
+        className={`member-sidebar hidden md:flex fixed md:sticky top-0 left-0 z-40 h-screen shrink-0 border-r border-border flex-col transition-all duration-300 ease-in-out overflow-visible ${
+          collapsed ? "w-14" : "w-72 member-sidebar-open"
         }`}
       >
         {/* Toggle button — centered on the right edge */}
@@ -489,7 +490,7 @@ export function AppShell() {
         role="dialog"
         aria-modal="true"
         aria-label="Menu de navegação"
-        ref={mobileMenuRef} aria-hidden={!open} inert={!open} className={`member-mobile-menu fixed md:hidden top-0 left-0 z-40 h-dvh w-72 border-r border-border bg-background transition-transform duration-300 ${
+        ref={mobileMenuRef} aria-hidden={!open} inert={!open} className={`member-mobile-menu fixed md:hidden top-0 left-0 z-40 h-dvh w-72 border-r border-border transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -641,7 +642,6 @@ export function AppShell() {
           </div>
         )}
         <main ref={mainRef} className={`member-main min-w-0 flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
-          <EdgesBackground />
           <div data-route={path} className={isFunnelsPage ? 'h-full min-w-0' : 'mobile-route-content admin-route-slot min-w-0 w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
               <><Outlet /><WhatsappPrompt /></>

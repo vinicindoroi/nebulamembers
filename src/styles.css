@@ -45,16 +45,18 @@
 
 .courses-catalog { font-family: var(--font-course-body); }
 .member-main { position: relative; isolation: isolate; }
+/* Own stacking context so the edge light and the ambient wash paint above the page background */
+.member-shell { isolation: isolate; }
 .member-edge-background {
   --edge-deep: color-mix(in srgb, var(--primary) 48%, var(--background));
   --edge-mid: var(--primary);
   --edge-ice: color-mix(in srgb, var(--primary) 55%, var(--foreground));
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
   overflow: hidden;
-  background: var(--background);
+  background: transparent;
 }
 .member-edge-background canvas { display: block; width: 100%; height: 100%; opacity: 0.55; }
 .light .member-edge-background canvas { opacity: 0.28; }
@@ -877,10 +879,15 @@
 .dash-shine::after { animation: dash-shine 9s var(--ease-fluid) 2.4s infinite; opacity: 0.6; }
 .dash .dash-bar > span::after { animation-duration: 5s; opacity: 0.5; }
 .dash .dash-card {
-  border-color: color-mix(in oklab, var(--border) 70%, transparent);
-  background: color-mix(in oklab, var(--card) 88%, transparent);
-  backdrop-filter: blur(8px);
-  transition: border-color 0.5s var(--ease-fluid), transform 0.6s var(--ease-fluid), box-shadow 0.6s var(--ease-fluid), background 0.5s var(--ease-fluid);
+  background-image: var(--liquid-sheen);
+  background-color: var(--liquid-tint);
+  background-size: 220% 220%;
+  background-position: 0% 0%;
+  backdrop-filter: var(--liquid-blur);
+  border-color: var(--liquid-border);
+  box-shadow: var(--liquid-inset), var(--liquid-shadow);
+  animation: liquid-drift 22s ease-in-out infinite alternate;
+  transition: border-color 0.5s var(--ease-fluid), transform 0.6s var(--ease-fluid), box-shadow 0.6s var(--ease-fluid), background-color 0.5s var(--ease-fluid);
 }
 .dash .dash-card-hover:hover { transform: translateY(-3px); }
 .dash [data-tilt].dash-card-hover { transition: transform 0.7s var(--ease-fluid), box-shadow 0.6s var(--ease-fluid), border-color 0.5s var(--ease-fluid); }
@@ -913,6 +920,85 @@
 @media (prefers-reduced-motion: reduce) {
   .dash-skel::after, .dash-shine::after { animation: none; }
   .dash .dash-card-hover:hover img { transform: none; }
+}
+
+/* ============ Liquid glass — surfaces, cards and sidebar ============ */
+:root {
+  --liquid-tint: oklch(1 0 0 / 0.05);
+  --liquid-tint-strong: color-mix(in oklab, var(--background) 72%, transparent);
+  --liquid-tint-side: oklch(1 0 0 / 0.055);
+  --liquid-sheen: linear-gradient(135deg, oklch(1 0 0 / 0.075), oklch(1 0 0 / 0.015) 45%, oklch(1 0 0 / 0.04));
+  --liquid-blur: blur(20px) saturate(1.35);
+  --liquid-border: color-mix(in oklab, var(--foreground) 11%, transparent);
+  --liquid-hi: oklch(1 0 0 / 0.075);
+  --liquid-lo: oklch(0 0 0 / 0.32);
+  --liquid-shadow: 0 20px 44px -30px oklch(0 0 0 / 0.75);
+  --liquid-inset: inset 0 1px 0 var(--liquid-hi), inset 0 -1px 0 var(--liquid-lo);
+}
+.light {
+  --liquid-tint: oklch(0 0 0 / 0.045);
+  --liquid-tint-strong: color-mix(in oklab, var(--background) 84%, transparent);
+  --liquid-tint-side: oklch(0 0 0 / 0.05);
+  --liquid-sheen: linear-gradient(135deg, oklch(1 0 0 / 0.78), oklch(1 0 0 / 0.25) 45%, oklch(1 0 0 / 0.55));
+  --liquid-blur: blur(18px) saturate(1.2);
+  --liquid-border: color-mix(in oklab, var(--foreground) 11%, transparent);
+  --liquid-hi: oklch(1 0 0 / 0.85);
+  --liquid-lo: oklch(0 0 0 / 0.06);
+  --liquid-shadow: 0 16px 34px -28px oklch(0 0 0 / 0.28);
+  --liquid-inset: inset 0 1px 0 var(--liquid-hi), inset 0 -1px 0 var(--liquid-lo);
+}
+/* Soft ambient wash: gives the glass surfaces something to refract */
+.member-shell::before {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(30% 80% at 3% 50%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 76%),
+    radial-gradient(38% 44% at 24% 26%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 72%),
+    radial-gradient(34% 40% at 76% 68%, color-mix(in oklab, var(--primary) 6%, transparent), transparent 72%);
+  animation: ambient-drift 30s ease-in-out infinite alternate;
+}
+@keyframes ambient-drift {
+  from { transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  to   { transform: translate3d(2%, 2%, 0) scale(1.08); }
+}
+@keyframes liquid-drift { to { background-position: 100% 100%; } }
+.liquid-glass,
+.member-surface {
+  background-image: var(--liquid-sheen);
+  background-color: var(--liquid-tint);
+  background-size: 220% 220%;
+  background-position: 0% 0%;
+  backdrop-filter: var(--liquid-blur);
+  border-color: var(--liquid-border);
+  box-shadow: var(--liquid-inset), var(--liquid-shadow);
+  isolation: isolate;
+  animation: liquid-drift 22s ease-in-out infinite alternate;
+}
+.member-sidebar { background: var(--background); }
+.member-sidebar-open {
+  background-image: linear-gradient(90deg, transparent 55%, oklch(1 0 0 / 0.05)), var(--liquid-sheen);
+  background-color: var(--liquid-tint-side);
+  background-size: 220% 220%;
+  background-position: 0% 0%;
+  backdrop-filter: var(--liquid-blur);
+  border-right-color: var(--liquid-border);
+  box-shadow: inset -1px 0 0 var(--liquid-hi);
+  animation: liquid-drift 28s ease-in-out infinite alternate;
+}
+.member-mobile-menu {
+  background-image: var(--liquid-sheen);
+  background-color: var(--liquid-tint-strong);
+  background-size: 220% 220%;
+  background-position: 0% 0%;
+  backdrop-filter: var(--liquid-blur);
+  border-right-color: var(--liquid-border);
+  box-shadow: inset -1px 0 0 var(--liquid-hi);
+}
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass, .member-surface, .member-sidebar-open, .member-mobile-menu, .member-shell::before { animation: none; }
 }
 
 /* Globe starfield parallax */
