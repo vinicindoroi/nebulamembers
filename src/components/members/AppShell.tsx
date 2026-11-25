@@ -5,6 +5,9 @@ import {
   PanelLeftClose, PanelLeftOpen, StickyNote, HelpCircle, Trello, Mic, Lock, Package, Flame, CalendarClock, Activity, HeartPulse, Zap,
 } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouteMotion } from "@/hooks/use-route-motion";
+import { useActiveIndicator } from "@/hooks/use-active-indicator";
+import { MEMBER_NAV_ORDER } from "@/lib/route-transition";
 import { useMobileDrawer } from "@/hooks/use-mobile-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
@@ -212,7 +215,21 @@ export function AppShell() {
 
   const searchRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const bottomNavRef = useRef<HTMLElement>(null);
   useScrollRestore(mainRef);
+  const routeMotion = useRouteMotion(MEMBER_NAV_ORDER);
+  const bottomTabs = useMemo(
+    () =>
+      [
+        { to: "/dashboard", label: "Início", icon: LayoutDashboard },
+        { to: "/courses", label: "Cursos", icon: GraduationCap },
+        { to: "/community", label: "Comunidade", icon: Users },
+        { to: "/notes", label: "Notas", icon: StickyNote },
+        { to: "/profile", label: "Perfil", icon: User },
+      ].filter((item) => !isLocked(item.to)),
+    [isLocked],
+  );
+  const bottomIndicator = useActiveIndicator(bottomNavRef, `${path}:${bottomTabs.map((item) => item.to).join("|")}`);
   const [siteSettings, setSiteSettings] = useState({ name: "Nebula Members", logoUrl: brandLogo.url, primaryColor: "#7ad3d8" });
 
   useEffect(() => {
@@ -642,27 +659,30 @@ export function AppShell() {
           </div>
         )}
         <main ref={mainRef} className={`member-main min-w-0 flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
-          <div data-route={path} className={isFunnelsPage ? 'h-full min-w-0' : 'mobile-route-content admin-route-slot min-w-0 w-full max-w-[1600px] mx-auto'}>
-            {hasAccess ? (
-              <><Outlet /><WhatsappPrompt /></>
-            ) : (
-              <PlanLockScreen pending={planPending} />
-            )}
+          <div
+            key={path}
+            data-route={path}
+            data-route-motion={routeMotion}
+            className={`route-stage ${isFunnelsPage ? "h-full min-w-0" : "mobile-route-content admin-route-slot min-w-0 w-full max-w-[1600px] mx-auto"}`}
+          >
+            {hasAccess ? <Outlet /> : <PlanLockScreen pending={planPending} />}
           </div>
+          {hasAccess && <WhatsappPrompt />}
         </main>
       </div>
 
       {isFunnelsPage && <button className="mobile-workspace-menu md:hidden" onClick={() => setOpen(true)} aria-label="Abrir menu da plataforma" aria-expanded={open}><Menu className="h-5 w-5" /></button>}
       {/* Bottom nav (mobile) */}
       {!isFunnelsPage && (
-        <nav aria-label="Navegação principal" className="member-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
-          {[
-            { to: "/dashboard", label: "Início", icon: LayoutDashboard },
-            { to: "/courses", label: "Cursos", icon: GraduationCap },
-            { to: "/community", label: "Comunidade", icon: Users },
-            { to: "/notes", label: "Notas", icon: StickyNote },
-            { to: "/profile", label: "Perfil", icon: User },
-          ].filter((item) => !isLocked(item.to)).map((item) => {
+        <nav ref={bottomNavRef} aria-label="Navegação principal" className="member-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
+          {bottomIndicator.ready && (
+            <span
+              aria-hidden
+              className={`member-tab-indicator${bottomIndicator.animate ? " is-live" : ""}`}
+              style={{ transform: `translate3d(${bottomIndicator.x}px, 0, 0)` }}
+            />
+          )}
+          {bottomTabs.map((item) => {
             const active = path === item.to || path.startsWith(item.to + "/");
             const Icon = item.icon;
             if (isLocked(item.to)) {
@@ -682,7 +702,7 @@ export function AppShell() {
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className={`member-tab-icon h-5 w-5${active ? " is-active" : ""}`} />
                 {item.label}
               </Link>
             );

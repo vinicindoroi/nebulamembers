@@ -5,6 +5,8 @@ import {
 } from "lucide-react";
 import { NotificationBell } from "@/components/members/NotificationBell";
 import { useState, useRef } from "react";
+import { useRouteMotion } from "@/hooks/use-route-motion";
+import { ADMIN_NAV_ORDER } from "@/lib/route-transition";
 import { useMobileDrawer } from "@/hooks/use-mobile-drawer";
 import { useAuth } from "@/hooks/use-auth";
 import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
@@ -67,6 +69,7 @@ export function AdminShell() {
   const name = (user?.user_metadata as any)?.full_name || email.split("@")[0] || "Admin";
   const initials = name.slice(0, 2).toUpperCase();
   const current = allNav.find((n) => path.startsWith(n.to))?.label ?? "Admin";
+  const routeMotion = useRouteMotion(ADMIN_NAV_ORDER);
   const onSignOut = async () => { await signOut(); navigate({ to: "/login" }); };
 
   return (
@@ -181,7 +184,7 @@ export function AdminShell() {
           </div>
         </header>
         <main className="admin-main min-w-0 flex-1 px-4 md:px-8 py-6 md:py-8">
-          <div key={path} data-route={path} className="mobile-route-content admin-route-slot min-w-0">
+          <div key={path} data-route={path} data-route-motion={routeMotion} className="route-stage mobile-route-content admin-route-slot min-w-0">
             <Outlet />
           </div>
         </main>
