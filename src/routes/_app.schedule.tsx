@@ -52,6 +52,7 @@ function SchedulePage() {
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [notesMap, setNotesMap] = useState<Record<string, CallNotes>>({});
   const [onWaitlist, setOnWaitlist] = useState(false);
+  const [groupCalls, setGroupCalls] = useState<{ id: string; starts_at: string; ends_at: string; booked_by: string }[]>([]);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   async function load() {
@@ -66,14 +67,16 @@ function SchedulePage() {
       setBlockedSlots(cfg.blockedSlots);
       const from = new Date();
       const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
-      const [b, m, w, fb, nt, wl] = await Promise.all([
+      const [b, m, w, fb, nt, wl, gc] = await Promise.all([
         supabase.rpc("mentor_busy_slots", { _from: from.toISOString(), _to: to.toISOString() }),
         supabase.from("mentor_bookings").select("*").eq("user_id", user.id).order("starts_at", { ascending: false }),
         supabase.rpc("mentor_my_booked_weeks"),
         supabase.from("mentor_call_feedback").select("booking_id, rating").eq("user_id", user.id),
         supabase.from("mentor_call_notes").select("booking_id, summary, tasks, updated_at"),
         supabase.from("mentor_waitlist").select("user_id").eq("user_id", user.id).maybeSingle(),
+        supabase.rpc("my_group_bookings"),
       ]);
+      setGroupCalls((gc.data ?? []) as { id: string; starts_at: string; ends_at: string; booked_by: string }[]);
       setRatings(Object.fromEntries((fb.data ?? []).map((x) => [x.booking_id, x.rating])));
       setNotesMap(Object.fromEntries((nt.data ?? []).map((x) => [x.booking_id, { booking_id: x.booking_id, summary: x.summary ?? "", tasks: normalizeTasks(x.tasks), updated_at: x.updated_at }])));
       setOnWaitlist(!!wl.data);
@@ -193,6 +196,24 @@ function SchedulePage() {
 
                 <Button size="sm" variant="outline" onClick={() => cancel(b.id)}><X className="h-4 w-4" /> Cancelar</Button>
               </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {groupCalls.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Call do seu grupo</h2>
+          {groupCalls.map((b) => (
+            <div key={b.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-5">
+              <div className="flex items-center gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary"><CalendarClock className="h-5 w-5" /></div>
+                <div>
+                  <p className="font-semibold capitalize">{fmtDate(b.starts_at, tz)}</p>
+                  <p className="text-sm text-muted-foreground">{fmtTime(b.starts_at, tz)} – {fmtTime(b.ends_at, tz)} · marcada por {b.booked_by}</p>
+                </div>
+              </div>
+              <CallLinkButton bookingId={b.id} startsAt={b.starts_at} endsAt={b.ends_at} />
             </div>
           ))}
         </section>

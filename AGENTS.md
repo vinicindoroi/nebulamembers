@@ -14,7 +14,7 @@
 - Keep existing funnel connection anchors fixed when nodes move; users reposition anchors manually.
 - Store member classification tags and assignments in separate admin-only RLS tables; tags must never grant access or become editable through student profiles.
 - Use the shared member-groups hook and grouping helpers in administrative screens; one persisted group catalog and membership mapping prevents divergent assignments between Members and Scheduling.
-- Enforce group weekly booking limits through a database trigger shared by reservations and admin rescheduling; expose only occupied week dates to students so group classification and peer details remain admin-only.
+- Enforce group weekly booking limits through a database trigger shared by reservations and admin rescheduling; group peers see each other's upcoming calls and Meet link only via SECURITY DEFINER `my_group_bookings`/`my_call_link` (first name only), while group catalog and membership tables stay admin-only.
 - Persist course banner order and timing in app_settings, store images in the private course-banners bucket with signed URLs, and share the query between admin and catalog so changes remain synchronized.
 - Derive per-member and per-group lesson counts from lesson_progress through one shared hook and pure helper, so every admin screen reports identical numbers and duplicate progress rows never double-count.
 - Funnel Tracker (ported from TRACKLY) uses tracker_* tables scoped by workspace_id = owner user id; public ingestion via /api/public/tracker-event/$userId and /funnel-tracker.js, kept separate from the funnel-builder 'funnels' tables.

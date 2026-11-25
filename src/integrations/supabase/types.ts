@@ -2750,6 +2750,7 @@ export type Database = {
         Returns: boolean
       }
       is_active_member: { Args: { _user_id?: string }; Returns: boolean }
+      is_group_peer: { Args: { _other: string }; Returns: boolean }
       is_member_approved: { Args: { _user_id?: string }; Returns: boolean }
       mentor_busy_slots: {
         Args: { _from: string; _to: string }
@@ -2765,6 +2766,15 @@ export type Database = {
         }[]
       }
       my_call_link: { Args: { _booking_id: string }; Returns: string }
+      my_group_bookings: {
+        Args: never
+        Returns: {
+          booked_by: string
+          ends_at: string
+          id: string
+          starts_at: string
+        }[]
+      }
       notify_mentor_waitlist: {
         Args: { _except: string; _starts: string }
         Returns: undefined
