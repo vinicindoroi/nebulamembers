@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CalendarClock, Clock, Loader2, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +13,50 @@ import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
 import {
   fetchScheduleConfig, slotsForDay, weekKey, fmtTime, fmtDate, ymdFromLocal,
-  type ScheduleSettings, type Availability, type Booking,
+  type Booking,
 } from "@/lib/mentor-schedule";
 import { normalizeTasks, pendingFeedback, type CallNotes } from "@/lib/call-feedback";
 import { CallFeedbackCard } from "@/components/schedule/CallFeedbackCard";
 import { PastCallItem } from "@/components/schedule/PastCallItem";
 import { WaitlistToggle } from "@/components/schedule/WaitlistToggle";
+
+async function fetchMemberSchedule(userId: string) {
+  const cfgPromise = fetchScheduleConfig();
+  const busyPromise = cfgPromise.then((cfg) => {
+    const from = new Date();
+    const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
+    return supabase.rpc("mentor_busy_slots", { _from: from.toISOString(), _to: to.toISOString() });
+  });
+
+  // Tudo que não depende das configurações começa ao mesmo tempo; só os horários ocupados aguardam o prazo da agenda.
+  const [cfg, acc, b, m, w, fb, nt, wl, gc] = await Promise.all([
+    cfgPromise,
+    supabase.rpc("can_access_mentor_schedule", {}),
+    busyPromise,
+    supabase.from("mentor_bookings").select("*").eq("user_id", userId).order("starts_at", { ascending: false }),
+    supabase.rpc("mentor_my_booked_weeks"),
+    supabase.from("mentor_call_feedback").select("booking_id, rating").eq("user_id", userId),
+    supabase.from("mentor_call_notes").select("booking_id, summary, tasks, updated_at"),
+    supabase.from("mentor_waitlist").select("user_id").eq("user_id", userId).maybeSingle(),
+    supabase.rpc("my_group_bookings"),
+  ]);
+  if (acc.error || b.error || m.error) throw acc.error || b.error || m.error;
+
+  return {
+    settings: cfg.settings,
+    availability: cfg.availability,
+    extras: cfg.extras,
+    blockedSlots: cfg.blockedSlots,
+    allowed: !!acc.data,
+    groupCalls: (gc.data ?? []) as { id: string; starts_at: string; ends_at: string; booked_by: string }[],
+    ratings: Object.fromEntries((fb.data ?? []).map((x) => [x.booking_id, x.rating])),
+    notesMap: Object.fromEntries((nt.data ?? []).map((x) => [x.booking_id, { booking_id: x.booking_id, summary: x.summary ?? "", tasks: normalizeTasks(x.tasks), updated_at: x.updated_at }])) as Record<string, CallNotes>,
+    onWaitlist: !!wl.data,
+    usedWeeks: new Set(((w.data ?? []) as { week_start: string }[]).map((x) => String(x.week_start).slice(0, 10))),
+    busy: new Set((b.data ?? []).map((x) => new Date(x.starts_at).getTime())),
+    mine: (m.data ?? []) as Booking[],
+  };
+}
 
 export const Route = createFileRoute("/_app/schedule")({
   head: () => ({
@@ -36,79 +75,52 @@ export const Route = createFileRoute("/_app/schedule")({
 function SchedulePage() {
   const { user } = useAuth();
   const { isAdmin } = useAdmin();
-  const [settings, setSettings] = useState<ScheduleSettings | null>(null);
-  const [availability, setAvailability] = useState<Availability[]>([]);
-  const [extras, setExtras] = useState<string[]>([]);
-  const [blockedSlots, setBlockedSlots] = useState<string[]>([]);
-  const [busy, setBusy] = useState<Set<number>>(new Set());
-  const [mine, setMine] = useState<Booking[]>([]);
-  const [usedWeeks, setUsedWeeks] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
-  const [allowed, setAllowed] = useState(true);
   const [day, setDay] = useState<Date | undefined>();
   const [slot, setSlot] = useState<Date | null>(null);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
-  const [ratings, setRatings] = useState<Record<string, number>>({});
-  const [notesMap, setNotesMap] = useState<Record<string, CallNotes>>({});
-  const [onWaitlist, setOnWaitlist] = useState(false);
-  const [groupCalls, setGroupCalls] = useState<{ id: string; starts_at: string; ends_at: string; booked_by: string }[]>([]);
+  const [waitlistOverride, setWaitlistOverride] = useState<boolean | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const scheduleQuery = useQuery({
+    queryKey: ["member-schedule", user?.id],
+    enabled: !!user,
+    queryFn: () => fetchMemberSchedule(user!.id),
+    staleTime: 15_000,
+    gcTime: 5 * 60_000,
+    refetchInterval: 20_000,
+  });
+  const load = useCallback(async () => { await scheduleQuery.refetch(); }, [scheduleQuery.refetch]);
 
-  async function load() {
-    if (!user) return;
-    try {
-      const cfg = await fetchScheduleConfig();
-      const acc = await supabase.rpc("can_access_mentor_schedule", {});
-      setAllowed(!!acc.data);
-      setSettings(cfg.settings);
-      setAvailability(cfg.availability);
-      setExtras(cfg.extras);
-      setBlockedSlots(cfg.blockedSlots);
-      const from = new Date();
-      const to = new Date(Date.now() + ((cfg.settings?.max_days_ahead ?? 30) + 1) * 86400_000);
-      const [b, m, w, fb, nt, wl, gc] = await Promise.all([
-        supabase.rpc("mentor_busy_slots", { _from: from.toISOString(), _to: to.toISOString() }),
-        supabase.from("mentor_bookings").select("*").eq("user_id", user.id).order("starts_at", { ascending: false }),
-        supabase.rpc("mentor_my_booked_weeks"),
-        supabase.from("mentor_call_feedback").select("booking_id, rating").eq("user_id", user.id),
-        supabase.from("mentor_call_notes").select("booking_id, summary, tasks, updated_at"),
-        supabase.from("mentor_waitlist").select("user_id").eq("user_id", user.id).maybeSingle(),
-        supabase.rpc("my_group_bookings"),
-      ]);
-      setGroupCalls((gc.data ?? []) as { id: string; starts_at: string; ends_at: string; booked_by: string }[]);
-      setRatings(Object.fromEntries((fb.data ?? []).map((x) => [x.booking_id, x.rating])));
-      setNotesMap(Object.fromEntries((nt.data ?? []).map((x) => [x.booking_id, { booking_id: x.booking_id, summary: x.summary ?? "", tasks: normalizeTasks(x.tasks), updated_at: x.updated_at }])));
-      setOnWaitlist(!!wl.data);
-      setUsedWeeks(new Set(((w.data ?? []) as { week_start: string }[]).map((x) => String(x.week_start).slice(0, 10))));
-      if (b.error || m.error) throw b.error || m.error;
-      setBusy(new Set((b.data ?? []).map((x) => new Date(x.starts_at).getTime())));
-      setMine((m.data ?? []) as Booking[]);
-    } catch {
-      toast.error("Não foi possível carregar a agenda.");
-    } finally {
-      setLoading(false);
-    }
-  }
-  useEffect(() => { load(); }, [user?.id]);
-
-  // Atualização ao vivo: aviso compartilhado + checagem periódica/ao voltar à aba
+  // O cache abre a tela imediatamente ao voltar; o canal e o React Query mantêm os horários atualizados.
   useEffect(() => {
     if (!user) return;
     const ch = supabase.channel("mentor-schedule-room")
-      .on("broadcast", { event: "changed" }, () => load())
+      .on("broadcast", { event: "changed" }, () => { void load(); })
       .subscribe();
     channelRef.current = ch;
-    const iv = setInterval(load, 20000);
-    const onFocus = () => load();
-    window.addEventListener("focus", onFocus);
     return () => {
       supabase.removeChannel(ch);
       channelRef.current = null;
-      clearInterval(iv);
-      window.removeEventListener("focus", onFocus);
     };
-  }, [user?.id]);
+  }, [user?.id, load]);
+
+  const data = scheduleQuery.data;
+  const settings = data?.settings ?? null;
+  const availability = data?.availability ?? [];
+  const extras = data?.extras ?? [];
+  const blockedSlots = data?.blockedSlots ?? [];
+  const busy = data?.busy ?? new Set<number>();
+  const mine = data?.mine ?? [];
+  const usedWeeks = data?.usedWeeks ?? new Set<string>();
+  const allowed = data?.allowed ?? true;
+  const ratings = data?.ratings ?? {};
+  const notesMap = data?.notesMap ?? {};
+  const onWaitlist = waitlistOverride ?? data?.onWaitlist ?? false;
+  const groupCalls = data?.groupCalls ?? [];
+
+  useEffect(() => {
+    if (waitlistOverride !== null && data?.onWaitlist === waitlistOverride) setWaitlistOverride(null);
+  }, [data?.onWaitlist, waitlistOverride]);
 
   useEffect(() => {
     if (slot && busy.has(slot.getTime())) {
@@ -150,7 +162,10 @@ function SchedulePage() {
     load(); notifyOthers();
   }
 
-  if (loading) return <p role="status" className="text-sm text-muted-foreground">Carregando agenda...</p>;
+  if (scheduleQuery.isError && !data) {
+    return <p role="alert" className="text-sm text-muted-foreground">Não foi possível carregar a agenda. <button className="text-primary" onClick={() => void load()}>Tentar novamente</button></p>;
+  }
+  if (scheduleQuery.isPending) return <p role="status" className="text-sm text-muted-foreground">Carregando agenda...</p>;
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const lastDay = new Date(today.getTime() + (settings?.max_days_ahead ?? 30) * 86400_000);
@@ -312,7 +327,7 @@ function SchedulePage() {
       )}
 
       {allowed && settings?.enabled && upcoming.length === 0 && user && (
-        <WaitlistToggle userId={user.id} joined={onWaitlist} onChange={setOnWaitlist} />
+        <WaitlistToggle userId={user.id} joined={onWaitlist} onChange={(joined) => { setWaitlistOverride(joined); void load(); }} />
       )}
 
       {past.length > 0 && (

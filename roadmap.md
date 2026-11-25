@@ -19,3 +19,4 @@
 - [ ] Ativar push no celular para quedas e recuperação de domínios — aguardando conexão Firebase com web push (conexão recusada)
 - [x] Configurações → Integrações: aluno conecta a própria Stripe (chave restrita, só leitura, guardada criptografada)
 - [x] Dashboard do aluno: globo girando com os locais das vendas + faturamento, país e campanha (utm_campaign) que mais venderam
+- [x] Diagnosticar e remover a lentidão na abertura das abas, medindo navegação e consultas

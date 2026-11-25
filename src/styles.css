@@ -1024,46 +1024,15 @@
   animation: none;
 }
 
-/* ===== Route focus: desfoca a saída e devolve o foco à próxima aba ===== */
+/* ===== Route focus: a próxima aba entra em foco sem capturar a página anterior ===== */
 @media (prefers-reduced-motion: no-preference) {
-  .member-main,
-  .admin-main {
-    view-transition-name: nebula-content;
-  }
-
-  ::view-transition {
-    background: var(--background);
-  }
-
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
-
-  ::view-transition-old(nebula-content),
-  ::view-transition-new(nebula-content) {
-    animation-duration: 0.48s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    animation-fill-mode: both;
-    mix-blend-mode: normal;
+  .route-focus-enter {
+    animation: nebula-route-focus 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
     transform-origin: 50% 20%;
   }
 
-  ::view-transition-old(nebula-content) {
-    animation-name: nebula-vt-leave;
-  }
-
-  ::view-transition-new(nebula-content) {
-    animation-name: nebula-vt-enter;
-  }
-
-  @keyframes nebula-vt-leave {
-    from { opacity: 1; filter: blur(0); transform: scale(1); }
-    to { opacity: 0; filter: blur(8px); transform: scale(0.996); }
-  }
-
-  @keyframes nebula-vt-enter {
-    from { opacity: 0; filter: blur(8px); transform: scale(1.004); }
-    to { opacity: 1; filter: blur(0); transform: scale(1); }
+  @keyframes nebula-route-focus {
+    from { opacity: 0; filter: blur(3px); transform: translateY(4px) scale(1.002); }
+    to { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
   }
 }

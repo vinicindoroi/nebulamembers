@@ -45,32 +45,26 @@ function Page() {
 
   const load = async () => {
     setLoading(true);
-    const [pRes, profRes, lRes, cRes] = await Promise.all([
-      supabase.from("posts").select("*").order("created_at", { ascending: false }).limit(200),
+    const [pRes, profRes] = await Promise.all([
+      supabase.from("posts")
+        .select("id, user_id, content, created_at, post_likes(post_id), comments(id, post_id, user_id, content, created_at)")
+        .order("created_at", { ascending: false })
+        .limit(200),
       supabase.from("profiles").select("id, full_name"),
-      supabase.from("post_likes").select("post_id"),
-      supabase.from("comments").select("*").order("created_at", { ascending: true }),
     ]);
 
     const profiles = new Map((profRes.data ?? []).map((p) => [p.id, p.full_name]));
-    const likes = (lRes.data ?? []).reduce((acc, l) => {
-      acc[l.post_id] = (acc[l.post_id] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    const comments = (cRes.data ?? []).map((c) => ({
-      ...c,
-      author_name: profiles.get(c.user_id) ?? null,
-    }));
-
-    const mapped: Post[] = (pRes.data ?? []).map((p) => ({
+    const mapped: Post[] = ((pRes.data ?? []) as any[]).map((p) => ({
       id: p.id,
       user_id: p.user_id,
       content: p.content,
       created_at: p.created_at,
       author_name: profiles.get(p.user_id) ?? null,
       author_email: null,
-      likes: likes[p.id] ?? 0,
-      comments: comments.filter((c) => c.post_id === p.id),
+      likes: p.post_likes?.length ?? 0,
+      comments: [...(p.comments ?? [])]
+        .sort((a: any, b: any) => a.created_at.localeCompare(b.created_at))
+        .map((c: any) => ({ ...c, author_name: profiles.get(c.user_id) ?? null })),
     }));
 
     setPosts(mapped);

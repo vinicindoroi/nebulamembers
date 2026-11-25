@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CalendarClock, Check, ChevronDown, Loader2, MessageCircle, NotebookPen, Plus, Trash2, X } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 import { syncBookingToGoogle } from "@/lib/google-calendar.functions";
@@ -54,55 +55,62 @@ export const Route = createFileRoute("/admin/schedule")({
 
 type Profile = { id: string; full_name: string | null; email: string | null; phone: string | null; plan: string | null };
 
-function AdminSchedule() {
-  const [settings, setSettings] = useState<ScheduleSettings | null>(null);
-  const [availability, setAvailability] = useState<Availability[]>([]);
-  const [extras, setExtras] = useState<string[]>([]);
-  const [blockedSlots, setBlockedSlots] = useState<string[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
-  const [links, setLinks] = useState<Record<string, string>>({});
-  const [feedback, setFeedback] = useState<Record<string, CallFeedback>>({});
-  const [noted, setNoted] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
+async function fetchAdminSchedule() {
+  const bookingsPromise = supabase.from("mentor_bookings").select("*").order("starts_at");
+  const linksPromise = bookingsPromise.then((b) => {
+    if (b.error) throw b.error;
+    return fetchBookingLinks(b.data.map((x) => x.id));
+  });
+  const [cfg, b, p, f, n, links] = await Promise.all([
+    fetchScheduleConfig(),
+    bookingsPromise,
+    (supabase as any).rpc("admin_list_profiles"),
+    supabase.from("mentor_call_feedback").select("*"),
+    supabase.from("mentor_call_notes").select("booking_id"),
+    linksPromise,
+  ]);
+  if (b.error) throw b.error;
+  return {
+    ...cfg,
+    bookings: (b.data ?? []) as Booking[],
+    profiles: Object.fromEntries(((p.data ?? []) as Profile[]).map((x) => [x.id, x])) as Record<string, Profile>,
+    feedback: Object.fromEntries(((f.data ?? []) as CallFeedback[]).map((x) => [x.booking_id, x])) as Record<string, CallFeedback>,
+    noted: new Set((n.data ?? []).map((x) => x.booking_id)),
+    links,
+  };
+}
 
-  async function load() {
-    try {
-      const cfg = await fetchScheduleConfig();
-      setSettings(cfg.settings);
-      setAvailability(cfg.availability);
-      setExtras(cfg.extras);
-      setBlockedSlots(cfg.blockedSlots);
-      const [b, p, f, n] = await Promise.all([
-        supabase.from("mentor_bookings").select("*").order("starts_at"),
-        (supabase as any).rpc("admin_list_profiles"),
-        supabase.from("mentor_call_feedback").select("*"),
-        supabase.from("mentor_call_notes").select("booking_id"),
-      ]);
-      setFeedback(Object.fromEntries(((f.data ?? []) as CallFeedback[]).map((x) => [x.booking_id, x])));
-      setNoted(new Set((n.data ?? []).map((x) => x.booking_id)));
-      setBookings((b.data ?? []) as Booking[]);
-      setProfiles(Object.fromEntries(((p.data ?? []) as Profile[]).map((x) => [x.id, x])));
-      setLinks(await fetchBookingLinks((b.data ?? []).map((x) => x.id)));
-    } catch {
-      toast.error("Erro ao carregar agendamentos.");
-    } finally {
-      setLoading(false);
-    }
-  }
+function AdminSchedule() {
+  const scheduleQuery = useQuery({
+    queryKey: ["admin-schedule"],
+    queryFn: fetchAdminSchedule,
+    staleTime: 15_000,
+    gcTime: 5 * 60_000,
+    refetchInterval: 30_000,
+  });
+  const load = useCallback(async () => { await scheduleQuery.refetch(); }, [scheduleQuery.refetch]);
+
   useEffect(() => {
-    load();
     const ch = supabase
       .channel(`admin-bookings-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "mentor_bookings" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "mentor_bookings" }, () => { void load(); })
       .subscribe();
-    const iv = setInterval(load, 30000);
-    const onFocus = () => load();
-    window.addEventListener("focus", onFocus);
-    return () => { supabase.removeChannel(ch); clearInterval(iv); window.removeEventListener("focus", onFocus); };
-  }, []);
+    return () => { supabase.removeChannel(ch); };
+  }, [load]);
 
-  if (loading || !settings) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  const data = scheduleQuery.data;
+  const settings = data?.settings ?? null;
+  const availability = data?.availability ?? [];
+  const extras = data?.extras ?? [];
+  const blockedSlots = data?.blockedSlots ?? [];
+  const bookings = data?.bookings ?? [];
+  const profiles = data?.profiles ?? {};
+  const links = data?.links ?? {};
+  const feedback = data?.feedback ?? {};
+  const noted = data?.noted ?? new Set<string>();
+
+  if (scheduleQuery.isError && !data) return <p className="text-sm text-muted-foreground">Erro ao carregar agendamentos. <button className="text-primary" onClick={() => void load()}>Tentar novamente</button></p>;
+  if (scheduleQuery.isPending || !settings) return <p className="text-sm text-muted-foreground">Carregando...</p>;
 
   return (
     <div className="space-y-6">

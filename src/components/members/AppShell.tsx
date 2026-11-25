@@ -642,7 +642,7 @@ export function AppShell() {
           </div>
         )}
         <main ref={mainRef} className={`member-main min-w-0 flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
-          <div data-route={path} className={isFunnelsPage ? 'h-full min-w-0' : 'mobile-route-content admin-route-slot min-w-0 w-full max-w-[1600px] mx-auto'}>
+          <div key={path} data-route={path} className={isFunnelsPage ? 'h-full min-w-0' : 'mobile-route-content admin-route-slot route-focus-enter min-w-0 w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
               <><Outlet /><WhatsappPrompt /></>
             ) : (

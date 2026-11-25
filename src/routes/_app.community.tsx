@@ -420,27 +420,33 @@ function CommunityPage() {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["posts", user?.id, limit],
     enabled: !!user,
+    staleTime: 30_000,
     queryFn: async (): Promise<Post[]> => {
-      const [pRes, lRes, cRes, profRes] = await Promise.all([
-        db.from("posts").select("*").order("created_at", { ascending: false }).limit(limit),
-        db.from("post_likes").select("post_id, user_id"),
-        db.from("comments").select("*").order("created_at", { ascending: true }),
+      // Curtidas e comentários vêm embutidos apenas nos posts visíveis; antes baixávamos as tabelas inteiras.
+      const [pRes, profRes] = await Promise.all([
+        db.from("posts")
+          .select("id, user_id, content, image_url, created_at, post_likes(post_id, user_id), comments(id, post_id, user_id, content, image_url, created_at)")
+          .order("created_at", { ascending: false })
+          .limit(limit),
         db.from("public_profiles").select("id, full_name, avatar_url, instagram, xp"),
       ]);
       if (pRes.error) throw pRes.error;
+      if (profRes.error) throw profRes.error;
       const profs = new Map((profRes.data ?? []).map((p: any) => [p.id, p]));
-      const likes = lRes.data ?? [];
-      const comments = (cRes.data ?? []).map((c: any) => ({
-        ...c,
-        author: profs.get(c.user_id) ?? null,
-      }));
       return (pRes.data ?? []).map((p: any) => {
-        const postComments = comments.filter((c: any) => c.post_id === p.id);
+        const postComments = [...(p.comments ?? [])]
+          .sort((a: any, b: any) => a.created_at.localeCompare(b.created_at))
+          .map((c: any) => ({ ...c, author: profs.get(c.user_id) ?? null }));
+        const likes = p.post_likes ?? [];
         return {
-          ...p,
+          id: p.id,
+          user_id: p.user_id,
+          content: p.content,
+          image_url: p.image_url,
+          created_at: p.created_at,
           author: profs.get(p.user_id) ?? null,
-          likes: likes.filter((l: any) => l.post_id === p.id).length,
-          liked: likes.some((l: any) => l.post_id === p.id && l.user_id === user!.id),
+          likes: likes.length,
+          liked: likes.some((l: any) => l.user_id === user!.id),
           comments: postComments,
           commentCount: postComments.length,
         };

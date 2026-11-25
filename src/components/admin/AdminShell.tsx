@@ -181,7 +181,7 @@ export function AdminShell() {
           </div>
         </header>
         <main className="admin-main min-w-0 flex-1 px-4 md:px-8 py-6 md:py-8">
-          <div key={path} data-route={path} className="mobile-route-content admin-route-slot min-w-0">
+          <div key={path} data-route={path} className="mobile-route-content admin-route-slot route-focus-enter min-w-0">
             <Outlet />
           </div>
         </main>
