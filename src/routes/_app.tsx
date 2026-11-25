@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { isAwaitingApproval, isPendingPlan } from "@/lib/approval";
+import { PaymentLock } from "@/components/members/PaymentLock";
+import { blockingReminders, ymd, type PaymentReminder } from "@/lib/payment-reminders";
 
 export const Route = createFileRoute("/_app")({
   component: AppGate,
@@ -35,6 +37,17 @@ function AppGate() {
     refetchOnWindowFocus: true,
   });
 
+  const lockQuery = useQuery({
+    queryKey: ["my-payment-lock", user?.id ?? null],
+    enabled: !!user && isAdmin === false,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("payment_reminders").select("*").eq("user_id", user!.id).is("paid_at", null).order("due_date");
+      return blockingReminders((data ?? []) as PaymentReminder[], ymd(new Date()));
+    },
+    refetchInterval: (q) => ((q.state.data as unknown[] | undefined)?.length ? 30_000 : false),
+    refetchOnWindowFocus: true,
+  });
+
   const planReady = planQuery.isSuccess || planQuery.isError;
   if (loading || !session || adminLoading || (!isAdmin && !planReady)) {
     return <LoadingScreen />;
@@ -48,6 +61,21 @@ function AppGate() {
         onRefresh={() => void planQuery.refetch()}
         onSignOut={async () => {
           await queryClient.cancelQueries();
+          queryClient.clear();
+          await signOut();
+          navigate({ to: "/login", replace: true });
+        }}
+      />
+    );
+  }
+
+  if (!isAdmin && lockQuery.data?.length) {
+    return (
+      <PaymentLock
+        rows={lockQuery.data}
+        checking={lockQuery.isFetching}
+        onRefresh={() => void lockQuery.refetch()}
+        onSignOut={async () => {
           queryClient.clear();
           await signOut();
           navigate({ to: "/login", replace: true });

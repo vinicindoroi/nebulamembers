@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { PGlite } from "@electric-sql/pglite";
 import fs from "node:fs";
-import { addMonths, buildInstallments, reminderStatus, studentVisibleReminders, adminDueReminders, daysUntil } from "../src/lib/payment-reminders.ts";
+import { isBlocking, addMonths, buildInstallments, reminderStatus, studentVisibleReminders, adminDueReminders, daysUntil } from "../src/lib/payment-reminders.ts";
 
 // Monthly installments keep the due day and clamp to month end.
 assert.equal(addMonths("2026-01-31", 1), "2026-02-28");
@@ -31,6 +31,13 @@ const mk = (id, due, paid = null) => ({ id, user_id: "u", label: id, amount: 1, 
 const list = [mk("late", "2026-11-01"), mk("paid", "2026-11-05", "x"), mk("in5", "2026-11-17"), mk("in6", "2026-11-18"), mk("in8", "2026-11-20")];
 assert.deepEqual(studentVisibleReminders(list, today).map((r) => r.id), ["late", "in5"]);
 assert.deepEqual(adminDueReminders(list, today).map((r) => r.id), ["late", "in5", "in6"]);
+
+// Lock: from the due date on, unless paid or unblocked.
+assert.equal(isBlocking({ due_date: "2026-11-12", paid_at: null }, today), true);
+assert.equal(isBlocking({ due_date: "2026-11-01", paid_at: null }, today), true);
+assert.equal(isBlocking({ due_date: "2026-11-13", paid_at: null }, today), false);
+assert.equal(isBlocking({ due_date: "2026-11-01", paid_at: "x" }, today), false);
+assert.equal(isBlocking({ due_date: "2026-11-01", paid_at: null, unblocked_at: "x" }, today), false);
 
 // RLS: admin manages everything; member reads only own, cannot write; pending member reads nothing.
 const db = new PGlite();

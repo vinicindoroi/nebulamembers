@@ -8,6 +8,7 @@ export type PaymentReminder = {
   due_date: string; // YYYY-MM-DD
   note: string | null;
   paid_at: string | null;
+  unblocked_at?: string | null;
   created_at?: string;
 };
 
@@ -91,4 +92,16 @@ export function dueLabel(r: Pick<PaymentReminder, "due_date" | "paid_at">, today
   if (d === 0) return "Vence hoje";
   if (d === 1) return "Vence amanhã";
   return `Vence em ${d} dias`;
+}
+
+/** Pix key shown on the payment lock screen. */
+export const PIX_KEY = "vinicio.bf@hotmail.com";
+
+/** True when this unpaid installment locks the member area: from the due date on, until paid or unblocked by an admin. */
+export function isBlocking(r: Pick<PaymentReminder, "due_date" | "paid_at" | "unblocked_at">, today: string) {
+  return !r.paid_at && !r.unblocked_at && daysUntil(r.due_date, today) <= 0;
+}
+
+export function blockingReminders<T extends Pick<PaymentReminder, "due_date" | "paid_at" | "unblocked_at">>(list: T[], today: string) {
+  return list.filter((r) => isBlocking(r, today));
 }

@@ -1918,6 +1918,7 @@ export type Database = {
           label: string
           note: string | null
           paid_at: string | null
+          unblocked_at: string | null
           user_id: string
         }
         Insert: {
@@ -1929,6 +1930,7 @@ export type Database = {
           label?: string
           note?: string | null
           paid_at?: string | null
+          unblocked_at?: string | null
           user_id: string
         }
         Update: {
@@ -1940,6 +1942,7 @@ export type Database = {
           label?: string
           note?: string | null
           paid_at?: string | null
+          unblocked_at?: string | null
           user_id?: string
         }
         Relationships: [

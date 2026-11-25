@@ -267,6 +267,13 @@
       "when": 1795460655358,
       "tag": "0037_global_settings_signed_in_read",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1795632897263,
+      "tag": "0038_migration",
+      "breakpoints": true
     }
   ]
 }

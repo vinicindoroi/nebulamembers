@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, Trash2, Undo2, Wallet, MessageCircle, Plus, ArrowRight } from "lucide-react";
+import { Check, Trash2, Undo2, Wallet, MessageCircle, Plus, ArrowRight, Unlock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Modal, Field, inputClass } from "@/components/admin/Modal";
 import { Button } from "@/components/ui/button";
 import { waLink } from "@/lib/whatsapp";
 import {
+  isBlocking,
   adminDueReminders, buildInstallments, dueLabel, formatBRL, formatDue, reminderStatus, ymd,
   ADMIN_NOTICE_DAYS, type PaymentReminder,
 } from "@/lib/payment-reminders";
@@ -19,6 +20,13 @@ function statusClass(r: PaymentReminder, today: string) {
   if (s === "overdue") return "bg-destructive/15 text-destructive";
   if (s === "today" || s === "soon") return "bg-primary/15 text-primary";
   return "bg-muted text-muted-foreground";
+}
+
+async function unblock(id: string) {
+  const { error } = await db.from("payment_reminders").update({ unblocked_at: new Date().toISOString() }).eq("id", id);
+  if (error) { toast.error(error.message); return false; }
+  toast.success("Aluno desbloqueado.");
+  return true;
 }
 
 async function setPaid(id: string, paid: boolean) {
@@ -91,7 +99,13 @@ export function PaymentRemindersModal({ member, onClose }: { member: { id: strin
                 <span>{open.length} em aberto{openTotal > 0 ? ` · ${formatBRL(openTotal)}` : ""}</span>
                 <span>{list.length - open.length} pagas</span>
               </div>
-              <ul className="divide-y divide-border rounded-xl border border-border">
+              {blocked.length > 0 && (
+        <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2.5 text-sm">
+          <span className="font-medium text-destructive">{blocked.length} {blocked.length === 1 ? "aluno bloqueado" : "alunos bloqueados"}</span>
+          <span className="text-muted-foreground"> por pagamento em aberto. Marque como pago ou desbloqueie.</span>
+        </div>
+      )}
+      <ul className="divide-y divide-border rounded-xl border border-border">
                 {list.map((r) => (
                   <li key={r.id} className="flex items-center gap-3 px-3 py-2.5">
                     <div className="min-w-0 flex-1">
@@ -182,6 +196,7 @@ export function DuePaymentsPanel() {
 
   if (loading || rows.length === 0) return null;
   const overdue = rows.filter((r) => reminderStatus(r, today) === "overdue").length;
+  const blocked = rows.filter((r) => isBlocking(r, today));
 
   return (
     <section className="glass rounded-2xl p-5">
@@ -198,6 +213,12 @@ export function DuePaymentsPanel() {
           <Button asChild size="sm" variant="outline"><Link to="/admin/members">Membros<ArrowRight className="h-3.5 w-3.5" /></Link></Button>
         </div>
       </div>
+      {blocked.length > 0 && (
+        <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2.5 text-sm">
+          <span className="font-medium text-destructive">{blocked.length} {blocked.length === 1 ? "aluno bloqueado" : "alunos bloqueados"}</span>
+          <span className="text-muted-foreground"> por pagamento em aberto. Marque como pago ou desbloqueie.</span>
+        </div>
+      )}
       <ul className="divide-y divide-border rounded-xl border border-border">
         {rows.map((r) => {
           const name = r.profile?.full_name || r.profile?.email || "Aluno";
@@ -213,6 +234,11 @@ export function DuePaymentsPanel() {
               {r.profile?.phone && (
                 <Button asChild size="sm" variant="outline">
                   <a href={waLink(r.profile.phone)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                </Button>
+              )}
+              {isBlocking(r, today) && (
+                <Button size="sm" variant="outline" onClick={async () => (await unblock(r.id)) && load()}>
+                  <Unlock className="h-4 w-4" /> Desbloquear
                 </Button>
               )}
               <Button size="sm" variant="outline" onClick={async () => (await setPaid(r.id, true)) && load()}>
