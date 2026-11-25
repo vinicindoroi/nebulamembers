@@ -900,3 +900,11 @@
   .dash-skel::after, .dash-shine::after { animation: none; }
   .dash .dash-card-hover:hover img { transform: none; }
 }
+
+/* Globe starfield parallax */
+.globe-stars { position: absolute; inset: 0; pointer-events: none;
+  transform: translate3d(calc(var(--gx, 0) * var(--depth) * -1px), calc(var(--gy, 0) * var(--depth) * -1px), 0); will-change: transform; }
+.globe-stars > span { position: absolute; border-radius: 9999px; background: var(--foreground);
+  box-shadow: 0 0 4px color-mix(in oklab, var(--primary) 60%, transparent); animation: globe-twinkle 4s ease-in-out infinite; }
+@keyframes globe-twinkle { 0%,100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(0.6); filter: brightness(0.5); } }
+@media (prefers-reduced-motion: reduce) { .globe-stars > span { animation: none; } }

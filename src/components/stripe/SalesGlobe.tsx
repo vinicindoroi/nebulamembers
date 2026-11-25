@@ -192,6 +192,11 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
         offPhi += (tgtPhi - offPhi) * 0.045;
         offTheta += (tgtTheta - offTheta) * 0.045;
       }
+      const host = wrap.parentElement;
+      if (host) {
+        host.style.setProperty("--gx", String(offPhi + Math.sin(spin) * 0.05));
+        host.style.setProperty("--gy", String(offTheta));
+      }
       globe.update(
         reduce || sized.length === 0
           ? { phi: spin + offPhi, theta: clamp(tilt + offTheta, -1.4, 1.4) }
@@ -223,6 +228,16 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
   return (
     <div className="relative w-full max-w-[480px] mx-auto aspect-square">
       <div className="globe-halo" aria-hidden />
+      {STAR_LAYERS.map((layer, i) => (
+        <div key={i} className="globe-stars" style={{ ["--depth" as string]: layer.depth }} aria-hidden>
+          {layer.stars.map((st, j) => (
+            <span
+              key={j}
+              style={{ left: `${st.x}%`, top: `${st.y}%`, width: st.s, height: st.s, opacity: st.o, animationDelay: `${st.d}s`, animationDuration: `${st.t}s` }}
+            />
+          ))}
+        </div>
+      ))}
       <div className="globe-orbit globe-orbit-dashed" style={{ inset: "-4%" }} aria-hidden />
       <div className="globe-orbit globe-orbit-dot" style={{ inset: "3%" }} aria-hidden />
       <div
@@ -235,3 +250,22 @@ export default function SalesGlobe({ points, focus }: { points: GlobePoint[]; fo
     </div>
   );
 }
+
+// Deterministic starfield in 3 depth layers around the globe (parallax via --gx/--gy).
+const STAR_LAYERS = [
+  { depth: 10, count: 34, size: [1, 1.5] },
+  { depth: 22, count: 20, size: [1.5, 2] },
+  { depth: 40, count: 10, size: [2, 2.8] },
+].map((l, li) => {
+  const r = (n: number) => { const x = Math.sin(n * 9301 + li * 49297) * 233280; return x - Math.floor(x); };
+  const stars = [] as { x: number; y: number; s: number; o: number; d: number; t: number }[];
+  let k = 0;
+  while (stars.length < l.count && k < 500) {
+    k++;
+    const x = r(k) * 120 - 10, y = r(k + 0.5) * 120 - 10;
+    const dx = x - 50, dy = y - 50;
+    if (Math.sqrt(dx * dx + dy * dy) < 40) continue; // keep clear of the planet
+    stars.push({ x, y, s: l.size[0]! + r(k + 0.25) * (l.size[1]! - l.size[0]!), o: 0.25 + r(k + 0.75) * 0.6, d: r(k + 0.1) * 6, t: 3 + r(k + 0.3) * 4 });
+  }
+  return { depth: l.depth, stars };
+});
