@@ -58,8 +58,8 @@
   overflow: hidden;
   background: transparent;
 }
-.member-edge-background canvas { display: block; width: 100%; height: 100%; opacity: 0.32; }
-.light .member-edge-background canvas { opacity: 0.18; }
+.member-edge-background canvas { display: block; width: 100%; height: 100%; opacity: 0.1; }
+.light .member-edge-background canvas { opacity: 0.1; }
 .community-social { font-family: var(--font-course-body); }
 .community-social h1,
 .community-social h2,
