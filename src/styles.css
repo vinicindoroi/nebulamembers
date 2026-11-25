@@ -485,19 +485,7 @@
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes route-enter {
-    0%   { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes route-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
   .animate-fade-up { animation: fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .admin-route-slot { animation: route-fade 0.32s ease-out both; }
-  .admin-route-slot > *:not(.fixed) {
-    animation: route-enter 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
   .stagger-enter > * { animation: fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .stagger-enter > *:nth-child(1) { animation-delay: 0ms; }
   .stagger-enter > *:nth-child(2) { animation-delay: 30ms; }
@@ -545,9 +533,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-up,
-    .admin-route-slot,
-    .admin-route-slot > *,
-    .admin-route-slot > *:not(.fixed),
     .stagger-enter > *,
     .animate-wizard-in,
     .animate-wizard-fade,
@@ -1039,14 +1024,17 @@
   animation: none;
 }
 
-/* ===== Route morph: a aba se transforma na próxima ===== */
+/* ===== Route focus: desfoca a saída e devolve o foco à próxima aba ===== */
 @media (prefers-reduced-motion: no-preference) {
   .member-main,
   .admin-main {
     view-transition-name: nebula-content;
   }
 
-  /* A página nova entra varrida na diagonal e empurra a antiga para fora. */
+  ::view-transition {
+    background: var(--background);
+  }
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none;
@@ -1054,9 +1042,11 @@
 
   ::view-transition-old(nebula-content),
   ::view-transition-new(nebula-content) {
-    animation-duration: 0.42s;
-    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    animation-duration: 0.48s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     animation-fill-mode: both;
+    mix-blend-mode: normal;
+    transform-origin: 50% 20%;
   }
 
   ::view-transition-old(nebula-content) {
@@ -1068,12 +1058,12 @@
   }
 
   @keyframes nebula-vt-leave {
-    from { clip-path: polygon(0% 0, 100% 0, 100% 100%, -26% 100%); filter: blur(0); }
-    to   { clip-path: polygon(126% 0, 100% 0, 100% 100%, 100% 100%); filter: blur(3px); }
+    from { opacity: 1; filter: blur(0); transform: scale(1); }
+    to { opacity: 0; filter: blur(8px); transform: scale(0.996); }
   }
 
   @keyframes nebula-vt-enter {
-    from { clip-path: polygon(0 0, 0 0, -26% 100%, 0 100%); filter: blur(3px); }
-    to   { clip-path: polygon(0 0, 126% 0, 100% 100%, 0 100%); filter: blur(0); }
+    from { opacity: 0; filter: blur(8px); transform: scale(1.004); }
+    to { opacity: 1; filter: blur(0); transform: scale(1); }
   }
 }
