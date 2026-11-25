@@ -19,6 +19,7 @@ import { fetchPlans, isPendingPlan, NO_ACCESS_FEATURES, FULL_ACCESS_FEATURES } f
 import { isTabAllowed } from "@/lib/plan-access";
 import brandLogo from "@/assets/nebula-wordmark.png.asset.json";
 import brandMark from "@/assets/nebula-mark-n.png.asset.json";
+import { EdgesBackground } from "@/components/members/EdgesBackground";
 
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; badge?: string };
@@ -640,6 +641,7 @@ export function AppShell() {
           </div>
         )}
         <main ref={mainRef} className={`member-main min-w-0 flex-1 ${isFunnelsPage ? 'p-0 overflow-hidden' : 'px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8'}`}>
+          <EdgesBackground />
           <div data-route={path} className={isFunnelsPage ? 'h-full min-w-0' : 'mobile-route-content admin-route-slot min-w-0 w-full max-w-[1600px] mx-auto'}>
             {hasAccess ? (
               <><Outlet /><WhatsappPrompt /></>

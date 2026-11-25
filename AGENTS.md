@@ -8,6 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Mount the shared edge shader only after hydration in the member shell; read its palette from semantic CSS tokens, cap rendering at 30fps, and pause hidden/reduced-motion animation to keep every tab consistent and lightweight.
 
 - Scope funnel-editor visual rules under `.funnel-studio`, but inherit the platform's semantic colors and Plus Jakarta Sans typography so the workspace stays visually consistent.
 - Route funnel connections between perpendicular anchors with corner-aware cubic curves so branches bend concavely toward their destination.

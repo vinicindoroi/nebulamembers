@@ -44,6 +44,20 @@
 }
 
 .courses-catalog { font-family: var(--font-course-body); }
+.member-main { position: relative; isolation: isolate; }
+.member-edge-background {
+  --edge-deep: color-mix(in srgb, var(--primary) 48%, var(--background));
+  --edge-mid: var(--primary);
+  --edge-ice: color-mix(in srgb, var(--primary) 55%, var(--foreground));
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--background);
+}
+.member-edge-background canvas { display: block; width: 100%; height: 100%; opacity: 0.55; }
+.light .member-edge-background canvas { opacity: 0.28; }
 .community-social { font-family: var(--font-course-body); }
 .community-social h1,
 .community-social h2,
