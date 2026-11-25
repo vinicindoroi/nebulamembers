@@ -65,6 +65,13 @@ void main() {
   float shape0 = clamp((thick - edge) / BAND, 0.0, 1.0);
   float shape = shape0 + GRAIN * (grain(gl_FragCoord.xy) - 0.5);
 
+  // Nuvens lentas variam a tonalidade da mesma cor da marca, como uma nebulosa.
+  float clouds = noise3(p * 2.1 + 1.4 * w + vec2(-t * 0.25, t * 0.18));
+  float detail = noise(p * 7.0 + w * 2.0);
+  float tone = clamp(clouds * 0.85 + detail * 0.15, 0.0, 1.0);
+  vec3 nebula = mix(u_anil, u_coral, smoothstep(0.2, 0.66, tone));
+  nebula = mix(nebula, u_gelo, smoothstep(0.58, 0.9, tone) * 0.72);
+
   // rampa de 4 cores sobre o fundo
   float s = clamp(shape - 0.125, 0.0, 1.0);
   float alpha = smoothstep(0.0, SOFT, clamp(s * 4.0, 0.0, 1.0));
@@ -74,9 +81,12 @@ void main() {
   col = mix(col, u_coral, smoothstep(lo, hi, clamp(x, 0.0, 1.0)));
   col = mix(col, u_gelo, smoothstep(lo, hi, clamp(x - 1.0, 0.0, 1.0)));
   col = mix(col, u_anil, smoothstep(lo, hi, clamp(x - 2.0, 0.0, 1.0)));
+  col = mix(col, nebula, 0.78);
+  alpha *= mix(0.78, 1.12, smoothstep(0.2, 0.82, clouds));
   // o escuro fica escuro: o grão não leva pontos claros para longe da luz
-  col *= alpha * smoothstep(0.0, 0.3, shape0);
-  o = vec4(mix(u_base, col, alpha * smoothstep(0.0, 0.3, shape0)), 1.0);
+  float light = alpha * smoothstep(0.0, 0.3, shape0);
+  col *= light;
+  o = vec4(mix(u_base, col, light), 1.0);
 }`;
 const vertexSource = `#version 300 es
 void main() { vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2); gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0); }`;
