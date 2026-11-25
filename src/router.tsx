@@ -12,6 +12,8 @@ export const getRouter = () => {
     defaultPreload: "intent",
     defaultPreloadDelay: 50,
     defaultPreloadStaleTime: 0,
+    // Navegações usam view transitions: a aba "se transforma" na próxima em vez de cortar.
+    defaultViewTransition: true,
   });
 
   return router;

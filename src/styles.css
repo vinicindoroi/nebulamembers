@@ -1038,3 +1038,42 @@
   box-shadow: inset -1px 0 0 oklch(1 0 0 / 0.08);
   animation: none;
 }
+
+/* ===== Route morph: a aba se transforma na próxima ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .member-main,
+  .admin-main {
+    view-transition-name: nebula-content;
+  }
+
+  /* A página nova entra varrida na diagonal e empurra a antiga para fora. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  ::view-transition-old(nebula-content),
+  ::view-transition-new(nebula-content) {
+    animation-duration: 0.42s;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    animation-fill-mode: both;
+  }
+
+  ::view-transition-old(nebula-content) {
+    animation-name: nebula-vt-leave;
+  }
+
+  ::view-transition-new(nebula-content) {
+    animation-name: nebula-vt-enter;
+  }
+
+  @keyframes nebula-vt-leave {
+    from { clip-path: polygon(0% 0, 100% 0, 100% 100%, -26% 100%); filter: blur(0); }
+    to   { clip-path: polygon(126% 0, 100% 0, 100% 100%, 100% 100%); filter: blur(3px); }
+  }
+
+  @keyframes nebula-vt-enter {
+    from { clip-path: polygon(0 0, 0 0, -26% 100%, 0 100%); filter: blur(3px); }
+    to   { clip-path: polygon(0 0, 126% 0, 100% 100%, 0 100%); filter: blur(0); }
+  }
+}
