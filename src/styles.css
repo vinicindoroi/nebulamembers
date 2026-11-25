@@ -1008,3 +1008,26 @@
   box-shadow: 0 0 4px color-mix(in oklab, var(--primary) 60%, transparent); animation: globe-twinkle 4s ease-in-out infinite; }
 @keyframes globe-twinkle { 0%,100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(0.6); filter: brightness(0.5); } }
 @media (prefers-reduced-motion: reduce) { .globe-stars > span { animation: none; } }
+
+/* Liquid glass v2: refractive rim + specular highlights */
+:root {
+  --liquid-rim: linear-gradient(150deg, oklch(1 0 0 / 0.38), oklch(1 0 0 / 0.06) 28%, oklch(1 0 0 / 0.02) 55%, color-mix(in oklab, var(--primary) 45%, transparent) 100%);
+  --liquid-fill: linear-gradient(160deg, oklch(1 0 0 / 0.09), oklch(1 0 0 / 0.025) 40%, oklch(1 0 0 / 0.05));
+  --liquid-glow: inset 0 1px 1px oklch(1 0 0 / 0.22), inset 0 0 22px oklch(1 0 0 / 0.05), inset 0 -10px 24px -14px color-mix(in oklab, var(--primary) 35%, transparent);
+}
+.light {
+  --liquid-rim: linear-gradient(150deg, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0.4) 35%, oklch(0 0 0 / 0.08) 70%, color-mix(in oklab, var(--primary) 35%, transparent));
+  --liquid-fill: linear-gradient(160deg, oklch(1 0 0 / 0.6), oklch(1 0 0 / 0.25) 45%, oklch(1 0 0 / 0.4));
+  --liquid-glow: inset 0 1px 1px oklch(1 0 0 / 0.9), inset 0 0 20px oklch(1 0 0 / 0.35);
+}
+.dash .dash-card,
+.liquid-glass,
+.member-surface {
+  border: 1px solid transparent !important;
+  background:
+    var(--liquid-fill) padding-box,
+    var(--liquid-rim) border-box !important;
+  backdrop-filter: blur(14px) saturate(1.8) brightness(1.08);
+  box-shadow: var(--liquid-glow), 0 24px 50px -30px oklch(0 0 0 / 0.7) !important;
+  animation: none;
+}
