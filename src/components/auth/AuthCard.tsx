@@ -1,4 +1,5 @@
 import { NebulaCanvas } from "./NebulaCanvas";
+import { StarText } from "./StarText";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Lock, Mail, User as UserIcon } from "lucide-react";
@@ -116,6 +117,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
     <main className="min-h-screen grid lg:grid-cols-2 bg-background">
       <aside className="relative hidden lg:block overflow-hidden bg-background">
         <NebulaCanvas className="absolute inset-0 h-full w-full" />
+        <StarText className="pointer-events-none absolute inset-0 h-full w-full" />
         <div className="absolute inset-x-0 bottom-0 p-12">
           <p className="text-3xl font-semibold tracking-tight text-foreground max-w-md">Sua jornada começa aqui.</p>
           <p className="mt-2 text-sm text-muted-foreground max-w-sm">Cursos, mentoria e comunidade em um só lugar.</p>
