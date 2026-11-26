@@ -27,18 +27,18 @@ class Semaphore {
     if (this.free <= 0) await new Promise<void>((r) => this.queue.push(r));
     else this.free--;
     try { return await fn(); } finally {
-      if (this.queue.length) this.queue.shift()!();
+      const next = this.queue.shift();
+      if (next) next();
       else this.free++;
     }
   }
 }
 
-const apiSlot = new Semaphore(MAX_IN_FLIGHT);
-
 async function stripeGetOnce(key: string, path: string, params: Array<[string, string]>): Promise<any> {
   const qs = new URLSearchParams(params).toString();
   const res = await fetch(`${API}${path}${qs ? `?${qs}` : ""}`, {
     headers: { Authorization: `Bearer ${key}`, "Stripe-Version": "2024-06-20" },
+    signal: AbortSignal.timeout(15000),
   });
   const text = await res.text();
   let body: any = null;
@@ -50,7 +50,10 @@ async function stripeGetOnce(key: string, path: string, params: Array<[string, s
   return body;
 }
 
-export async function stripeGet(key: string, path: string, params: Array<[string, string]> = []): Promise<any> {
+/** Every RPC owns its queue: Worker requests must never await another request's I/O. */
+export function createStripeReader() {
+  const apiSlot = new Semaphore(MAX_IN_FLIGHT);
+async function stripeGet(key: string, path: string, params: Array<[string, string]> = []): Promise<any> {
   return apiSlot.run(async () => {
     for (let attempt = 0; ; attempt++) {
       try {
@@ -128,7 +131,7 @@ async function chargesInWindow(key: string, from: number, to: number, last: bool
 }
 
 /** Sales since `sinceUnix`; checkout session metadata is merged in when the key can read sessions. */
-export async function fetchSales(key: string, sinceUnix: number, untilUnix?: number): Promise<{ sales: Sale[]; truncated: boolean; checkoutRead: boolean }> {
+async function fetchSales(key: string, sinceUnix: number, untilUnix?: number): Promise<{ sales: Sale[]; truncated: boolean; checkoutRead: boolean }> {
   const until = untilUnix ?? Math.floor(Date.now() / 1000);
   const parts = windows(sinceUnix, until);
   const sessionRange: Array<[string, string]> = [["created[gte]", String(sinceUnix)], ["created[lte]", String(until)], ["status", "complete"]];
@@ -168,7 +171,7 @@ async function declinesInWindow(key: string, from: number, to: number, last: boo
   }
 }
 
-export async function fetchDeclines(key: string, sinceUnix: number, untilUnix: number): Promise<{ declines: Decline[]; truncated: boolean }> {
+async function fetchDeclines(key: string, sinceUnix: number, untilUnix: number): Promise<{ declines: Decline[]; truncated: boolean }> {
   const parts = windows(sinceUnix, untilUnix);
   const chunks = await Promise.all(parts.map(([a, b], i) => declinesInWindow(key, a, b, i === parts.length - 1)));
   const seen = new Set<string>();
@@ -182,4 +185,19 @@ export async function fetchDeclines(key: string, sinceUnix: number, untilUnix: n
     }
   }
   return { declines, truncated: chunks.some((c) => c.truncated) };
+}
+
+  return { stripeGet, fetchSales, fetchDeclines };
+}
+
+export async function stripeGet(key: string, path: string, params: Array<[string, string]> = []) {
+  return createStripeReader().stripeGet(key, path, params);
+}
+
+export async function fetchSales(key: string, sinceUnix: number, untilUnix?: number) {
+  return createStripeReader().fetchSales(key, sinceUnix, untilUnix);
+}
+
+export async function fetchDeclines(key: string, sinceUnix: number, untilUnix: number) {
+  return createStripeReader().fetchDeclines(key, sinceUnix, untilUnix);
 }

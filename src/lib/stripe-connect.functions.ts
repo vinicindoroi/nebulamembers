@@ -150,7 +150,8 @@ export const getStripeSalesHistory = createServerFn({ method: "POST" })
     const r = row as { key_ciphertext: string; livemode: boolean };
 
     const { decryptStripeKey } = await import("./stripe-crypto.server");
-    const { fetchSales, fetchDeclines, StripeError } = await import("./stripe-api.server");
+    const { createStripeReader, StripeError } = await import("./stripe-api.server");
+    const { fetchSales, fetchDeclines } = createStripeReader();
     const key = await decryptStripeKey(r.key_ciphertext);
     try {
       const [{ sales, truncated }, failed] = await Promise.all([
