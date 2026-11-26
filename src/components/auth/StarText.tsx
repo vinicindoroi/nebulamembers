@@ -24,8 +24,8 @@ export function StarText({ text = "NEBULA MEMBERS", className = "" }: { text?: s
       const step = Math.max(4, Math.round(size / 22));
       stars = [];
       for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
-        if (data[(y * w + x) * 4 + 3]! > 128 && Math.random() < 0.7)
-          stars.push({ x: x + (Math.random() - 0.5) * step * 0.3, y: y + (Math.random() - 0.5) * step * 0.3, r: 0.35 + Math.random() * 0.8, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.6 });
+        if (data[(y * w + x) * 4 + 3]! > 128 && Math.random() < 0.85)
+          stars.push({ x: x + (Math.random() - 0.5) * step * 0.15, y: y + (Math.random() - 0.5) * step * 0.15, r: 0.35 + Math.random() * 0.8, ph: Math.random() * 6.28, sp: 0.6 + Math.random() * 1.6 });
       }
     };
     let raf = 0, last = 0; const start = performance.now();
@@ -36,7 +36,7 @@ export function StarText({ text = "NEBULA MEMBERS", className = "" }: { text?: s
       const fade = Math.min(1, t / 3);
       ctx.clearRect(0, 0, cv.width, cv.height);
       for (const s of stars) {
-        const a = (0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph))) * fade;
+        const a = (0.4 + 0.4 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph))) * fade;
         ctx.fillStyle = `rgba(225,235,255,${a})`;
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
       }

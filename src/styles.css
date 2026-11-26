@@ -1045,3 +1045,5 @@
 .auth-page .auth-hero { animation: auth-slide .8s cubic-bezier(.2,.7,.2,1) both; }
 .auth-page .auth-card { animation: auth-pop .6s cubic-bezier(.2,.7,.2,1) both; }
 @media (prefers-reduced-motion: reduce) { .auth-page .auth-rise, .auth-page .auth-hero, .auth-page .auth-card { animation: none; } }
+.auth-page .auth-ambient { background: radial-gradient(circle, color-mix(in oklab, var(--primary) 14%, transparent), transparent 65%); filter: blur(40px); }
+.auth-page .auth-glass { background: color-mix(in oklab, var(--background) 35%, transparent); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent); }

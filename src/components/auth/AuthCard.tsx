@@ -2,7 +2,7 @@ import { NebulaCanvas } from "./NebulaCanvas";
 import { StarText } from "./StarText";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CalendarCheck, Eye, EyeOff, Lock, Mail, PlayCircle, User as UserIcon, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, CalendarCheck, Eye, EyeOff, Lock, Mail, PlayCircle, User as UserIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -27,6 +27,11 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    const last = localStorage.getItem("nebula:last-email");
+    if (last) setEmail(last);
+  }, []);
 
   useEffect(() => {
     setMode(initialMode);
@@ -69,6 +74,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
       } else {
         const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        localStorage.setItem("nebula:last-email", email.trim().toLowerCase());
 
         // After successful auth, check if restrict_to_leads is active
         const { data: settings } = await supabase
@@ -117,12 +123,13 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
   const rise = () => ({ className: "auth-rise", style: { ["--i" as string]: i++ } as React.CSSProperties });
 
   return (
-    <main className="auth-page min-h-svh grid lg:grid-cols-2 bg-background">
-      <section className="flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
+    <main className="auth-page relative min-h-svh grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] bg-background overflow-hidden">
+      <div aria-hidden className="auth-ambient pointer-events-none absolute -left-40 top-1/4 h-[36rem] w-[36rem] rounded-full" />
+      <section className="relative flex items-center justify-center px-6 py-12 sm:px-10">
+      <div className="w-full max-w-md 2xl:max-w-lg 2xl:text-[1.05rem]">
           <div className="mb-8">
-            <img {...rise()} src={brandLogo.url} alt="Nebula Members" className="auth-rise mb-8 h-10 w-auto object-contain" />
-            <h1 {...rise()} className="auth-rise text-3xl md:text-4xl font-semibold tracking-tight">{copy.title}</h1>
+            <img {...rise()} src={brandLogo.url} alt="Nebula Members" className="auth-rise mb-10 h-10 2xl:h-12 w-auto object-contain" />
+            <h1 {...rise()} className="auth-rise text-3xl md:text-4xl 2xl:text-5xl font-semibold tracking-tight">{copy.title}</h1>
             <p {...rise()} className="auth-rise text-sm text-muted-foreground mt-2">{copy.subtitle}</p>
           </div>
 
@@ -158,7 +165,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
                   value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" /></div>
               )}
               <div {...rise()}><Field icon={<Mail className="h-4 w-4" />} type="email" label="E-mail" placeholder="seu@email.com" name="email"
-                value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></div>
+                value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" autoFocus={!email} /></div>
               {mode !== "forgot" && (
                 <div {...rise()}><PasswordField value={password} onChange={setPassword}
                   autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
@@ -177,9 +184,9 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
                 {...rise()}
                 type="submit"
                 disabled={loading}
-                className="auth-rise w-full inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-2xl px-6 py-3.5 text-sm font-medium glow transition-transform hover:scale-[1.01] disabled:opacity-70"
+                className="auth-rise group w-full inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-2xl px-6 py-3.5 text-sm font-medium glow transition-transform hover:scale-[1.01] disabled:opacity-70"
               >
-                {loading ? "Aguarde..." : <>{copy.submit} <ArrowRight className="h-4 w-4" /></>}
+                {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Aguarde...</> : <>{copy.submit} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
               </button>
             </form>
           )}
@@ -202,9 +209,10 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
         <div className="auth-hero relative h-full w-full overflow-hidden rounded-3xl bg-background">
           <NebulaCanvas className="absolute inset-0 h-full w-full" />
           <StarText className="pointer-events-none absolute inset-0 h-full w-full" />
-          <div className="absolute inset-x-0 bottom-0 flex gap-4 justify-center p-8">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 flex gap-4 p-8 2xl:p-10">
             {HIGHLIGHTS.map((h, k) => (
-              <div key={h.title} className={`auth-card glass-strong rounded-2xl p-5 w-64 ${k === 1 ? "hidden xl:block" : ""} ${k === 2 ? "hidden 2xl:block" : ""}`} style={{ animationDelay: `${1 + k * 0.2}s` }}>
+              <div key={h.title} className={`auth-card auth-glass rounded-2xl p-5 flex-1 max-w-xs ${k === 1 ? "hidden xl:block" : ""} ${k === 2 ? "hidden 2xl:block" : ""}`} style={{ animationDelay: `${1 + k * 0.2}s` }}>
                 <h.icon className="h-5 w-5 text-primary" />
                 <p className="mt-3 text-sm font-medium text-foreground">{h.title}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{h.text}</p>
@@ -225,6 +233,7 @@ const HIGHLIGHTS = [
 
 function PasswordField({ value, onChange, autoComplete }: { value: string; onChange: (v: string) => void; autoComplete: string }) {
   const [show, setShow] = useState(false);
+  const [caps, setCaps] = useState(false);
   return (
     <label className="block">
       <span className="text-xs text-muted-foreground mb-1.5 block">Senha</span>
@@ -234,12 +243,14 @@ function PasswordField({ value, onChange, autoComplete }: { value: string; onCha
         </span>
         <input type={show ? "text" : "password"} name="password" placeholder="••••••••" required autoComplete={autoComplete}
           value={value} onChange={(e) => onChange(e.target.value)}
+          onKeyUp={(e) => setCaps(e.getModifierState("CapsLock"))} onBlur={() => setCaps(false)}
           className="w-full glass rounded-2xl pl-11 pr-11 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/25 transition-all" />
         <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? "Esconder a senha" : "Mostrar a senha"}
           className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors">
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
+      {caps && <span className="mt-1.5 block text-[11px] text-primary">Caps Lock está ativado</span>}
     </label>
   );
 }
