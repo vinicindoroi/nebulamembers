@@ -1,3 +1,4 @@
+import { NebulaCanvas } from "./NebulaCanvas";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Lock, Mail, User as UserIcon } from "lucide-react";
@@ -112,9 +113,17 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
   const copy = COPY[mode];
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12">
+    <main className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <aside className="relative hidden lg:block overflow-hidden bg-background">
+        <NebulaCanvas className="absolute inset-0 h-full w-full" />
+        <div className="absolute inset-x-0 bottom-0 p-12">
+          <p className="text-3xl font-semibold tracking-tight text-foreground max-w-md">Sua jornada começa aqui.</p>
+          <p className="mt-2 text-sm text-muted-foreground max-w-sm">Cursos, mentoria e comunidade em um só lugar.</p>
+        </div>
+      </aside>
+      <section className="flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md animate-fade-up">
-        <div className="glass-strong rounded-2xl p-8 md:p-10">
+        <div className="p-2 md:p-6">
           <div className="flex flex-col items-center text-center mb-6">
             <img src={brandLogo.url} alt="Nebula Members" className="mb-5 h-12 w-full max-w-xs object-contain" />
             <h1 className="text-2xl font-semibold">{copy.title}</h1>
@@ -202,6 +211,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
           </p>
         </div>
       </div>
+      </section>
     </main>
   );
 }
