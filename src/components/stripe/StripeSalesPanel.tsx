@@ -49,8 +49,10 @@ function GlobeStage({ points, focus, children }: { points: GlobePoint[]; focus: 
   );
 }
 
-export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
-  const [period, setPeriod] = useState<SalesWindow>(30);
+export function StripeSalesPanel({ mock = false, period: extPeriod, onPeriodChange }: { mock?: boolean; period?: SalesWindow; onPeriodChange?: (p: SalesWindow) => void }) {
+  const [innerPeriod, setInnerPeriod] = useState<SalesWindow>(30);
+  const period = extPeriod ?? innerPeriod;
+  const setPeriod = (p: SalesWindow) => { setInnerPeriod(p); onPeriodChange?.(p); };
   const fetchSales = useServerFn(getStripeSales);
   const q = useQuery({
     queryKey: ["stripe-sales", String(period)],

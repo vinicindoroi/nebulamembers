@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
@@ -78,8 +78,11 @@ function previewHistory(): History {
   };
 }
 
-export function StripeSalesHistory({ mock = false }: { mock?: boolean }) {
+export function StripeSalesHistory({ mock = false, period }: { mock?: boolean; period?: "today" | 7 | 30 | 90 }) {
   const [preset, setPreset] = useState<Preset>("30");
+  useEffect(() => {
+    if (period !== undefined) setPreset(period === "today" ? "today" : (String(period) as Preset));
+  }, [period]);
   const [custom, setCustom] = useState<DateRange | undefined>();
   const [pickerOpen, setPickerOpen] = useState(false);
   const fetchHistory = useServerFn(getStripeSalesHistory);

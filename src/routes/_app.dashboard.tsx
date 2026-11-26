@@ -162,6 +162,7 @@ function Dashboard() {
   const visibleLocked = showAllAchievements ? locked : locked.slice(0, 3);
   const revealRef = useScrollReveal<HTMLDivElement>();
   const [mockSales, setMockSales] = useState(false);
+  const [salesPeriod, setSalesPeriod] = useState<"today" | 7 | 30 | 90>(30);
   const [showMockToggle, setShowMockToggle] = useState(false);
   const { isAdmin } = useAdmin();
 
@@ -252,11 +253,11 @@ function Dashboard() {
       <PaymentReminderBanner />
 
       <div data-reveal>
-        <StripeSalesPanel mock={mockSales && isAdmin === true} />
+        <StripeSalesPanel mock={mockSales && isAdmin === true} period={salesPeriod} onPeriodChange={setSalesPeriod} />
       </div>
 
       <div data-reveal>
-        <StripeSalesHistory mock={mockSales && isAdmin === true} />
+        <StripeSalesHistory mock={mockSales && isAdmin === true} period={salesPeriod} />
       </div>
 
       {/* Progress strip */}
