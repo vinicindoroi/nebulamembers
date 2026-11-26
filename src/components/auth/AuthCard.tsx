@@ -1,6 +1,6 @@
 import { NebulaCanvas } from "./NebulaCanvas";
 import { StarText } from "./StarText";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Loader2, CalendarCheck, Eye, EyeOff, Lock, Mail, PlayCircle, User as UserIcon, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -27,6 +27,52 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [phase, setPhase] = useState<"idle" | "out">("idle");
+  const [boxH, setBoxH] = useState<number | null>(null);
+  const [swapped, setSwapped] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const swapTimer = useRef<number | null>(null);
+
+  // Smooth swap between Entrar / Criar conta / Recuperar senha:
+  // content leaves, swaps, then enters while the box height morphs.
+  const swapTo = (next: AuthMode) => {
+    const el = boxRef.current;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (next === mode || reduced || !el) {
+      setMode(next);
+      setSent(false);
+      return;
+    }
+    if (swapTimer.current) window.clearTimeout(swapTimer.current);
+    setSwapped(true);
+    setBoxH(el.offsetHeight);
+    setPhase("out");
+    swapTimer.current = window.setTimeout(() => {
+      setMode(next);
+      setSent(false);
+      setPhase("idle");
+      swapTimer.current = null;
+    }, 180);
+  };
+
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (!el || boxH === null) return;
+    const child = el.firstElementChild as HTMLElement | null;
+    // offsetHeight is the layout height, so the entering animation's
+    // translate never inflates the target value.
+    const nextH = child ? child.offsetHeight : el.scrollHeight;
+    const id = requestAnimationFrame(() => setBoxH(nextH));
+    return () => cancelAnimationFrame(id);
+  }, [mode, boxH]);
+
+  useEffect(() => {
+    if (boxH === null) return;
+    const id = window.setTimeout(() => setBoxH(null), 560);
+    return () => window.clearTimeout(id);
+  }, [boxH, mode]);
+
+  useEffect(() => () => { if (swapTimer.current) window.clearTimeout(swapTimer.current); }, []);
 
   useEffect(() => {
     const last = localStorage.getItem("nebula:last-email");
@@ -42,8 +88,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
   }, [session, navigate]);
 
   const goSignIn = () => {
-    setMode("signin");
-    setSent(false);
+    swapTo("signin");
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -127,78 +172,86 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
       <div aria-hidden className="auth-ambient pointer-events-none absolute -left-40 top-1/4 h-[36rem] w-[36rem] rounded-full" />
       <section className="relative flex items-center justify-center px-6 py-12 sm:px-10">
       <div className="w-full max-w-md 2xl:max-w-lg 2xl:text-[1.05rem]">
-          <div className="mb-8">
-            <img {...rise()} src={brandLogo.url} alt="Nebula Members" className="auth-rise mb-10 h-10 2xl:h-12 w-auto object-contain" />
-            <h1 {...rise()} className="auth-rise text-3xl md:text-4xl 2xl:text-5xl font-semibold tracking-tight">{copy.title}</h1>
-            <p {...rise()} className="auth-rise text-sm text-muted-foreground mt-2">{copy.subtitle}</p>
-          </div>
+          <img {...rise()} src={brandLogo.url} alt="Nebula Members" className="auth-rise mb-10 h-10 2xl:h-12 w-auto object-contain" />
 
-          {mode === "forgot" ? (
-            <button
-              type="button"
-              onClick={goSignIn}
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Voltar para entrar
-            </button>
-          ) : null}
+          <div
+            ref={boxRef}
+            data-swap={swapped ? "" : undefined}
+            className="auth-swap"
+            style={boxH !== null ? { height: `${boxH}px`, overflow: "hidden" } : undefined}
+          >
+            <div key={mode} className={phase === "out" ? "auth-swap-out" : swapped ? "auth-swap-in" : undefined}>
+              <h1 {...rise()} className="auth-rise text-3xl md:text-4xl 2xl:text-5xl font-semibold tracking-tight">{copy.title}</h1>
+              <p {...rise()} className="auth-rise text-sm text-muted-foreground mt-2 mb-8">{copy.subtitle}</p>
 
-          {mode === "forgot" && sent ? (
-            <div className="glass rounded-2xl p-5 text-sm">
-              <p className="font-medium text-foreground">Link enviado</p>
-              <p className="text-muted-foreground mt-1">
-                Se existir uma conta para <span className="text-foreground">{email.trim()}</span>, você vai receber
-                um link para criar uma nova senha. Confira também a caixa de spam.
-              </p>
-              <button
-                type="button"
-                onClick={goSignIn}
-                className="mt-5 w-full inline-flex items-center justify-center gap-2 glass rounded-2xl px-6 py-3 text-sm font-medium hover:bg-muted transition"
-              >
-                Voltar para entrar
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={onSubmit} className="space-y-5">
-              {mode === "signup" && (
-                <div {...rise()}><Field icon={<UserIcon className="h-4 w-4" />} label="Nome" placeholder="Seu nome" name="name"
-                  value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" /></div>
-              )}
-              <div {...rise()}><Field icon={<Mail className="h-4 w-4" />} type="email" label="E-mail" placeholder="seu@email.com" name="email"
-                value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" autoFocus={!email} /></div>
-              {mode !== "forgot" && (
-                <div {...rise()}><PasswordField value={password} onChange={setPassword}
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
-              )}
+              {mode === "forgot" ? (
+                <button
+                  type="button"
+                  onClick={goSignIn}
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" /> Voltar para entrar
+                </button>
+              ) : null}
 
-              {mode === "signin" && (
-                <div {...rise()} className="auth-rise flex justify-end -mt-1">
-                  <button type="button" onClick={() => setMode("forgot")}
-                    className="text-xs text-primary hover:underline underline-offset-4">
-                    Esqueci minha senha
+              {mode === "forgot" && sent ? (
+                <div className="glass rounded-2xl p-5 text-sm">
+                  <p className="font-medium text-foreground">Link enviado</p>
+                  <p className="text-muted-foreground mt-1">
+                    Se existir uma conta para <span className="text-foreground">{email.trim()}</span>, você vai receber
+                    um link para criar uma nova senha. Confira também a caixa de spam.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={goSignIn}
+                    className="mt-5 w-full inline-flex items-center justify-center gap-2 glass rounded-2xl px-6 py-3 text-sm font-medium hover:bg-muted transition"
+                  >
+                    Voltar para entrar
                   </button>
                 </div>
+              ) : (
+                <form onSubmit={onSubmit} className="space-y-5">
+                  {mode === "signup" && (
+                    <div {...rise()}><Field icon={<UserIcon className="h-4 w-4" />} label="Nome" placeholder="Seu nome" name="name"
+                      value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" /></div>
+                  )}
+                  <div {...rise()}><Field icon={<Mail className="h-4 w-4" />} type="email" label="E-mail" placeholder="seu@email.com" name="email"
+                    value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" autoFocus={!email} /></div>
+                  {mode !== "forgot" && (
+                    <div {...rise()}><PasswordField value={password} onChange={setPassword}
+                      autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
+                  )}
+
+                  {mode === "signin" && (
+                    <div {...rise()} className="auth-rise flex justify-end -mt-1">
+                      <button type="button" onClick={() => swapTo("forgot")}
+                        className="text-xs text-primary hover:underline underline-offset-4">
+                        Esqueci minha senha
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    {...rise()}
+                    type="submit"
+                    disabled={loading}
+                    className="auth-rise auth-submit group relative overflow-hidden w-full inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-2xl px-6 py-3.5 text-sm font-medium glow transition-transform hover:scale-[1.01] disabled:opacity-70"
+                  >
+                    {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Aguarde...</> : <>{copy.submit} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+                  </button>
+                </form>
               )}
 
-              <button
-                {...rise()}
-                type="submit"
-                disabled={loading}
-                className="auth-rise auth-submit group relative overflow-hidden w-full inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-2xl px-6 py-3.5 text-sm font-medium glow transition-transform hover:scale-[1.01] disabled:opacity-70"
-              >
-                {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Aguarde...</> : <>{copy.submit} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
-              </button>
-            </form>
-          )}
-
-          {mode !== "forgot" && (
-            <p {...rise()} className="auth-rise text-center text-sm text-muted-foreground mt-8">
-              {mode === "signin" ? "Novo por aqui? " : "Já tem conta? "}
-              <button type="button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")} className="text-primary hover:underline underline-offset-4">
-                {mode === "signin" ? "Criar conta" : "Entrar"}
-              </button>
-            </p>
-          )}
+              {mode !== "forgot" && (
+                <p {...rise()} className="auth-rise text-center text-sm text-muted-foreground mt-8">
+                  {mode === "signin" ? "Novo por aqui? " : "Já tem conta? "}
+                  <button type="button" onClick={() => swapTo(mode === "signin" ? "signup" : "signin")} className="text-primary hover:underline underline-offset-4">
+                    {mode === "signin" ? "Criar conta" : "Entrar"}
+                  </button>
+                </p>
+              )}
+            </div>
+          </div>
       </div>
       </section>
 
