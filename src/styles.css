@@ -1047,3 +1047,36 @@
 @media (prefers-reduced-motion: reduce) { .auth-page .auth-rise, .auth-page .auth-hero, .auth-page .auth-card { animation: none; } }
 .auth-page .auth-ambient { background: radial-gradient(circle, color-mix(in oklab, var(--primary) 14%, transparent), transparent 65%); filter: blur(40px); }
 .auth-page .auth-glass { background: color-mix(in oklab, var(--background) 35%, transparent); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent); }
+
+/* Login: animated fields */
+@property --auth-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes auth-spin { to { --auth-angle: 360deg; } }
+@keyframes auth-icon-pop { 0% { transform: translateY(-50%) scale(1); } 40% { transform: translateY(-50%) scale(1.25); } 100% { transform: translateY(-50%) scale(1); } }
+@keyframes auth-shine { from { transform: translateX(-120%) skewX(-20deg); } to { transform: translateX(220%) skewX(-20deg); } }
+.auth-page .auth-field { border-radius: 1rem; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+.auth-page .auth-field::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: conic-gradient(from var(--auth-angle), transparent 0 60%, var(--primary) 75%, color-mix(in oklab, var(--primary) 40%, white) 82%, transparent 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .4s ease; animation: auth-spin 3.5s linear infinite;
+}
+.auth-page .auth-field::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 0 transparent; transition: box-shadow .4s ease;
+}
+.auth-page .auth-field:focus-within { transform: translateY(-1px); }
+.auth-page .auth-field:focus-within::before { opacity: 1; }
+.auth-page .auth-field:focus-within::after { box-shadow: 0 8px 30px -10px color-mix(in oklab, var(--primary) 45%, transparent); }
+.auth-page .auth-field:hover input { border-color: color-mix(in oklab, var(--foreground) 18%, transparent); }
+.auth-page .auth-field input { transition: background-color .3s, border-color .3s, box-shadow .3s; }
+.auth-page .auth-field input:focus { box-shadow: none; background: color-mix(in oklab, var(--primary) 5%, transparent); }
+.auth-page .auth-field:focus-within > span:first-child { animation: auth-icon-pop .45s cubic-bezier(.2,.7,.2,1); }
+.auth-page label:focus-within > span:first-child { color: var(--foreground); transition: color .3s; }
+.auth-page .auth-submit::after {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, white 35%, transparent), transparent);
+  transform: translateX(-120%) skewX(-20deg);
+}
+.auth-page .auth-submit:hover::after { animation: auth-shine .9s ease; }
+.auth-page .auth-submit:active { transform: scale(.98); }
+@media (prefers-reduced-motion: reduce) { .auth-page .auth-field::before, .auth-page .auth-field > span:first-child, .auth-page .auth-submit::after { animation: none !important; } }

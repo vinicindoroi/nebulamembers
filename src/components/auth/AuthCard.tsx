@@ -184,7 +184,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
                 {...rise()}
                 type="submit"
                 disabled={loading}
-                className="auth-rise group w-full inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-2xl px-6 py-3.5 text-sm font-medium glow transition-transform hover:scale-[1.01] disabled:opacity-70"
+                className="auth-rise auth-submit group relative overflow-hidden w-full inline-flex items-center justify-center gap-2 gradient-primary text-primary-foreground rounded-2xl px-6 py-3.5 text-sm font-medium glow transition-transform hover:scale-[1.01] disabled:opacity-70"
               >
                 {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Aguarde...</> : <>{copy.submit} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
               </button>
@@ -237,7 +237,7 @@ function PasswordField({ value, onChange, autoComplete }: { value: string; onCha
   return (
     <label className="block">
       <span className="text-xs text-muted-foreground mb-1.5 block">Senha</span>
-      <div className="relative group">
+      <div className="auth-field relative group">
         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
           <Lock className="h-4 w-4" />
         </span>
@@ -259,7 +259,7 @@ export function Field({ icon, label, ...props }: { icon: React.ReactNode; label:
   return (
     <label className="block">
       <span className="text-xs text-muted-foreground mb-1.5 block">{label}</span>
-      <div className="relative group">
+      <div className="auth-field relative group">
         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
           {icon}
         </span>
