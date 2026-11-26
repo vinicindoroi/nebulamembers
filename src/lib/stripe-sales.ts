@@ -186,3 +186,78 @@ export function bestDay(series: DayPoint[]): DayPoint | null {
 export function recentSales(sales: Sale[], n: number): Sale[] {
   return [...sales].sort((a, b) => b.created - a.created).slice(0, n);
 }
+
+// ---------- Declined payments ----------
+
+export type Decline = { amount: number; currency: string; country: string | null; campaign: string | null; created: number; reason: string };
+
+const REASONS: Record<string, string> = {
+  insufficient_funds: "Saldo insuficiente",
+  generic_decline: "Recusado pelo banco",
+  do_not_honor: "Recusado pelo banco",
+  card_declined: "Cartão recusado",
+  lost_card: "Cartão perdido",
+  stolen_card: "Cartão roubado",
+  expired_card: "Cartão vencido",
+  incorrect_cvc: "CVC incorreto",
+  invalid_cvc: "CVC incorreto",
+  incorrect_number: "Número do cartão incorreto",
+  invalid_number: "Número do cartão incorreto",
+  invalid_expiry_month: "Validade incorreta",
+  invalid_expiry_year: "Validade incorreta",
+  incorrect_zip: "CEP/ZIP incorreto",
+  processing_error: "Erro de processamento",
+  fraudulent: "Suspeita de fraude",
+  merchant_blacklist: "Bloqueado pela Stripe (Radar)",
+  highest_risk_level: "Bloqueado pela Stripe (Radar)",
+  card_velocity_exceeded: "Limite de tentativas excedido",
+  withdrawal_count_limit_exceeded: "Limite do cartão excedido",
+  card_not_supported: "Cartão não suportado",
+  currency_not_supported: "Moeda não suportada",
+  transaction_not_allowed: "Transação não permitida",
+  authentication_required: "Autenticação 3DS necessária",
+  try_again_later: "Tente novamente mais tarde",
+  pickup_card: "Cartão retido pelo banco",
+  restricted_card: "Cartão restrito",
+  security_violation: "Violação de segurança",
+  service_not_allowed: "Serviço não permitido",
+  call_issuer: "Contatar o banco emissor",
+};
+
+/** Human (pt-BR) reason for a failed charge: decline code, then Radar/outcome, then failure code. */
+export function declineReason(charge: any): string {
+  const codes = [charge?.outcome?.reason, charge?.failure_code];
+  if (charge?.outcome?.type === "blocked" && !charge?.outcome?.reason) return "Bloqueado pela Stripe (Radar)";
+  for (const c of codes) if (typeof c === "string" && REASONS[c]) return REASONS[c]!;
+  const raw = codes.find((c) => typeof c === "string" && c);
+  return raw ? String(raw).replace(/_/g, " ") : "Motivo não informado";
+}
+
+/** Failed charge → declined attempt (amount in minor units). Null for anything that is not a failure. */
+export function chargeToDecline(charge: any, checkoutMeta?: Meta): Decline | null {
+  if (!charge || charge.status !== "failed") return null;
+  const pi = typeof charge.payment_intent === "object" ? charge.payment_intent : null;
+  return {
+    amount: Number(charge.amount) || 0,
+    currency: String(charge.currency || "").toLowerCase(),
+    country: saleCountry(charge),
+    campaign: extractCampaign(charge.metadata, pi?.metadata, checkoutMeta),
+    created: Number(charge.created) || 0,
+    reason: declineReason(charge),
+  };
+}
+
+export type DeclineSummary = { count: number; rate: number; reasons: { reason: string; count: number }[]; recent: Decline[] };
+
+/** Count, decline rate over all attempts (0–100, one decimal), reasons by frequency and the latest attempts. */
+export function summarizeDeclines(declines: Decline[], salesCount: number, recentN = 8): DeclineSummary {
+  const by = new Map<string, number>();
+  for (const d of declines) by.set(d.reason, (by.get(d.reason) ?? 0) + 1);
+  const total = declines.length + salesCount;
+  return {
+    count: declines.length,
+    rate: total ? Math.round((declines.length / total) * 1000) / 10 : 0,
+    reasons: [...by].map(([reason, count]) => ({ reason, count })).sort((a, b) => b.count - a.count || a.reason.localeCompare(b.reason)),
+    recent: [...declines].sort((a, b) => b.created - a.created).slice(0, recentN),
+  };
+}

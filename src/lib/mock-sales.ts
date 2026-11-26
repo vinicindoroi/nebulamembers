@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { summarizeSales, type DayPoint, type Sale, type SalesSummary } from "./stripe-sales";
+import { summarizeDeclines, summarizeSales, type DayPoint, type Decline, type DeclineSummary, type Sale, type SalesSummary } from "./stripe-sales";
 
 // Deterministic fake sales for the dev-only "</>" toggle on the dashboard.
 // Same date always yields the same sales, so the globe and the history agree.
@@ -65,5 +65,15 @@ export function mockHistory(fromUnix: number, toUnix: number) {
     bestDay: series.reduce<DayPoint | null>((b, p) => (!b || p.revenue > b.revenue ? p : b), null),
     recent: [...sales].sort((a, b) => b.created - a.created).slice(0, 8),
     truncated: false,
+    declines: mockDeclines(sales),
   };
+}
+
+const MOCK_REASONS = ["Saldo insuficiente", "Saldo insuficiente", "Saldo insuficiente", "Recusado pelo banco", "Recusado pelo banco", "CVC incorreto", "Cartão vencido", "Autenticação 3DS necessária", "Suspeita de fraude"];
+
+function mockDeclines(sales: Sale[]): DeclineSummary & { truncated: boolean } {
+  const declines: Decline[] = sales
+    .filter((_, i) => i % 6 === 2)
+    .map((s, i) => ({ ...s, created: s.created - 90, reason: MOCK_REASONS[i % MOCK_REASONS.length]! }));
+  return { ...summarizeDeclines(declines, sales.length), truncated: false };
 }

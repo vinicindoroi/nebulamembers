@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { bestDay, dailySeries, isRestrictedStripeKey, keyLast4, recentSales, SALES_PERIODS, summarizeSales, validateRange } from "@/lib/stripe-sales";
+import { bestDay, dailySeries, isRestrictedStripeKey, keyLast4, recentSales, SALES_PERIODS, summarizeDeclines, summarizeSales, validateRange } from "@/lib/stripe-sales";
 
 const TABLE = "student_stripe_connections" as never;
 
@@ -143,10 +143,13 @@ export const getStripeSalesHistory = createServerFn({ method: "POST" })
     const r = row as { key_ciphertext: string; livemode: boolean };
 
     const { decryptStripeKey } = await import("./stripe-crypto.server");
-    const { fetchSales, StripeError } = await import("./stripe-api.server");
+    const { fetchSales, fetchDeclines, StripeError } = await import("./stripe-api.server");
     const key = await decryptStripeKey(r.key_ciphertext);
     try {
-      const { sales, truncated } = await fetchSales(key, data.from, to);
+      const [{ sales, truncated }, failed] = await Promise.all([
+        fetchSales(key, data.from, to),
+        fetchDeclines(key, data.from, to).catch((e) => { console.error("declines", e); return null; }),
+      ]);
       const summary = summarizeSales(sales);
       const series = dailySeries(sales, summary.currency, data.from, to, data.offset);
       return {
@@ -157,6 +160,7 @@ export const getStripeSalesHistory = createServerFn({ method: "POST" })
         series,
         bestDay: bestDay(series),
         recent: recentSales(sales.filter((s) => s.currency === summary.currency), 8),
+        declines: failed ? { ...summarizeDeclines(failed.declines, sales.length), truncated: failed.truncated } : null,
       };
     } catch (e) {
       if (e instanceof StripeError && (e.status === 401 || e.status === 403)) return { connected: true as const, invalidKey: true as const };

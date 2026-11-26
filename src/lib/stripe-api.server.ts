@@ -1,5 +1,5 @@
 // Read-only Stripe REST calls made with a student's own restricted key.
-import { chargeToSale, type Sale } from "./stripe-sales";
+import { chargeToDecline, chargeToSale, type Decline, type Sale } from "./stripe-sales";
 
 const API = "https://api.stripe.com/v1";
 /** The period is split into windows fetched in parallel; each window reads at most this many pages of 100. */
@@ -114,4 +114,22 @@ export async function fetchSales(key: string, sinceUnix: number, untilUnix?: num
     }
   }
   return { sales, truncated: chunks.some((c) => c.truncated), checkoutRead: sessions !== null };
+}
+
+/** Declined charges in [since, until]; capped so a card-testing attack can't stall the dashboard. */
+export async function fetchDeclines(key: string, sinceUnix: number, untilUnix: number): Promise<{ declines: Decline[]; truncated: boolean }> {
+  const query = `status:'failed' AND created>=${sinceUnix} AND created<=${untilUnix}`;
+  let page: Page;
+  try {
+    page = await searchAll(key, query, [], 3);
+  } catch (e) {
+    if (!(e instanceof StripeError) || (e.status !== 400 && e.status !== 404)) throw e;
+    page = await listAll(key, "/charges", [["created[gte]", String(sinceUnix)], ["created[lte]", String(untilUnix)]], 5);
+  }
+  const declines: Decline[] = [];
+  for (const c of page.items) {
+    const d = chargeToDecline(c);
+    if (d) declines.push(d);
+  }
+  return { declines, truncated: page.truncated };
 }

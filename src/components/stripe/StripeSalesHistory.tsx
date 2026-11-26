@@ -5,10 +5,10 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
 import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { AlertTriangle, CalendarDays, CalendarRange, Globe2, History, Megaphone, Receipt, ShoppingBag, Trophy, Wallet } from "lucide-react";
+import { AlertTriangle, CalendarDays, CalendarRange, Globe2, History, Megaphone, Receipt, ShoppingBag, Trophy, Wallet, XCircle } from "lucide-react";
 import { getStripeSalesHistory } from "@/lib/stripe-connect.functions";
 import { mockHistory } from "@/lib/mock-sales";
-import { toMajor, type DayPoint, type Ranked, type Sale } from "@/lib/stripe-sales";
+import { toMajor, type DayPoint, type DeclineSummary, type Ranked, type Sale } from "@/lib/stripe-sales";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { countryName, flag, money } from "./format";
@@ -48,6 +48,7 @@ type History = {
   bestDay: DayPoint | null;
   recent: Sale[];
   truncated: boolean;
+  declines: (DeclineSummary & { truncated: boolean }) | null;
 };
 
 // Decorative data shown before the Stripe is connected (labelled "Prévia").
@@ -73,6 +74,7 @@ function previewHistory(): History {
     bestDay: series.reduce((b, p) => (p.revenue > b.revenue ? p : b), series[0]!),
     recent: [],
     truncated: false,
+    declines: null,
   };
 }
 
@@ -105,12 +107,12 @@ export function StripeSalesHistory({ mock = false }: { mock?: boolean }) {
   const h: History | null = useMemo(() => {
     if (mock) {
       const m = mockHistory(fromUnix, toUnix);
-      return { ...m.summary, series: m.series, bestDay: m.bestDay, recent: m.recent, truncated: m.truncated };
+      return { ...m.summary, series: m.series, bestDay: m.bestDay, recent: m.recent, truncated: m.truncated, declines: m.declines };
     }
     if (preview) return previewHistory();
     if (!d || !d.connected || "invalidKey" in d) return null;
-    const { summary, series, bestDay, recent, truncated } = d;
-    return { ...summary, series, bestDay, recent, truncated };
+    const { summary, series, bestDay, recent, truncated, declines } = d;
+    return { ...summary, series, bestDay, recent, truncated, declines: declines ?? null };
   }, [d, preview, mock, fromUnix, toUnix]);
 
   if (invalidKey) return null; // the globe panel above already explains how to reconnect
@@ -213,6 +215,7 @@ export function StripeSalesHistory({ mock = false }: { mock?: boolean }) {
             />
             <RecentSales sales={h.recent} preview={preview} className="md:col-span-2 xl:col-span-1" />
           </div>
+          {h.declines && <Declines d={h.declines} />}
           {(h.withoutCampaign > 0 || h.truncated) && (
             <div className="space-y-1 text-[11px] text-muted-foreground">
               {h.withoutCampaign > 0 && <p>{h.withoutCampaign} {h.withoutCampaign === 1 ? "venda sem" : "vendas sem"} utm_campaign no período.</p>}
@@ -391,6 +394,63 @@ function RecentSales({ sales, preview, className = "" }: { sales: Sale[]; previe
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  );
+}
+
+function Declines({ d }: { d: DeclineSummary & { truncated: boolean } }) {
+  const max = d.reasons[0]?.count ?? 1;
+  return (
+    <div className="border-t border-border pt-5 space-y-4">
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+          <XCircle className="h-3.5 w-3.5 text-destructive" /> Vendas recusadas
+        </h3>
+        <span className="text-sm font-semibold tabular-nums">{d.count}</span>
+        <span className="text-xs text-muted-foreground tabular-nums">{d.rate.toLocaleString("pt-BR")}% das tentativas</span>
+        {d.truncated && <span className="text-[11px] text-muted-foreground">(mostrando as mais recentes)</span>}
+      </div>
+      {d.count === 0 ? (
+        <p className="text-xs text-muted-foreground">Nenhuma tentativa recusada no período.</p>
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="min-w-0">
+            <p className="text-[11px] text-muted-foreground mb-2">Motivos</p>
+            <ul className="space-y-2">
+              {d.reasons.slice(0, 6).map((r) => (
+                <li key={r.reason} className="text-xs">
+                  <div className="flex justify-between gap-3 mb-1">
+                    <span className="truncate">{r.reason}</span>
+                    <span className="tabular-nums text-muted-foreground shrink-0">{r.count}</span>
+                  </div>
+                  <div className="h-1 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-destructive/70" style={{ width: `${(r.count / max) * 100}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] text-muted-foreground mb-2">Últimas recusas</p>
+            <ul className="divide-y divide-border">
+              {d.recent.map((x, i) => (
+                <li key={`${x.created}-${i}`} className="py-2 first:pt-0 flex items-center gap-3 text-xs min-w-0">
+                  <span className="text-base leading-none w-5 text-center shrink-0" title={x.country ? countryName(x.country) : "País desconhecido"}>
+                    {x.country ? flag(x.country) : "·"}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate">{x.reason}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">
+                      {format(new Date(x.created * 1000), "dd/MM · HH:mm")}{x.campaign ? ` · ${x.campaign}` : ""}
+                    </div>
+                  </div>
+                  <span className="tabular-nums text-muted-foreground line-through shrink-0">{money(x.amount, x.currency)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       )}
     </div>
   );
