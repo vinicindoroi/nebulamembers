@@ -199,9 +199,6 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
               </button>
             </p>
           )}
-          <p {...rise()} className="auth-rise text-center text-xs text-muted-foreground mt-3">
-            <a href="/landing" className="hover:text-foreground transition-colors">← Ir para a Página de Vendas</a>
-          </p>
       </div>
       </section>
 
