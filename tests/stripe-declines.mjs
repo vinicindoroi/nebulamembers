@@ -23,3 +23,14 @@ assert.deepEqual(s.reasons, [{ reason: "Saldo insuficiente", count: 2 }, { reaso
 assert.deepEqual(s.recent.map((x) => x.created), [3, 2, 1]);
 assert.equal(summarizeDeclines([], 0).rate, 0);
 console.log("stripe declines: ok");
+
+// ---------- Rótulos quando a busca atinge o limite ----------
+import { declineCountLabel, declineRateLabel } from "../src/lib/stripe-sales.ts";
+
+assert.equal(declineCountLabel(300, false), "300");
+assert.equal(declineCountLabel(1234, false), "1.234");
+assert.equal(declineCountLabel(300, true), "300+");
+assert.equal(declineCountLabel(1234, true), "1.234+");
+assert.equal(declineRateLabel(54.3, false), "54,3%");
+assert.equal(declineRateLabel(54.3, true), "≈ 54,3%");
+assert.equal(declineRateLabel(0, true), "≈ 0%");

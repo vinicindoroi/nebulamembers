@@ -268,6 +268,17 @@ export function chargeToDecline(charge: any, checkoutMeta?: Meta): Decline | nul
 
 export type DeclineSummary = { count: number; rate: number; reasons: { reason: string; count: number }[]; recent: Decline[] };
 
+/** "300" — or "300+" when the fetch hit the cap, so the number is never read as the real total. */
+export function declineCountLabel(count: number, truncated: boolean): string {
+  return truncated ? `${count.toLocaleString("pt-BR")}+` : count.toLocaleString("pt-BR");
+}
+
+/** "54,3%" — with "≈" when the sample was capped and the share is only an estimate. */
+export function declineRateLabel(rate: number, truncated: boolean): string {
+  const text = rate.toLocaleString("pt-BR");
+  return truncated ? `≈ ${text}%` : `${text}%`;
+}
+
 /** Count, decline rate over all attempts (0–100, one decimal), reasons by frequency and the latest attempts. */
 export function summarizeDeclines(declines: Decline[], salesCount: number, recentN = 8): DeclineSummary {
   const by = new Map<string, number>();

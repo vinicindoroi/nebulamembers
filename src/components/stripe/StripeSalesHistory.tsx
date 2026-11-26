@@ -8,7 +8,7 @@ import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, 
 import { AlertTriangle, CalendarDays, CalendarRange, Globe2, History, Megaphone, Receipt, ShoppingBag, Trophy, Wallet, XCircle } from "lucide-react";
 import { getStripeSalesHistory } from "@/lib/stripe-connect.functions";
 import { mockHistory } from "@/lib/mock-sales";
-import { toMajor, type DayPoint, type DeclineSummary, type Ranked, type Sale } from "@/lib/stripe-sales";
+import { toMajor, declineCountLabel, declineRateLabel, type DayPoint, type DeclineSummary, type Ranked, type Sale } from "@/lib/stripe-sales";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { countryName, flag, money } from "./format";
@@ -407,9 +407,9 @@ function Declines({ d }: { d: DeclineSummary & { truncated: boolean } }) {
         <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
           <XCircle className="h-3.5 w-3.5 text-destructive" /> Vendas recusadas
         </h3>
-        <span className="text-sm font-semibold tabular-nums">{d.count}</span>
-        <span className="text-xs text-muted-foreground tabular-nums">{d.rate.toLocaleString("pt-BR")}% das tentativas</span>
-        {d.truncated && <span className="text-[11px] text-muted-foreground">(mostrando as mais recentes)</span>}
+        <span className="text-sm font-semibold tabular-nums">{declineCountLabel(d.count, d.truncated)}</span>
+        <span className="text-xs text-muted-foreground tabular-nums">{declineRateLabel(d.rate, d.truncated)} das tentativas</span>
+        {d.truncated && <span className="text-[11px] text-muted-foreground">(contando só as mais recentes)</span>}
       </div>
       {d.count === 0 ? (
         <p className="text-xs text-muted-foreground">Nenhuma tentativa recusada no período.</p>
