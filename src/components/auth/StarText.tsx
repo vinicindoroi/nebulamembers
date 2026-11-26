@@ -11,9 +11,10 @@ export function StarText({ text = "NEBULA MEMBERS", className = "" }: { text?: s
     const build = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = cv.clientWidth, h = cv.clientHeight;
+      if (w <= 0 || h <= 0) { stars = []; return; }
       cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const off = document.createElement("canvas"); off.width = w; off.height = h;
-      const o = off.getContext("2d")!;
+      const o = off.getContext("2d"); if (!o) return;
       const lines = text.split(" ");
       const longest = Math.max(...lines.map((l) => l.length));
       const size = Math.min((w * 0.7) / (longest * 0.72), 110);
@@ -24,11 +25,11 @@ export function StarText({ text = "NEBULA MEMBERS", className = "" }: { text?: s
       // Random (not grid) points inside the glyphs, so it reads like a star field, not a dot matrix.
       stars = [];
       let ink = 0;
-      for (let k = 3; k < data.length; k += 16) if (data[k]! > 160) ink += 4;
+      for (let k = 3; k < data.length; k += 16) if ((data[k] ?? 0) > 160) ink += 4;
       const target = Math.round(ink / 28);
       for (let n = 0, tries = 0; n < target && tries < target * 60; tries++) {
         const x = Math.random() * w, y = Math.random() * h;
-        if (data[((y | 0) * w + (x | 0)) * 4 + 3]! < 160) continue;
+        if ((data[((y | 0) * w + (x | 0)) * 4 + 3] ?? 0) < 160) continue;
         const roll = Math.random();
         const r = roll > 0.988 ? 1.4 + Math.random() * 0.8 : roll > 0.85 ? 0.8 + Math.random() * 0.4 : 0.3 + Math.random() * 0.4;
         stars.push({ x, y, r, ph: Math.random() * 6.28, sp: 0.3 + Math.random() * 1.2 });

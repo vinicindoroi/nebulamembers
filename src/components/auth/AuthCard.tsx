@@ -199,6 +199,16 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
               </button>
             </p>
           )}
+          {mode !== "forgot" && (
+            <div {...rise()} className="auth-rise mt-8 flex items-center justify-center gap-4 border-t border-border/50 pt-6">
+              <Users aria-hidden className="h-5 w-5 shrink-0 text-primary" />
+              <div>
+                {/* Verified aggregate of profiles on 2026-11-26; not a live activity count. */}
+                <p className="text-sm text-foreground"><span className="font-semibold tabular-nums">60</span> membros cadastrados</p>
+                <p className="mt-1 text-xs text-muted-foreground">Nebula Members · 26 nov 2026</p>
+              </div>
+            </div>
+          )}
       </div>
       </section>
 
