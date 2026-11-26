@@ -291,3 +291,42 @@ export function summarizeDeclines(declines: Decline[], salesCount: number, recen
     recent: [...declines].sort((a, b) => b.created - a.created).slice(0, recentN),
   };
 }
+
+export type DeclineSource = "stripe" | "checkout" | "cliente";
+export type DeclineFinding = { source: DeclineSource; title: string; detail: string; count: number };
+export type DeclineDiagnosis = { main: DeclineSource | null; share: Record<DeclineSource, number>; findings: DeclineFinding[] };
+
+const SOURCE_RULES: { source: DeclineSource; reasons: string[]; title: string; detail: string }[] = [
+  { source: "stripe", reasons: ["Bloqueado pela Stripe (Radar)"], title: "Antifraude da Stripe bloqueando", detail: "O Radar está barrando pagamentos antes do banco. Revise as regras do Radar ou peça liberação à Stripe; muitos bloqueios seguidos costumam indicar teste de cartões por robôs." },
+  { source: "checkout", reasons: ["CVC incorreto", "Validade incorreta", "CEP/ZIP incorreto", "Número do cartão inválido", "Número do cartão incorreto"], title: "Campos do cartão com erro", detail: "Clientes erram CVC, validade ou CEP. Melhore a validação e as máscaras dos campos e não peça CEP se não for necessário." },
+  { source: "checkout", reasons: ["Autenticação 3DS necessária"], title: "3D Secure não tratado", detail: "O banco pediu autenticação e o checkout não completou o 3DS. Use Payment Intents/Checkout da Stripe com confirmação no navegador." },
+  { source: "checkout", reasons: ["Transação não permitida", "Moeda não suportada", "Cartão não suportado", "Serviço não permitido"], title: "Tipo de compra não aceito pelo cartão", detail: "Cartões recusando a moeda ou compra internacional. Ofereça moeda local e outros métodos (Apple/Google Pay, Link)." },
+  { source: "checkout", reasons: ["Limite de tentativas excedido", "Tente novamente mais tarde", "Erro de processamento"], title: "Tentativas repetidas", detail: "O mesmo cartão tenta várias vezes seguidas. Bloqueie cliques duplos no botão de pagar e limite novas tentativas." },
+  { source: "cliente", reasons: ["Saldo insuficiente", "Recusado pelo banco", "Contatar o banco emissor", "Suspeita de fraude", "Cartão restrito", "Cartão retido pelo banco", "Limite do cartão excedido", "Cartão perdido", "Cartão roubado", "Cartão expirado"], title: "Banco do cliente recusou", detail: "Saldo, limite ou bloqueio do próprio banco. Não é falha sua: ofereça outro método de pagamento e recuperação por e-mail." },
+];
+
+/** Classifies decline reasons into Stripe, checkout or customer-bank causes, with actionable findings. */
+export function diagnoseDeclines(reasons: { reason: string; count: number }[], recent: Decline[] = []): DeclineDiagnosis {
+  const share: Record<DeclineSource, number> = { stripe: 0, checkout: 0, cliente: 0 };
+  const findings: DeclineFinding[] = [];
+  for (const rule of SOURCE_RULES) {
+    const count = reasons.filter((r) => rule.reasons.includes(r.reason)).reduce((s, r) => s + r.count, 0);
+    if (!count) continue;
+    share[rule.source] += count;
+    findings.push({ source: rule.source, title: rule.title, detail: rule.detail, count });
+  }
+  // Same amount+campaign failing several times within 2 minutes = retries from the checkout.
+  const sorted = [...recent].sort((a, b) => a.created - b.created);
+  let bursts = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const a = sorted[i - 1]!, b = sorted[i]!;
+    if (b.created - a.created <= 120 && a.amount === b.amount && a.campaign === b.campaign) bursts++;
+  }
+  if (bursts >= 2 && !findings.some((f) => f.title === "Tentativas repetidas")) {
+    findings.push({ source: "checkout", title: "Tentativas repetidas", detail: "Várias recusas do mesmo valor em poucos segundos. Bloqueie clique duplo no botão de pagar e limite novas tentativas.", count: bursts });
+  }
+  findings.sort((x, y) => y.count - x.count);
+  const total = share.stripe + share.checkout + share.cliente;
+  const main = total ? (Object.entries(share).sort((x, y) => y[1] - x[1])[0]![0] as DeclineSource) : null;
+  return { main, share, findings };
+}

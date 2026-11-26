@@ -8,7 +8,7 @@ import { Area, Bar, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, 
 import { AlertTriangle, CalendarDays, CalendarRange, Globe2, History, Megaphone, Receipt, ShoppingBag, Trophy, Wallet, XCircle } from "lucide-react";
 import { getStripeSalesHistory } from "@/lib/stripe-connect.functions";
 import { mockHistory } from "@/lib/mock-sales";
-import { toMajor, declineCountLabel, declineRateLabel, type DayPoint, type DeclineSummary, type Ranked, type Sale } from "@/lib/stripe-sales";
+import { toMajor, declineCountLabel, declineRateLabel, diagnoseDeclines, type DeclineSource, type DayPoint, type DeclineSummary, type Ranked, type Sale } from "@/lib/stripe-sales";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { countryName, flag, money } from "./format";
@@ -417,6 +417,8 @@ function Declines({ d }: { d: DeclineSummary & { truncated: boolean } }) {
       {d.count === 0 ? (
         <p className="text-xs text-muted-foreground">Nenhuma tentativa recusada no período.</p>
       ) : (
+        <>
+        <DeclineDiagnosisBox d={d} />
         <div className="grid gap-5 md:grid-cols-2">
           <div className="min-w-0">
             <p className="text-[11px] text-muted-foreground mb-2">Motivos</p>
@@ -454,7 +456,40 @@ function Declines({ d }: { d: DeclineSummary & { truncated: boolean } }) {
             </ul>
           </div>
         </div>
+        </>
       )}
+    </div>
+  );
+}
+
+const SOURCE_LABEL: Record<DeclineSource, string> = { stripe: "Stripe", checkout: "Checkout", cliente: "Banco do cliente" };
+
+function DeclineDiagnosisBox({ d }: { d: DeclineSummary }) {
+  const dx = diagnoseDeclines(d.reasons, d.recent);
+  if (!dx.main) return null;
+  const total = dx.share.stripe + dx.share.checkout + dx.share.cliente;
+  const verdict = dx.main === "stripe" ? "O problema principal está na Stripe (antifraude)."
+    : dx.main === "checkout" ? "O problema principal está no seu checkout."
+    : "A maioria das recusas vem do banco do cliente, não da Stripe nem do checkout.";
+  return (
+    <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <p className="text-xs font-semibold">Diagnóstico: {verdict}</p>
+        <div className="flex gap-3 text-[11px] text-muted-foreground tabular-nums">
+          {(Object.keys(SOURCE_LABEL) as DeclineSource[]).map((k) => (
+            <span key={k}>{SOURCE_LABEL[k]} {total ? Math.round((dx.share[k] / total) * 100) : 0}%</span>
+          ))}
+        </div>
+      </div>
+      <ul className="space-y-2">
+        {dx.findings.slice(0, 4).map((f) => (
+          <li key={f.title} className="text-xs">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground mr-2">{SOURCE_LABEL[f.source]}</span>
+            <span className="font-medium">{f.title}</span> <span className="text-muted-foreground tabular-nums">({f.count})</span>
+            <p className="text-muted-foreground mt-0.5">{f.detail}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

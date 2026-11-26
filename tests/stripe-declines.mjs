@@ -34,3 +34,15 @@ assert.equal(declineCountLabel(1234, true), "1.234+");
 assert.equal(declineRateLabel(54.3, false), "54,3%");
 assert.equal(declineRateLabel(54.3, true), "≈ 54,3%");
 assert.equal(declineRateLabel(0, true), "≈ 0%");
+
+{
+  const { diagnoseDeclines } = await import("../src/lib/stripe-sales.ts");
+  const assert = (await import("node:assert/strict")).default;
+  const d = diagnoseDeclines([{ reason: "Bloqueado pela Stripe (Radar)", count: 10 }, { reason: "CVC incorreto", count: 3 }, { reason: "Saldo insuficiente", count: 5 }]);
+  assert.equal(d.main, "stripe");
+  assert.equal(d.share.checkout, 3);
+  const c = diagnoseDeclines([{ reason: "Autenticação 3DS necessária", count: 7 }, { reason: "Saldo insuficiente", count: 2 }]);
+  assert.equal(c.main, "checkout");
+  assert.equal(c.findings[0].title, "3D Secure não tratado");
+  console.log("diagnoseDeclines ok");
+}
