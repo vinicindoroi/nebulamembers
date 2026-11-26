@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chargeToSale, extractCampaign, isRestrictedStripeKey, saleCountry, summarizeSales, toMajor } from "../src/lib/stripe-sales.ts";
+import { chargeToSale, extractCampaign, isRestrictedStripeKey, saleCountry, summarizeSales, toMajor, windowStartUnix } from "../src/lib/stripe-sales.ts";
 
 // Só chave restrita (somente leitura) é aceita
 assert.equal(isRestrictedStripeKey("rk_live_51Abcdefghijklmnop"), true);
@@ -83,3 +83,19 @@ assert.equal(bestDay(dailySeries([], "brl", from, to, -180)), null);
 assert.deepEqual(recentSales(hist, 2).map((s) => s.amount), [500, 2000]);
 
 console.log("stripe-sales history: ok");
+
+// ---------- Janela "Hoje" (meia-noite do fuso do aluno) ----------
+const u = (iso) => Math.floor(Date.parse(iso) / 1000);
+
+// 7/30/90 dias: volta N dias a partir de agora
+assert.equal(windowStartUnix(7, u("2026-02-05T10:00:00Z"), 0), u("2026-01-29T10:00:00Z"));
+assert.equal(windowStartUnix(30, u("2026-02-05T10:00:00Z"), -180), u("2026-01-06T10:00:00Z"));
+
+// Hoje em UTC-3: 10:00 UTC são 07:00 locais -> meia-noite local = 03:00 UTC
+assert.equal(windowStartUnix("today", u("2026-02-05T10:00:00Z"), -180), u("2026-02-05T03:00:00Z"));
+// 01:00 UTC ainda é 22:00 do dia anterior em UTC-3 -> a janela começa 22h antes
+assert.equal(windowStartUnix("today", u("2026-02-05T01:00:00Z"), -180), u("2026-02-04T03:00:00Z"));
+// UTC+9 (Tóquio): 23:00 UTC já é 08:00 do dia seguinte -> meia-noite local = 15:00 UTC de hoje
+assert.equal(windowStartUnix("today", u("2026-02-05T23:00:00Z"), 540), u("2026-02-05T15:00:00Z"));
+// Nunca no futuro
+assert.equal(windowStartUnix("today", u("2026-02-05T03:00:00Z"), -180), u("2026-02-05T03:00:00Z"));

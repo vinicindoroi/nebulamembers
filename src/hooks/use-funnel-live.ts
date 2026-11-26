@@ -2,6 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { LIVE_WINDOW_MS, liveVisitors, rankFunnels, topBy, type FunnelEventRow } from "@/lib/funnel-live";
+import { windowStartUnix, type SalesWindow } from "@/lib/stripe-sales";
+
+// "Hoje" precisa começar à meia-noite do fuso do aluno, não à meia-noite em UTC.
+const sinceIso = (w: SalesWindow) =>
+  new Date(windowStartUnix(w, Math.floor(Date.now() / 1000), -new Date().getTimezoneOffset()) * 1000).toISOString();
 
 const COLS = "funnel_id, event_type, visitor_id, session_id, country, created_at";
 
@@ -24,7 +29,7 @@ async function fetchEvents(ids: string[], sinceIso: string, cap: number) {
 
 const MOCK_COUNTRIES = ["BR", "US", "PT", "MX", "DE", "ES", "AR"];
 
-export function useFunnelLive(days: number, mock = false) {
+export function useFunnelLive(salesWindow: SalesWindow, mock = false) {
   const { user } = useAuth();
   const funnels = useQuery({
     queryKey: ["dash-funnels", user?.id],
@@ -46,10 +51,10 @@ export function useFunnelLive(days: number, mock = false) {
     queryFn: () => fetchEvents(ids, new Date(Date.now() - LIVE_WINDOW_MS).toISOString(), 5000),
   });
   const period = useQuery({
-    queryKey: ["dash-funnel-period", ids.join(","), days],
+    queryKey: ["dash-funnel-period", ids.join(","), String(salesWindow)],
     enabled: ids.length > 0 && !mock,
     staleTime: 60_000,
-    queryFn: () => fetchEvents(ids, new Date(Date.now() - days * 86400_000).toISOString(), 20000),
+    queryFn: () => fetchEvents(ids, sinceIso(salesWindow), 20000),
   });
 
   if (mock) {

@@ -129,6 +129,25 @@ export function summarizeSales(sales: Sale[]): SalesSummary {
 export const SALES_PERIODS = [7, 30, 90] as const;
 export type SalesPeriod = (typeof SALES_PERIODS)[number];
 
+/** Sales window on the globe: the buyer's own calendar day, or the last N days. */
+export type SalesWindow = SalesPeriod | "today";
+export const SALES_WINDOWS: readonly SalesWindow[] = ["today", ...SALES_PERIODS];
+
+/**
+ * First second of the window (unix). "today" is midnight in the buyer's own
+ * calendar (offsetMin = minutes east of UTC), never midnight in UTC.
+ */
+export function windowStartUnix(win: SalesWindow, nowUnix: number, offsetMin: number): number {
+  if (win !== "today") return nowUnix - win * 86400;
+  const midnight = Math.floor(Date.parse(`${dayKey(nowUnix, offsetMin)}T00:00:00Z`) / 1000) - offsetMin * 60;
+  return Math.max(0, Math.min(midnight, nowUnix));
+}
+
+/** "hoje" / "últimos 7 dias" — for headings and empty states. */
+export function windowLabel(win: SalesWindow): string {
+  return win === "today" ? "hoje" : `últimos ${win} dias`;
+}
+
 // ---------- Sales history (date range, daily series, recent sales) ----------
 
 export const MAX_HISTORY_DAYS = 366;

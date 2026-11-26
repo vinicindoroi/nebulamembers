@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { bestDay, dailySeries, isRestrictedStripeKey, keyLast4, recentSales, SALES_PERIODS, summarizeDeclines, summarizeSales, validateRange } from "@/lib/stripe-sales";
+import { bestDay, dailySeries, isRestrictedStripeKey, keyLast4, recentSales, SALES_PERIODS, summarizeDeclines, summarizeSales, validateRange, windowStartUnix, type SalesWindow } from "@/lib/stripe-sales";
 
 const TABLE = "student_stripe_connections" as never;
 
@@ -78,7 +78,14 @@ export const disconnectStripe = createServerFn({ method: "POST" })
 
 export const getStripeSales = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ days: z.number().int().refine((n) => (SALES_PERIODS as readonly number[]).includes(n)) }).parse(d))
+  .inputValidator((d) =>
+    z
+      .object({
+        period: z.union([z.literal("today"), z.number().int().refine((n) => (SALES_PERIODS as readonly number[]).includes(n))]),
+        offset: z.number().int().min(-840).max(840),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }) => {
     await assertApproved(context.supabase);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -94,7 +101,7 @@ export const getStripeSales = createServerFn({ method: "POST" })
     const { decryptStripeKey } = await import("./stripe-crypto.server");
     const { fetchSales, StripeError } = await import("./stripe-api.server");
     const key = await decryptStripeKey(r.key_ciphertext);
-    const since = Math.floor(Date.now() / 1000) - data.days * 86400;
+    const since = windowStartUnix(data.period as SalesWindow, Math.floor(Date.now() / 1000), data.offset);
     try {
       const { sales, truncated, checkoutRead } = await fetchSales(key, since);
       return {

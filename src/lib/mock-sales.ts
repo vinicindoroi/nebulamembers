@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { summarizeDeclines, summarizeSales, type DayPoint, type Decline, type DeclineSummary, type Sale, type SalesSummary } from "./stripe-sales";
+import { summarizeDeclines, summarizeSales, windowStartUnix, type DayPoint, type Decline, type DeclineSummary, type Sale, type SalesSummary, type SalesWindow } from "./stripe-sales";
 
 // Deterministic fake sales for the dev-only "</>" toggle on the dashboard.
 // Same date always yields the same sales, so the globe and the history agree.
@@ -43,9 +43,10 @@ export function mockSalesForRange(fromUnix: number, toUnix: number): Sale[] {
   return sales;
 }
 
-export function mockSummary(days: number): SalesSummary {
+export function mockSummary(period: SalesWindow): SalesSummary {
   const to = Math.floor(Date.now() / 1000);
-  return summarizeSales(mockSalesForRange(to - days * 86400, to));
+  const from = windowStartUnix(period, to, -new Date().getTimezoneOffset());
+  return summarizeSales(mockSalesForRange(from, to));
 }
 
 export function mockHistory(fromUnix: number, toUnix: number) {

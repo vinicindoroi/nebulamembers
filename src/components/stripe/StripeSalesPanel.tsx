@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, ArrowRight, Globe2, Megaphone, ShoppingBag, Receipt, Sparkles, Trophy } from "lucide-react";
 import { getStripeSales } from "@/lib/stripe-connect.functions";
 import { mockSummary } from "@/lib/mock-sales";
-import { SALES_PERIODS, type SalesPeriod } from "@/lib/stripe-sales";
+import { SALES_WINDOWS, windowLabel, type SalesWindow } from "@/lib/stripe-sales";
 import { countryName, flag, money } from "./format";
 import { COUNTRY_CENTROIDS } from "@/lib/country-centroids";
 import type { GlobePoint } from "./SalesGlobe";
@@ -50,22 +50,22 @@ function GlobeStage({ points, focus, children }: { points: GlobePoint[]; focus: 
 }
 
 export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
-  const [days, setDays] = useState<SalesPeriod>(30);
+  const [period, setPeriod] = useState<SalesWindow>(30);
   const fetchSales = useServerFn(getStripeSales);
   const q = useQuery({
-    queryKey: ["stripe-sales", days],
-    queryFn: () => fetchSales({ data: { days } }),
+    queryKey: ["stripe-sales", String(period)],
+    queryFn: () => fetchSales({ data: { period, offset: -new Date().getTimezoneOffset() } }),
     staleTime: 5 * 60_000,
     retry: false,
     enabled: !mock,
   });
 
   const d = mock
-    ? { connected: true as const, livemode: false, accountName: "Conta de exemplo", summary: mockSummary(days), truncated: false }
+    ? { connected: true as const, livemode: false, accountName: "Conta de exemplo", summary: mockSummary(period), truncated: false }
     : q.data;
   const summary = d && d.connected && "summary" in d ? d.summary : null;
 
-  const fl = useFunnelLive(days, mock);
+  const fl = useFunnelLive(period, mock);
   const liveKey = [...fl.liveByCountry].map(([c, n]) => c + n).join(",");
   const points = useMemo<GlobePoint[]>(
     () => [
@@ -190,7 +190,7 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
             </div>
           )}
           {s.orders === 0 && (
-            <p className="absolute bottom-5 inset-x-5 text-center text-xs text-muted-foreground">Nenhuma venda nos últimos {days} dias.</p>
+            <p className="absolute bottom-5 inset-x-5 text-center text-xs text-muted-foreground">Nenhuma venda {period === "today" ? "hoje" : `nos últimos ${period} dias`}.</p>
           )}
         </GlobeStage>
 
@@ -198,21 +198,21 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
           <header className="flex flex-wrap items-center gap-3">
             <p className="flex-1 min-w-0 text-xs text-muted-foreground truncate">{d.accountName ? `Stripe · ${d.accountName}` : "Stripe conectada"}</p>
             <div className="flex gap-1 p-1 rounded-full bg-muted/40 border border-border" role="group" aria-label="Período">
-              {SALES_PERIODS.map((p) => (
+              {SALES_WINDOWS.map((w) => (
                 <button
-                  key={p}
-                  onClick={() => setDays(p)}
-                  aria-pressed={days === p}
-                  className={`text-xs px-3 py-1 rounded-full transition-colors ${days === p ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  key={String(w)}
+                  onClick={() => setPeriod(w)}
+                  aria-pressed={period === w}
+                  className={`text-xs px-3 py-1 rounded-full transition-colors ${period === w ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {p}d
+                  {w === "today" ? "Hoje" : `${w}d`}
                 </button>
               ))}
             </div>
           </header>
 
           <div>
-            <p className="text-xs text-muted-foreground">Faturamento · últimos {days} dias</p>
+            <p className="text-xs text-muted-foreground">Faturamento · {windowLabel(period)}</p>
             <p className="mt-1 text-4xl sm:text-5xl font-semibold tracking-tight tabular-nums text-gradient-primary truncate" title={money(s.revenue, cur)}>
               {money(s.revenue, cur)}
             </p>
@@ -244,12 +244,12 @@ export function StripeSalesPanel({ mock = false }: { mock?: boolean }) {
                 <div className="min-w-0">
                   <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Workflow className="h-3 w-3" /> Funil que mais vende</p>
                   <p className="font-medium truncate" title={fl.topSales?.name}>{fl.topSales?.name ?? "—"}</p>
-                  <p className="text-[11px] text-muted-foreground">{fl.topSales ? `${fl.topSales.sales} vendas · ${days}d` : "Sem vendas no período"}</p>
+                  <p className="text-[11px] text-muted-foreground">{fl.topSales ? `${fl.topSales.sales} vendas · ${period === "today" ? "hoje" : `${period}d`}` : "Sem vendas no período"}</p>
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Workflow className="h-3 w-3" /> Funil com mais acessos</p>
                   <p className="font-medium truncate" title={fl.topVisitors?.name}>{fl.topVisitors?.name ?? "—"}</p>
-                  <p className="text-[11px] text-muted-foreground">{fl.topVisitors ? `${fl.topVisitors.visitors.toLocaleString("pt-BR")} acessos · ${days}d` : "Sem acessos no período"}</p>
+                  <p className="text-[11px] text-muted-foreground">{fl.topVisitors ? `${fl.topVisitors.visitors.toLocaleString("pt-BR")} acessos · ${period === "today" ? "hoje" : `${period}d`}` : "Sem acessos no período"}</p>
                 </div>
               </div>
             </div>
