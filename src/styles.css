@@ -1036,3 +1036,12 @@
     to { opacity: 1; transform: none; }
   }
 }
+
+/* Login: staggered rise-from-blur entrance */
+@keyframes auth-rise { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes auth-slide { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+@keyframes auth-pop { from { opacity: 0; transform: translateY(12px) scale(.95); } to { opacity: 1; transform: none; } }
+.auth-page .auth-rise { animation: auth-rise .6s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 100ms); }
+.auth-page .auth-hero { animation: auth-slide .8s cubic-bezier(.2,.7,.2,1) both; }
+.auth-page .auth-card { animation: auth-pop .6s cubic-bezier(.2,.7,.2,1) both; }
+@media (prefers-reduced-motion: reduce) { .auth-page .auth-rise, .auth-page .auth-hero, .auth-page .auth-card { animation: none; } }
