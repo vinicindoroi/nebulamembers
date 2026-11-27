@@ -21,3 +21,4 @@
 - [x] Dashboard do aluno: globo girando com os locais das vendas + faturamento, país e campanha (utm_campaign) que mais venderam
 - [x] Diagnosticar e remover a lentidão na abertura das abas, medindo navegação e consultas
 - [x] Adaptar pastas glass ao criador de funis, preservando organização e ações existentes
+- [x] Adaptar as barras de ferramentas dos funis e mapas mentais ao modelo Floating Dock

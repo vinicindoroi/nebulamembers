@@ -31,3 +31,4 @@
 - Keep login constellation motion in a decorative client-mounted canvas using semantic palette tokens, capped at 24fps and paused offscreen/hidden, with a static reduced-motion state, so visual effects never interfere with signing in.
 - Keep Dashboard motion as abstract decorative contours separate from sales data, with semantic colors, a 24fps cap, offscreen/hidden pause and static reduced-motion rendering, so decoration never implies fabricated metrics.
 - Render funnel folders through FunnelGlassFolder using existing folder assignments and real node previews; keep all items available in an expandable list so decorative fan previews never limit access.
+- Enhance canvas toolbars through the shared CanvasDock wrapper without duplicating action handlers; fixed control slots and pointer-only transforms keep magnification lightweight and avoid layout shifts.

@@ -147,6 +147,9 @@
   --folder-rim: color-mix(in oklab, var(--foreground) 19%, transparent);
   --folder-sheet: linear-gradient(150deg, color-mix(in oklab, var(--primary) 10%, var(--card)), var(--secondary));
   --folder-sheen: linear-gradient(120deg, transparent 20%, color-mix(in oklab, var(--foreground) 7%, transparent) 50%, transparent 80%);
+  --dock-surface: color-mix(in oklab, var(--card) 82%, transparent);
+  --dock-item: color-mix(in oklab, var(--foreground) 5%, var(--card));
+  --dock-rim: color-mix(in oklab, var(--foreground) 10%, transparent);
 }
 
 .light {

@@ -28,6 +28,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { CanvasDock } from './CanvasDock';
 
 export type InteractionMode = "select" | "pan" | "draw" | "sticky-note" | "free-text";
 interface FunnelFloatingToolbarProps {
@@ -207,7 +208,7 @@ export function FunnelFloatingToolbar({
           </DropdownMenu>
         </div>
       </header>
-      <div className="funnel-tools-dock" role="toolbar" aria-label="Ferramentas do canvas">
+      <CanvasDock className="funnel-tools-dock" label="Ferramentas do canvas">
         {tools.map((tool) => (
           <Button
             key={tool.mode}
@@ -288,7 +289,7 @@ export function FunnelFloatingToolbar({
             <Ungroup className="h-4 w-4" />
           </Button>
         )}
-      </div>
+      </CanvasDock>
       <input
         type="file"
         ref={imageInput}
