@@ -10,6 +10,7 @@ import { PaymentReminderBanner } from "@/components/PaymentReminderBanner";
 import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 import { StripeSalesHistory } from "@/components/stripe/StripeSalesHistory";
 import { useScrollReveal, revealDelay } from "@/hooks/use-scroll-reveal";
+import { DashboardMotion } from "@/components/DashboardMotion";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
@@ -195,10 +196,9 @@ function Dashboard() {
       )}
       {/* Hero */}
       <header className="dash-hero rounded-2xl border border-border p-6 sm:p-8">
-        <div className="dash-hero-orb" aria-hidden />
-        <div className="dash-hero-orb-2" aria-hidden />
+        <DashboardMotion />
         <div className="sales-hairline absolute inset-x-0 top-0 h-px" aria-hidden />
-        <div className="flex flex-col md:flex-row md:items-center gap-6">
+        <div className="relative flex flex-col md:flex-row md:items-center gap-6">
           <div className="min-w-0 flex-1 space-y-4">
             <span data-reveal style={revealDelay(0)} suppressHydrationWarning className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/50 backdrop-blur px-2.5 py-1 text-[11px] text-muted-foreground">
               <Sparkles className="h-3 w-3 text-primary" /> {today}

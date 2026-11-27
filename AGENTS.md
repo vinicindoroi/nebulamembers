@@ -29,3 +29,4 @@
 
 - Instantiate Stripe request queues inside each server-function invocation, sharing only within that invocation; Worker requests cannot safely await another request’s queued I/O.
 - Keep login constellation motion in a decorative client-mounted canvas using semantic palette tokens, capped at 24fps and paused offscreen/hidden, with a static reduced-motion state, so visual effects never interfere with signing in.
+- Keep Dashboard motion as abstract decorative contours separate from sales data, with semantic colors, a 24fps cap, offscreen/hidden pause and static reduced-motion rendering, so decoration never implies fabricated metrics.

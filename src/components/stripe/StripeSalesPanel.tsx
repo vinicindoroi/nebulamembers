@@ -265,8 +265,8 @@ export function StripeSalesPanel({ mock = false, period: extPeriod, onPeriodChan
           />
 
           <div className="grid sm:grid-cols-2 gap-5">
-            <RankList title="Países" rows={s.countries.slice(0, 5)} total={s.revenue} cur={cur} label={(k) => `${flag(k)} ${countryName(k)}`} />
-            <RankList title="Campanhas" rows={s.campaigns.slice(0, 5)} total={s.revenue} cur={cur} label={(k) => k} />
+            <RankList key={`countries-${period}`} title="Países" rows={s.countries.slice(0, 5)} total={s.revenue} cur={cur} label={(k) => `${flag(k)} ${countryName(k)}`} />
+            <RankList key={`campaigns-${period}`} title="Campanhas" rows={s.campaigns.slice(0, 5)} total={s.revenue} cur={cur} label={(k) => k} />
           </div>
 
           <div className="space-y-1 text-[11px] text-muted-foreground">
@@ -310,7 +310,7 @@ function RankList({ title, rows, total, cur, label }: { title: string; rows: { k
               <span className="tabular-nums text-muted-foreground shrink-0">{money(r.revenue, cur)}</span>
             </div>
             <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
-              <div className="h-full rounded-full bg-primary shadow-[var(--shadow-glow)]" style={{ width: `${total ? Math.max(2, (r.revenue / total) * 100) : 0}%` }} />
+              <div className="dash-rank-fill h-full rounded-full bg-primary shadow-[var(--shadow-glow)]" style={{ width: `${total ? Math.max(2, (r.revenue / total) * 100) : 0}%` }} />
             </div>
           </li>
         ))}
