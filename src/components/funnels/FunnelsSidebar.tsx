@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Plus, Search, Trash2, ChevronLeft, ChevronRight, GitFork, Pencil, Upload, Brain, Folder, FolderPlus, FolderOpen, ChevronDown, Move, Copy } from 'lucide-react';
+import { Plus, Search, Trash2, ChevronLeft, ChevronRight, GitFork, Pencil, Upload, Brain, Folder, FolderPlus, Move, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -42,6 +42,7 @@ import { cn } from '@/lib/utils';
 import { Funnel } from '@/hooks/useFunnels';
 import { FunnelFolder } from '@/hooks/useFunnelFolders';
 import { FunnelFolderDialog } from './FunnelFolderDialog';
+import { FunnelGlassFolder } from './FunnelGlassFolder';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Node, Edge, Viewport } from '@xyflow/react';
@@ -271,7 +272,7 @@ export function FunnelsSidebar({
             <Button
               variant="ghost"
               size="icon"
-              aria-label={`Ações de ${funnel.name}`} className="h-7 w-7 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-white/10 transition-opacity shrink-0 mr-2"
+              aria-label={`Ações de ${funnel.name}`} className="h-7 w-7 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-accent transition-opacity shrink-0 mr-2"
               onClick={(e) => e.stopPropagation()}
             >
               <MoreHorizontal className="h-3.5 w-3.5" />
@@ -331,7 +332,7 @@ export function FunnelsSidebar({
               </DropdownMenuSub>
             )}
 
-            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuSeparator className="bg-border" />
 
             <DropdownMenuItem
               onSelect={() => setFunnelToDelete(funnel.id)}
@@ -426,6 +427,7 @@ export function FunnelsSidebar({
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="Nova pasta"
                     onClick={() => setIsNewFolderDialogOpen(true)}
                     className="h-8 w-8 hover:bg-muted/50"
                   >
@@ -497,106 +499,40 @@ export function FunnelsSidebar({
                   {search ? 'Nenhum funil encontrado' : 'Nenhum funil criado'}
                 </p>
                 {!search && (
-                  <button
+                  <Button variant="ghost"
                     aria-label="Novo funil" onClick={onCreateFunnel}
                     className="mt-3 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
                   >
                     + Criar primeiro funil
-                  </button>
+                  </Button>
                 )}
               </div>
             ) : (
               <>
                 {/* Folders */}
                 {folders.filter(f => search === '' || f.name.toLowerCase().includes(search.toLowerCase()) || (funnelsByFolder[f.id] && funnelsByFolder[f.id].length > 0)).map((folder) => {
-                  const isExpanded = expandedFolders[folder.id];
+                  const isExpanded = Boolean(search || expandedFolders[folder.id]);
                   const folderFunnels = funnelsByFolder[folder.id] || [];
                   
                   return (
-                    <div key={folder.id} className="mb-1">
-                      <div
-                        onClick={() => toggleFolder(folder.id)}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          e.dataTransfer.dropEffect = 'move';
-                        }}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          try {
-                            const data = JSON.parse(e.dataTransfer.getData('application/json'));
-                            if (data.type === 'funnel' && onMoveFunnel) {
-                              onMoveFunnel(data.id, folder.id);
-                            }
-                          } catch (err) {}
-                        }}
-                        className="group w-full overflow-hidden flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer hover:bg-card text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
-                          {isExpanded ? (
-                            <FolderOpen className="w-4 h-4 shrink-0 text-primary/70" />
-                          ) : (
-                            <Folder className="w-4 h-4 shrink-0" />
-                          )}
-                          <span className="text-[13px] font-medium truncate min-w-0">{folder.name}</span>
-                          <span className="text-[10px] bg-muted/40 px-1.5 py-0.5 rounded-full ml-1 shrink-0">
-                            {folderFunnels.length}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:bg-white/10 transition-opacity mr-2"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreHorizontal className="h-3.5 w-3.5" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-popover border-border shadow-2xl">
-                              <DropdownMenuItem
-                                onSelect={() => setFolderToRename(folder)}
-                                className="text-xs cursor-pointer"
-                              >
-                                <Pencil className="mr-2 h-3.5 w-3.5" />
-                                Renomear Pasta
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onSelect={() => setFolderToDelete(folder.id)}
-                                className="text-xs text-destructive cursor-pointer focus:text-destructive"
-                              >
-                                <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                Excluir Pasta
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          
-                          <ChevronDown 
-                            className={cn("w-3.5 h-3.5 transition-transform opacity-50", isExpanded ? "rotate-180" : "")} 
-                          />
-                        </div>
-                      </div>
-
-                      {/* Folder Content */}
-                      {isExpanded && (
-                        <div className="mt-1 space-y-0.5 relative before:absolute before:left-[22px] before:top-0 before:bottom-3 before:w-px before:bg-muted/40">
-                          {folderFunnels.length === 0 ? (
-                            <div className="pl-9 py-2 text-[11px] text-muted-foreground/50">
-                              Pasta vazia
-                            </div>
-                          ) : (
-                            folderFunnels.map(funnel => renderFunnelItem(funnel, true))
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    <FunnelGlassFolder key={folder.id} label={folder.name} funnels={folderFunnels} open={isExpanded}
+                      onToggle={() => toggleFolder(folder.id)}
+                      onSelect={(funnel) => { onSelectFunnel(funnel); if (window.matchMedia('(max-width: 1099px)').matches) onToggleCollapse?.(); }}
+                      onMove={(id) => onMoveFunnel?.(id, folder.id)}
+                      onRename={() => setFolderToRename(folder)} onDelete={() => setFolderToDelete(folder.id)}>
+                      {folderFunnels.map(funnel => renderFunnelItem(funnel))}
+                    </FunnelGlassFolder>
                   );
                 })}
 
                 {/* Root Funnels (No Folder) */}
-                {funnelsByFolder['root'] && funnelsByFolder['root'].map(funnel => renderFunnelItem(funnel, false))}
+                {funnelsByFolder['root'] && <FunnelGlassFolder label={folders.length ? 'Sem pasta' : 'Meus funis'}
+                  funnels={funnelsByFolder['root']} open={Boolean(search || expandedFolders['root'])}
+                  onToggle={() => toggleFolder('root')}
+                  onSelect={(funnel) => { onSelectFunnel(funnel); if (window.matchMedia('(max-width: 1099px)').matches) onToggleCollapse?.(); }}
+                  onMove={(id) => onMoveFunnel?.(id, null)}>
+                  {funnelsByFolder['root'].map(funnel => renderFunnelItem(funnel))}
+                </FunnelGlassFolder>}
               </>
             )}
           </div>
