@@ -57,7 +57,8 @@ export function StripeSalesPanel({ mock = false, period: extPeriod, onPeriodChan
   const q = useQuery({
     queryKey: ["stripe-sales", String(period)],
     queryFn: () => fetchSales({ data: { period, offset: -new Date().getTimezoneOffset() } }),
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
+    gcTime: 60 * 60_000,
     retry: false,
     enabled: !mock,
   });

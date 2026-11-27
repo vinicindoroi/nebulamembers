@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -98,7 +98,9 @@ export function StripeSalesHistory({ mock = false, period }: { mock?: boolean; p
   const q = useQuery({
     queryKey: ["stripe-sales-history", fromUnix, toUnix],
     queryFn: () => fetchHistory({ data: { from: fromUnix, to: toUnix, offset: -new Date().getTimezoneOffset() } }),
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
+    gcTime: 60 * 60_000,
+    placeholderData: keepPreviousData,
     retry: false,
     enabled: !mock,
   });
