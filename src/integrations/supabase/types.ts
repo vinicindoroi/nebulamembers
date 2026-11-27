@@ -2195,6 +2195,120 @@ export type Database = {
         }
         Relationships: []
       }
+      student_meta_connections: {
+        Row: {
+          connected_at: string
+          expires_at: string
+          facebook_name: string
+          token_ciphertext: string
+          user_id: string
+        }
+        Insert: {
+          connected_at?: string
+          expires_at: string
+          facebook_name: string
+          token_ciphertext: string
+          user_id: string
+        }
+        Update: {
+          connected_at?: string
+          expires_at?: string
+          facebook_name?: string
+          token_ciphertext?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_meta_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_meta_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_meta_oauth_states: {
+        Row: {
+          created_at: string
+          expires_at: string
+          redirect_uri: string
+          state_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          redirect_uri: string
+          state_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          redirect_uri?: string
+          state_hash?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_meta_oauth_states_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_meta_oauth_states_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_meta_reports: {
+        Row: {
+          cache_key: string
+          expires_at: string
+          report: Json
+          user_id: string
+        }
+        Insert: {
+          cache_key: string
+          expires_at: string
+          report: Json
+          user_id: string
+        }
+        Update: {
+          cache_key?: string
+          expires_at?: string
+          report?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_meta_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_meta_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_stripe_connections: {
         Row: {
           account_name: string | null

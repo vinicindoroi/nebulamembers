@@ -32,3 +32,4 @@
 - Keep Dashboard motion as abstract decorative contours separate from sales data, with semantic colors, a 24fps cap, offscreen/hidden pause and static reduced-motion rendering, so decoration never implies fabricated metrics.
 - Render funnel folders through FunnelGlassFolder using existing folder assignments and real node previews; keep all items available in an expandable list so decorative fan previews never limit access.
 - Enhance canvas toolbars through the shared CanvasDock wrapper without duplicating action handlers; fixed control slots and pointer-only transforms keep magnification lightweight and avoid layout shifts.
+- Meta uses custom per-user Facebook Login for Business with caller-bound, single-use OAuth states and AES-GCM tokens bound to the user ID in server-only tables; approved-member checks precede access, and caches are keyed by user/account/dates/version to prevent cross-user data exposure.

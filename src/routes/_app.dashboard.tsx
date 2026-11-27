@@ -11,6 +11,7 @@ import { StripeSalesPanel } from "@/components/stripe/StripeSalesPanel";
 import { StripeSalesHistory } from "@/components/stripe/StripeSalesHistory";
 import { useScrollReveal, revealDelay } from "@/hooks/use-scroll-reveal";
 import { DashboardMotion } from "@/components/DashboardMotion";
+import { MetaCampaignPanel } from "@/components/meta/MetaCampaignPanel";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
@@ -258,6 +259,10 @@ function Dashboard() {
 
       <div data-reveal>
         <StripeSalesHistory mock={mockSales && isAdmin === true} period={salesPeriod} />
+      </div>
+
+      <div data-reveal>
+        <MetaCampaignPanel />
       </div>
 
       {/* Progress strip */}

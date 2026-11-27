@@ -61,6 +61,7 @@ import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$c
 import { Route as ApiPublicJobsClosePastCallsRouteImport } from './routes/api/public/jobs/close-past-calls'
 import { Route as ApiPublicJobsGurufuckerRouteImport } from './routes/api/public/jobs/gurufucker'
 import { Route as ApiPublicJobsUptimeCheckRouteImport } from './routes/api/public/jobs/uptime-check'
+import { Route as ApiPublicMetaCallbackRouteImport } from './routes/api/public/meta/callback'
 import { Route as ApiPublicTrackerEventWorkspaceIdRouteImport } from './routes/api/public/tracker-event.$workspaceId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -324,6 +325,11 @@ const ApiPublicJobsUptimeCheckRoute =
     path: '/api/public/jobs/uptime-check',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicMetaCallbackRoute = ApiPublicMetaCallbackRouteImport.update({
+  id: '/api/public/meta/callback',
+  path: '/api/public/meta/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTrackerEventWorkspaceIdRoute =
   ApiPublicTrackerEventWorkspaceIdRouteImport.update({
     id: '/api/public/tracker-event/$workspaceId',
@@ -383,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
   '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
+  '/api/public/meta/callback': typeof ApiPublicMetaCallbackRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRoutesByTo {
@@ -437,6 +444,7 @@ export interface FileRoutesByTo {
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
   '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
+  '/api/public/meta/callback': typeof ApiPublicMetaCallbackRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRoutesById {
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/api/public/jobs/close-past-calls': typeof ApiPublicJobsClosePastCallsRoute
   '/api/public/jobs/gurufucker': typeof ApiPublicJobsGurufuckerRoute
   '/api/public/jobs/uptime-check': typeof ApiPublicJobsUptimeCheckRoute
+  '/api/public/meta/callback': typeof ApiPublicMetaCallbackRoute
   '/api/public/tracker-event/$workspaceId': typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 export interface FileRouteTypes {
@@ -549,6 +558,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/close-past-calls'
     | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
+    | '/api/public/meta/callback'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -603,6 +613,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/close-past-calls'
     | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
+    | '/api/public/meta/callback'
     | '/api/public/tracker-event/$workspaceId'
   id:
     | '__root__'
@@ -658,6 +669,7 @@ export interface FileRouteTypes {
     | '/api/public/jobs/close-past-calls'
     | '/api/public/jobs/gurufucker'
     | '/api/public/jobs/uptime-check'
+    | '/api/public/meta/callback'
     | '/api/public/tracker-event/$workspaceId'
   fileRoutesById: FileRoutesById
 }
@@ -676,6 +688,7 @@ export interface RootRouteChildren {
   ApiPublicJobsClosePastCallsRoute: typeof ApiPublicJobsClosePastCallsRoute
   ApiPublicJobsGurufuckerRoute: typeof ApiPublicJobsGurufuckerRoute
   ApiPublicJobsUptimeCheckRoute: typeof ApiPublicJobsUptimeCheckRoute
+  ApiPublicMetaCallbackRoute: typeof ApiPublicMetaCallbackRoute
   ApiPublicTrackerEventWorkspaceIdRoute: typeof ApiPublicTrackerEventWorkspaceIdRoute
 }
 
@@ -1045,6 +1058,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsUptimeCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/meta/callback': {
+      id: '/api/public/meta/callback'
+      path: '/api/public/meta/callback'
+      fullPath: '/api/public/meta/callback'
+      preLoaderRoute: typeof ApiPublicMetaCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/tracker-event/$workspaceId': {
       id: '/api/public/tracker-event/$workspaceId'
       path: '/api/public/tracker-event/$workspaceId'
@@ -1172,6 +1192,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicJobsClosePastCallsRoute: ApiPublicJobsClosePastCallsRoute,
   ApiPublicJobsGurufuckerRoute: ApiPublicJobsGurufuckerRoute,
   ApiPublicJobsUptimeCheckRoute: ApiPublicJobsUptimeCheckRoute,
+  ApiPublicMetaCallbackRoute: ApiPublicMetaCallbackRoute,
   ApiPublicTrackerEventWorkspaceIdRoute: ApiPublicTrackerEventWorkspaceIdRoute,
 }
 export const routeTree = rootRouteImport

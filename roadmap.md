@@ -22,4 +22,5 @@
 - [x] Diagnosticar e remover a lentidão na abertura das abas, medindo navegação e consultas
 - [x] Adaptar pastas glass ao criador de funis, preservando organização e ações existentes
 - [x] Adaptar as barras de ferramentas dos funis e mapas mentais ao modelo Floating Dock
-- [ ] Conectar Facebook de cada aluno e exibir suas campanhas no painel — aguardando autorização para integração própria da Meta, pois não há App User Connector Meta disponível.
+- [x] Preparar conexão individual do Facebook, armazenamento protegido e campanhas no Dashboard.
+- [ ] Ativar conexão real dos alunos — depende do app da Meta, credenciais e aprovação de ads_read.
