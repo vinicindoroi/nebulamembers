@@ -28,3 +28,4 @@
 - Students connect their own Stripe with a restricted read-only key (`rk_*`) stored AES-GCM-encrypted (STRIPE_KEYS_SECRET) in `student_stripe_connections`, readable only by server functions after `is_member_approved()`; sales totals, top countries/campaigns, the history date-range validation and daily series come only from src/lib/stripe-sales.ts (tests/stripe-sales.mjs), and the WebGL globe is lazy-loaded behind ClientOnly so SSR never imports it.
 
 - Instantiate Stripe request queues inside each server-function invocation, sharing only within that invocation; Worker requests cannot safely await another request’s queued I/O.
+- Keep login constellation motion in a decorative client-mounted canvas using semantic palette tokens, capped at 24fps and paused offscreen/hidden, with a static reduced-motion state, so visual effects never interfere with signing in.

@@ -1,5 +1,6 @@
 import { NebulaCanvas } from "./NebulaCanvas";
 import { StarText } from "./StarText";
+import { ConstellationMotion } from "./ConstellationMotion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Loader2, CalendarCheck, Eye, EyeOff, Lock, Mail, PlayCircle, User as UserIcon, Users } from "lucide-react";
@@ -259,6 +260,7 @@ export function AuthCard({ initialMode = "signin" }: { initialMode?: AuthMode })
         <div className="auth-hero relative h-full w-full overflow-hidden rounded-3xl bg-background">
           <NebulaCanvas className="absolute inset-0 h-full w-full" />
           <StarText className="pointer-events-none absolute inset-0 h-full w-full" />
+          <ConstellationMotion />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background/70 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 flex gap-4 p-8 2xl:p-10">
             {HIGHLIGHTS.map((h, k) => (
