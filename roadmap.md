@@ -22,6 +22,5 @@
 - [x] Diagnosticar e remover a lentidão na abertura das abas, medindo navegação e consultas
 - [x] Adaptar pastas glass ao criador de funis, preservando organização e ações existentes
 - [x] Adaptar as barras de ferramentas dos funis e mapas mentais ao modelo Floating Dock
-- [x] Preparar conexão individual do Facebook, armazenamento protegido e campanhas no Dashboard.
-- [ ] Ativar conexão real dos alunos — depende do app da Meta, credenciais e aprovação de ads_read.
+- [x] Cancelar a integração Meta e retirar Facebook Ads do Dashboard e das configurações a pedido do usuário.
 - [x] Refinar a tela de carregamento com motion graphics grafite/ciano sem atrasar a entrada.

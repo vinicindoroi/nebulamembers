@@ -5,7 +5,6 @@ import {
   User as UserIcon, ShieldCheck, AlertTriangle, Check, Plug,
 } from "lucide-react";
 import { StripeConnectCard } from "@/components/stripe/StripeConnectCard";
-import { MetaConnectCard } from "@/components/meta/MetaConnectCard";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -314,14 +313,9 @@ function SettingsPage() {
           )}
 
           {tab === "integrations" && (
-            <>
-              <Section title="Stripe" description="Conecte sua conta para ver suas vendas no Dashboard.">
-                <StripeConnectCard />
-              </Section>
-              <Section title="Facebook Ads">
-                <MetaConnectCard />
-              </Section>
-            </>
+            <Section title="Stripe" description="Conecte sua conta para ver suas vendas no Dashboard.">
+              <StripeConnectCard />
+            </Section>
           )}
 
           {tab === "about" && (
