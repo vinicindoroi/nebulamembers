@@ -55,6 +55,11 @@ export function FunnelGlassFolder({ label, funnels, open, onToggle, onSelect, on
       <div className="fgf-back" aria-hidden="true"><div className="fgf-back-contours" /></div>
       <div className="fgf-sheets" aria-hidden={!open}>
         {funnels.slice(0, 3).map((funnel, index) => <Button key={funnel.id} variant="ghost" tabIndex={open ? 0 : -1}
+          draggable={open}
+          onDragStart={event => {
+            event.dataTransfer.setData('application/json', JSON.stringify({ type: 'funnel', id: funnel.id }));
+            event.dataTransfer.effectAllowed = 'move';
+          }}
           className={`fgf-sheet fgf-sheet-${index}`} aria-label={`Abrir funil ${funnel.name}`} onClick={() => onSelect(funnel)} title={funnel.name}>
           <span className="fgf-sheet-title">{funnel.name}</span>
           <FunnelPreview funnel={funnel} />
