@@ -611,3 +611,63 @@
   box-shadow: none;
   outline: none;
 }
+
+/* ── Visual polish: glass header, ambient canvas, glass zoom controls ── */
+.funnel-studio .funnel-editor-header {
+  background: color-mix(in oklab, var(--funnel-surface) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-bottom-color: color-mix(in oklab, var(--foreground) 7%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--primary) 10%, transparent), 0 12px 32px -24px color-mix(in oklab, var(--primary) 40%, transparent);
+}
+.funnel-studio .funnel-editor-header::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary) 55%, transparent), transparent);
+  pointer-events: none;
+}
+.funnel-studio .funnel-editor-mark {
+  box-shadow: 0 0 18px -6px color-mix(in oklab, var(--primary) 60%, transparent), inset 0 1px 0 color-mix(in oklab, var(--foreground) 10%, transparent);
+}
+.funnel-studio .funnel-header-button {
+  border: 1px solid transparent;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.funnel-studio .funnel-header-button:hover {
+  border-color: color-mix(in oklab, var(--primary) 25%, transparent);
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
+  color: var(--foreground);
+}
+.funnel-studio .funnel-canvas-viewport::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 50% 0%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 70%),
+    radial-gradient(40% 40% at 100% 100%, color-mix(in oklab, var(--primary) 5%, transparent), transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, color-mix(in oklab, var(--background) 85%, transparent) 100%);
+}
+.funnel-studio .funnel-flow-canvas .react-flow__controls {
+  background: color-mix(in oklab, var(--card) 60%, transparent) !important;
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 9%, transparent) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 16px 40px -18px color-mix(in oklab, var(--primary) 35%, transparent) !important;
+}
+.funnel-studio .funnel-flow-canvas .react-flow__controls-button {
+  background: transparent;
+  border-color: color-mix(in oklab, var(--foreground) 7%, transparent);
+  color: var(--muted-foreground);
+  transition: color 0.2s, background-color 0.2s;
+}
+.funnel-studio .funnel-flow-canvas .react-flow__controls-button:hover {
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+.funnel-studio .funnel-flow-canvas .react-flow__controls-button svg { fill: currentColor; }
