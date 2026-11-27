@@ -44,6 +44,16 @@
 }
 
 .courses-catalog { font-family: var(--font-course-body); }
+.nebula-loading { --loading-mark-shadow: 0 0 30px color-mix(in oklab, var(--primary) 12%, transparent), inset 0 1px 0 color-mix(in oklab, var(--foreground) 12%, transparent); }
+.nebula-loading-mark { box-shadow: var(--loading-mark-shadow); }
+.nebula-loading-track span { animation: nebula-loading-scan 2.4s ease-in-out infinite; }
+.nebula-loading-dots { animation: nebula-loading-breathe 2s ease-in-out infinite; }
+@keyframes nebula-loading-scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(340%); } }
+@keyframes nebula-loading-breathe { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .nebula-loading-track span, .nebula-loading-dots { animation: none; }
+  .nebula-loading-track span { margin-inline: auto; }
+}
 .member-main { position: relative; isolation: isolate; }
 /* Own stacking context so the edge light and the ambient wash paint above the page background */
 .member-shell { isolation: isolate; }
