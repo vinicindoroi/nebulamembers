@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { offerLinkLabel, readOfferLinks, readOfferPrompts, type OfferLink, type OfferPrompt } from "@/lib/offer-link";
 import { PromptCard } from "@/components/members/OfferPromptCard";
+import { OfferCloneGuide } from "@/components/members/OfferCloneGuide";
 import { toast } from "sonner";
 import {
   useMemberOffers,
@@ -29,12 +30,12 @@ export const Route = createFileRoute("/_app/offers")({
       { title: "Ofertas — Nebula Members" },
       {
         name: "description",
-        content: "Ofertas e materiais prontos do seu mentor, liberados para o seu plano.",
+        content: "Materiais do mentor, dicas de recriação e prompts para criar sua página e publicar no GitHub.",
       },
       { property: "og:title", content: "Ofertas — Nebula Members" },
       {
         property: "og:description",
-        content: "Ofertas e materiais prontos do seu mentor, liberados para o seu plano.",
+        content: "Materiais do mentor, dicas de recriação e prompts para criar sua página e publicar no GitHub.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -67,7 +68,7 @@ function OffersPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-7 animate-fade-up">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Ofertas</h1>
+        <h1 className="text-3xl font-bold">Ofertas</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Ofertas e materiais prontos do seu mentor, disponíveis para o seu plano.
         </p>
@@ -117,6 +118,7 @@ function OffersPage() {
           ))}
         </div>
       )}
+      <OfferCloneGuide offers={offers} />
     </div>
   );
 }
@@ -142,12 +144,13 @@ function OfferCard({
     .join(" · ");
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-border bg-card">
-      <button
+    <article className="overflow-hidden rounded-lg border border-glass-border bg-glass backdrop-blur-xl">
+      <Button
+        variant="ghost"
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-primary/5 px-5 py-4 text-left transition-colors hover:bg-primary/10"
+        className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 whitespace-normal rounded-none bg-primary/5 px-5 py-4 text-left transition-colors hover:bg-primary/10"
       >
         <span className="flex min-w-0 items-center gap-3">
           <Package className="h-5 w-5 shrink-0 text-primary" />
@@ -162,7 +165,7 @@ function OfferCard({
             className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           />
         </span>
-      </button>
+      </Button>
 
       {open && (
         <div className="space-y-4 p-5">

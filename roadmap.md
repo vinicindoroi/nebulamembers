@@ -24,3 +24,4 @@
 - [x] Adaptar as barras de ferramentas dos funis e mapas mentais ao modelo Floating Dock
 - [x] Cancelar a integração Meta e retirar Facebook Ads do Dashboard e das configurações a pedido do usuário.
 - [x] Refinar a tela de carregamento com motion graphics grafite/ciano sem atrasar a entrada.
+- [x] Enriquecer Ofertas com dicas de recriação, prompt personalizado com links disponíveis e orientação para GitHub Pages.

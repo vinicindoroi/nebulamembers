@@ -34,3 +34,4 @@
 - Enhance canvas toolbars through the shared CanvasDock wrapper without duplicating action handlers; fixed control slots and pointer-only transforms keep magnification lightweight and avoid layout shifts.
 - Meta uses custom per-user Facebook Login for Business with caller-bound, single-use OAuth states and AES-GCM tokens bound to the user ID in server-only tables; approved-member checks precede access, and caches are keyed by user/account/dates/version to prevent cross-user data exposure.
 - Keep the member loading screen decorative and independent of auth timing; its client-mounted canvas uses semantic tokens, a 24fps cap, hidden/offscreen pause, and static reduced-motion rendering without fake percentages or minimum wait times.
+- Keep offer recreation guidance client-side in OfferCloneGuide, sourcing references only from the member's accessible offers; copying a prompt never implies an AI call or GitHub deployment.
